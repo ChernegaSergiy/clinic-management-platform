@@ -5,6 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+use App\Repository\PatientRepository;
 use Symfony\Component\Yaml\Yaml;
 
 // Завантаження .env файлу
@@ -73,11 +74,8 @@ switch ($requestUri) {
             header('Location: /login');
             exit();
         }
-        $patients = [
-            ['id' => 1, 'name' => 'Іван Петренко', 'birth_date' => '1985-05-20', 'phone' => '+380501234567'],
-            ['id' => 2, 'name' => 'Марія Іваненко', 'birth_date' => '1992-08-15', 'phone' => '+380671234567'],
-            ['id' => 3, 'name' => 'Олена Сидоренко', 'birth_date' => '1978-11-30', 'phone' => '+380931234567'],
-        ];
+        $patientRepository = new PatientRepository();
+        $patients = $patientRepository->findAll();
         echo $twig->render('patients/index.html.twig', ['patients' => $patients]);
         break;
     case '/dashboard': // Приклад захищеного маршруту
