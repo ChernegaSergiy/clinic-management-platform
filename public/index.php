@@ -70,5 +70,7 @@ $router->add('GET', '/billing', [BillingController::class, 'index']);
 $router->add('GET', '/billing/new', [BillingController::class, 'create']);
 $router->add('POST', '/billing/new', [BillingController::class, 'store']);
 $router->add('GET', '/billing/show', [BillingController::class, 'show']);
+$router->add('GET', '/billing/edit', [BillingController::class, 'edit']);
+$router->add('POST', '/billing/edit', [BillingController::class, 'update']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
