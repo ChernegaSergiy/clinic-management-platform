@@ -30,7 +30,15 @@ class InventoryController
             header('Location: /login');
             exit();
         }
-        View::render('inventory/new.html.twig');
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('inventory/new.html.twig', [
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function store(): void
