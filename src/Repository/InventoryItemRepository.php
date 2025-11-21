@@ -153,19 +153,14 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         ");
         $stmt->execute([':inventory_item_id' => $itemId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    public function getMovementHistory(int $itemId): array
+    }
+
+    public function findByName(string $name): ?array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                im.*,
-                CONCAT(u.last_name, ' ', u.first_name) as user_name
-            FROM inventory_movements im
-            LEFT JOIN users u ON im.user_id = u.id
-            WHERE im.inventory_item_id = :inventory_item_id
-            ORDER BY im.created_at DESC
-        ");
-        $stmt->execute([':inventory_item_id' => $itemId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare("SELECT * FROM inventory_items WHERE name = :name");
+        $stmt->execute([':name' => $name]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
     }
 
     public function decreaseQuantity(int $itemId, int $quantity, int $userId = null, string $reason = 'Виконання рецепту'): bool
