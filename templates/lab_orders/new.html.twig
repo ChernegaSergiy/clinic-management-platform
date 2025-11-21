@@ -14,7 +14,7 @@
 
         <form class="ui form" method="POST" action="/lab-orders/new?record_id={{ medical_record.id }}">
             {{ forms.input('order_code', 'Код замовлення', old.order_code ?? null, 'text', 'Наприклад, Загальний аналіз крові', errors.order_code ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до замовлення') }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до замовлення', errors.notes ?? null) }}
 
             {{ ui.button('Зберегти замовлення', 'primary', 'large', 'save') }}
             <a href="/medical-records/show?id={{ medical_record.id }}" class="ui button">Скасувати</a>
