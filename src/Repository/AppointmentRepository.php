@@ -96,4 +96,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt = $this->pdo->prepare("UPDATE appointments SET status = :status WHERE id = :id");
         return $stmt->execute([':status' => $status, ':id' => $id]);
     }
+
+    public function findByPatientId(int $patientId): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                a.*, 
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            LEFT JOIN users u ON a.doctor_id = u.id
+            WHERE a.patient_id = :patient_id
+            ORDER BY a.start_time DESC
+        ");
+        $stmt->execute([':patient_id' => $patientId]);
+        return $stmt->fetchAll();
+    }
 }
