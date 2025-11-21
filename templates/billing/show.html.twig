@@ -45,6 +45,14 @@
                     <td>Оновлено</td>
                     <td>{{ invoice.updated_at|date('Y-m-d H:i') }}</td>
                 </tr>
+                <tr>
+                    <td>Всього оплачено</td>
+                    <td>{{ invoice.total_paid | number_format(2) }}</td>
+                </tr>
+                <tr>
+                    <td>Залишок до оплати</td>
+                    <td>{{ invoice.remaining_amount | number_format(2) }}</td>
+                </tr>
             </tbody>
         </table>
 
@@ -53,4 +61,85 @@
         <a href="/billing/edit?id={{ invoice.id }}" class="ui primary button">Редагувати</a>
         <a href="/billing" class="ui button">Повернутися до списку</a>
     </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Історія оплат</h3>
+
+        {% if errors is not empty %}
+            <div class="ui error message">
+                <ul class="list">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if invoice.payments is empty %}
+            <p>Немає оплат для цього рахунку.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Сума</th>
+                        <th>Метод оплати</th>
+                        <th>ID транзакції</th>
+                        <th>Дата оплати</th>
+                        <th>Примітки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in invoice.payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.amount | number_format(2) }}</td>
+                            <td>{{ payment.payment_method }}</td>
+                            <td>{{ payment.transaction_id ?: 'Не вказано' }}</td>
+                            <td>{{ payment.payment_date|date('Y-m-d H:i') }}</td>
+                            <td>{{ payment.notes ?: 'Немає' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Додати оплату</h3>
+        <form class="ui form" action="/billing/add-payment" method="POST">
+            <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+            <div class="two fields">
+                <div class="field {% if errors.amount %}error{% endif %}">
+                    <label>Сума оплати</label>
+                    <input type="number" name="amount" placeholder="0.00" step="0.01" min="0.01" value="{{ old.amount ?? '' }}">
+                    {% if errors.amount %}<div class="ui red basic pointing label">{{ errors.amount | first }}</div>{% endif %}
+                </div>
+                <div class="field {% if errors.payment_method %}error{% endif %}">
+                    <label>Метод оплати</label>
+                    <select class="ui dropdown" name="payment_method">
+                        <option value="">Виберіть метод</option>
+                        <option value="cash" {% if old.payment_method == 'cash' %}selected{% endif %}>Готівка</option>
+                        <option value="card" {% if old.payment_method == 'card' %}selected{% endif %}>Картка</option>
+                        <option value="bank_transfer" {% if old.payment_method == 'bank_transfer' %}selected{% endif %}>Банківський переказ</option>
+                    </select>
+                    {% if errors.payment_method %}<div class="ui red basic pointing label">{{ errors.payment_method | first }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field {% if errors.transaction_id %}error{% endif %}">
+                    <label>ID транзакції (необов'язково)</label>
+                    <input type="text" name="transaction_id" value="{{ old.transaction_id ?? '' }}">
+                    {% if errors.transaction_id %}<div class="ui red basic pointing label">{{ errors.transaction_id | first }}</div>{% endif %}
+                </div>
+                <div class="field {% if errors.notes %}error{% endif %}">
+                    <label>Примітки (необов'язково)</label>
+                    <textarea name="notes" rows="2">{{ old.notes ?? '' }}</textarea>
+                    {% if errors.notes %}<div class="ui red basic pointing label">{{ errors.notes | first }}</div>{% endif %}
+                </div>
+            </div>
+            <button class="ui green button" type="submit">Додати оплату</button>
+        </form>
+    </div>
 {% endblock %}
+
