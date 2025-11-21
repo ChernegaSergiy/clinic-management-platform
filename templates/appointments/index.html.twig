@@ -1,0 +1,66 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Записи на прийом - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Записи на прийом</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                {{ ui.button('Створити запис', 'primary', '', 'plus') }}
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Пошук записів...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пацієнт</th>
+                    <th>Лікар</th>
+                    <th>Час початку</th>
+                    <th>Час закінчення</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.id }}</td>
+                        <td>{{ appointment.patient_name }}</td>
+                        <td>{{ appointment.doctor_name }}</td>
+                        <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
+                        <td>{{ appointment.end_time|date('Y-m-d H:i') }}</td>
+                        <td>{{ appointment.status }}</td>
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="#" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">Немає записів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
