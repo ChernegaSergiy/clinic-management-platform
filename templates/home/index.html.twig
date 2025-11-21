@@ -1,0 +1,147 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Клініка - Сучасна платформа управління{% endblock %}
+
+{% block body %}
+    {# Hero Section #}
+    <div class="ui inverted vertical masthead center aligned segment hero-section">
+        <div class="ui text container">
+            <h1 class="ui inverted header">
+                Сучасна платформа для управління клінікою
+            </h1>
+            <h2>Оптимізуйте роботу, покращуйте сервіс, розвивайтеся.</h2>
+            <a href="#" class="ui huge primary button">
+                Записатися на прийом <i class="right arrow icon"></i>
+            </a>
+        </div>
+    </div>
+
+    {# Services Teaser Grid #}
+    <div class="ui vertical stripe segment">
+        <div class="ui middle aligned stackable grid container">
+            <div class="row">
+                <div class="center aligned column">
+                    <h2 class="ui header">Наші переваги</h2>
+                    <p>Ми пропонуємо комплексні рішення для автоматизації медичних закладів.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="four wide column">
+                    {{ ui.card(
+                        'Електронні медичні картки',
+                        'Зберігайте повну історію пацієнтів в одному місці, забезпечуючи швидкий доступ та безпеку даних.',
+                        '',
+                        'https://via.placeholder.com/300x200?text=EMR',
+                        '#'
+                    ) }}
+                </div>
+                <div class="four wide column">
+                    {{ ui.card(
+                        'Онлайн запис та розклад',
+                        'Оптимізуйте графік прийомів, зменшіть черги та підвищіть зручність для пацієнтів.',
+                        '',
+                        'https://via.placeholder.com/300x200?text=Scheduling',
+                        '#'
+                    ) }}
+                </div>
+                <div class="four wide column">
+                    {{ ui.card(
+                        'Управління складом медикаментів',
+                        'Контролюйте залишки, терміни придатності та автоматизуйте замовлення.',
+                        '',
+                        'https://via.placeholder.com/300x200?text=Inventory',
+                        '#'
+                    ) }}
+                </div>
+                <div class="four wide column">
+                    {{ ui.card(
+                        'Аналітика та звітність',
+                        'Отримуйте повну картину роботи клініки за допомогою детальних звітів та дашбордів.',
+                        '',
+                        'https://via.placeholder.com/300x200?text=Analytics',
+                        '#'
+                    ) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Testimonial/Trust Indicator Block #}
+    <div class="ui inverted vertical stripe segment">
+        <div class="ui text container">
+            <h2 class="ui header center aligned inverted">Нам довіряють</h2>
+            <div class="ui three column stackable grid">
+                <div class="column">
+                    <h3 class="ui inverted header">
+                        <i class="users icon"></i> 1000+
+                    </h3>
+                    <p>Задоволених пацієнтів</p>
+                </div>
+                <div class="column">
+                    <h3 class="ui inverted header">
+                        <i class="hospital icon"></i> 50+
+                    </h3>
+                    <p>Клінік використовують нашу платформу</p>
+                </div>
+                <div class="column">
+                    <h3 class="ui inverted header">
+                        <i class="chart line icon"></i> 30%
+                    </h3>
+                    <p>Збільшення ефективності роботи</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Call to Action #}
+    <div class="ui vertical stripe segment">
+        <div class="ui text container center aligned">
+            <h2 class="ui header">Готові оптимізувати вашу клініку?</h2>
+            <p>Зв'яжіться з нами, щоб дізнатися більше про можливості платформи.</p>
+            <a href="#" class="ui huge button">Зв'язатися з нами</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .hero-section {
+            min-height: 700px;
+            padding: 1em 0em;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1500x700?text=Clinic+Hero');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-section h1.header {
+            font-size: 4em;
+            font-weight: normal;
+            margin-bottom: 0em;
+            padding-bottom: 0em;
+        }
+        .hero-section h2 {
+            font-size: 1.7em;
+            font-weight: normal;
+            margin-top: 1.5em;
+        }
+        .ui.vertical.stripe {
+            padding: 8em 0em;
+        }
+        .ui.inverted.vertical.stripe {
+            background-color: #2185d0; /* Primary Blue from design system */
+            padding: 8em 0em;
+            color: white;
+        }
+        .ui.inverted.vertical.stripe h2.header,
+        .ui.inverted.vertical.stripe h3.header {
+            color: white;
+        }
+        .ui.inverted.vertical.stripe p {
+            color: rgba(255, 255, 255, .9);
+        }
+    </style>
+{% endblock %}

@@ -14,4 +14,4 @@ $twig = new Environment($loader, [
 ]);
 
 // Рендеринг шаблону
-echo $twig->render('index.html.twig', ['name' => 'World']);
+echo $twig->render('home/index.html.twig', ['name' => 'World']);
