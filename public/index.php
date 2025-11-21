@@ -33,5 +33,6 @@ $router->add('POST', '/patients/new', [PatientController::class, 'store']);
 $router->add('GET', '/patients/show', [PatientController::class, 'show']);
 $router->add('GET', '/patients/edit', [PatientController::class, 'edit']);
 $router->add('POST', '/patients/edit', [PatientController::class, 'update']);
+$router->add('GET', '/patients/toggle-status', [PatientController::class, 'toggleStatus']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
