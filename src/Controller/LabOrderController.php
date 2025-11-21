@@ -119,7 +119,16 @@ class LabOrderController
             return;
         }
 
-        View::render('lab_orders/edit.html.twig', ['order' => $order]);
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('lab_orders/edit.html.twig', [
+            'order' => $order,
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function update(): void
