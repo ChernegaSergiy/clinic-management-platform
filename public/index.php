@@ -57,6 +57,13 @@ switch ($requestUri) {
         session_destroy();
         header('Location: /');
         exit();
+    case '/dashboard': // Приклад захищеного маршруту
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        echo "<h1>Вітаємо, " . $_SESSION['user'] . "! Це ваш дашборд.</h1><p><a href=\"/logout\">Вийти</a></p>";
+        break;
     default:
         header("HTTP/1.0 404 Not Found");
         echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
