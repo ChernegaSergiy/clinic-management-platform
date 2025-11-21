@@ -1,0 +1,5 @@
+CREATE TABLE icd_codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(10) NOT NULL UNIQUE,
+    description TEXT NOT NULL
+);
