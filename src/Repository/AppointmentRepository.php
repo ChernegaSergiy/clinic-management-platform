@@ -66,4 +66,28 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE appointments SET 
+                    patient_id = :patient_id, 
+                    doctor_id = :doctor_id, 
+                    start_time = :start_time, 
+                    end_time = :end_time, 
+                    status = :status, 
+                    notes = :notes 
+                WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':patient_id' => $data['patient_id'],
+            ':doctor_id' => $data['doctor_id'],
+            ':start_time' => $data['start_time'],
+            ':end_time' => $data['end_time'],
+            ':status' => $data['status'],
+            ':notes' => $data['notes'] ?? null,
+        ]);
+    }
 }
