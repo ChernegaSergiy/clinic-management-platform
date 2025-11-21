@@ -1,0 +1,39 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Створити новий рахунок - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Створити новий рахунок</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/new">
+            <div class="two fields">
+                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.input('amount', 'Сума', old.amount ?? null, 'number', '0.00', errors.amount ?? null, {'step': '0.01', 'required': 'required'}) }}
+            </div>
+            <div class="two fields">
+                {{ forms.select('appointment_id', 'Запис на прийом (необов\'язково)', appointments, old.appointment_id ?? null, errors.appointment_id ?? null) }}
+                {{ forms.select('medical_record_id', 'Медичний запис (необов\'язково)', medical_records, old.medical_record_id ?? null, errors.medical_record_id ?? null) }}
+            </div>
+            <div class="field">
+                {{ forms.select('status', 'Статус', {'pending': 'Очікує оплати', 'paid': 'Оплачено', 'cancelled': 'Скасовано'}, old.status ?? 'pending', errors.status ?? null, {'required': 'required'}) }}
+            </div>
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до рахунку') }}
+
+            {{ ui.button('Зберегти рахунок', 'primary', 'large', 'save') }}
+            <a href="/billing" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
