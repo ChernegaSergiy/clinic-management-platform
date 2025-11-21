@@ -1,0 +1,64 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Контракти - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування контрактами</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/billing/contracts/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати контракт
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if contracts is empty %}
+            <p>Немає контрактів для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Сторона А</th>
+                        <th>Сторона Б</th>
+                        <th>Дата початку</th>
+                        <th>Дата закінчення</th>
+                        <th>Статус</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in contracts %}
+                        <tr>
+                            <td>{{ contract.id }}</td>
+                            <td>{{ contract.title }}</td>
+                            <td>{{ contract.party_a }}</td>
+                            <td>{{ contract.party_b }}</td>
+                            <td>{{ contract.start_date|date('Y-m-d') }}</td>
+                            <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'Не вказано' }}</td>
+                            <td>{{ contract.status }}</td>
+                            <td>
+                                <a href="/billing/contracts/show?id={{ contract.id }}" class="ui icon button">
+                                    <i class="eye icon"></i>
+                                </a>
+                                <a href="/billing/contracts/edit?id={{ contract.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <a href="/billing/contracts/delete?id={{ contract.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
