@@ -37,5 +37,7 @@ $router->add('GET', '/patients/toggle-status', [PatientController::class, 'toggl
 
 // Appointment routes
 $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
+$router->add('GET', '/appointments/new', [AppointmentController::class, 'create']);
+$router->add('POST', '/appointments/new', [AppointmentController::class, 'store']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
