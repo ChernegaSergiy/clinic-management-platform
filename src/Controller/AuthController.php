@@ -79,6 +79,7 @@ class AuthController
             header('Location: /login');
             exit();
         }
-        echo "<h1>Вітаємо, " . $_SESSION['user']['first_name'] . "! Це ваш дашборд.</h1><p><a href=\"/logout\">Вийти</a></p>";
+        header('Location: /dashboard');
+        exit();
     }
 }
