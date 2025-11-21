@@ -1,0 +1,56 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Контакти та запис на прийом - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui vertical stripe segment">
+        <div class="ui text container">
+            <h2 class="ui header">Зв'яжіться з нами або запишіться на прийом</h2>
+            <p>Будь ласка, заповніть форму нижче, і ми зв'яжемося з вами найближчим часом.</p>
+
+            <form class="ui form">
+                <div class="two fields">
+                    {{ forms.input('name', 'Ваше ім\'я', '', 'text', 'Ім\'я Прізвище') }}
+                    {{ forms.input('email', 'Ваш Email', '', 'email', 'example@email.com') }}
+                </div>
+                <div class="two fields">
+                    {{ forms.input('phone', 'Номер телефону', '', 'tel', '+380 XX XXX XX XX') }}
+                    {{ forms.input('appointment_date', 'Бажана дата прийому', '', 'date') }}
+                </div>
+                {{ forms.textarea('message', 'Ваше повідомлення', '', 'Опишіть ваше питання або причину звернення') }}
+
+                {{ ui.button('Надіслати запит', 'primary', 'large', 'send') }}
+            </form>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Наше розташування</h3>
+            <div class="ui grid">
+                <div class="eight wide column">
+                    <p><strong>Адреса:</strong> м. Київ, вул. Хрещатик, 1</p>
+                    <p><strong>Телефон:</strong> +380 (44) 123-45-67</p>
+                    <p><strong>Email:</strong> info@clinic.ua</p>
+                </div>
+                <div class="eight wide column">
+                    {# Placeholder for map embed #}
+                    <div class="ui segment placeholder-map">
+                        <p>Тут буде інтерактивна карта (наприклад, Google Maps)</p>
+                        <img src="https://via.placeholder.com/400x200?text=Map+Placeholder" alt="Map Placeholder" class="ui fluid image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Ініціалізація Semantic UI Dropdown для select елементів
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}

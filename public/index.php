@@ -23,6 +23,9 @@ switch ($requestUri) {
     case '/about':
         echo $twig->render('about/index.html.twig');
         break;
+    case '/contact':
+        echo $twig->render('contact/index.html.twig');
+        break;
     default:
         header("HTTP/1.0 404 Not Found");
         echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
