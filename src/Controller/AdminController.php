@@ -138,4 +138,33 @@ class AdminController
         header('Location: /admin/users/show?id=' . $id);
         exit();
     }
+
+    public function deleteUser(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) { // Assuming role_id 1 is admin
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "Користувача не знайдено";
+            return;
+        }
+
+        // Prevent admin from deleting themselves
+        if ($user['id'] === $_SESSION['user']['id']) {
+            $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
+            header('Location: /admin/users');
+            exit();
+        }
+
+        $this->userRepository->delete($id);
+        $_SESSION['success_message'] = "Користувача успішно видалено.";
+        header('Location: /admin/users');
+        exit();
+    }
 }
