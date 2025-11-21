@@ -18,6 +18,12 @@ $twig = new Environment($loader, [
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
+// Проста імітація користувачів
+$users = [
+    'admin' => password_hash('password', PASSWORD_BCRYPT),
+    'doctor' => password_hash('password', PASSWORD_BCRYPT),
+];
+
 switch ($requestUri) {
     case '/':
         echo $twig->render('home/index.html.twig', ['name' => 'World']);
