@@ -103,7 +103,16 @@ class InventoryController
             return;
         }
 
-        View::render('inventory/edit.html.twig', ['item' => $item]);
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('inventory/edit.html.twig', [
+            'item' => $item,
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function update(): void
