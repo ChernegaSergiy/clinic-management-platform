@@ -14,6 +14,14 @@ class UserRepository implements UserRepositoryInterface
         $this->pdo = Database::getInstance();
     }
 
+    public function findByEmail(string $email): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+
     public function findAllDoctors(): array
     {
         $stmt = $this->pdo->query("
