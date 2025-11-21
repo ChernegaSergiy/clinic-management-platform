@@ -136,6 +136,7 @@ class AdminController
 
         // TODO: Add validation
         $this->userRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Дані користувача успішно оновлено.";
         header('Location: /admin/users/show?id=' . $id);
         exit();
     }
