@@ -1,13 +1,13 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Записи на прийом - Клініка{% endblock %}
+{% block title %}Календар записів - Клініка{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Записи на прийом</h2>
+                <h2 class="ui header">Календар записів</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/appointments/new" class="ui primary button">
@@ -18,15 +18,10 @@
 
         <div class="ui divider"></div>
 
-        <div class="ui form">
-            <div class="field">
-                <div class="ui icon input">
-                    <input type="text" placeholder="Пошук записів...">
-                    <i class="search icon"></i>
-                </div>
-            </div>
-        </div>
+        <div id='calendar'></div>
 
+        <div class="ui divider"></div>
+        <h3 class="ui header">Список записів</h3>
         <table class="ui celled table">
             <thead>
                 <tr>
@@ -65,4 +60,24 @@
             </tbody>
         </table>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/api/appointments' // API endpoint for events
+            });
+            calendar.render();
+        });
+    </script>
 {% endblock %}
