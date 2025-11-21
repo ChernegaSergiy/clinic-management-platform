@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\Validator;
 use App\Core\View;
 use App\Repository\AppointmentRepository;
 use App\Repository\PatientRepository;
@@ -73,7 +74,36 @@ class AppointmentController
             exit();
         }
 
-        // TODO: Add validation
+        $validator = new Validator();
+        $rules = [
+            'patient_id' => ['required'],
+            'doctor_id' => ['required'],
+            'start_time' => ['required'],
+            'end_time' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            // Повторне завантаження даних для форми у випадку помилки
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
+
+            View::render('appointments/new.html.twig', [
+                'errors' => $validator->getErrors(),
+                'old' => $_POST,
+                'patients' => $patientOptions,
+                'doctors' => $doctorOptions,
+            ]);
+            return;
+        }
+
         $this->appointmentRepository->save($_POST);
         header('Location: /appointments');
         exit();
