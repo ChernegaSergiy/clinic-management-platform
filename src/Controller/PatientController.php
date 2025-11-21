@@ -77,4 +77,23 @@ class PatientController
         header('Location: /patients');
         exit();
     }
+
+    public function show(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $patient = $this->patientRepository->findById($id);
+
+        if (!$patient) {
+            http_response_code(404);
+            echo "Пацієнта не знайдено"; // Поки що просто текст
+            return;
+        }
+
+        View::render('patients/show.html.twig', ['patient' => $patient]);
+    }
 }
