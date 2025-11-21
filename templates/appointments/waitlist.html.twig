@@ -1,0 +1,109 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Список очікування - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Список очікування</h2>
+
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Додати до списку очікування</h3>
+        <form class="ui form" action="/appointments/waitlist/add" method="POST">
+            <div class="two fields">
+                <div class="field {% if errors.patient_id %}error{% endif %}">
+                    <label>Пацієнт</label>
+                    <select class="ui search dropdown" name="patient_id">
+                        <option value="">Виберіть пацієнта</option>
+                        {% for id, name in patients %}
+                            <option value="{{ id }}" {% if old.patient_id == id %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.patient_id %}<div class="ui red basic pointing label">{{ errors.patient_id | first }}</div>{% endif %}
+                </div>
+                <div class="field {% if errors.desired_doctor_id %}error{% endif %}">
+                    <label>Бажаний лікар (необов'язково)</label>
+                    <select class="ui search dropdown" name="desired_doctor_id">
+                        <option value="">Виберіть лікаря</option>
+                        {% for id, name in doctors %}
+                            <option value="{{ id }}" {% if old.desired_doctor_id == id %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.desired_doctor_id %}<div class="ui red basic pointing label">{{ errors.desired_doctor_id | first }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field {% if errors.desired_start_time %}error{% endif %}">
+                    <label>Бажаний час початку (необов'язково)</label>
+                    <input type="datetime-local" name="desired_start_time" value="{{ old.desired_start_time }}">
+                    {% if errors.desired_start_time %}<div class="ui red basic pointing label">{{ errors.desired_start_time | first }}</div>{% endif %}
+                </div>
+                <div class="field {% if errors.desired_end_time %}error{% endif %}">
+                    <label>Бажаний час закінчення (необов'язково)</label>
+                    <input type="datetime-local" name="desired_end_time" value="{{ old.desired_end_time }}">
+                    {% if errors.desired_end_time %}<div class="ui red basic pointing label">{{ errors.desired_end_time | first }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="field {% if errors.notes %}error{% endif %}">
+                <label>Примітки (необов'язково)</label>
+                <textarea name="notes" rows="3">{{ old.notes }}</textarea>
+                {% if errors.notes %}<div class="ui red basic pointing label">{{ errors.notes | first }}</div>{% endif %}
+            </div>
+            <button class="ui primary button" type="submit">Додати до списку</button>
+        </form>
+
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Записи в списку очікування</h3>
+        {% if waitlistEntries is empty %}
+            <p>Наразі немає записів у списку очікування.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Пацієнт</th>
+                        <th>Бажаний лікар</th>
+                        <th>Бажаний час</th>
+                        <th>Примітки</th>
+                        <th>Статус</th>
+                        <th>Дата створення</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in waitlistEntries %}
+                        <tr>
+                            <td>{{ entry.id }}</td>
+                            <td>{{ entry.patient_name }}</td>
+                            <td>{{ entry.doctor_name ?: 'Будь-який' }}</td>
+                            <td>
+                                {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}Будь-який{% endif %}
+                                {% if entry.desired_end_time %} - {{ entry.desired_end_time|date('H:i') }}{% endif %}
+                            </td>
+                            <td>{{ entry.notes ?: 'Немає' }}</td>
+                            <td>{{ entry.status }}</td>
+                            <td>{{ entry.created_at|date('Y-m-d H:i') }}</td>
+                            <td>
+                                {# <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a> #}
+                                {# <a href="/appointments/waitlist/cancel?id={{ entry.id }}" class="ui red button">Скасувати</a> #}
+                                <button class="ui green button" onclick="alert('Функціонал виконання запису буде додано пізніше');">Виконати</button>
+                                <button class="ui red button" onclick="alert('Функціонал скасування запису буде додано пізніше');">Скасувати</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
