@@ -43,7 +43,7 @@
         <div class="right menu">
             {% if session.user is defined %}
                 <a class="ui item" href="/logout">
-                    Вийти ({{ session.user }})
+                    Вийти ({{ session.user.first_name }})
                 </a>
             {% else %}
                 <a class="ui item" href="/login">
