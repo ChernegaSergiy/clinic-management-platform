@@ -62,5 +62,7 @@ $router->add('GET', '/inventory', [InventoryController::class, 'index']);
 $router->add('GET', '/inventory/new', [InventoryController::class, 'create']);
 $router->add('POST', '/inventory/new', [InventoryController::class, 'store']);
 $router->add('GET', '/inventory/show', [InventoryController::class, 'show']);
+$router->add('GET', '/inventory/edit', [InventoryController::class, 'edit']);
+$router->add('POST', '/inventory/edit', [InventoryController::class, 'update']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
