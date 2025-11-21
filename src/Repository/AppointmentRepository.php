@@ -113,4 +113,28 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt->execute([':patient_id' => $patientId]);
         return $stmt->fetchAll();
     }
+
+    public function findByDateRange(string $start, string $end): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                a.id, 
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                a.start_time, 
+                a.end_time, 
+                a.status,
+                a.doctor_id
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN users u ON a.doctor_id = u.id
+            WHERE a.start_time >= :start_time AND a.end_time <= :end_time
+            ORDER BY a.start_time ASC
+        ");
+        $stmt->execute([
+            ':start_time' => $start,
+            ':end_time' => $end,
+        ]);
+        return $stmt->fetchAll();
+    }
 }
