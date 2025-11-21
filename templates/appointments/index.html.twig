@@ -21,6 +21,16 @@
         <div id='calendar'></div>
 
         <div class="ui divider"></div>
+        <h3 class="ui header">Легенда статусів</h3>
+        <div class="ui labels">
+            <a class="ui label blue">Заплановано</a>
+            <a class="ui label green">Виконано</a>
+            <a class="ui label red">Скасовано</a>
+            <a class="ui label yellow">Не з'явився</a>
+            <a class="ui label grey">Інше</a>
+        </div>
+
+        <div class="ui divider"></div>
         <h3 class="ui header">Список записів</h3>
         <table class="ui celled table">
             <thead>
@@ -65,17 +75,30 @@
 {% block javascripts %}
     {{ parent() }}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/resource-timeline@6.1.15/index.global.min.js'></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives', // For non-commercial use
+                plugins: [ 'dayGridMonth', 'timeGridWeek', 'timeGridDay', 'resourceTimelinePlugin' ],
+                initialView: 'resourceTimelineDay',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
                 },
-                events: '/api/appointments' // API endpoint for events
+                resourceAreaHeaderContent: 'Лікарі',
+                resources: {{ doctors|json_encode|raw }},
+                events: '/api/appointments', // API endpoint for events
+                eventDidMount: function(info) {
+                    // Додаємо tooltip або іншу інформацію при наведенні
+                    $(info.el).popup({
+                        title: info.event.title,
+                        content: 'Час: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end.toLocaleTimeString(),
+                        position: 'top center'
+                    });
+                }
             });
             calendar.render();
         });
