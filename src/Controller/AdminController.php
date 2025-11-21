@@ -83,6 +83,9 @@ class AdminController
             return;
         }
 
+        $role = $this->roleRepository->findById($user['role_id']);
+        $user['role_name'] = $role['name'] ?? 'Невідома';
+
         View::render('admin/show_user.html.twig', ['user' => $user]);
     }
 
