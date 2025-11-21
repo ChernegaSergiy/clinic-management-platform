@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати пацієнта - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати пацієнта: {{ patient.last_name }} {{ patient.first_name }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/patients/edit?id={{ patient.id }}">
+            <div class="three fields">
+                {{ forms.input('last_name', 'Прізвище', patient.last_name, 'text', 'Прізвище', errors.last_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('first_name', 'Ім\'я', patient.first_name, 'text', 'Ім\'я', errors.first_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('middle_name', 'По батькові', patient.middle_name, 'text', 'По батькові') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('birth_date', 'Дата народження', patient.birth_date, 'date', '', errors.birth_date ?? null, {'required': 'required'}) }}
+                {{ forms.select('gender', 'Стать', {'male': 'Чоловіча', 'female': 'Жіноча', 'other': 'Інша'}, patient.gender, errors.gender ?? null, {'required': 'required'}) }}
+                {{ forms.input('phone', 'Телефон', patient.phone, 'tel', '+380 XX XXX XX XX', errors.phone ?? null, {'required': 'required'}) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('email', 'Email', patient.email, 'email', 'example@email.com', errors.email ?? null) }}
+                {{ forms.input('address', 'Адреса', patient.address, 'text', 'м. Київ, вул. Хрещатик, 1') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('tax_id', 'РНОКПП', patient.tax_id, 'text', '1234567890') }}
+                {{ forms.input('document_id', 'ID-картка/паспорт', patient.document_id, 'text', '001234567') }}
+                {{ forms.select('marital_status', 'Сімейний стан', {'single': 'Неодружений/Незаміжня', 'married': 'Одружений/Заміжня', 'divorced': 'Розлучений/Розлучена', 'widowed': 'Вдівець/Вдова'}, patient.marital_status, errors.marital_status ?? null) }}
+            </div>
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/patients/show?id={{ patient.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
