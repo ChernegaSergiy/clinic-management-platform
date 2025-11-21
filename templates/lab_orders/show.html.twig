@@ -1,0 +1,56 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Лабораторне замовлення #{{ order.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі лабораторного замовлення #{{ order.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ order.id }}</td>
+                </tr>
+                <tr>
+                    <td>Пацієнт</td>
+                    <td><a href="/patients/show?id={{ order.patient_id }}">{{ order.patient_name }}</a></td>
+                </tr>
+                <tr>
+                    <td>Лікар</td>
+                    <td>{{ order.doctor_name }}</td>
+                </tr>
+                <tr>
+                    <td>Медичний запис ID</td>
+                    <td><a href="/medical-records/show?id={{ order.medical_record_id }}">{{ order.medical_record_id }}</a></td>
+                </tr>
+                <tr>
+                    <td>Код замовлення</td>
+                    <td>{{ order.order_code }}</td>
+                </tr>
+                <tr>
+                    <td>Статус</td>
+                    <td>{{ order.status }}</td>
+                </tr>
+                <tr>
+                    <td>QR-код хеш</td>
+                    <td>{{ order.qr_code_hash }}</td>
+                </tr>
+                <tr>
+                    <td>Результати</td>
+                    <td>{{ order.results|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>Створено</td>
+                    <td>{{ order.created_at|date('Y-m-d H:i') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/lab-orders/edit?id={{ order.id }}" class="ui primary button">Редагувати</a>
+        <a href="/medical-records/show?id={{ order.medical_record_id }}" class="ui button">Повернутися до медичного запису</a>
+    </div>
+{% endblock %}
