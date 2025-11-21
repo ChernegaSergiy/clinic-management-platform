@@ -11,17 +11,17 @@
 
         <form class="ui form" method="POST" action="/billing/edit?id={{ invoice.id }}">
             <div class="two fields">
-                {{ forms.select('patient_id', 'Пацієнт', patients, invoice.patient_id, errors.patient_id ?? null, {'required': 'required', 'disabled': 'disabled'}) }}
-                {{ forms.input('amount', 'Сума', invoice.amount, 'number', '0.00', errors.amount ?? null, {'step': '0.01', 'required': 'required'}) }}
+                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? invoice.patient_id, errors.patient_id ?? null, {'required': 'required', 'disabled': 'disabled'}) }}
+                {{ forms.input('amount', 'Сума', old.amount ?? invoice.amount, 'number', '0.00', errors.amount ?? null, {'step': '0.01', 'required': 'required'}) }}
             </div>
             <div class="two fields">
-                {{ forms.select('appointment_id', 'Запис на прийом (необов\'язково)', appointments, invoice.appointment_id, errors.appointment_id ?? null) }}
-                {{ forms.select('medical_record_id', 'Медичний запис (необов\'язково)', medical_records, invoice.medical_record_id, errors.medical_record_id ?? null) }}
+                {{ forms.select('appointment_id', 'Запис на прийом (необов\'язково)', appointments, old.appointment_id ?? invoice.appointment_id, errors.appointment_id ?? null) }}
+                {{ forms.select('medical_record_id', 'Медичний запис (необов\'язково)', medical_records, old.medical_record_id ?? invoice.medical_record_id, errors.medical_record_id ?? null) }}
             </div>
             <div class="field">
-                {{ forms.select('status', 'Статус', {'pending': 'Очікує оплати', 'paid': 'Оплачено', 'cancelled': 'Скасовано'}, invoice.status, errors.status ?? null, {'required': 'required'}) }}
+                {{ forms.select('status', 'Статус', {'pending': 'Очікує оплати', 'paid': 'Оплачено', 'cancelled': 'Скасовано'}, old.status ?? invoice.status, errors.status ?? null, {'required': 'required'}) }}
             </div>
-            {{ forms.textarea('notes', 'Примітки', invoice.notes, 'Додаткові примітки до рахунку') }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? invoice.notes, 'Додаткові примітки до рахунку', errors.notes ?? null) }}
 
             {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
             <a href="/billing/show?id={{ invoice.id }}" class="ui button">Скасувати</a>
