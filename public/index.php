@@ -63,6 +63,18 @@ switch ($requestUri) {
         header('Location: /');
         exit();
         break;
+    case '/patients':
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        $patients = [
+            ['id' => 1, 'name' => 'Іван Петренко', 'birth_date' => '1985-05-20', 'phone' => '+380501234567'],
+            ['id' => 2, 'name' => 'Марія Іваненко', 'birth_date' => '1992-08-15', 'phone' => '+380671234567'],
+            ['id' => 3, 'name' => 'Олена Сидоренко', 'birth_date' => '1978-11-30', 'phone' => '+380931234567'],
+        ];
+        echo $twig->render('patients/index.html.twig', ['patients' => $patients]);
+        break;
     case '/dashboard': // Приклад захищеного маршруту
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
