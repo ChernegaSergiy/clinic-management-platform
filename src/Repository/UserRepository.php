@@ -79,4 +79,10 @@ class UserRepository implements UserRepositoryInterface
 
         return $stmt->execute($params);
     }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }
