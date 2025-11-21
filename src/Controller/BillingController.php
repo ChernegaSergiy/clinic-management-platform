@@ -137,9 +137,11 @@ class BillingController
             return;
         }
 
+        $patientId = $invoice['patient_id'];
+
         $patients = $this->patientRepository->findAllActive();
-        $appointments = $this->appointmentRepository->findAll(); // TODO: filter by patient
-        $medicalRecords = $this->medicalRecordRepository->findByPatientId(0); // TODO: filter by patient
+        $appointments = $this->appointmentRepository->findByPatientId((int)$patientId);
+        $medicalRecords = $this->medicalRecordRepository->findByPatientId((int)$patientId);
 
         $patientOptions = [];
         foreach ($patients as $patient) {
