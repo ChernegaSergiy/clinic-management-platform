@@ -71,7 +71,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     amount = :amount, 
                     status = :status, 
                     notes = :notes,
-                    paid_date = :paid_date
+                    paid_date = :paid_date,
+                    type = :type
                 WHERE id = :id";
         
         $stmt = $this->pdo->prepare($sql);
@@ -85,6 +86,24 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ':status' => $data['status'],
             ':notes' => $data['notes'] ?? null,
             ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+            ':type' => $data['type'] ?? 'invoice',
+        ]);
+    }
+
+    public function logFinancialTransaction(int $patientId, float $amount, string $type, string $notes = null, int $linkedEntityId = null): bool
+    {
+        $sql = "INSERT INTO invoices (patient_id, amount, status, notes, type, medical_record_id) 
+                VALUES (:patient_id, :amount, :status, :notes, :type, :medical_record_id)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':patient_id' => $patientId,
+            ':amount' => $amount,
+            ':status' => 'completed', // Financial transactions are typically 'completed' immediately
+            ':notes' => $notes,
+            ':type' => $type,
+            ':medical_record_id' => $linkedEntityId,
         ]);
     }
 }
