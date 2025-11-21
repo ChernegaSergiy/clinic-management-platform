@@ -1,0 +1,56 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Рахунок #{{ invoice.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі рахунку #{{ invoice.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ invoice.id }}</td>
+                </tr>
+                <tr>
+                    <td>Пацієнт</td>
+                    <td><a href="/patients/show?id={{ invoice.patient_id }}">{{ invoice.patient_name }}</a></td>
+                </tr>
+                <tr>
+                    <td>Сума</td>
+                    <td>{{ invoice.amount }}</td>
+                </tr>
+                <tr>
+                    <td>Статус</td>
+                    <td>{{ invoice.status }}</td>
+                </tr>
+                <tr>
+                    <td>Дата виставлення</td>
+                    <td>{{ invoice.issued_date|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Дата оплати</td>
+                    <td>{{ invoice.paid_date ? invoice.paid_date|date('Y-m-d H:i') : 'Не оплачено' }}</td>
+                </tr>
+                <tr>
+                    <td>Примітки</td>
+                    <td>{{ invoice.notes|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>Створено</td>
+                    <td>{{ invoice.created_at|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Оновлено</td>
+                    <td>{{ invoice.updated_at|date('Y-m-d H:i') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/billing/edit?id={{ invoice.id }}" class="ui primary button">Редагувати</a>
+        <a href="/billing" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
