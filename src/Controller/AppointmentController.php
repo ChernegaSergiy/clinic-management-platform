@@ -27,7 +27,7 @@ class AppointmentController
             header('Location: /login');
             exit();
         }
-        $appointments = $this->appointmentRepository->findAll();
+        //$appointments = $this->appointmentRepository->findAll(); // Removed, will be fetched via JSON
         $doctors = $this->userRepository->findAllDoctors();
 
         $doctorOptions = [];
@@ -36,7 +36,7 @@ class AppointmentController
         }
 
         View::render('appointments/index.html.twig', [
-            'appointments' => $appointments,
+            //'appointments' => $appointments, // Removed, will be fetched via JSON
             'doctors' => $doctorOptions,
         ]);
     }
@@ -111,7 +111,16 @@ class AppointmentController
 
     public function json(): void
     {
-        $appointments = $this->appointmentRepository->findAll();
+        // Default to fetching all if no date range is provided (e.g., for initial load of a simple list)
+        $start = $_GET['start'] ?? null;
+        $end = $_GET['end'] ?? null;
+
+        if ($start && $end) {
+            $appointments = $this->appointmentRepository->findByDateRange($start, $end);
+        } else {
+            $appointments = $this->appointmentRepository->findAll();
+        }
+        
         $events = [];
 
         $statusColors = [
@@ -128,7 +137,7 @@ class AppointmentController
                 'end' => $appointment['end_time'],
                 'id' => $appointment['id'],
                 'color' => $statusColors[$appointment['status']] ?? '#767676', // Default grey
-                'resourceId' => $appointment['doctor_id'],
+                'resourceId' => $appointment['doctor_id'], // This is important for resource view
             ];
         }
 
