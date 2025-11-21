@@ -74,4 +74,36 @@
         {% endif %}
         <a href="/patients" class="ui button">Повернутися до списку</a>
     </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Медичні записи</h3>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Дата візиту</th>
+                    <th>Лікар</th>
+                    <th>Діагноз</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in medical_records %}
+                    <tr>
+                        <td>{{ record.visit_date|date('Y-m-d H:i') }}</td>
+                        <td>{{ record.doctor_name }}</td>
+                        <td>{{ record.diagnosis_text }}</td>
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="center aligned">Немає медичних записів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
