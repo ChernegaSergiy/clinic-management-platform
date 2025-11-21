@@ -48,6 +48,16 @@
             </tbody>
         </table>
 
+        <div class="ui segment basic center aligned">
+            <h3 class="ui header">QR-код замовлення</h3>
+            {% if qrCodeImage %}
+                <img src="{{ qrCodeImage }}" alt="QR Code для замовлення #{{ order.id }}" class="ui centered image small">
+            {% else %}
+                <p>Неможливо згенерувати QR-код.</p>
+            {% endif %}
+        </div>
+
+
         <div class="ui divider"></div>
 
         <a href="/lab-orders/edit?id={{ order.id }}" class="ui primary button">Редагувати</a>
