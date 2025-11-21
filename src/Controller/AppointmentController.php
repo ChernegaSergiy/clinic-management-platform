@@ -7,18 +7,21 @@ use App\Core\View;
 use App\Repository\AppointmentRepository;
 use App\Repository\PatientRepository;
 use App\Repository\UserRepository;
+use App\Core\NotificationService;
 
 class AppointmentController
 {
     private AppointmentRepository $appointmentRepository;
     private PatientRepository $patientRepository;
     private UserRepository $userRepository;
+    private NotificationService $notificationService;
 
     public function __construct()
     {
         $this->appointmentRepository = new AppointmentRepository();
         $this->patientRepository = new PatientRepository();
         $this->userRepository = new UserRepository();
+        $this->notificationService = new NotificationService();
     }
 
     public function index(): void
