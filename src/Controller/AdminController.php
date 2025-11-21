@@ -136,9 +136,16 @@ class AdminController
             $roleOptions[$role['id']] = $role['name'];
         }
 
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
         View::render('admin/edit_user.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
+            'old' => $old,
+            'errors' => $errors,
         ]);
     }
 
