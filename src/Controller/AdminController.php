@@ -150,6 +150,27 @@ class AdminController
         }
 
         // TODO: Add validation
+        $validator = new Validator();
+        $rules = [
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'email' => ['required', 'email'],
+            'role_id' => ['required', 'numeric'],
+        ];
+
+        if (!empty($_POST['password'])) {
+            $rules['password'] = ['min:6'];
+        }
+
+        $validator->validate($_POST, $rules);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/users/edit?id=' . $id);
+            exit();
+        }
+
         $this->userRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Дані користувача успішно оновлено.";
         header('Location: /admin/users/show?id=' . $id);
