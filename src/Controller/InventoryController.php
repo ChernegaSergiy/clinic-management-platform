@@ -21,7 +21,14 @@ class InventoryController
             exit();
         }
         $items = $this->inventoryItemRepository->findAll();
-        View::render('inventory/index.html.twig', ['items' => $items]);
+        $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
+        $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
+
+        View::render('inventory/index.html.twig', [
+            'items' => $items,
+            'lowStockItems' => $lowStockItems,
+            'overStockedItems' => $overStockedItems,
+        ]);
     }
 
     public function create(): void
@@ -38,6 +45,8 @@ class InventoryController
         View::render('inventory/new.html.twig', [
             'old' => $old,
             'errors' => $errors,
+            'min_stock_level' => $old['min_stock_level'] ?? 0,
+            'max_stock_level' => $old['max_stock_level'] ?? 0,
         ]);
     }
 
@@ -112,6 +121,8 @@ class InventoryController
             'item' => $item,
             'old' => $old,
             'errors' => $errors,
+            'min_stock_level' => $old['min_stock_level'] ?? $item['min_stock_level'],
+            'max_stock_level' => $old['max_stock_level'] ?? $item['max_stock_level'],
         ]);
     }
 
