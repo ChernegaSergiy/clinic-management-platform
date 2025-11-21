@@ -18,6 +18,30 @@
 
         <div class="ui divider"></div>
 
+        {% if lowStockItems is not empty %}
+            <div class="ui warning message">
+                <div class="header">Увага: Низький рівень запасів!</div>
+                <p>Наступні позиції мають кількість нижче мінімального порогу:</p>
+                <ul class="list">
+                    {% for item in lowStockItems %}
+                        <li>{{ item.name }} (Кількість: {{ item.quantity }}, Мін. поріг: {{ item.min_stock_level }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if overStockedItems is not empty %}
+            <div class="ui info message">
+                <div class="header">Інформація: Надлишок запасів!</div>
+                <p>Наступні позиції мають кількість вище максимального порогу:</p>
+                <ul class="list">
+                    {% for item in overStockedItems %}
+                        <li>{{ item.name }} (Кількість: {{ item.quantity }}, Макс. поріг: {{ item.max_stock_level }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         <div class="ui form">
             <div class="field">
                 <div class="ui icon input">
@@ -34,7 +58,7 @@
                     <th>Назва</th>
                     <th>INN</th>
                     <th>Кількість</th>
-                    <th>Мін. поріг</th>
+                    <th>Мін. рівень запасу</th>
                     <th>Термін придатності</th>
                     <th>Дії</th>
                 </tr>
@@ -46,7 +70,7 @@
                         <td>{{ item.name }}</td>
                         <td>{{ item.inn }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.min_stock_threshold }}</td>
+                        <td>{{ item.min_stock_level }}</td>
                         <td>{{ item.expiry_date }}</td>
                         <td>
                             <a href="/inventory/show?id={{ item.id }}" class="ui icon button">
