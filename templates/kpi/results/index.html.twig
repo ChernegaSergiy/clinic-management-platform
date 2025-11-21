@@ -1,0 +1,42 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Результати KPI - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Результати KPI</h2>
+        <div class="ui divider"></div>
+
+        {% if results is empty %}
+            <p>Немає результатів KPI для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>KPI</th>
+                        <th>Період</th>
+                        <th>Значення</th>
+                        <th>Одиниця</th>
+                        <th>Примітки</th>
+                        <th>Дата розрахунку</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                        <tr>
+                            <td>{{ result.id }}</td>
+                            <td>{{ result.kpi_name }}</td>
+                            <td>{{ result.period_start|date('Y-m-d') }} - {{ result.period_end|date('Y-m-d') }}</td>
+                            <td>{{ result.calculated_value | number_format(2) }}</td>
+                            <td>{{ result.unit ?: 'N/A' }}</td>
+                            <td>{{ result.notes ?: 'Немає' }}</td>
+                            <td>{{ result.created_at|date('Y-m-d H:i') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
