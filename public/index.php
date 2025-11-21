@@ -82,4 +82,7 @@ $router->add('GET', '/admin/users/edit', [AdminController::class, 'editUser']);
 $router->add('POST', '/admin/users/edit', [AdminController::class, 'updateUser']);
 $router->add('POST', '/admin/users/delete', [AdminController::class, 'deleteUser']);
 
+// Dashboard route
+$router->add('GET', '/dashboard', [DashboardController::class, 'index']);
+
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
