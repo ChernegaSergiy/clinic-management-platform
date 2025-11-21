@@ -23,7 +23,10 @@
             <div class="three fields">
                 {{ forms.input('cost', 'Вартість (за одиницю)', old.cost ?? item.cost, 'number', '0.00', errors.cost ?? null, {'step': '0.01'}) }}
                 {{ forms.input('quantity', 'Кількість', old.quantity ?? item.quantity, 'number', '0', errors.quantity ?? null, {'required': 'required'}) }}
-                {{ forms.input('min_stock_threshold', 'Мінімальний поріг запасу', old.min_stock_threshold ?? item.min_stock_threshold, 'number', '0', errors.min_stock_threshold ?? null) }}
+                {{ forms.input('min_stock_level', 'Мінімальний рівень запасу', old.min_stock_level ?? item.min_stock_level, 'number', '0', errors.min_stock_level ?? null) }}
+            </div>
+            <div class="field">
+                {{ forms.input('max_stock_level', 'Максимальний рівень запасу', old.max_stock_level ?? item.max_stock_level, 'number', '0', errors.max_stock_level ?? null) }}
             </div>
             {{ forms.input('location', 'Місце зберігання', old.location ?? item.location, 'text', 'Наприклад, Склад 1, полиця А', errors.location ?? null) }}
 
