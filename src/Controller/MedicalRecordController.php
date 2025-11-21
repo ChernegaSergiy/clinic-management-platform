@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\View;
 use App\Repository\AppointmentRepository;
+use App\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
 
@@ -12,12 +13,14 @@ class MedicalRecordController
     private MedicalRecordRepository $medicalRecordRepository;
     private AppointmentRepository $appointmentRepository;
     private LabOrderRepository $labOrderRepository;
+    private IcdCodeRepository $icdCodeRepository;
 
     public function __construct()
     {
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->appointmentRepository = new AppointmentRepository();
         $this->labOrderRepository = new LabOrderRepository();
+        $this->icdCodeRepository = new IcdCodeRepository();
     }
 
     public function create(): void
@@ -59,8 +62,8 @@ class MedicalRecordController
         $data['patient_id'] = $appointment['patient_id'];
         $data['appointment_id'] = $appointmentId;
         $data['doctor_id'] = $appointment['doctor_id'];
-
-        $this->medicalRecordRepository->save($data);
+        
+        $medicalRecordId = $this->medicalRecordRepository->save($data);
 
         // Оновлюємо статус запису на "виконано"
         $this->appointmentRepository->updateStatus($appointmentId, 'completed');
@@ -91,5 +94,19 @@ class MedicalRecordController
             'record' => $record,
             'lab_orders' => $labOrders,
         ]);
+    }
+
+    public function getIcdCodes(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $searchTerm = $_GET['search'] ?? '';
+        $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
+        
+        header('Content-Type: application/json');
+        echo json_encode($codes);
     }
 }
