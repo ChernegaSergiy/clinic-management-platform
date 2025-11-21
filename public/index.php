@@ -52,11 +52,11 @@ switch ($requestUri) {
             echo $twig->render('auth/login.html.twig');
         }
         break;
-        break;
     case '/logout':
         session_destroy();
         header('Location: /');
         exit();
+        break;
     case '/dashboard': // Приклад захищеного маршруту
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
