@@ -49,4 +49,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':notes' => $data['notes'] ?? null,
         ]);
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                a.*, 
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN users u ON a.doctor_id = u.id
+            WHERE a.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
