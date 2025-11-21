@@ -23,6 +23,7 @@
         "phpunit/phpunit": "^12.4"
     },
     "scripts": {
+        "test": "phpunit",
         "test:cs": "phpcs",
         "test:stan": "phpstan analyse"
     }
