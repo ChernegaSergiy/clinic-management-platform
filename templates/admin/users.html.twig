@@ -1,0 +1,64 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Користувачі - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Користувачі</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                {{ ui.button('Додати користувача', 'primary', '', 'plus') }}
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Пошук користувачів...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ім'я</th>
+                    <th>Прізвище</th>
+                    <th>Email</th>
+                    <th>Роль</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role_id }}</td> {# TODO: Display role name #}
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="#" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає користувачів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
