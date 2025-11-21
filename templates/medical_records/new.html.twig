@@ -1,0 +1,29 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Створити медичний запис - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Створити новий медичний запис</h2>
+        <p><strong>Пацієнт:</strong> {{ appointment.patient_name }}</p>
+        <p><strong>Лікар:</strong> {{ appointment.doctor_name }}</p>
+        <p><strong>Час прийому:</strong> {{ appointment.start_time|date('Y-m-d H:i') }}</p>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/medical-records/new?appointment_id={{ appointment.id }}">
+            <div class="two fields">
+                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', '', 'text', 'Наприклад, J03.9') }}
+                {{ forms.input('visit_date', 'Дата візиту', appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', {}, {'required': 'required'})
+ }}
+            </div>
+            {{ forms.textarea('diagnosis_text', 'Діагноз', '', 'Опишіть діагноз') }}
+            {{ forms.textarea('treatment', 'Лікування', '', 'Опишіть призначене лікування') }}
+            {{ forms.textarea('notes', 'Примітки', '', 'Додаткові примітки') }}
+
+            {{ ui.button('Зберегти запис', 'primary', 'large', 'save') }}
+            <a href="/appointments/show?id={{ appointment.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
