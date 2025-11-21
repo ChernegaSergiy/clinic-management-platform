@@ -17,8 +17,10 @@ class Router
 
     public function dispatch(string $method, string $uri): void
     {
+        $path = parse_url($uri, PHP_URL_PATH);
+
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $uri) {
+            if ($route['method'] === $method && $route['path'] === $path) {
                 call_user_func($route['handler']);
                 return;
             }
