@@ -34,8 +34,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, notes) 
-                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :notes)";
+        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes) 
+                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -44,6 +44,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':doctor_id' => $data['doctor_id'],
             ':start_time' => $data['start_time'],
             ':end_time' => $data['end_time'],
+            ':status' => $data['status'] ?? 'scheduled', // Встановлюємо статус за замовчуванням
             ':notes' => $data['notes'] ?? null,
         ]);
     }
