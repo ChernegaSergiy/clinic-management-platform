@@ -30,5 +30,6 @@ $router->add('GET', '/dashboard', [AuthController::class, 'dashboard']);
 $router->add('GET', '/patients', [PatientController::class, 'index']);
 $router->add('GET', '/patients/new', [PatientController::class, 'create']);
 $router->add('POST', '/patients/new', [PatientController::class, 'store']);
+$router->add('GET', '/patients/show', [PatientController::class, 'show']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
