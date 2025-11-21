@@ -23,7 +23,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
                 a.start_time, 
                 a.end_time, 
-                a.status
+                a.status,
+                a.doctor_id
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
