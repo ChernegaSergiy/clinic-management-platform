@@ -1,0 +1,36 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Імпорт лабораторних замовлень - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Імпорт лабораторних замовлень (HL7/DICOM)</h2>
+        <div class="ui divider"></div>
+
+        {% if errors is not empty %}
+            <div class="ui error message">
+                <ul class="list">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if success_message %}
+            <div class="ui success message">
+                <div class="header">Успіх!</div>
+                <p>{{ success_message }}</p>
+            </div>
+        {% endif %}
+
+        <form class="ui form" action="/lab-orders/import/process" method="POST" enctype="multipart/form-data">
+            <div class="field">
+                <label>Виберіть HL7/DICOM файл</label>
+                <input type="file" name="hl7_dicom_file" accept=".hl7,.dcm,.txt,.xml">
+            </div>
+            <button class="ui primary button" type="submit">Завантажити та обробити</button>
+        </form>
+    </div>
+{% endblock %}
