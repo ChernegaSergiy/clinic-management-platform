@@ -86,6 +86,17 @@ class LabOrderController
         $data['medical_record_id'] = $recordId;
 
         $this->labOrderRepository->save($data);
+        
+        $doctor = $this->userRepository->findById($medicalRecord['doctor_id']);
+        if ($doctor) {
+            $message = sprintf(
+                'Нове лабораторне замовлення "%s" створено для медичного запису #%d.',
+                $data['order_code'],
+                $recordId
+            );
+            $this->notificationService->createNotification($doctor['id'], $message);
+        }
+
         $_SESSION['success_message'] = "Лабораторне замовлення успішно створено.";
         header('Location: /medical-records/show?id=' . $recordId);
         exit();
