@@ -4,15 +4,18 @@ namespace App\Controller;
 
 use App\Core\Validator;
 use App\Core\View;
+use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
 
 class PatientController
 {
     private PatientRepository $patientRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
 
     public function __construct()
     {
         $this->patientRepository = new PatientRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
     }
 
     public function index(): void
@@ -94,7 +97,12 @@ class PatientController
             return;
         }
 
-        View::render('patients/show.html.twig', ['patient' => $patient]);
+        $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
+
+        View::render('patients/show.html.twig', [
+            'patient' => $patient,
+            'medical_records' => $medicalRecords,
+        ]);
     }
 
     public function edit(): void
