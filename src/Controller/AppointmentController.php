@@ -243,4 +243,76 @@ class AppointmentController
         header('Location: /appointments/show?id=' . $id);
         exit();
     }
+
+    public function showWaitlist(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
+        $patients = $this->patientRepository->findAllActive();
+        $doctors = $this->userRepository->findAllDoctors();
+
+        $patientOptions = [];
+        foreach ($patients as $patient) {
+            $patientOptions[$patient['id']] = $patient['full_name'];
+        }
+
+        $doctorOptions = [];
+        foreach ($doctors as $doctor) {
+            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        }
+
+        View::render('appointments/waitlist.html.twig', [
+            'waitlistEntries' => $waitlistEntries,
+            'patients' => $patientOptions,
+            'doctors' => $doctorOptions,
+        ]);
+    }
+
+    public function addPatientToWaitlist(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new Validator();
+        $rules = [
+            'patient_id' => ['required'],
+            // 'desired_start_time' => ['required', 'date'],
+            // 'desired_end_time' => ['date'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
+
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
+
+            View::render('appointments/waitlist.html.twig', [
+                'errors' => $validator->getErrors(),
+                'old' => $_POST,
+                'waitlistEntries' => $waitlistEntries,
+                'patients' => $patientOptions,
+                'doctors' => $doctorOptions,
+            ]);
+            return;
+        }
+
+        $this->appointmentRepository->addToWaitlist($_POST);
+        header('Location: /appointments/waitlist');
+        exit();
+    }
 }
