@@ -1,0 +1,48 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Користувач #{{ user.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі користувача #{{ user.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ user.id }}</td>
+                </tr>
+                <tr>
+                    <td>Ім'я</td>
+                    <td>{{ user.first_name }}</td>
+                </tr>
+                <tr>
+                    <td>Прізвище</td>
+                    <td>{{ user.last_name }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Роль</td>
+                    <td>{{ user.role_id }}</td> {# TODO: Display role name #}
+                </tr>
+                <tr>
+                    <td>Створено</td>
+                    <td>{{ user.created_at|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Оновлено</td>
+                    <td>{{ user.updated_at|date('Y-m-d H:i') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/admin/users/edit?id={{ user.id }}" class="ui primary button">Редагувати</a>
+        <a href="/admin/users" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
