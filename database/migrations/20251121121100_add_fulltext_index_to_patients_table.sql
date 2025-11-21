@@ -1,0 +1,1 @@
+ALTER TABLE patients ADD FULLTEXT(first_name, last_name, middle_name, address);
