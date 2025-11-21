@@ -1,0 +1,52 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Медичний запис #{{ record.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі медичного запису #{{ record.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ record.id }}</td>
+                </tr>
+                <tr>
+                    <td>Пацієнт</td>
+                    <td><a href="/patients/show?id={{ record.patient_id }}">{{ record.patient_name }}</a></td>
+                </tr>
+                <tr>
+                    <td>Лікар</td>
+                    <td>{{ record.doctor_name }}</td>
+                </tr>
+                <tr>
+                    <td>Дата візиту</td>
+                    <td>{{ record.visit_date|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Код діагнозу (ICD-10)</td>
+                    <td>{{ record.diagnosis_code }}</td>
+                </tr>
+                <tr>
+                    <td>Діагноз</td>
+                    <td>{{ record.diagnosis_text|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>Лікування</td>
+                    <td>{{ record.treatment|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>Примітки</td>
+                    <td>{{ record.notes|nl2br }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/medical-records/edit?id={{ record.id }}" class="ui primary button">Редагувати</a>
+        <a href="/patients/show?id={{ record.patient_id }}" class="ui button">Повернутися до пацієнта</a>
+    </div>
+{% endblock %}
