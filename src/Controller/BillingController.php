@@ -10,6 +10,7 @@ use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
 use App\Repository\ServiceRepository;
 use App\Repository\ServiceBundleRepository;
+use App\Core\CSVExporter;
 
 class BillingController
 {
@@ -368,5 +369,43 @@ class BillingController
         $_SESSION['success_message'] = "Рахунок успішно оновлено.";
         header('Location: /billing/show?id=' . $id);
         exit();
+    }
+
+    public function exportInvoices(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        // Fetch all invoices
+        $invoices = $this->invoiceRepository->findAll();
+
+        if (empty($invoices)) {
+            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
+            header('Location: /billing');
+            exit();
+        }
+
+        // Prepare data for CSV
+        $headers = [
+            'ID', 'Пацієнт', 'Сума', 'Статус', 'Дата виставлення', 'Дата оплати', 'Тип', 'Примітки'
+        ];
+        $exportData = [];
+        foreach ($invoices as $invoice) {
+            $exportData[] = [
+                $invoice['id'],
+                $invoice['patient_name'],
+                $invoice['amount'],
+                $invoice['status'],
+                $invoice['issued_date'],
+                $invoice['paid_date'],
+                $invoice['type'],
+                $invoice['notes'],
+            ];
+        }
+
+        $exporter = new \App\Core\CSVExporter($headers, $exportData);
+        $exporter->download('invoices_export.csv');
     }
 }
