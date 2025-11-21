@@ -78,6 +78,19 @@ switch ($requestUri) {
         $patients = $patientRepository->findAll();
         echo $twig->render('patients/index.html.twig', ['patients' => $patients]);
         break;
+    case '/patients/new':
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        if ($requestMethod === 'POST') {
+            $patientRepository = new PatientRepository();
+            $patientRepository->save($_POST);
+            header('Location: /patients');
+            exit();
+        }
+        echo $twig->render('patients/new.html.twig');
+        break;
     case '/dashboard': // Приклад захищеного маршруту
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
