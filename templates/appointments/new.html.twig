@@ -1,0 +1,36 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Створити запис на прийом - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Створити новий запис на прийом</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/appointments/new">
+            <div class="two fields">
+                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, {'required': 'required'}) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('start_time', 'Час початку', old.start_time ?? null, 'datetime-local', '', errors.start_time ?? null, {'required': 'required'}) }}
+                {{ forms.input('end_time', 'Час закінчення', old.end_time ?? null, 'datetime-local', '', errors.end_time ?? null, {'required': 'required'}) }}
+            </div>
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до запису') }}
+
+            {{ ui.button('Зберегти запис', 'primary', 'large', 'save') }}
+            <a href="/appointments" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
