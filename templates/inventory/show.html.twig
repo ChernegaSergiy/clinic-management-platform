@@ -46,8 +46,12 @@
                     <td>{{ item.quantity }}</td>
                 </tr>
                 <tr>
-                    <td>Мінімальний поріг запасу</td>
-                    <td>{{ item.min_stock_threshold }}</td>
+                    <td>Мінімальний рівень запасу</td>
+                    <td>{{ item.min_stock_level }}</td>
+                </tr>
+                <tr>
+                    <td>Максимальний рівень запасу</td>
+                    <td>{{ item.max_stock_level }}</td>
                 </tr>
                 <tr>
                     <td>Місце зберігання</td>
@@ -68,5 +72,37 @@
 
         <a href="/inventory/edit?id={{ item.id }}" class="ui primary button">Редагувати</a>
         <a href="/inventory" class="ui button">Повернутися до списку</a>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Історія рухів</h3>
+        {% if movementHistory is empty %}
+            <p>Немає записів історії рухів для цієї позиції.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Тип руху</th>
+                        <th>Зміна кількості</th>
+                        <th>Нова кількість</th>
+                        <th>Причина</th>
+                        <th>Користувач</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in movementHistory %}
+                        <tr>
+                            <td>{{ movement.movement_type }}</td>
+                            <td>{{ movement.quantity_change }}</td>
+                            <td>{{ movement.new_quantity }}</td>
+                            <td>{{ movement.reason ?: 'Не вказано' }}</td>
+                            <td>{{ movement.user_name ?: 'Система' }}</td>
+                            <td>{{ movement.created_at|date('Y-m-d H:i') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 {% endblock %}
