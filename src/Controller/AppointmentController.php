@@ -154,4 +154,62 @@ class AppointmentController
 
         View::render('appointments/show.html.twig', ['appointment' => $appointment]);
     }
+
+    public function edit(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $appointment = $this->appointmentRepository->findById($id);
+
+        if (!$appointment) {
+            http_response_code(404);
+            echo "Запис не знайдено";
+            return;
+        }
+
+        $patients = $this->patientRepository->findAllActive();
+        $doctors = $this->userRepository->findAllDoctors();
+
+        $patientOptions = [];
+        foreach ($patients as $patient) {
+            $patientOptions[$patient['id']] = $patient['full_name'];
+        }
+
+        $doctorOptions = [];
+        foreach ($doctors as $doctor) {
+            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        }
+
+        View::render('appointments/edit.html.twig', [
+            'appointment' => $appointment,
+            'patients' => $patientOptions,
+            'doctors' => $doctorOptions,
+        ]);
+    }
+
+    public function update(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $appointment = $this->appointmentRepository->findById($id);
+
+        if (!$appointment) {
+            http_response_code(404);
+            echo "Запис не знайдено";
+            return;
+        }
+
+        // TODO: Add validation
+        $this->appointmentRepository->update($id, $_POST);
+        header('Location: /appointments/show?id=' . $id);
+        exit();
+    }
 }
