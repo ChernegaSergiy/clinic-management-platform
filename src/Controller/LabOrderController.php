@@ -52,14 +52,25 @@ class LabOrderController
             return;
         }
 
-        // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'order_code' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /lab-orders/new?record_id=' . $recordId);
+            exit();
+        }
+
         $data = $_POST;
         $data['patient_id'] = $medicalRecord['patient_id'];
         $data['doctor_id'] = $medicalRecord['doctor_id'];
         $data['medical_record_id'] = $recordId;
 
         $this->labOrderRepository->save($data);
-
+        $_SESSION['success_message'] = "Лабораторне замовлення успішно створено.";
         header('Location: /medical-records/show?id=' . $recordId);
         exit();
     }
