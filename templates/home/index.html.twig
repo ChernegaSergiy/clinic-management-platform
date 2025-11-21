@@ -1,18 +1,18 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Клініка - Сучасна платформа управління{% endblock %}
+{% block title %}{{ page.hero.title }} - Клініка{% endblock %}
 
 {% block body %}
     {# Hero Section #}
     <div class="ui inverted vertical masthead center aligned segment hero-section">
         <div class="ui text container">
             <h1 class="ui inverted header">
-                Сучасна платформа для управління клінікою
+                {{ page.hero.title }}
             </h1>
-            <h2>Оптимізуйте роботу, покращуйте сервіс, розвивайтеся.</h2>
+            <h2>{{ page.hero.subtitle }}</h2>
             <a href="#" class="ui huge primary button">
-                Записатися на прийом <i class="right arrow icon"></i>
+                {{ page.hero.cta_button }} <i class="right arrow icon"></i>
             </a>
         </div>
     </div>
@@ -22,47 +22,22 @@
         <div class="ui middle aligned stackable grid container">
             <div class="row">
                 <div class="center aligned column">
-                    <h2 class="ui header">Наші переваги</h2>
-                    <p>Ми пропонуємо комплексні рішення для автоматизації медичних закладів.</p>
+                    <h2 class="ui header">{{ page.advantages.title }}</h2>
+                    <p>{{ page.advantages.subtitle }}</p>
                 </div>
             </div>
             <div class="row">
-                <div class="four wide column">
-                    {{ ui.card(
-                        'Електронні медичні картки',
-                        'Зберігайте повну історію пацієнтів в одному місці, забезпечуючи швидкий доступ та безпеку даних.',
-                        '',
-                        'https://via.placeholder.com/300x200?text=EMR',
-                        '#'
-                    ) }}
-                </div>
-                <div class="four wide column">
-                    {{ ui.card(
-                        'Онлайн запис та розклад',
-                        'Оптимізуйте графік прийомів, зменшіть черги та підвищіть зручність для пацієнтів.',
-                        '',
-                        'https://via.placeholder.com/300x200?text=Scheduling',
-                        '#'
-                    ) }}
-                </div>
-                <div class="four wide column">
-                    {{ ui.card(
-                        'Управління складом медикаментів',
-                        'Контролюйте залишки, терміни придатності та автоматизуйте замовлення.',
-                        '',
-                        'https://via.placeholder.com/300x200?text=Inventory',
-                        '#'
-                    ) }}
-                </div>
-                <div class="four wide column">
-                    {{ ui.card(
-                        'Аналітика та звітність',
-                        'Отримуйте повну картину роботи клініки за допомогою детальних звітів та дашбордів.',
-                        '',
-                        'https://via.placeholder.com/300x200?text=Analytics',
-                        '#'
-                    ) }}
-                </div>
+                {% for item in page.advantages.items %}
+                    <div class="four wide column">
+                        {{ ui.card(
+                            item.title,
+                            item.description,
+                            '',
+                            'https://via.placeholder.com/300x200?text=' ~ item.title|url_encode,
+                            '#'
+                        ) }}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -70,26 +45,16 @@
     {# Testimonial/Trust Indicator Block #}
     <div class="ui inverted vertical stripe segment">
         <div class="ui text container">
-            <h2 class="ui header center aligned inverted">Нам довіряють</h2>
+            <h2 class="ui header center aligned inverted">{{ page.trust.title }}</h2>
             <div class="ui three column stackable grid">
-                <div class="column">
-                    <h3 class="ui inverted header">
-                        <i class="users icon"></i> 1000+
-                    </h3>
-                    <p>Задоволених пацієнтів</p>
-                </div>
-                <div class="column">
-                    <h3 class="ui inverted header">
-                        <i class="hospital icon"></i> 50+
-                    </h3>
-                    <p>Клінік використовують нашу платформу</p>
-                </div>
-                <div class="column">
-                    <h3 class="ui inverted header">
-                        <i class="chart line icon"></i> 30%
-                    </h3>
-                    <p>Збільшення ефективності роботи</p>
-                </div>
+                {% for item in page.trust.items %}
+                    <div class="column">
+                        <h3 class="ui inverted header">
+                            <i class="users icon"></i> {{ item.value }}
+                        </h3>
+                        <p>{{ item.label }}</p>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -97,9 +62,9 @@
     {# Call to Action #}
     <div class="ui vertical stripe segment">
         <div class="ui text container center aligned">
-            <h2 class="ui header">Готові оптимізувати вашу клініку?</h2>
-            <p>Зв'яжіться з нами, щоб дізнатися більше про можливості платформи.</p>
-            <a href="#" class="ui huge button">Зв'язатися з нами</a>
+            <h2 class="ui header">{{ page.cta.title }}</h2>
+            <p>{{ page.cta.subtitle }}</p>
+            <a href="#" class="ui huge button">{{ page.cta.button }}</a>
         </div>
     </div>
 {% endblock %}
