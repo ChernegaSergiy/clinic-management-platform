@@ -108,6 +108,19 @@ class AppointmentController
         }
 
         $this->appointmentRepository->save($_POST);
+        
+        $patient = $this->patientRepository->findById($_POST['patient_id']);
+        $doctor = $this->userRepository->findById($_POST['doctor_id']);
+        if ($patient && $doctor) {
+            $message = sprintf(
+                'Новий запис: Пацієнт %s до лікаря %s на %s.',
+                $patient['first_name'] . ' ' . $patient['last_name'],
+                $doctor['first_name'] . ' ' . $doctor['last_name'],
+                $_POST['start_time']
+            );
+            $this->notificationService->createNotification($doctor['id'], $message);
+        }
+
         header('Location: /appointments');
         exit();
     }
