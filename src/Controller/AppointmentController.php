@@ -27,7 +27,17 @@ class AppointmentController
             exit();
         }
         $appointments = $this->appointmentRepository->findAll();
-        View::render('appointments/index.html.twig', ['appointments' => $appointments]);
+        $doctors = $this->userRepository->findAllDoctors();
+
+        $doctorOptions = [];
+        foreach ($doctors as $doctor) {
+            $doctorOptions[] = ['id' => $doctor['id'], 'title' => $doctor['full_name']];
+        }
+
+        View::render('appointments/index.html.twig', [
+            'appointments' => $appointments,
+            'doctors' => $doctorOptions,
+        ]);
     }
 
     public function create(): void
