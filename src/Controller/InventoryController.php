@@ -115,7 +115,22 @@ class InventoryController
         }
 
         // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'quantity' => ['required', 'numeric', 'min:0'],
+            'cost' => ['numeric', 'min:0'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /inventory/edit?id=' . $id);
+            exit();
+        }
+
         $this->inventoryItemRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Позицію складу успішно оновлено.";
         header('Location: /inventory/show?id=' . $id);
         exit();
     }
