@@ -55,4 +55,23 @@ class AdminController
         header('Location: /admin/users');
         exit();
     }
+
+    public function showUser(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) { // Assuming role_id 1 is admin
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "Користувача не знайдено";
+            return;
+        }
+
+        View::render('admin/show_user.html.twig', ['user' => $user]);
+    }
 }
