@@ -3,33 +3,67 @@
 namespace App\Controller;
 
 use App\Core\View;
+use App\Core\Validator;
+use App\Repository\UserRepository;
 
 class AuthController
 {
+    private UserRepository $userRepository;
+
+    public function __construct()
+    {
+        $this->userRepository = new UserRepository();
+    }
+
     public function showLoginForm(): void
     {
-        View::render('auth/login.html.twig');
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('auth/login.html.twig', [
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function login(): void
     {
-        $users = [
-            'admin' => password_hash('password', PASSWORD_BCRYPT),
-            'doctor' => password_hash('password', PASSWORD_BCRYPT),
-        ];
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $error = [];
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /login');
+            exit();
+        }
 
-        if (isset($users[$username]) && password_verify($password, $users[$username])) {
-            $_SESSION['user'] = $username;
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        $user = $this->userRepository->findByEmail($email);
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'email' => $user['email'],
+                'role_id' => $user['role_id'],
+            ];
             header('Location: /dashboard');
             exit();
         } else {
-            $error['message'] = 'Невірне ім\'я користувача або пароль.';
+            $_SESSION['errors'] = ['login' => 'Невірний email або пароль.'];
+            $_SESSION['old'] = $_POST;
+            header('Location: /login');
+            exit();
         }
-        View::render('auth/login.html.twig', ['error' => $error]);
     }
 
     public function logout(): void
@@ -45,6 +79,6 @@ class AuthController
             header('Location: /login');
             exit();
         }
-        echo "<h1>Вітаємо, " . $_SESSION['user'] . "! Це ваш дашборд.</h1><p><a href=\"/logout\">Вийти</a></p>";
+        echo "<h1>Вітаємо, " . $_SESSION['user']['first_name'] . "! Це ваш дашборд.</h1><p><a href=\"/logout\">Вийти</a></p>";
     }
 }
