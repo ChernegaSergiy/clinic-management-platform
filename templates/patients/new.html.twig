@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нового пацієнта - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нового пацієнта</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/patients/new">
+            <div class="three fields">
+                {{ forms.input('last_name', 'Прізвище', '', 'text', 'Прізвище', errors.last_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('first_name', 'Ім\'я', '', 'text', 'Ім\'я', errors.first_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('middle_name', 'По батькові', '', 'text', 'По батькові') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('birth_date', 'Дата народження', '', 'date', '', errors.birth_date ?? null, {'required': 'required'}) }}
+                {{ forms.select('gender', 'Стать', {'male': 'Чоловіча', 'female': 'Жіноча', 'other': 'Інша'}, '', errors.gender ?? null, {'required': 'required'}) }}
+                {{ forms.input('phone', 'Телефон', '', 'tel', '+380 XX XXX XX XX', errors.phone ?? null, {'required': 'required'}) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('email', 'Email', '', 'email', 'example@email.com', errors.email ?? null) }}
+                {{ forms.input('address', 'Адреса', '', 'text', 'м. Київ, вул. Хрещатик, 1') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('tax_id', 'РНОКПП', '', 'text', '1234567890') }}
+                {{ forms.input('document_id', 'ID-картка/паспорт', '', 'text', '001234567') }}
+                {{ forms.select('marital_status', 'Сімейний стан', {'single': 'Неодружений/Незаміжня', 'married': 'Одружений/Заміжня', 'divorced': 'Розлучений/Розлучена', 'widowed': 'Вдівець/Вдова'}, '', errors.marital_status ?? null) }}
+            </div>
+
+            {{ ui.button('Зберегти пацієнта', 'primary', 'large', 'save') }}
+            <a href="/patients" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
