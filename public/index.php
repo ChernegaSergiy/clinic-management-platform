@@ -80,5 +80,6 @@ $router->add('POST', '/admin/users/new', [AdminController::class, 'storeUser']);
 $router->add('GET', '/admin/users/show', [AdminController::class, 'showUser']);
 $router->add('GET', '/admin/users/edit', [AdminController::class, 'editUser']);
 $router->add('POST', '/admin/users/edit', [AdminController::class, 'updateUser']);
+$router->add('POST', '/admin/users/delete', [AdminController::class, 'deleteUser']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
