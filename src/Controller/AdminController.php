@@ -63,6 +63,7 @@ class AdminController
 
         // TODO: Add validation
         $this->userRepository->save($_POST);
+        $_SESSION['success_message'] = "Користувача успішно створено.";
         header('Location: /admin/users');
         exit();
     }
