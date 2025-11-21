@@ -110,6 +110,9 @@ class MedicalRecordController
             return;
         }
 
+        // Log the view event
+        $this->auditLogger->log('medical_record', $id, 'view', null, null, $_SESSION['user']['id'] ?? null);
+
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
         $attachments = $this->attachmentService->getAttachmentsForEntity('medical_record', $id);
 
