@@ -1,0 +1,64 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Рахунки - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Рахунки</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                {{ ui.button('Створити рахунок', 'primary', '', 'plus') }}
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Пошук рахунків...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пацієнт</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th>Дата виставлення</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.id }}</td>
+                        <td>{{ invoice.patient_name }}</td>
+                        <td>{{ invoice.amount }}</td>
+                        <td>{{ invoice.status }}</td>
+                        <td>{{ invoice.issued_date|date('Y-m-d H:i') }}</td>
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="#" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає рахунків для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
