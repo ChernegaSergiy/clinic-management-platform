@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Database;
 use PDO;
+use App\Core\AuditLogger;
 
 class PatientRepository implements PatientRepositoryInterface
 {
@@ -82,6 +83,9 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        $oldPatient = $this->findById($id);
+        $oldStatus = $oldPatient['status'] ?? null;
+
         $sql = "UPDATE patients SET 
                     first_name = :first_name, 
                     last_name = :last_name, 
@@ -99,7 +103,7 @@ class PatientRepository implements PatientRepositoryInterface
         
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        $success = $stmt->execute([
             ':id' => $id,
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
@@ -114,6 +118,14 @@ class PatientRepository implements PatientRepositoryInterface
             ':marital_status' => $data['marital_status'] ?? null,
             ':status' => $data['status'] ?? 'active',
         ]);
+
+        if ($success && $oldStatus !== ($data['status'] ?? 'active')) {
+            $auditLogger = new AuditLogger();
+            // Assuming current user ID is available, for now, null or placeholder
+            $auditLogger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
+        }
+
+        return $success;
     }
 
     public function findAllActive(): array
