@@ -1,9 +1,32 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>My Webpage</title>
-    </head>
-    <body>
-        <h1>Hello, {{ name }}!</h1>
-    </body>
-</html>
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Головна сторінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h1 class="ui header">Вітаємо, {{ name }}!</h1>
+        <p>Це демонстраційна сторінка, що показує наслідування базового шаблону.</p>
+        
+        <h2 class="ui header">Слоти шаблону</h2>
+        <p>Цей контент знаходиться всередині блоку `body`.</p>
+        <p>Ви можете перевизначати блоки `title`, `stylesheets` та `javascripts`.</p>
+
+        <div class="ui message">
+            <div class="header">
+                Блок для флеш-повідомлень
+            </div>
+            <p>Тут можна відображати системні сповіщення (наприклад, після успішного збереження форми).</p>
+        </div>
+
+        <div class="ui grid">
+            <div class="twelve wide column">
+                <h3>Основний контент</h3>
+                <p>Це основна частина сторінки.</p>
+            </div>
+            <div class="four wide column">
+                <h4>Сайдбар</h4>
+                <p>Тут може бути додаткова навігація або контекстна інформація.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
