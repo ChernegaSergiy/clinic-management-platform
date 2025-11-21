@@ -5,6 +5,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+use Symfony\Component\Yaml\Yaml;
+
 session_start();
 
 // Налаштування завантажувача шаблонів
@@ -15,6 +17,9 @@ $twig = new Environment($loader, [
     // 'cache' => __DIR__ . '/../var/cache', // Розкоментуйте для кешування
 ]);
 
+// Завантаження контенту
+$content = Yaml::parseFile(__DIR__ . '/../content/home.uk.yml');
+
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -24,9 +29,10 @@ $users = [
     'doctor' => password_hash('password', PASSWORD_BCRYPT),
 ];
 
+// Маршрутизація
 switch ($requestUri) {
     case '/':
-        echo $twig->render('home/index.html.twig', ['name' => 'World']);
+        echo $twig->render('home/index.html.twig', ['page' => $content]);
         break;
     case '/about':
         echo $twig->render('about/index.html.twig');
