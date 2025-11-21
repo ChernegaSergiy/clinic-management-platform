@@ -93,7 +93,12 @@ class InventoryController
             return;
         }
 
-        View::render('inventory/show.html.twig', ['item' => $item]);
+        $movementHistory = $this->inventoryItemRepository->getMovementHistory($id);
+
+        View::render('inventory/show.html.twig', [
+            'item' => $item,
+            'movementHistory' => $movementHistory,
+        ]);
     }
 
     public function edit(): void
