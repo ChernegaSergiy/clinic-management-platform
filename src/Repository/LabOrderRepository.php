@@ -46,4 +46,21 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             ':status' => $data['status'] ?? 'ordered',
         ]);
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                lo.*,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM lab_orders lo
+            JOIN patients p ON lo.patient_id = p.id
+            JOIN users u ON lo.doctor_id = u.id
+            WHERE lo.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
