@@ -21,8 +21,12 @@ class PatientController
             header('Location: /login');
             exit();
         }
-        $patients = $this->patientRepository->findAll();
-        View::render('patients/index.html.twig', ['patients' => $patients]);
+        $searchTerm = $_GET['search'] ?? '';
+        $patients = $this->patientRepository->findAll($searchTerm);
+        View::render('patients/index.html.twig', [
+            'patients' => $patients,
+            'searchTerm' => $searchTerm,
+        ]);
     }
 
     public function create(): void
