@@ -116,15 +116,9 @@ class PatientRepository implements PatientRepositoryInterface
         ]);
     }
 
-    public function updateStatus(int $id, bool $status): bool
-    {
-        $stmt = $this->pdo->prepare("UPDATE patients SET active = :active WHERE id = :id");
-        return $stmt->execute([':active' => $status, ':id' => $id]);
-    }
-
     public function findAllActive(): array
     {
-        $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as full_name FROM patients WHERE active = TRUE ORDER BY last_name, first_name");
+        $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as full_name FROM patients WHERE status = 'active' ORDER BY last_name, first_name");
         return $stmt->fetchAll();
     }
 }
