@@ -65,4 +65,23 @@ class MedicalRecordController
         header('Location: /patients/show?id=' . $appointment['patient_id']);
         exit();
     }
+
+    public function show(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
+        View::render('medical_records/show.html.twig', ['record' => $record]);
+    }
 }
