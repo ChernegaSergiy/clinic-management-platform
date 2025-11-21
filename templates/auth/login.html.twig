@@ -14,15 +14,15 @@
             </h2>
             <form class="ui large form" method="POST" action="/login">
                 <div class="ui stacked segment">
-                    {{ forms.input('username', 'Ім\'я користувача', '', 'text', 'Ваше ім\'я користувача', error.username ?? null, {'required': 'required'}) }}
-                    {{ forms.input('password', 'Пароль', '', 'password', 'Ваш пароль', error.password ?? null, {'required': 'required'}) }}
+                    {{ forms.input('email', 'Email', old.email ?? null, 'email', 'Ваш email', errors.email ?? null, {'required': 'required'}) }}
+                    {{ forms.input('password', 'Пароль', null, 'password', 'Ваш пароль', errors.password ?? null, {'required': 'required'}) }}
                     {{ ui.button('Увійти', 'teal', 'fluid large', 'sign-in') }}
                 </div>
 
-                {% if error.message is defined %}
+                {% if errors.login %}
                     <div class="ui error message">
                         <div class="header">Помилка входу</div>
-                        <p>{{ error.message }}</p>
+                        <p>{{ errors.login }}</p>
                     </div>
                 {% endif %}
             </form>
