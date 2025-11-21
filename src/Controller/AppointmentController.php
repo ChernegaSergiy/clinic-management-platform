@@ -256,6 +256,26 @@ class AppointmentController
 
         $this->appointmentRepository->updateStatus($id, 'cancelled');
 
+        $patient = $this->patientRepository->findById($appointment['patient_id']);
+        $doctor = $this->userRepository->findById($appointment['doctor_id']);
+
+        if ($patient) {
+            $messagePatient = sprintf(
+                'Ваш запис до лікаря %s на %s скасовано.',
+                $doctor['first_name'] . ' ' . $doctor['last_name'],
+                $appointment['start_time']
+            );
+            $this->notificationService->createNotification($patient['id'], $messagePatient); // Assuming patient ID is user ID for notification
+        }
+        if ($doctor) {
+            $messageDoctor = sprintf(
+                'Запис пацієнта %s на %s скасовано.',
+                $patient['first_name'] . ' ' . $patient['last_name'],
+                $appointment['start_time']
+            );
+            $this->notificationService->createNotification($doctor['id'], $messageDoctor);
+        }
+
         header('Location: /appointments/show?id=' . $id);
         exit();
     }
