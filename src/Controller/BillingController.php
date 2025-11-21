@@ -59,10 +59,17 @@ class BillingController
             $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id'] . ' - ' . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
         }
 
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
         View::render('billing/new.html.twig', [
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
             'medical_records' => $medicalRecordOptions,
+            'old' => $old,
+            'errors' => $errors,
         ]);
     }
 
