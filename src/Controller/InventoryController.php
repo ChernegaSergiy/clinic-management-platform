@@ -64,4 +64,45 @@ class InventoryController
 
         View::render('inventory/show.html.twig', ['item' => $item]);
     }
+
+    public function edit(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $item = $this->inventoryItemRepository->findById($id);
+
+        if (!$item) {
+            http_response_code(404);
+            echo "Позицію складу не знайдено";
+            return;
+        }
+
+        View::render('inventory/edit.html.twig', ['item' => $item]);
+    }
+
+    public function update(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $item = $this->inventoryItemRepository->findById($id);
+
+        if (!$item) {
+            http_response_code(404);
+            echo "Позицію складу не знайдено";
+            return;
+        }
+
+        // TODO: Add validation
+        $this->inventoryItemRepository->update($id, $_POST);
+        header('Location: /inventory/show?id=' . $id);
+        exit();
+    }
 }
