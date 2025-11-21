@@ -61,7 +61,22 @@ class AdminController
             exit();
         }
 
-        // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:6'],
+            'role_id' => ['required', 'numeric'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/users/new');
+            exit();
+        }
+
         $this->userRepository->save($_POST);
         $_SESSION['success_message'] = "Користувача успішно створено.";
         header('Location: /admin/users');
