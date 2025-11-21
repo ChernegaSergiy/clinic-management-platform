@@ -47,7 +47,7 @@
                         <td>{{ invoice.status }}</td>
                         <td>{{ invoice.issued_date|date('Y-m-d H:i') }}</td>
                         <td>
-                            <a href="#" class="ui icon button">
+                            <a href="/billing/show?id={{ invoice.id }}" class="ui icon button">
                                 <i class="eye icon"></i>
                             </a>
                             <a href="#" class="ui icon button">
