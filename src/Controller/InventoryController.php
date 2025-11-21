@@ -40,8 +40,22 @@ class InventoryController
             exit();
         }
 
-        // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'quantity' => ['required', 'numeric', 'min:0'],
+            'cost' => ['numeric', 'min:0'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /inventory/new');
+            exit();
+        }
+
         $this->inventoryItemRepository->save($_POST);
+        $_SESSION['success_message'] = "Позицію складу успішно додано.";
         header('Location: /inventory');
         exit();
     }
