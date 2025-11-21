@@ -8,6 +8,7 @@ use App\Repository\PatientRepository;
 use App\Repository\PrescriptionRepository;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\UserRepository;
+use App\Repository\InventoryItemRepository;
 
 class PrescriptionController
 {
@@ -15,6 +16,7 @@ class PrescriptionController
     private PatientRepository $patientRepository;
     private MedicalRecordRepository $medicalRecordRepository;
     private UserRepository $userRepository;
+    private InventoryItemRepository $inventoryItemRepository;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class PrescriptionController
         $this->patientRepository = new PatientRepository();
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->userRepository = new UserRepository();
+        $this->inventoryItemRepository = new InventoryItemRepository();
     }
 
     public function create(): void
