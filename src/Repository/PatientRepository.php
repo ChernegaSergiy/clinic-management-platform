@@ -33,6 +33,12 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function save(array $data): bool
     {
+        // Check for duplicate patient before saving
+        if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
+            // Patient with same first name, last name, and birth date already exists
+            return false;
+        }
+
         $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status) 
                 VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status)";
         
