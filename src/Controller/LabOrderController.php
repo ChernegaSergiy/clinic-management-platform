@@ -8,6 +8,7 @@ use App\Repository\MedicalRecordRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
+use App\Core\QrCodeGenerator; // Додано QrCodeGenerator
 
 class LabOrderController
 {
@@ -15,6 +16,7 @@ class LabOrderController
     private LabOrderRepository $labOrderRepository;
     private UserRepository $userRepository;
     private NotificationService $notificationService;
+    private QrCodeGenerator $qrCodeGenerator; // Ініціалізація
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class LabOrderController
         $this->labOrderRepository = new LabOrderRepository();
         $this->userRepository = new UserRepository();
         $this->notificationService = new NotificationService();
+        $this->qrCodeGenerator = new QrCodeGenerator(); // Ініціалізація
     }
 
     public function create(): void
