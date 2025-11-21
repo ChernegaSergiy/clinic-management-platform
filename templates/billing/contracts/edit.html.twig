@@ -1,0 +1,58 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати контракт #{{ contract.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати контракт #{{ contract.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/contracts/edit?id={{ contract.id }}" enctype="multipart/form-data">
+            {{ forms.input('title', 'Назва контракту', old.title ?? contract.title, 'text', 'Наприклад, Договір про надання медичних послуг', errors.title ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис контракту', old.description ?? contract.description, 'Детальний опис умов контракту', errors.description ?? null) }}
+            
+            <div class="two fields">
+                {{ forms.input('start_date', 'Дата початку', old.start_date ?? contract.start_date|date('Y-m-d'), 'date', '', errors.start_date ?? null, {'required': 'required'}) }}
+                {{ forms.input('end_date', 'Дата закінчення (необов\'язково)', old.end_date ?? contract.end_date|date('Y-m-d'), 'date', '', errors.end_date ?? null) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('party_a', 'Сторона А (наприклад, Назва клініки)', old.party_a ?? contract.party_a, 'text', 'Назва сторони А', errors.party_a ?? null) }}
+                {{ forms.input('party_b', 'Сторона Б (наприклад, ПІБ пацієнта/лікаря)', old.party_b ?? contract.party_b, 'text', 'Назва сторони Б', errors.party_b ?? null) }}
+            </div>
+
+            <div class="field {% if errors.contract_file %}error{% endif %}">
+                <label>Файл контракту</label>
+                {% if contract.file_path %}
+                    <p>Поточний файл: <a href="/billing/contracts/{{ contract.id }}/download">{{ contract.file_path | split('/') | last }}</a></p>
+                    <p>Завантажити новий файл (замінить існуючий):</p>
+                {% endif %}
+                <input type="file" name="contract_file">
+                {% if errors.contract_file %}<div class="ui red basic pointing label">{{ errors.contract_file | first }}</div>{% endif %}
+            </div>
+
+            <div class="field {% if errors.status %}error{% endif %}">
+                <label>Статус</label>
+                <select class="ui dropdown" name="status">
+                    <option value="active" {% if (old.status is defined and old.status == 'active') or (old.status is not defined and contract.status == 'active') %}selected{% endif %}>Активний</option>
+                    <option value="expired" {% if old.status == 'expired' or contract.status == 'expired' %}selected{% endif %}>Завершений</option>
+                    <option value="terminated" {% if old.status == 'terminated' or contract.status == 'terminated' %}selected{% endif %}>Розірваний</option>
+                </select>
+                {% if errors.status %}<div class="ui red basic pointing label">{{ errors.status | first }}</div>{% endif %}
+            </div>
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/billing/contracts/show?id={{ contract.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
