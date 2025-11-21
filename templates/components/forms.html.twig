@@ -40,3 +40,27 @@
         {{ key }}="{{ value }}"
     {% endfor %}
 {% endmacro %}
+
+{% macro prescription_item(index, item = {}, errors = {}) %}
+    <div class="fields" data-item-index="{{ index }}">
+        <div class="eight wide field {% if errors['items['~index~'][medication_name]'] %}error{% endif %}">
+            <label>Назва медикаменту</label>
+            <input type="text" name="items[{{ index }}][medication_name]" placeholder="Назва медикаменту" value="{{ item.medication_name ?? '' }}" required>
+            {% if errors['items['~index~'][medication_name]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][medication_name]'] | first }}</div>{% endif %}
+        </div>
+        <div class="three wide field {% if errors['items['~index~'][dosage]'] %}error{% endif %}">
+            <label>Дозування</label>
+            <input type="text" name="items[{{ index }}][dosage]" placeholder="Дозування" value="{{ item.dosage ?? '' }}" required>
+            {% if errors['items['~index~'][dosage]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][dosage]'] | first }}</div>{% endif %}
+        </div>
+        <div class="three wide field {% if errors['items['~index~'][frequency]'] %}error{% endif %}">
+            <label>Частота</label>
+            <input type="text" name="items[{{ index }}][frequency]" placeholder="Частота" value="{{ item.frequency ?? '' }}" required>
+            {% if errors['items['~index~'][frequency]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][frequency]'] | first }}</div>{% endif %}
+        </div>
+        <div class="one wide field">
+            <label>&nbsp;</label>
+            <button type="button" class="ui red icon button remove-item"><i class="trash icon"></i></button>
+        </div>
+    </div>
+{% endmacro %}
