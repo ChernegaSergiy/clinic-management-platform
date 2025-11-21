@@ -93,7 +93,8 @@ class PatientRepository implements PatientRepositoryInterface
                     address = :address, 
                     tax_id = :tax_id, 
                     document_id = :document_id, 
-                    marital_status = :marital_status 
+                    marital_status = :marital_status,
+                    status = :status
                 WHERE id = :id";
         
         $stmt = $this->pdo->prepare($sql);
@@ -111,6 +112,7 @@ class PatientRepository implements PatientRepositoryInterface
             ':tax_id' => $data['tax_id'] ?? null,
             ':document_id' => $data['document_id'] ?? null,
             ':marital_status' => $data['marital_status'] ?? null,
+            ':status' => $data['status'] ?? 'active',
         ]);
     }
 
