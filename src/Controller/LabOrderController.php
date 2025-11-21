@@ -130,7 +130,21 @@ class LabOrderController
         }
 
         // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'order_code' => ['required'],
+            'status' => ['required', 'in:ordered,in_progress,completed,cancelled'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /lab-orders/edit?id=' . $id);
+            exit();
+        }
+
         $this->labOrderRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Лабораторне замовлення успішно оновлено.";
         header('Location: /lab-orders/show?id=' . $id);
         exit();
     }
