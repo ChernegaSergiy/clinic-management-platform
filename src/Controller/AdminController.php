@@ -79,6 +79,10 @@ class AdminController
             'role_id' => ['required', 'numeric'],
         ]);
 
+        if ($this->userRepository->findByEmail($_POST['email'])) {
+            $validator->addError('email', 'Цей email вже використовується.');
+        }
+
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
