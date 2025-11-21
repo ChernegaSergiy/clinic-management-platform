@@ -1,0 +1,48 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Запис #{{ appointment.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі запису #{{ appointment.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ appointment.id }}</td>
+                </tr>
+                <tr>
+                    <td>Пацієнт</td>
+                    <td><a href="/patients/show?id={{ appointment.patient_id }}">{{ appointment.patient_name }}</a></td>
+                </tr>
+                <tr>
+                    <td>Лікар</td>
+                    <td>{{ appointment.doctor_name }}</td>
+                </tr>
+                <tr>
+                    <td>Час початку</td>
+                    <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Час закінчення</td>
+                    <td>{{ appointment.end_time|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Статус</td>
+                    <td>{{ appointment.status }}</td>
+                </tr>
+                <tr>
+                    <td>Примітки</td>
+                    <td>{{ appointment.notes|nl2br }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/appointments/edit?id={{ appointment.id }}" class="ui primary button">Редагувати</a>
+        <a href="/appointments" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
