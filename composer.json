@@ -1,0 +1,20 @@
+{
+    "name": "clinic/platform",
+    "description": "A Clinic Management Platform",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Serhii",
+            "email": "serhii@example.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "^3.22"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
