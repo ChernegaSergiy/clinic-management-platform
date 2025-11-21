@@ -1,0 +1,72 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Пацієнт {{ patient.first_name }} {{ patient.last_name }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Картка пацієнта: {{ patient.last_name }} {{ patient.first_name }} {{ patient.middle_name }}</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">Основна інформація</h3>
+                <table class="ui definition table">
+                    <tbody>
+                        <tr>
+                            <td>ID</td>
+                            <td>{{ patient.id }}</td>
+                        </tr>
+                        <tr>
+                            <td>Дата народження</td>
+                            <td>{{ patient.birth_date }}</td>
+                        </tr>
+                        <tr>
+                            <td>Стать</td>
+                            <td>{{ patient.gender }}</td>
+                        </tr>
+                        <tr>
+                            <td>Телефон</td>
+                            <td>{{ patient.phone }}</td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{{ patient.email }}</td>
+                        </tr>
+                        <tr>
+                            <td>Адреса</td>
+                            <td>{{ patient.address }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="eight wide column">
+                <h3 class="ui header">Додаткова інформація</h3>
+                <table class="ui definition table">
+                    <tbody>
+                        <tr>
+                            <td>РНОКПП</td>
+                            <td>{{ patient.tax_id }}</td>
+                        </tr>
+                        <tr>
+                            <td>ID-картка/паспорт</td>
+                            <td>{{ patient.document_id }}</td>
+                        </tr>
+                        <tr>
+                            <td>Сімейний стан</td>
+                            <td>{{ patient.marital_status }}</td>
+                        </tr>
+                        <tr>
+                            <td>Статус</td>
+                            <td>{{ patient.active ? 'Активний' : 'Архівний' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">Редагувати</a>
+        <a href="/patients" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
