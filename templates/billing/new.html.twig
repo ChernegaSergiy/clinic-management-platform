@@ -21,7 +21,7 @@
             <div class="field">
                 {{ forms.select('status', 'Статус', {'pending': 'Очікує оплати', 'paid': 'Оплачено', 'cancelled': 'Скасовано'}, old.status ?? 'pending', errors.status ?? null, {'required': 'required'}) }}
             </div>
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до рахунку') }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до рахунку', errors.notes ?? null) }}
 
             {{ ui.button('Зберегти рахунок', 'primary', 'large', 'save') }}
             <a href="/billing" class="ui button">Скасувати</a>
