@@ -6,6 +6,7 @@ use App\Core\Validator;
 use App\Core\View;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
+use App\Core\CSVExporter;
 
 class PatientController
 {
@@ -65,9 +66,7 @@ class PatientController
             return;
         }
 
-        // Перевірка на дублікати
-        $existingPatient = $this->patientRepository->findByCredentials($_POST['last_name'], $_POST['first_name'], $_POST['birth_date']);
-        if ($existingPatient) {
+        if (!$this->patientRepository->save($_POST)) {
             $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
             View::render('patients/new.html.twig', [
                 'errors' => $errors,
@@ -75,8 +74,7 @@ class PatientController
             ]);
             return;
         }
-
-        $this->patientRepository->save($_POST);
+        
         header('Location: /patients');
         exit();
     }
@@ -162,26 +160,23 @@ class PatientController
         exit();
     }
 
-    public function toggleStatus(): void
+    public function exportCsv(): void
     {
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
-        $patient = $this->patientRepository->findById($id);
+        $patients = $this->patientRepository->getAllForExport();
 
-        if (!$patient) {
-            http_response_code(404);
-            echo "Пацієнта не знайдено";
-            return;
+        if (empty($patients)) {
+            // Optionally handle cases with no data to export
+            header('Location: /patients');
+            exit();
         }
 
-        $newStatus = !$patient['active'];
-        $this->patientRepository->updateStatus($id, $newStatus);
-
-        header('Location: /patients/show?id=' . $id);
-        exit();
+        $headers = array_keys($patients[0]);
+        $exporter = new CSVExporter($headers, $patients);
+        $exporter->download('patients_export.csv');
     }
 }
