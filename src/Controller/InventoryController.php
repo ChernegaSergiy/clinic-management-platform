@@ -45,4 +45,23 @@ class InventoryController
         header('Location: /inventory');
         exit();
     }
+
+    public function show(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $item = $this->inventoryItemRepository->findById($id);
+
+        if (!$item) {
+            http_response_code(404);
+            echo "Позицію складу не знайдено";
+            return;
+        }
+
+        View::render('inventory/show.html.twig', ['item' => $item]);
+    }
 }
