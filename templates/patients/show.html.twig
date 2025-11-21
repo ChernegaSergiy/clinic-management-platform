@@ -67,6 +67,11 @@
         <div class="ui divider"></div>
 
         <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">Редагувати</a>
+        {% if patient.active %}
+            <a href="/patients/toggle-status?id={{ patient.id }}" class="ui negative button">Архівувати</a>
+        {% else %}
+            <a href="/patients/toggle-status?id={{ patient.id }}" class="ui positive button">Активувати</a>
+        {% endif %}
         <a href="/patients" class="ui button">Повернутися до списку</a>
     </div>
 {% endblock %}
