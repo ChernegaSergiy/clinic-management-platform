@@ -7,6 +7,10 @@ use Twig\Loader\FilesystemLoader;
 
 use Symfony\Component\Yaml\Yaml;
 
+// Завантаження .env файлу
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
+
 session_start();
 
 // Налаштування завантажувача шаблонів
