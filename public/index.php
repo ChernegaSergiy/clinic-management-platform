@@ -34,6 +34,24 @@ switch ($requestUri) {
     case '/contact':
         echo $twig->render('contact/index.html.twig');
         break;
+    case '/login':
+        if ($requestMethod === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $error = [];
+
+            if (isset($users[$username]) && password_verify($password, $users[$username])) {
+                $_SESSION['user'] = $username;
+                header('Location: /dashboard'); // Перенаправлення на дашборд після успішного входу
+                exit();
+            } else {
+                $error['message'] = 'Невірне ім\'я користувача або пароль.';
+            }
+            echo $twig->render('auth/login.html.twig', ['error' => $error]);
+        } else {
+            echo $twig->render('auth/login.html.twig');
+        }
+        break;
     default:
         header("HTTP/1.0 404 Not Found");
         echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
