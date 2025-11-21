@@ -172,9 +172,24 @@ class BillingController
         }
 
         // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'patient_id' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'status' => ['required', 'in:pending,paid,cancelled'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /billing/edit?id=' . $id);
+            exit();
+        }
+
         $data = $_POST;
         $data['patient_id'] = $invoice['patient_id']; // Patient ID cannot be changed after creation
         $this->invoiceRepository->update($id, $data);
+        $_SESSION['success_message'] = "Рахунок успішно оновлено.";
         header('Location: /billing/show?id=' . $id);
         exit();
     }
