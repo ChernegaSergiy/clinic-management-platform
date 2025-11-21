@@ -175,4 +175,27 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt->execute([':status' => $status]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findAppointmentsForReminder(int $minutesBefore): array
+    {
+        $sql = "
+            SELECT 
+                a.id, 
+                a.patient_id,
+                a.doctor_id,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                a.start_time, 
+                a.end_time
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN users u ON a.doctor_id = u.id
+            WHERE a.status = 'scheduled' 
+              AND a.start_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL :minutes_before MINUTE)
+        ";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':minutes_before' => $minutesBefore]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
