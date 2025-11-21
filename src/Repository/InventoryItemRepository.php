@@ -4,14 +4,17 @@ namespace App\Repository;
 
 use App\Database;
 use PDO;
+use App\Repository\InvoiceRepository; // Додано InvoiceRepository
 
 class InventoryItemRepository implements InventoryItemRepositoryInterface
 {
     private PDO $pdo;
+    private InvoiceRepository $invoiceRepository; // Ініціалізація
 
     public function __construct()
     {
         $this->pdo = Database::getInstance();
+        $this->invoiceRepository = new InvoiceRepository(); // Ініціалізація
     }
 
     public function findAll(): array
@@ -45,7 +48,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             if ($success) {
                 $itemId = (int)$this->pdo->lastInsertId();
                 if (($data['quantity'] ?? 0) > 0) {
-                    $this->logMovement($itemId, $_SESSION['user']['id'] ?? null, 'in', $data['quantity'], $data['quantity'], 'Початковий запас');
+                    $this->logMovement($itemId, $_SESSION['user']['id'] ?? null, 'in', $data['quantity'], $data['quantity'], 'Початковий запас', $data['cost'] ?? 0.00);
                 }
                 $this->pdo->commit();
                 return $itemId;
@@ -78,6 +81,9 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             }
             $oldQuantity = $oldItem['quantity'];
             $newQuantity = $data['quantity'] ?? $oldQuantity;
+            $oldCost = $oldItem['cost'];
+            $newCost = $data['cost'] ?? $oldCost;
+
 
             $sql = "UPDATE inventory_items SET 
                         name = :name, 
@@ -103,18 +109,20 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                 ':batch_number' => $data['batch_number'] ?? null,
                 ':expiry_date' => $data['expiry_date'] ?? null,
                 ':supplier' => $data['supplier'] ?? null,
-                ':cost' => $data['cost'] ?? 0.00,
+                ':cost' => $newCost,
                 ':quantity' => $newQuantity,
                 ':min_stock_level' => $data['min_stock_level'] ?? 0,
                 ':max_stock_level' => $data['max_stock_level'] ?? 0,
                 ':location' => $data['location'] ?? null,
             ]);
 
-            if ($success && $newQuantity !== $oldQuantity) {
-                $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
-                $quantityChange = abs($newQuantity - $oldQuantity);
-                $reason = $data['movement_reason'] ?? 'Оновлення позиції';
-                $this->logMovement($id, $_SESSION['user']['id'] ?? null, $movementType, $quantityChange, $newQuantity, $reason);
+            if ($success) {
+                if ($newQuantity !== $oldQuantity) {
+                    $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
+                    $quantityChange = abs($newQuantity - $oldQuantity);
+                    $reason = $data['movement_reason'] ?? 'Оновлення позиції';
+                    $this->logMovement($id, $_SESSION['user']['id'] ?? null, $movementType, $quantityChange, $newQuantity, $reason, $newCost);
+                }
             }
             $this->pdo->commit();
             return $success;
@@ -125,12 +133,12 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         }
     }
 
-    private function logMovement(int $itemId, ?int $userId, string $movementType, int $quantityChange, int $newQuantity, string $reason): bool
+    private function logMovement(int $itemId, ?int $userId, string $movementType, int $quantityChange, int $newQuantity, string $reason, float $itemCost): bool
     {
         $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, quantity_change, new_quantity, reason) 
                 VALUES (:inventory_item_id, :user_id, :movement_type, :quantity_change, :new_quantity, :reason)";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
+        $success = $stmt->execute([
             ':inventory_item_id' => $itemId,
             ':user_id' => $userId,
             ':movement_type' => $movementType,
@@ -138,6 +146,27 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             ':new_quantity' => $newQuantity,
             ':reason' => $reason,
         ]);
+
+        if ($success) {
+            $amount = $quantityChange * $itemCost;
+            $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue'; // Assuming 'revenue' for 'out'
+            if ($movementType === 'out') $amount = -$amount; // Negative for cost deduction
+            
+            $itemDetails = $this->findById($itemId);
+            $patientId = 0; // Placeholder, as inventory movement might not directly link to a patient
+            if (isset($_SESSION['current_patient_id'])) { // If there's a context of a patient
+                $patientId = $_SESSION['current_patient_id'];
+            }
+            
+            $this->invoiceRepository->logFinancialTransaction(
+                $patientId, // Need a patient ID, might be a system patient or context specific
+                $amount,
+                $transactionType,
+                sprintf("Рух складу: %s %d одиниць '%s'. Причина: %s", $movementType === 'in' ? 'Прихід' : 'Вибуття', $quantityChange, $itemDetails['name'], $reason),
+                $itemId // Linked entity ID
+            );
+        }
+        return $success;
     }
 
     public function getMovementHistory(int $itemId): array
@@ -179,7 +208,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             $success = $stmt->execute([':quantity' => $newQuantity, ':id' => $itemId]);
 
             if ($success) {
-                $this->logMovement($itemId, $userId, 'out', $quantity, $newQuantity, $reason);
+                $this->logMovement($itemId, $userId, 'out', $quantity, $newQuantity, $reason, $item['cost']);
             }
             $this->pdo->commit();
             return $success;
