@@ -184,6 +184,10 @@ class AdminController
 
         $validator->validate($_POST, $rules);
 
+        if ($this->userRepository->findByEmailExcludingId($_POST['email'], $id)) {
+            $validator->addError('email', 'Цей email вже використовується іншим користувачем.');
+        }
+
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
