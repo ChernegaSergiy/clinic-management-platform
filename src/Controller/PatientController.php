@@ -96,4 +96,61 @@ class PatientController
 
         View::render('patients/show.html.twig', ['patient' => $patient]);
     }
+
+    public function edit(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $patient = $this->patientRepository->findById($id);
+
+        if (!$patient) {
+            http_response_code(404);
+            echo "Пацієнта не знайдено";
+            return;
+        }
+
+        View::render('patients/edit.html.twig', ['patient' => $patient]);
+    }
+
+    public function update(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $patient = $this->patientRepository->findById($id);
+
+        if (!$patient) {
+            http_response_code(404);
+            echo "Пацієнта не знайдено";
+            return;
+        }
+
+        $validator = new Validator();
+        $rules = [
+            'last_name' => ['required'],
+            'first_name' => ['required'],
+            'birth_date' => ['required'],
+            'gender' => ['required'],
+            'phone' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            View::render('patients/edit.html.twig', [
+                'errors' => $validator->getErrors(),
+                'patient' => array_merge($patient, $_POST),
+            ]);
+            return;
+        }
+
+        $this->patientRepository->update($id, $_POST);
+        header('Location: /patients/show?id=' . $id);
+        exit();
+    }
 }
