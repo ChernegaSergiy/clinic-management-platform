@@ -230,7 +230,53 @@ class BillingController
             return;
         }
 
-        View::render('billing/show.html.twig', ['invoice' => $invoice]);
+        View::render('billing/show.html.twig', [
+            'invoice' => $invoice,
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['errors']);
+    }
+
+    public function addPayment(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $invoiceId = (int)($_POST['invoice_id'] ?? 0);
+        $invoice = $this->invoiceRepository->findById($invoiceId);
+
+        if (!$invoice) {
+            http_response_code(404);
+            echo "Рахунок не знайдено";
+            return;
+        }
+
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            'payment_method' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /billing/show?id=' . $invoiceId);
+            exit();
+        }
+
+        $this->invoiceRepository->addPayment(
+            $invoiceId,
+            (float)$_POST['amount'],
+            $_POST['payment_method'],
+            $_POST['transaction_id'] ?? null,
+            $_POST['notes'] ?? null
+        );
+
+        $_SESSION['success_message'] = "Оплата успішно додана.";
+        header('Location: /billing/show?id=' . $invoiceId);
+        exit();
     }
 
     public function edit(): void
