@@ -1,0 +1,34 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нову позицію на склад - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нову позицію на склад</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/inventory/new">
+            <div class="two fields">
+                {{ forms.input('name', 'Назва', old.name ?? null, 'text', 'Назва позиції', errors.name ?? null, {'required': 'required'}) }}
+                {{ forms.input('inn', 'INN (Міжнародна непатентована назва)', old.inn ?? null, 'text', 'INN') }}
+            </div>
+            {{ forms.textarea('description', 'Опис', old.description ?? null, 'Детальний опис позиції') }}
+            <div class="three fields">
+                {{ forms.input('batch_number', 'Номер партії', old.batch_number ?? null, 'text', 'Номер партії') }}
+                {{ forms.input('expiry_date', 'Термін придатності', old.expiry_date ?? null, 'date', '') }}
+                {{ forms.input('supplier', 'Постачальник', old.supplier ?? null, 'text', 'Назва постачальника') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('cost', 'Вартість (за одиницю)', old.cost ?? null, 'number', '0.00', errors.cost ?? null, {'step': '0.01'}) }}
+                {{ forms.input('quantity', 'Кількість', old.quantity ?? null, 'number', '0', errors.quantity ?? null, {'required': 'required'}) }}
+                {{ forms.input('min_stock_threshold', 'Мінімальний поріг запасу', old.min_stock_threshold ?? null, 'number', '0') }}
+            </div>
+            {{ forms.input('location', 'Місце зберігання', old.location ?? null, 'text', 'Наприклад, Склад 1, полиця А') }}
+
+            {{ ui.button('Зберегти позицію', 'primary', 'large', 'save') }}
+            <a href="/inventory" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
