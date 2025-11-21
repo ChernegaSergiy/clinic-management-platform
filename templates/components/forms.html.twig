@@ -1,0 +1,42 @@
+{% macro input(name, label, value = '', type = 'text', placeholder = '', error = '', attributes = {}) %}
+    <div class="field {% if error %}error{% endif %}">
+        <label for="{{ name }}">{{ label }}</label>
+        <input type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" placeholder="{{ placeholder }}" {{ _self.html_attributes(attributes) }}>
+        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro textarea(name, label, value = '', placeholder = '', error = '', attributes = {}) %}
+    <div class="field {% if error %}error{% endif %}">
+        <label for="{{ name }}">{{ label }}</label>
+        <textarea id="{{ name }}" name="{{ name }}" placeholder="{{ placeholder }}" {{ _self.html_attributes(attributes) }}>{{ value }}</textarea>
+        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro select(name, label, options, selected = '', error = '', attributes = {}) %}
+    <div class="field {% if error %}error{% endif %}">
+        <label for="{{ name }}">{{ label }}</label>
+        <select id="{{ name }}" name="{{ name }}" class="ui dropdown" {{ _self.html_attributes(attributes) }}>
+            {% for option_value, option_label in options %}
+                <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_label }}</option>
+            {% endfor %}
+        </select>
+        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro checkbox(name, label, checked = false, attributes = {}) %}
+    <div class="field">
+        <div class="ui checkbox">
+            <input type="checkbox" id="{{ name }}" name="{{ name }}" {% if checked %}checked{% endif %} {{ _self.html_attributes(attributes) }}>
+            <label for="{{ name }}">{{ label }}</label>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro html_attributes(attributes) %}
+    {% for key, value in attributes %}
+        {{ key }}="{{ value }}"
+    {% endfor %}
+{% endmacro %}

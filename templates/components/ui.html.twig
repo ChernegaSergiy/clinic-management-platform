@@ -1,0 +1,42 @@
+{% macro button(text, type = 'primary', size = '', icon = '', attributes = {}) %}
+    {% set class = 'ui button' %}
+    {% if type == 'primary' %}{% set class = class ~ ' primary' %}
+    {% elseif type == 'secondary' %}{% set class = class ~ ' secondary' %}
+    {% elseif type == 'positive' %}{% set class = class ~ ' positive' %}
+    {% elseif type == 'negative' %}{% set class = class ~ ' negative' %}
+    {% elseif type == 'basic' %}{% set class = class ~ ' basic' %}
+    {% endif %}
+    {% if size == 'small' %}{% set class = class ~ ' small' %}
+    {% elseif size == 'large' %}{% set class = class ~ ' large' %}
+    {% endif %}
+    <button class="{{ class }}" {{ _self.html_attributes(attributes) }}>
+        {% if icon %}<i class="{{ icon }} icon"></i>{% endif %}
+        {{ text }}
+    </button>
+{% endmacro %}
+
+{% macro card(header, content, extra_content = '', image = '', link = '', attributes = {}) %}
+    {% set class = 'ui card' %}
+    {% if link %}<a href="{{ link }}" class="{{ class }}" {{ _self.html_attributes(attributes) }}>{% else %}<div class="{{ class }}" {{ _self.html_attributes(attributes) }}>{% endif %}
+        {% if image %}
+            <div class="image">
+                <img src="{{ image }}" alt="{{ header }}">
+            </div>
+        {% endif %}
+        <div class="content">
+            <div class="header">{{ header }}</div>
+            <div class="description">{{ content }}</div>
+        </div>
+        {% if extra_content %}
+            <div class="extra content">
+                {{ extra_content }}
+            </div>
+        {% endif %}
+    {% if link %}</a>{% else %}</div>{% endif %}
+{% endmacro %}
+
+{% macro html_attributes(attributes) %}
+    {% for key, value in attributes %}
+        {{ key }}="{{ value }}"
+    {% endfor %}
+{% endmacro %}
