@@ -63,4 +63,23 @@ class LabOrderController
         header('Location: /medical-records/show?id=' . $recordId);
         exit();
     }
+
+    public function show(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $order = $this->labOrderRepository->findById($id);
+
+        if (!$order) {
+            http_response_code(404);
+            echo "Лабораторне замовлення не знайдено";
+            return;
+        }
+
+        View::render('lab_orders/show.html.twig', ['order' => $order]);
+    }
 }
