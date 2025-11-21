@@ -22,8 +22,8 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, supplier, cost, quantity, min_stock_threshold, location) 
-                VALUES (:name, :description, :inn, :batch_number, :expiry_date, :supplier, :cost, :quantity, :min_stock_threshold, :location)";
+        $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, supplier, cost, quantity, min_stock_level, max_stock_level, location) 
+                VALUES (:name, :description, :inn, :batch_number, :expiry_date, :supplier, :cost, :quantity, :min_stock_level, :max_stock_level, :location)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -36,7 +36,8 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             ':supplier' => $data['supplier'] ?? null,
             ':cost' => $data['cost'] ?? 0.00,
             ':quantity' => $data['quantity'] ?? 0,
-            ':min_stock_threshold' => $data['min_stock_threshold'] ?? 0,
+            ':min_stock_level' => $data['min_stock_level'] ?? 0,
+            ':max_stock_level' => $data['max_stock_level'] ?? 0,
             ':location' => $data['location'] ?? null,
         ]);
     }
@@ -60,7 +61,8 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                     supplier = :supplier, 
                     cost = :cost, 
                     quantity = :quantity, 
-                    min_stock_threshold = :min_stock_threshold, 
+                    min_stock_level = :min_stock_level, 
+                    max_stock_level = :max_stock_level, 
                     location = :location 
                 WHERE id = :id";
         
@@ -76,8 +78,21 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             ':supplier' => $data['supplier'] ?? null,
             ':cost' => $data['cost'] ?? 0.00,
             ':quantity' => $data['quantity'] ?? 0,
-            ':min_stock_threshold' => $data['min_stock_threshold'] ?? 0,
+            ':min_stock_level' => $data['min_stock_level'] ?? 0,
+            ':max_stock_level' => $data['max_stock_level'] ?? 0,
             ':location' => $data['location'] ?? null,
         ]);
+    }
+
+    public function findItemsBelowMinStock(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM inventory_items WHERE quantity < min_stock_level AND min_stock_level > 0 ORDER BY name");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function findItemsAboveMaxStock(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM inventory_items WHERE quantity > max_stock_level AND max_stock_level > 0 ORDER BY name");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
