@@ -53,6 +53,11 @@
                             <a href="/admin/users/edit?id={{ user.id }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
+                            <form action="/admin/users/delete?id={{ user.id }}" method="POST" style="display: inline;">
+                                <button type="submit" class="ui icon button red" onclick="return confirm('Ви впевнені, що хочете видалити цього користувача?');">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 {% else %}
