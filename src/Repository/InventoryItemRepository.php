@@ -40,4 +40,12 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             ':location' => $data['location'] ?? null,
         ]);
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM inventory_items WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
