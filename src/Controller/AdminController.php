@@ -74,4 +74,54 @@ class AdminController
 
         View::render('admin/show_user.html.twig', ['user' => $user]);
     }
+
+    public function editUser(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) { // Assuming role_id 1 is admin
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "Користувача не знайдено";
+            return;
+        }
+
+        $roles = $this->roleRepository->findAll();
+        $roleOptions = [];
+        foreach ($roles as $role) {
+            $roleOptions[$role['id']] = $role['name'];
+        }
+
+        View::render('admin/edit_user.html.twig', [
+            'user' => $user,
+            'roles' => $roleOptions,
+        ]);
+    }
+
+    public function updateUser(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) { // Assuming role_id 1 is admin
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "Користувача не знайдено";
+            return;
+        }
+
+        // TODO: Add validation
+        $this->userRepository->update($id, $_POST);
+        header('Location: /admin/users/show?id=' . $id);
+        exit();
+    }
 }
