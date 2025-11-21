@@ -7,6 +7,7 @@ use App\Repository\AppointmentRepository;
 use App\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
+use App\Core\AttachmentService;
 
 class MedicalRecordController
 {
@@ -14,6 +15,7 @@ class MedicalRecordController
     private AppointmentRepository $appointmentRepository;
     private LabOrderRepository $labOrderRepository;
     private IcdCodeRepository $icdCodeRepository;
+    private AttachmentService $attachmentService;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class MedicalRecordController
         $this->appointmentRepository = new AppointmentRepository();
         $this->labOrderRepository = new LabOrderRepository();
         $this->icdCodeRepository = new IcdCodeRepository();
+        $this->attachmentService = new AttachmentService();
     }
 
     public function create(): void
