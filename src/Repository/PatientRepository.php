@@ -106,4 +106,10 @@ class PatientRepository implements PatientRepositoryInterface
             ':marital_status' => $data['marital_status'] ?? null,
         ]);
     }
+
+    public function updateStatus(int $id, bool $status): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE patients SET active = :active WHERE id = :id");
+        return $stmt->execute([':active' => $status, ':id' => $id]);
+    }
 }
