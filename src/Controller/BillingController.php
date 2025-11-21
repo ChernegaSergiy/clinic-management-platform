@@ -73,8 +73,22 @@ class BillingController
             exit();
         }
 
-        // TODO: Add validation
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'patient_id' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'status' => ['required', 'in:pending,paid,cancelled'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /billing/new');
+            exit();
+        }
+
         $this->invoiceRepository->save($_POST);
+        $_SESSION['success_message'] = "Рахунок успішно створено.";
         header('Location: /billing');
         exit();
     }
