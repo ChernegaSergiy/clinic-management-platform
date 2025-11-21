@@ -19,4 +19,25 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         $stmt = $this->pdo->query("SELECT * FROM inventory_items ORDER BY name");
         return $stmt->fetchAll();
     }
+
+    public function save(array $data): bool
+    {
+        $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, supplier, cost, quantity, min_stock_threshold, location) 
+                VALUES (:name, :description, :inn, :batch_number, :expiry_date, :supplier, :cost, :quantity, :min_stock_threshold, :location)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':name' => $data['name'],
+            ':description' => $data['description'] ?? null,
+            ':inn' => $data['inn'] ?? null,
+            ':batch_number' => $data['batch_number'] ?? null,
+            ':expiry_date' => $data['expiry_date'] ?? null,
+            ':supplier' => $data['supplier'] ?? null,
+            ':cost' => $data['cost'] ?? 0.00,
+            ':quantity' => $data['quantity'] ?? 0,
+            ':min_stock_threshold' => $data['min_stock_threshold'] ?? 0,
+            ':location' => $data['location'] ?? null,
+        ]);
+    }
 }
