@@ -1,0 +1,72 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Контракт #{{ contract.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі контракту #{{ contract.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ contract.id }}</td>
+                </tr>
+                <tr>
+                    <td>Назва</td>
+                    <td>{{ contract.title }}</td>
+                </tr>
+                <tr>
+                    <td>Опис</td>
+                    <td>{{ contract.description|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>Дата початку</td>
+                    <td>{{ contract.start_date|date('Y-m-d') }}</td>
+                </tr>
+                <tr>
+                    <td>Дата закінчення</td>
+                    <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'Не вказано' }}</td>
+                </tr>
+                <tr>
+                    <td>Сторона А</td>
+                    <td>{{ contract.party_a }}</td>
+                </tr>
+                <tr>
+                    <td>Сторона Б</td>
+                    <td>{{ contract.party_b }}</td>
+                </tr>
+                <tr>
+                    <td>Статус</td>
+                    <td>{{ contract.status }}</td>
+                </tr>
+                <tr>
+                    <td>Файл контракту</td>
+                    <td>
+                        {% if contract.file_path %}
+                            <a href="/billing/contracts/{{ contract.id }}/download" class="ui basic button">
+                                <i class="download icon"></i> Завантажити файл
+                            </a>
+                        {% else %}
+                            Немає файлу
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Створено</td>
+                    <td>{{ contract.created_at|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Оновлено</td>
+                    <td>{{ contract.updated_at|date('Y-m-d H:i') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/billing/contracts/edit?id={{ contract.id }}" class="ui primary button">Редагувати</a>
+        <a href="/billing/contracts" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
