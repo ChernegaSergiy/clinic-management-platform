@@ -78,4 +78,23 @@ class BillingController
         header('Location: /billing');
         exit();
     }
+
+    public function show(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $invoice = $this->invoiceRepository->findById($id);
+
+        if (!$invoice) {
+            http_response_code(404);
+            echo "Рахунок не знайдено";
+            return;
+        }
+
+        View::render('billing/show.html.twig', ['invoice' => $invoice]);
+    }
 }
