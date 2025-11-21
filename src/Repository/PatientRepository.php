@@ -39,8 +39,8 @@ class PatientRepository implements PatientRepositoryInterface
             return false;
         }
 
-        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status) 
-                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status)";
+        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status, status) 
+                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status, :status)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -56,6 +56,7 @@ class PatientRepository implements PatientRepositoryInterface
             ':tax_id' => $data['tax_id'] ?? null,
             ':document_id' => $data['document_id'] ?? null,
             ':marital_status' => $data['marital_status'] ?? null,
+            ':status' => $data['status'] ?? 'active',
         ]);
     }
 
