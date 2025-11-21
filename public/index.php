@@ -75,5 +75,7 @@ $router->add('POST', '/billing/edit', [BillingController::class, 'update']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
+$router->add('GET', '/admin/users/new', [AdminController::class, 'createUser']);
+$router->add('POST', '/admin/users/new', [AdminController::class, 'storeUser']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
