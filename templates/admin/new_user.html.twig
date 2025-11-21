@@ -1,0 +1,39 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нового користувача - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нового користувача</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/users/new">
+            <div class="two fields">
+                {{ forms.input('first_name', 'Ім\'я', old.first_name ?? null, 'text', 'Ім\'я користувача', errors.first_name ?? null, {'required': 'required'})
+ }}
+                {{ forms.input('last_name', 'Прізвище', old.last_name ?? null, 'text', 'Прізвище користувача', errors.last_name ?? null, {'required': 'required'})
+ }}
+            </div>
+            {{ forms.input('email', 'Email', old.email ?? null, 'email', 'Email користувача', errors.email ?? null, {'required': 'required'})
+ }}
+            {{ forms.input('password', 'Пароль', null, 'password', 'Пароль', errors.password ?? null, {'required': 'required'})
+ }}
+            {{ forms.select('role_id', 'Роль', roles, old.role_id ?? null, errors.role_id ?? null, {'required': 'required'})
+ }}
+
+            {{ ui.button('Зберегти користувача', 'primary', 'large', 'save') }}
+            <a href="/admin/users" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
