@@ -3,15 +3,24 @@
 namespace App\Controller;
 
 use App\Core\View;
+use App\Repository\AppointmentRepository;
 use App\Repository\InvoiceRepository;
+use App\Repository\MedicalRecordRepository;
+use App\Repository\PatientRepository;
 
 class BillingController
 {
     private InvoiceRepository $invoiceRepository;
+    private PatientRepository $patientRepository;
+    private AppointmentRepository $appointmentRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
 
     public function __construct()
     {
         $this->invoiceRepository = new InvoiceRepository();
+        $this->patientRepository = new PatientRepository();
+        $this->appointmentRepository = new AppointmentRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
     }
 
     public function index(): void
@@ -22,5 +31,51 @@ class BillingController
         }
         $invoices = $this->invoiceRepository->findAll();
         View::render('billing/index.html.twig', ['invoices' => $invoices]);
+    }
+
+    public function create(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $patients = $this->patientRepository->findAllActive();
+        $appointments = $this->appointmentRepository->findAll(); // TODO: filter by patient
+        $medicalRecords = $this->medicalRecordRepository->findByPatientId(0); // TODO: filter by patient
+
+        $patientOptions = [];
+        foreach ($patients as $patient) {
+            $patientOptions[$patient['id']] = $patient['full_name'];
+        }
+
+        $appointmentOptions = [];
+        foreach ($appointments as $appointment) {
+            $appointmentOptions[$appointment['id']] = 'Запис #' . $appointment['id'] . ' - ' . $appointment['patient_name'] . ' (' . $appointment['start_time'] . ')';
+        }
+
+        $medicalRecordOptions = [];
+        foreach ($medicalRecords as $record) {
+            $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id'] . ' - ' . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
+        }
+
+        View::render('billing/new.html.twig', [
+            'patients' => $patientOptions,
+            'appointments' => $appointmentOptions,
+            'medical_records' => $medicalRecordOptions,
+        ]);
+    }
+
+    public function store(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        // TODO: Add validation
+        $this->invoiceRepository->save($_POST);
+        header('Location: /billing');
+        exit();
     }
 }
