@@ -8,6 +8,6 @@ interface PatientRepositoryInterface
     public function save(array $data): bool;
     public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array;
     public function findById(int $id): ?array;
-    // public function update(int $id, array $data): bool;
+    public function update(int $id, array $data): bool;
     // public function delete(int $id): bool;
 }

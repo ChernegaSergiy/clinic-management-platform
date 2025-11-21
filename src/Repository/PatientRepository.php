@@ -72,4 +72,38 @@ class PatientRepository implements PatientRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE patients SET 
+                    first_name = :first_name, 
+                    last_name = :last_name, 
+                    middle_name = :middle_name, 
+                    birth_date = :birth_date, 
+                    gender = :gender, 
+                    phone = :phone, 
+                    email = :email, 
+                    address = :address, 
+                    tax_id = :tax_id, 
+                    document_id = :document_id, 
+                    marital_status = :marital_status 
+                WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':middle_name' => $data['middle_name'] ?? null,
+            ':birth_date' => $data['birth_date'],
+            ':gender' => $data['gender'],
+            ':phone' => $data['phone'],
+            ':email' => $data['email'] ?? null,
+            ':address' => $data['address'] ?? null,
+            ':tax_id' => $data['tax_id'] ?? null,
+            ':document_id' => $data['document_id'] ?? null,
+            ':marital_status' => $data['marital_status'] ?? null,
+        ]);
+    }
 }
