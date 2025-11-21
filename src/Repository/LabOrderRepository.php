@@ -63,4 +63,24 @@ class LabOrderRepository implements LabOrderRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE lab_orders SET 
+                    order_code = :order_code, 
+                    status = :status, 
+                    results = :results, 
+                    notes = :notes 
+                WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':order_code' => $data['order_code'],
+            ':status' => $data['status'],
+            ':results' => $data['results'] ?? null,
+            ':notes' => $data['notes'] ?? null,
+        ]);
+    }
 }
