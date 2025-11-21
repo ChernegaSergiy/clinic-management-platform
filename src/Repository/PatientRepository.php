@@ -14,9 +14,20 @@ class PatientRepository implements PatientRepositoryInterface
         $this->pdo = Database::getInstance();
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone FROM patients ORDER BY last_name, first_name");
+        $sql = "SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone FROM patients";
+        $params = [];
+
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE last_name LIKE :term OR first_name LIKE :term OR phone LIKE :term";
+            $params[':term'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY last_name, first_name";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
