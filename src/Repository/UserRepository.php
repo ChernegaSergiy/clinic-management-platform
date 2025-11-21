@@ -22,6 +22,20 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query("SELECT id, first_name, last_name, email, role_id FROM users ORDER BY last_name, first_name");
+        return $stmt->fetchAll();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT id, first_name, last_name, email, role_id FROM users WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+
     public function findAllDoctors(): array
     {
         $stmt = $this->pdo->query("
