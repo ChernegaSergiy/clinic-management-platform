@@ -54,7 +54,7 @@
                         <td>{{ appointment.end_time|date('Y-m-d H:i') }}</td>
                         <td>{{ appointment.status }}</td>
                         <td>
-                            <a href="#" class="ui icon button">
+                            <a href="/appointments/show?id={{ appointment.id }}" class="ui icon button">
                                 <i class="eye icon"></i>
                             </a>
                             <a href="#" class="ui icon button">
