@@ -1,0 +1,100 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Створити рецепт для {{ patient.first_name }} {{ patient.last_name }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Створити рецепт для <a href="/patients/show?id={{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</a></h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/prescriptions/new">
+            <input type="hidden" name="patient_id" value="{{ patient.id }}">
+            <div class="two fields">
+                <div class="field {% if errors.doctor_id %}error{% endif %}">
+                    <label>Лікар</label>
+                    <select class="ui search dropdown" name="doctor_id">
+                        <option value="">Виберіть лікаря</option>
+                        {% for id, name in doctors %}
+                            <option value="{{ id }}" {% if (old.doctor_id is defined and old.doctor_id == id) or (old.doctor_id is not defined and currentDoctorId == id) %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.doctor_id %}<div class="ui red basic pointing label">{{ errors.doctor_id | first }}</div>{% endif %}
+                </div>
+                <div class="field {% if errors.medical_record_id %}error{% endif %}">
+                    <label>Медичний запис (необов'язково)</label>
+                    <select class="ui search dropdown" name="medical_record_id">
+                        <option value="">Не пов'язувати</option>
+                        {% for record in medicalRecords %}
+                            <option value="{{ record.id }}" {% if old.medical_record_id == record.id %}selected{% endif %}>Запис №{{ record.id }} ({{ record.visit_date|date('Y-m-d') }})</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.medical_record_id %}<div class="ui red basic pointing label">{{ errors.medical_record_id | first }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="two fields">
+                {{ forms.input('issue_date', 'Дата виписки', old.issue_date ?? "now"|date('Y-m-d'), 'date', '', {}, {'required': 'required'})
+                }}
+                {{ forms.input('expiry_date', 'Дата закінчення (необов\'язково)', old.expiry_date ?? '', 'date') }}
+            </div>
+
+            <h3 class="ui header">Пункти рецепта</h3>
+            <div id="prescription-items">
+                {% if old.items is defined and old.items is not empty %}
+                    {% for key, item in old.items %}
+                        {{ forms.prescription_item(key, item, errors) }}
+                    {% endfor %}
+                {% else %}
+                    {{ forms.prescription_item(0, {}, {}) }}
+                {% endif %}
+            </div>
+            <button type="button" class="ui basic button add-item">Додати пункт</button>
+
+            {{ forms.textarea('notes', 'Примітки (необов\'язково)', old.notes ?? '', 'Додаткові примітки до рецепта') }}
+
+            {{ ui.button('Зберегти рецепт', 'primary', 'large', 'save') }}
+            <a href="/patients/show?id={{ patient.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+
+            var itemIndex = {{ old.items|length ?? 1 }};
+
+            $('.add-item').on('click', function() {
+                var newItemHtml = `
+                    <div class="fields" data-item-index="${itemIndex}">
+                        <div class="eight wide field">
+                            <label>Назва медикаменту</label>
+                            <input type="text" name="items[${itemIndex}][medication_name]" placeholder="Назва медикаменту" required>
+                        </div>
+                        <div class="three wide field">
+                            <label>Дозування</label>
+                            <input type="text" name="items[${itemIndex}][dosage]" placeholder="Дозування" required>
+                        </div>
+                        <div class="three wide field">
+                            <label>Частота</label>
+                            <input type="text" name="items[${itemIndex}][frequency]" placeholder="Частота" required>
+                        </div>
+                        <div class="one wide field">
+                            <label>&nbsp;</label>
+                            <button type="button" class="ui red icon button remove-item"><i class="trash icon"></i></button>
+                        </div>
+                    </div>
+                `;
+                $('#prescription-items').append(newItemHtml);
+                itemIndex++;
+            });
+
+            $('#prescription-items').on('click', '.remove-item', function() {
+                $(this).closest('.fields').remove();
+            });
+        });
+    </script>
+{% endblock %}
