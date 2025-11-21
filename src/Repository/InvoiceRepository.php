@@ -61,4 +61,30 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE invoices SET 
+                    patient_id = :patient_id, 
+                    appointment_id = :appointment_id, 
+                    medical_record_id = :medical_record_id, 
+                    amount = :amount, 
+                    status = :status, 
+                    notes = :notes,
+                    paid_date = :paid_date
+                WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':patient_id' => $data['patient_id'],
+            ':appointment_id' => $data['appointment_id'] ?? null,
+            ':medical_record_id' => $data['medical_record_id'] ?? null,
+            ':amount' => $data['amount'],
+            ':status' => $data['status'],
+            ':notes' => $data['notes'] ?? null,
+            ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+        ]);
+    }
 }
