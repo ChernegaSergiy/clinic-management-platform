@@ -3,18 +3,25 @@
 namespace App\Controller;
 
 use App\Core\View;
+use App\Core\Validator;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\LabOrderRepository;
+use App\Repository\UserRepository;
+use App\Core\NotificationService;
 
 class LabOrderController
 {
     private MedicalRecordRepository $medicalRecordRepository;
     private LabOrderRepository $labOrderRepository;
+    private UserRepository $userRepository;
+    private NotificationService $notificationService;
 
     public function __construct()
     {
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->labOrderRepository = new LabOrderRepository();
+        $this->userRepository = new UserRepository();
+        $this->notificationService = new NotificationService();
     }
 
     public function create(): void
