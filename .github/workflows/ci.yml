@@ -2,30 +2,36 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
+        extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
+        ini-values: post_max_size=256M, upload_max_filesize=256M
+        coverage: none # Disable Xdebug or PCOV for faster execution if not needed for coverage reports
 
-    - name: Install Dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Run Code Sniffer
-      run: composer test:cs
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
 
     - name: Run PHPStan
-      run: composer test:stan
+      run: composer stan
 
-    - name: Run PHPUnit
+    - name: Run PHP_CodeSniffer
+      run: composer cs
+
+    - name: Run PHPUnit tests
       run: composer test
