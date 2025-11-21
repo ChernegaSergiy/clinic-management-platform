@@ -2,11 +2,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
-
-use App\Repository\PatientRepository;
-use Symfony\Component\Yaml\Yaml;
+use App\Core\Router;
+use App\Controller\PageController;
+use App\Controller\AuthController;
+use App\Controller\PatientController;
 
 // Завантаження .env файлу
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
@@ -14,92 +13,22 @@ $dotenv->load();
 
 session_start();
 
-// Налаштування завантажувача шаблонів
-$loader = new FilesystemLoader(__DIR__ . '/../templates');
+$router = new Router();
 
-// Налаштування середовища Twig
-$twig = new Environment($loader, [
-    // 'cache' => __DIR__ . '/../var/cache', // Розкоментуйте для кешування
-]);
-$twig->addGlobal('session', $_SESSION);
+// Page routes
+$router->add('GET', '/', [PageController::class, 'home']);
+$router->add('GET', '/about', [PageController::class, 'about']);
+$router->add('GET', '/contact', [PageController::class, 'contact']);
 
-// Завантаження контенту
-$content = Yaml::parseFile(__DIR__ . '/../content/home.uk.yml');
+// Auth routes
+$router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
+$router->add('POST', '/login', [AuthController::class, 'login']);
+$router->add('GET', '/logout', [AuthController::class, 'logout']);
+$router->add('GET', '/dashboard', [AuthController::class, 'dashboard']);
 
-$requestUri = $_SERVER['REQUEST_URI'];
-$requestMethod = $_SERVER['REQUEST_METHOD'];
+// Patient routes
+$router->add('GET', '/patients', [PatientController::class, 'index']);
+$router->add('GET', '/patients/new', [PatientController::class, 'create']);
+$router->add('POST', '/patients/new', [PatientController::class, 'store']);
 
-// Проста імітація користувачів
-$users = [
-    'admin' => password_hash('password', PASSWORD_BCRYPT),
-    'doctor' => password_hash('password', PASSWORD_BCRYPT),
-];
-
-// Маршрутизація
-switch ($requestUri) {
-    case '/':
-        echo $twig->render('home/index.html.twig', ['page' => $content]);
-        break;
-    case '/about':
-        echo $twig->render('about/index.html.twig');
-        break;
-    case '/contact':
-        echo $twig->render('contact/index.html.twig');
-        break;
-    case '/login':
-        if ($requestMethod === 'POST') {
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $error = [];
-
-            if (isset($users[$username]) && password_verify($password, $users[$username])) {
-                $_SESSION['user'] = $username;
-                header('Location: /dashboard'); // Перенаправлення на дашборд після успішного входу
-                exit();
-            } else {
-                $error['message'] = 'Невірне ім\'я користувача або пароль.';
-            }
-            echo $twig->render('auth/login.html.twig', ['error' => $error]);
-        } else {
-            echo $twig->render('auth/login.html.twig');
-        }
-        break;
-    case '/logout':
-        session_destroy();
-        header('Location: /');
-        exit();
-        break;
-    case '/patients':
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
-        $patientRepository = new PatientRepository();
-        $patients = $patientRepository->findAll();
-        echo $twig->render('patients/index.html.twig', ['patients' => $patients]);
-        break;
-    case '/patients/new':
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
-        if ($requestMethod === 'POST') {
-            $patientRepository = new PatientRepository();
-            $patientRepository->save($_POST);
-            header('Location: /patients');
-            exit();
-        }
-        echo $twig->render('patients/new.html.twig');
-        break;
-    case '/dashboard': // Приклад захищеного маршруту
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
-        echo "<h1>Вітаємо, " . $_SESSION['user'] . "! Це ваш дашборд.</h1><p><a href=\"/logout\">Вийти</a></p>";
-        break;
-    default:
-        header("HTTP/1.0 404 Not Found");
-        echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
-        break;
-}
+$router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
