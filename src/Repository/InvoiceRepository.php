@@ -30,21 +30,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): ?int
     {
-        $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes) 
-                VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes)";
+        $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
+                VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
         
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        $success = $stmt->execute([
             ':patient_id' => $data['patient_id'],
             ':appointment_id' => $data['appointment_id'] ?? null,
             ':medical_record_id' => $data['medical_record_id'] ?? null,
             ':amount' => $data['amount'],
             ':status' => $data['status'] ?? 'pending',
             ':notes' => $data['notes'] ?? null,
+            ':type' => $data['type'] ?? 'invoice',
         ]);
+        return $success ? (int)$this->pdo->lastInsertId() : null;
     }
 
     public function findById(int $id): ?array
@@ -59,6 +61,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
+
+        if ($result) {
+            $result['payments'] = $this->getPaymentsForInvoice($id);
+            $result['total_paid'] = array_sum(array_column($result['payments'], 'amount'));
+            $result['remaining_amount'] = $result['amount'] - $result['total_paid'];
+        }
         return $result === false ? null : $result;
     }
 
@@ -90,20 +98,40 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ]);
     }
 
-    public function logFinancialTransaction(int $patientId, float $amount, string $type, string $notes = null, int $linkedEntityId = null): bool
+    public function addPayment(int $invoiceId, float $amount, string $paymentMethod, string $transactionId = null, string $notes = null): bool
     {
-        $sql = "INSERT INTO invoices (patient_id, amount, status, notes, type, medical_record_id) 
-                VALUES (:patient_id, :amount, :status, :notes, :type, :medical_record_id)";
-        
-        $stmt = $this->pdo->prepare($sql);
+        $this->pdo->beginTransaction();
+        try {
+            $sql = "INSERT INTO payments (invoice_id, amount, payment_method, transaction_id, notes) 
+                    VALUES (:invoice_id, :amount, :payment_method, :transaction_id, :notes)";
+            $stmt = $this->pdo->prepare($sql);
+            $success = $stmt->execute([
+                ':invoice_id' => $invoiceId,
+                ':amount' => $amount,
+                ':payment_method' => $paymentMethod,
+                ':transaction_id' => $transactionId,
+                ':notes' => $notes,
+            ]);
 
-        return $stmt->execute([
-            ':patient_id' => $patientId,
-            ':amount' => $amount,
-            ':status' => 'completed', // Financial transactions are typically 'completed' immediately
-            ':notes' => $notes,
-            ':type' => $type,
-            ':medical_record_id' => $linkedEntityId,
-        ]);
+            if ($success) {
+                // Update invoice status if fully paid
+                $invoice = $this->findById($invoiceId);
+                if ($invoice && $invoice['remaining_amount'] <= 0.01 && $invoice['status'] !== 'paid') {
+                    $this->update($invoiceId, array_merge($invoice, ['status' => 'paid', 'paid_date' => date('Y-m-d H:i:s')]));
+                }
+            }
+            $this->pdo->commit();
+            return $success;
+        } catch (\PDOException $e) {
+            $this->pdo->rollBack();
+            // Log error
+            return false;
+        }
     }
-}
+
+    public function getPaymentsForInvoice(int $invoiceId): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC");
+        $stmt->execute([':invoice_id' => $invoiceId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
