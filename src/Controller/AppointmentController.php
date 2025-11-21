@@ -212,4 +212,26 @@ class AppointmentController
         header('Location: /appointments/show?id=' . $id);
         exit();
     }
+
+    public function cancel(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $appointment = $this->appointmentRepository->findById($id);
+
+        if (!$appointment) {
+            http_response_code(404);
+            echo "Запис не знайдено";
+            return;
+        }
+
+        $this->appointmentRepository->updateStatus($id, 'cancelled');
+
+        header('Location: /appointments/show?id=' . $id);
+        exit();
+    }
 }
