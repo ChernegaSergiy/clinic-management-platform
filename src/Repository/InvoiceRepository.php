@@ -29,4 +29,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ");
         return $stmt->fetchAll();
     }
+
+    public function save(array $data): bool
+    {
+        $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes) 
+                VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':patient_id' => $data['patient_id'],
+            ':appointment_id' => $data['appointment_id'] ?? null,
+            ':medical_record_id' => $data['medical_record_id'] ?? null,
+            ':amount' => $data['amount'],
+            ':status' => $data['status'] ?? 'pending',
+            ':notes' => $data['notes'] ?? null,
+        ]);
+    }
 }
