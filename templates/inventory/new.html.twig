@@ -12,20 +12,20 @@
         <form class="ui form" method="POST" action="/inventory/new">
             <div class="two fields">
                 {{ forms.input('name', 'Назва', old.name ?? null, 'text', 'Назва позиції', errors.name ?? null, {'required': 'required'}) }}
-                {{ forms.input('inn', 'INN (Міжнародна непатентована назва)', old.inn ?? null, 'text', 'INN') }}
+                {{ forms.input('inn', 'INN (Міжнародна непатентована назва)', old.inn ?? null, 'text', 'INN', errors.inn ?? null) }}
             </div>
-            {{ forms.textarea('description', 'Опис', old.description ?? null, 'Детальний опис позиції') }}
+            {{ forms.textarea('description', 'Опис', old.description ?? null, 'Детальний опис позиції', errors.description ?? null) }}
             <div class="three fields">
-                {{ forms.input('batch_number', 'Номер партії', old.batch_number ?? null, 'text', 'Номер партії') }}
-                {{ forms.input('expiry_date', 'Термін придатності', old.expiry_date ?? null, 'date', '') }}
-                {{ forms.input('supplier', 'Постачальник', old.supplier ?? null, 'text', 'Назва постачальника') }}
+                {{ forms.input('batch_number', 'Номер партії', old.batch_number ?? null, 'text', 'Номер партії', errors.batch_number ?? null) }}
+                {{ forms.input('expiry_date', 'Термін придатності', old.expiry_date ?? null, 'date', '', errors.expiry_date ?? null) }}
+                {{ forms.input('supplier', 'Постачальник', old.supplier ?? null, 'text', 'Назва постачальника', errors.supplier ?? null) }}
             </div>
             <div class="three fields">
                 {{ forms.input('cost', 'Вартість (за одиницю)', old.cost ?? null, 'number', '0.00', errors.cost ?? null, {'step': '0.01'}) }}
                 {{ forms.input('quantity', 'Кількість', old.quantity ?? null, 'number', '0', errors.quantity ?? null, {'required': 'required'}) }}
-                {{ forms.input('min_stock_threshold', 'Мінімальний поріг запасу', old.min_stock_threshold ?? null, 'number', '0') }}
+                {{ forms.input('min_stock_threshold', 'Мінімальний поріг запасу', old.min_stock_threshold ?? null, 'number', '0', errors.min_stock_threshold ?? null) }}
             </div>
-            {{ forms.input('location', 'Місце зберігання', old.location ?? null, 'text', 'Наприклад, Склад 1, полиця А') }}
+            {{ forms.input('location', 'Місце зберігання', old.location ?? null, 'text', 'Наприклад, Склад 1, полиця А', errors.location ?? null) }}
 
             {{ ui.button('Зберегти позицію', 'primary', 'large', 'save') }}
             <a href="/inventory" class="ui button">Скасувати</a>
