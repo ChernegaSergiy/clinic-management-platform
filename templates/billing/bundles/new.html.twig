@@ -1,0 +1,58 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати новий пакет послуг - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати новий пакет послуг</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/bundles/new">
+            {{ forms.input('name', 'Назва пакету', old.name ?? '', 'text', 'Назва пакету послуг', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис пакету', old.description ?? '', 'Детальний опис пакету послуг', errors.description ?? null) }}
+            {{ forms.input('price', 'Ціна пакету', old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
+            
+            <div class="field {% if errors.services %}error{% endif %}">
+                <label>Послуги в пакеті</label>
+                <div class="ui fluid search multiple selection dropdown">
+                    <input type="hidden" name="services[]" value="{{ old.services|json_encode|raw }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть послуги</div>
+                    <div class="menu">
+                        {% for service in services %}
+                            <div class="item" data-value="{{ service.id }}">{{ service.name }} ({{ service.price | number_format(2) }})</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if errors.services %}<div class="ui red basic pointing label">{{ errors.services | first }}</div>{% endif %}
+            </div>
+
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
+                    <label>Активний пакет</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти пакет', 'primary', 'large', 'save') }}
+            <a href="/billing/bundles" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+
+            // Set pre-selected services if available
+            var oldServices = {{ old.services|json_encode|raw }};
+            if (oldServices && oldServices.length > 0) {
+                $('.ui.fluid.search.multiple.selection.dropdown').dropdown('set exactly', oldServices);
+            }
+        });
+    </script>
+{% endblock %}
