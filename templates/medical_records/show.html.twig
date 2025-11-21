@@ -29,6 +29,18 @@
                     <td>Код діагнозу (ICD-10)</td>
                     <td>{{ record.diagnosis_code }}</td>
                 </tr>
+                {% if record.icd_codes is not empty %}
+                <tr>
+                    <td>Додаткові ICD-10 коди</td>
+                    <td>
+                        <div class="ui labels">
+                            {% for icd in record.icd_codes %}
+                                <a class="ui label">{{ icd.code }} - {{ icd.description }}</a>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td>Діагноз</td>
                     <td>{{ record.diagnosis_text|nl2br }}</td>
