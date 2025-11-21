@@ -19,4 +19,12 @@ class RoleRepository implements RoleRepositoryInterface
         $stmt = $this->pdo->query("SELECT id, name FROM roles ORDER BY name");
         return $stmt->fetchAll();
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT id, name FROM roles WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
