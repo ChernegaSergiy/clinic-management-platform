@@ -43,6 +43,9 @@
         <div class="ui divider"></div>
 
         <a href="/appointments/edit?id={{ appointment.id }}" class="ui primary button">Редагувати</a>
+        {% if appointment.status == 'scheduled' %}
+            <a href="/appointments/cancel?id={{ appointment.id }}" class="ui negative button">Скасувати</a>
+        {% endif %}
         <a href="/appointments" class="ui button">Повернутися до списку</a>
     </div>
 {% endblock %}
