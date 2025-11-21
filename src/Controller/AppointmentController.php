@@ -68,4 +68,21 @@ class AppointmentController
         header('Location: /appointments');
         exit();
     }
+
+    public function json(): void
+    {
+        $appointments = $this->appointmentRepository->findAll();
+        $events = [];
+        foreach ($appointments as $appointment) {
+            $events[] = [
+                'title' => $appointment['patient_name'] . ' (' . $appointment['doctor_name'] . ')',
+                'start' => $appointment['start_time'],
+                'end' => $appointment['end_time'],
+                'id' => $appointment['id'],
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($events);
+    }
 }
