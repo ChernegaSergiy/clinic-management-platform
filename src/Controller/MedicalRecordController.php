@@ -4,17 +4,20 @@ namespace App\Controller;
 
 use App\Core\View;
 use App\Repository\AppointmentRepository;
+use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
 
 class MedicalRecordController
 {
     private MedicalRecordRepository $medicalRecordRepository;
     private AppointmentRepository $appointmentRepository;
+    private LabOrderRepository $labOrderRepository;
 
     public function __construct()
     {
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->appointmentRepository = new AppointmentRepository();
+        $this->labOrderRepository = new LabOrderRepository();
     }
 
     public function create(): void
@@ -82,6 +85,11 @@ class MedicalRecordController
             return;
         }
 
-        View::render('medical_records/show.html.twig', ['record' => $record]);
+        $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
+
+        View::render('medical_records/show.html.twig', [
+            'record' => $record,
+            'lab_orders' => $labOrders,
+        ]);
     }
 }
