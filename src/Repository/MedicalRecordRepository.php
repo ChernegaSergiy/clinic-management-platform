@@ -28,4 +28,23 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         $stmt->execute([':patient_id' => $patientId]);
         return $stmt->fetchAll();
     }
+
+    public function save(array $data): bool
+    {
+        $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, diagnosis_code, diagnosis_text, treatment, notes) 
+                VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, :diagnosis_code, :diagnosis_text, :treatment, :notes)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':patient_id' => $data['patient_id'],
+            ':appointment_id' => $data['appointment_id'],
+            ':doctor_id' => $data['doctor_id'],
+            ':visit_date' => $data['visit_date'],
+            ':diagnosis_code' => $data['diagnosis_code'] ?? null,
+            ':diagnosis_text' => $data['diagnosis_text'] ?? null,
+            ':treatment' => $data['treatment'] ?? null,
+            ':notes' => $data['notes'] ?? null,
+        ]);
+    }
 }
