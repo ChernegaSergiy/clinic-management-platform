@@ -1,0 +1,63 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Послуги - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування послугами</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/billing/services/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати послугу
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if services is empty %}
+            <p>Немає послуг для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Категорія</th>
+                        <th>Ціна</th>
+                        <th>Активна</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                        <tr>
+                            <td>{{ service.id }}</td>
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.category_name ?: 'Без категорії' }}</td>
+                            <td>{{ service.price | number_format(2) }}</td>
+                            <td>
+                                {% if service.is_active %}
+                                    <i class="check circle icon green"></i> Так
+                                {% else %}
+                                    <i class="times circle icon red"></i> Ні
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/billing/services/edit?id={{ service.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                {# <a href="/billing/services/delete?id={{ service.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a> #}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
