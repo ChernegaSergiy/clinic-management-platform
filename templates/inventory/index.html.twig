@@ -1,0 +1,66 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Склад - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Складські позиції</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                {{ ui.button('Додати позицію', 'primary', '', 'plus') }}
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Пошук позицій...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>INN</th>
+                    <th>Кількість</th>
+                    <th>Мін. поріг</th>
+                    <th>Термін придатності</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.inn }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.min_stock_threshold }}</td>
+                        <td>{{ item.expiry_date }}</td>
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="#" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">Немає позицій на складі.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
