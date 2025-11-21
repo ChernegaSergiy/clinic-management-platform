@@ -49,4 +49,35 @@
         <a href="/medical-records/edit?id={{ record.id }}" class="ui primary button">Редагувати</a>
         <a href="/patients/show?id={{ record.patient_id }}" class="ui button">Повернутися до пацієнта</a>
     </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Лабораторні замовлення</h3>
+        <a href="/lab-orders/new?record_id={{ record.id }}" class="ui green button">Створити лабораторне замовлення</a>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Код замовлення</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in lab_orders %}
+                    <tr>
+                        <td>{{ order.order_code }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>
+                            <a href="#" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="center aligned">Немає лабораторних замовлень для цього запису.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
