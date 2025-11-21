@@ -36,6 +36,14 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
+    public function findByEmailExcludingId(string $email, int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email AND id != :id");
+        $stmt->execute([':email' => $email, ':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+
     public function save(array $data): bool
     {
         $sql = "INSERT INTO users (first_name, last_name, email, password, role_id) 
