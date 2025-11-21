@@ -1,0 +1,57 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Підтвердження імпорту лабораторних замовлень - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Підтвердження імпорту лабораторних замовлень (HL7/DICOM)</h2>
+        <div class="ui divider"></div>
+
+        {% if errors is not empty %}
+            <div class="ui error message">
+                <ul class="list">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if parsedData is empty %}
+            <p>Немає даних для підтвердження імпорту.</p>
+        {% else %}
+            <h3 class="ui header">Перегляньте імпортовані дані</h3>
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Поле</th>
+                        <th>Значення</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Тип файлу</td>
+                        <td>{{ parsedData.type }}</td>
+                    </tr>
+                    <tr>
+                        <td>Код замовлення</td>
+                        <td>{{ parsedData.parsed_data.order_code }}</td>
+                    </tr>
+                    {# Additional fields from parsedData can be displayed here #}
+                    <tr>
+                        <td>Зміст файлу (фрагмент)</td>
+                        <td><pre>{{ parsedData.content|slice(0, 500) }}...</pre></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="ui divider"></div>
+
+            <form class="ui form" action="/lab-orders/import/finalize" method="POST">
+                <button class="ui green button" type="submit">Підтвердити та імпортувати</button>
+                <a href="/lab-orders/import" class="ui button">Скасувати</a>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}
