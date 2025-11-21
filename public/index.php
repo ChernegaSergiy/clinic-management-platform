@@ -53,5 +53,6 @@ $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 's
 // Lab Order routes
 $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
 $router->add('POST', '/lab-orders/new', [LabOrderController::class, 'store']);
+$router->add('GET', '/lab-orders/show', [LabOrderController::class, 'show']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
