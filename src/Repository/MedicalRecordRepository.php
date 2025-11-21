@@ -47,4 +47,21 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             ':notes' => $data['notes'] ?? null,
         ]);
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                mr.*,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM medical_records mr
+            JOIN patients p ON mr.patient_id = p.id
+            JOIN users u ON mr.doctor_id = u.id
+            WHERE mr.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
