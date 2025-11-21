@@ -58,6 +58,17 @@ class PatientController
             return;
         }
 
+        // Перевірка на дублікати
+        $existingPatient = $this->patientRepository->findByCredentials($_POST['last_name'], $_POST['first_name'], $_POST['birth_date']);
+        if ($existingPatient) {
+            $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
+            View::render('patients/new.html.twig', [
+                'errors' => $errors,
+                'old' => $_POST,
+            ]);
+            return;
+        }
+
         $this->patientRepository->save($_POST);
         header('Location: /patients');
         exit();
