@@ -36,17 +36,19 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function findAllDoctors(): array
+    public function save(array $data): bool
     {
-        $stmt = $this->pdo->query("
-            SELECT 
-                u.id, 
-                CONCAT(u.last_name, ' ', u.first_name) as full_name 
-            FROM users u
-            JOIN roles r ON u.role_id = r.id
-            WHERE r.name = 'doctor'
-            ORDER BY u.last_name, u.first_name
-        ");
-        return $stmt->fetchAll();
+        $sql = "INSERT INTO users (first_name, last_name, email, password, role_id) 
+                VALUES (:first_name, :last_name, :email, :password, :role_id)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':email' => $data['email'],
+            ':password' => password_hash($data['password'], PASSWORD_DEFAULT),
+            ':role_id' => $data['role_id'],
+        ]);
     }
 }
