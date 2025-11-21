@@ -19,4 +19,26 @@ class PatientRepository implements PatientRepositoryInterface
         $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone FROM patients ORDER BY last_name, first_name");
         return $stmt->fetchAll();
     }
+
+    public function save(array $data): bool
+    {
+        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status) 
+                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':middle_name' => $data['middle_name'] ?? null,
+            ':birth_date' => $data['birth_date'],
+            ':gender' => $data['gender'],
+            ':phone' => $data['phone'],
+            ':email' => $data['email'] ?? null,
+            ':address' => $data['address'] ?? null,
+            ':tax_id' => $data['tax_id'] ?? null,
+            ':document_id' => $data['document_id'] ?? null,
+            ':marital_status' => $data['marital_status'] ?? null,
+        ]);
+    }
 }
