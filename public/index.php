@@ -69,5 +69,6 @@ $router->add('POST', '/inventory/edit', [InventoryController::class, 'update']);
 $router->add('GET', '/billing', [BillingController::class, 'index']);
 $router->add('GET', '/billing/new', [BillingController::class, 'create']);
 $router->add('POST', '/billing/new', [BillingController::class, 'store']);
+$router->add('GET', '/billing/show', [BillingController::class, 'show']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
