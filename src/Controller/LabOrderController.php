@@ -193,4 +193,58 @@ class LabOrderController
         header('Location: /lab-orders/show?id=' . $id);
         exit();
     }
+
+    public function import(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        View::render('lab_orders/import.html.twig', [
+            'errors' => $_SESSION['errors'] ?? [],
+            'success_message' => $_SESSION['success_message'] ?? null,
+        ]);
+        unset($_SESSION['errors'], $_SESSION['success_message']);
+    }
+
+    public function processImport(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        if (empty($_FILES['hl7_dicom_file'])) {
+            $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
+            header('Location: /lab-orders/import');
+            exit();
+        }
+
+        $file = $_FILES['hl7_dicom_file'];
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
+            header('Location: /lab-orders/import');
+            exit();
+        }
+
+        // For now, just save the file and show a success message
+        $uploadDir = __DIR__ . '/../../uploads/hl7_dicom/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
+
+        $filename = uniqid('hl7_dicom_', true) . '_' . basename($file['name']);
+        $targetPath = $uploadDir . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            $_SESSION['success_message'] = 'Файл ' . $file['name'] . ' успішно завантажено. Подальша обробка буде реалізована.';
+        } else {
+            $_SESSION['errors']['file'] = 'Не вдалося зберегти завантажений файл.';
+        }
+
+        header('Location: /lab-orders/import');
+        exit();
+    }
 }
