@@ -41,4 +41,16 @@ class PatientRepository implements PatientRepositoryInterface
             ':marital_status' => $data['marital_status'] ?? null,
         ]);
     }
+
+    public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE last_name = :last_name AND first_name = :first_name AND birth_date = :birth_date");
+        $stmt->execute([
+            ':last_name' => $lastName,
+            ':first_name' => $firstName,
+            ':birth_date' => $birthDate,
+        ]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
