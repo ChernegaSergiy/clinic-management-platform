@@ -51,7 +51,16 @@ class AdminController
             $roleOptions[$role['id']] = $role['name'];
         }
 
-        View::render('admin/new_user.html.twig', ['roles' => $roleOptions]);
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('admin/new_user.html.twig', [
+            'roles' => $roleOptions,
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function storeUser(): void
