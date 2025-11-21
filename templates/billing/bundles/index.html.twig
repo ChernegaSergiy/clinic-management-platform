@@ -1,0 +1,73 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Пакети послуг - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування пакетами послуг</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/billing/bundles/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати пакет послуг
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if bundles is empty %}
+            <p>Немає пакетів послуг для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Ціна</th>
+                        <th>Активний</th>
+                        <th>Послуги в пакеті</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bundle in bundles %}
+                        <tr>
+                            <td>{{ bundle.id }}</td>
+                            <td>{{ bundle.name }}</td>
+                            <td>{{ bundle.price | number_format(2) }}</td>
+                            <td>
+                                {% if bundle.is_active %}
+                                    <i class="check circle icon green"></i> Так
+                                {% else %}
+                                    <i class="times circle icon red"></i> Ні
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if bundle.services is not empty %}
+                                    <ul class="ui list">
+                                        {% for service in bundle.services %}
+                                            <li>{{ service.name }} ({{ service.price | number_format(2) }})</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    Немає послуг
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/billing/bundles/edit?id={{ bundle.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                {# <a href="/billing/bundles/delete?id={{ bundle.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a> #}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
