@@ -33,7 +33,16 @@ class LabOrderController
             return;
         }
 
-        View::render('lab_orders/new.html.twig', ['medical_record' => $medicalRecord]);
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['old']);
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
+        View::render('lab_orders/new.html.twig', [
+            'medical_record' => $medicalRecord,
+            'old' => $old,
+            'errors' => $errors,
+        ]);
     }
 
     public function store(): void
