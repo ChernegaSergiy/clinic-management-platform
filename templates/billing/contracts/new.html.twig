@@ -1,0 +1,54 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати новий контракт - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати новий контракт</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/contracts/new" enctype="multipart/form-data">
+            {{ forms.input('title', 'Назва контракту', old.title ?? '', 'text', 'Наприклад, Договір про надання медичних послуг', errors.title ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис контракту', old.description ?? '', 'Детальний опис умов контракту', errors.description ?? null) }}
+            
+            <div class="two fields">
+                {{ forms.input('start_date', 'Дата початку', old.start_date ?? '', 'date', '', errors.start_date ?? null, {'required': 'required'}) }}
+                {{ forms.input('end_date', 'Дата закінчення (необов\'язково)', old.end_date ?? '', 'date', '', errors.end_date ?? null) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('party_a', 'Сторона А (наприклад, Назва клініки)', old.party_a ?? '', 'text', 'Назва сторони А', errors.party_a ?? null) }}
+                {{ forms.input('party_b', 'Сторона Б (наприклад, ПІБ пацієнта/лікаря)', old.party_b ?? '', 'text', 'Назва сторони Б', errors.party_b ?? null) }}
+            </div>
+
+            <div class="field {% if errors.contract_file %}error{% endif %}">
+                <label>Файл контракту</label>
+                <input type="file" name="contract_file">
+                {% if errors.contract_file %}<div class="ui red basic pointing label">{{ errors.contract_file | first }}</div>{% endif %}
+            </div>
+
+            <div class="field {% if errors.status %}error{% endif %}">
+                <label>Статус</label>
+                <select class="ui dropdown" name="status">
+                    <option value="active" {% if (old.status is defined and old.status == 'active') or (old.status is not defined) %}selected{% endif %}>Активний</option>
+                    <option value="expired" {% if old.status == 'expired' %}selected{% endif %}>Завершений</option>
+                    <option value="terminated" {% if old.status == 'terminated' %}selected{% endif %}>Розірваний</option>
+                </select>
+                {% if errors.status %}<div class="ui red basic pointing label">{{ errors.status | first }}</div>{% endif %}
+            </div>
+
+            {{ ui.button('Зберегти контракт', 'primary', 'large', 'save') }}
+            <a href="/billing/contracts" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
