@@ -1,0 +1,48 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нову послугу - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нову послугу</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/services/new">
+            {{ forms.input('name', 'Назва послуги', old.name ?? '', 'text', 'Назва послуги', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис послуги', old.description ?? '', 'Детальний опис послуги', errors.description ?? null) }}
+            {{ forms.input('price', 'Ціна', old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
+            
+            <div class="field {% if errors.category_id %}error{% endif %}">
+                <label>Категорія</label>
+                <select class="ui dropdown" name="category_id">
+                    <option value="">Виберіть категорію</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if old.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if errors.category_id %}<div class="ui red basic pointing label">{{ errors.category_id | first }}</div>{% endif %}
+            </div>
+
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
+                    <label>Активна послуга</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти послугу', 'primary', 'large', 'save') }}
+            <a href="/billing/services" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
