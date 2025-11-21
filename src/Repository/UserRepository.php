@@ -51,4 +51,32 @@ class UserRepository implements UserRepositoryInterface
             ':role_id' => $data['role_id'],
         ]);
     }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE users SET 
+                    first_name = :first_name, 
+                    last_name = :last_name, 
+                    email = :email, 
+                    role_id = :role_id";
+        
+        $params = [
+            ':id' => $id,
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':email' => $data['email'],
+            ':role_id' => $data['role_id'],
+        ];
+
+        if (!empty($data['password'])) {
+            $sql .= ", password = :password";
+            $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        
+        $sql .= " WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute($params);
+    }
 }
