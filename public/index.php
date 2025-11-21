@@ -16,6 +16,7 @@ $loader = new FilesystemLoader(__DIR__ . '/../templates');
 $twig = new Environment($loader, [
     // 'cache' => __DIR__ . '/../var/cache', // Розкоментуйте для кешування
 ]);
+$twig->addGlobal('session', $_SESSION);
 
 // Завантаження контенту
 $content = Yaml::parseFile(__DIR__ . '/../content/home.uk.yml');

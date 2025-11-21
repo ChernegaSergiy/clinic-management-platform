@@ -23,10 +23,21 @@
         <a class="item" href="/contact">
             Контакти
         </a>
-        <div class="right menu">
-            <a class="ui item" href="/login">
-                Вхід
+        {% if session.user is defined %}
+            <a class="item" href="/patients">
+                Пацієнти
             </a>
+        {% endif %}
+        <div class="right menu">
+            {% if session.user is defined %}
+                <a class="ui item" href="/logout">
+                    Вийти ({{ session.user }})
+                </a>
+            {% else %}
+                <a class="ui item" href="/login">
+                    Вхід
+                </a>
+            {% endif %}
         </div>
     </div>
 
