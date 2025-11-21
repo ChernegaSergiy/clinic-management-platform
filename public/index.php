@@ -50,4 +50,8 @@ $router->add('GET', '/medical-records/new', [MedicalRecordController::class, 'cr
 $router->add('POST', '/medical-records/new', [MedicalRecordController::class, 'store']);
 $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);
 
+// Lab Order routes
+$router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
+$router->add('POST', '/lab-orders/new', [LabOrderController::class, 'store']);
+
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
