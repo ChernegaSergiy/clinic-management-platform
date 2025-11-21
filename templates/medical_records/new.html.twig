@@ -14,9 +14,19 @@
 
         <form class="ui form" method="POST" action="/medical-records/new?appointment_id={{ appointment.id }}">
             <div class="two fields">
-                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', '', 'text', 'Наприклад, J03.9') }}
+                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', '', 'text', 'Наприклад, J03.9', {'required': 'required'}) }}
                 {{ forms.input('visit_date', 'Дата візиту', appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', {}, {'required': 'required'})
  }}
+            </div>
+            <div class="field">
+                <label>ICD-10 Коди</label>
+                <div class="ui fluid search multiple selection dropdown" id="icd-codes-dropdown">
+                    <input type="hidden" name="icd_codes">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть ICD-10 коди</div>
+                    <div class="menu">
+                    </div>
+                </div>
             </div>
             {{ forms.textarea('diagnosis_text', 'Діагноз', '', 'Опишіть діагноз') }}
             {{ forms.textarea('treatment', 'Лікування', '', 'Опишіть призначене лікування') }}
@@ -26,4 +36,37 @@
             <a href="/appointments/show?id={{ appointment.id }}" class="ui button">Скасувати</a>
         </form>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('#icd-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/icd-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact'
+            });
+        });
+    </script>
 {% endblock %}
