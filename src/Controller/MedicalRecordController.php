@@ -68,6 +68,22 @@ class MedicalRecordController
         
         $medicalRecordId = $this->medicalRecordRepository->save($data);
 
+        if ($medicalRecordId && !empty($_FILES['attachments']['name'][0])) {
+            foreach ($_FILES['attachments']['name'] as $key => $name) {
+                if ($_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
+                    $fileData = [
+                        'name' => $name,
+                        'type' => $_FILES['attachments']['type'][$key],
+                        'tmp_name' => $_FILES['attachments']['tmp_name'][$key],
+                        'error' => $_FILES['attachments']['error'][$key],
+                        'size' => $_FILES['attachments']['size'][$key],
+                    ];
+                    // Assuming current user ID is available in session
+                    $this->attachmentService->uploadAttachment($fileData, 'medical_record', $medicalRecordId, $_SESSION['user']['id'] ?? null);
+                }
+            }
+        }
+
         // Оновлюємо статус запису на "виконано"
         $this->appointmentRepository->updateStatus($appointmentId, 'completed');
 
