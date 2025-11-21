@@ -26,7 +26,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test:cs": "phpcs",
-        "test:stan": "phpstan analyse"
+        "cs": "phpcbf --standard=phpcs.xml --exclude=vendor",
+        "cs-check": "phpcs --standard=phpcs.xml --exclude=vendor",
+        "stan": "phpstan analyse"
     }
 }
