@@ -1,0 +1,34 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Дашборд - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Вітаємо, {{ session.user.first_name }}! Це ваш дашборд.</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui three column grid">
+            <div class="column">
+                <div class="ui segment">
+                    <h3 class="ui header">Пацієнти</h3>
+                    <p>Загальна кількість пацієнтів: <strong>{{ patient_count }}</strong></p>
+                    <a href="/patients" class="ui primary button">Переглянути пацієнтів</a>
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui segment">
+                    <h3 class="ui header">Записи</h3>
+                    <p>Майбутні записи: <strong>{{ upcoming_appointments_count }}</strong></p>
+                    <a href="/appointments" class="ui primary button">Переглянути записи</a>
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui segment">
+                    <h3 class="ui header">Інвентар</h3>
+                    <p>Позицій з низьким запасом: <strong>{{ low_stock_items_count }}</strong></p>
+                    <a href="/inventory" class="ui primary button">Переглянути інвентар</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
