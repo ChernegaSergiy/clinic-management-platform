@@ -48,5 +48,6 @@ $router->add('GET', '/api/appointments', [AppointmentController::class, 'json'])
 // Medical Record routes
 $router->add('GET', '/medical-records/new', [MedicalRecordController::class, 'create']);
 $router->add('POST', '/medical-records/new', [MedicalRecordController::class, 'store']);
+$router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
