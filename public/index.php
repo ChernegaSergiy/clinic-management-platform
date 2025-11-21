@@ -5,6 +5,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+session_start();
+
 // Налаштування завантажувача шаблонів
 $loader = new FilesystemLoader(__DIR__ . '/../templates');
 
@@ -13,8 +15,8 @@ $twig = new Environment($loader, [
     // 'cache' => __DIR__ . '/../var/cache', // Розкоментуйте для кешування
 ]);
 
-
 $requestUri = $_SERVER['REQUEST_URI'];
+$requestMethod = $_SERVER['REQUEST_METHOD'];
 
 switch ($requestUri) {
     case '/':
