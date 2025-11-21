@@ -234,22 +234,32 @@ class LabOrderController
             exit();
         }
 
-        // For now, just save the file and show a success message
-        $uploadDir = __DIR__ . '/../../uploads/hl7_dicom/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0775, true);
+        // Save the file temporarily for processing
+        $tempDir = __DIR__ . '/../../uploads/temp/';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0775, true);
+        }
+        $tempFilename = uniqid('hl7_dicom_temp_', true) . '_' . basename($file['name']);
+        $tempPath = $tempDir . $tempFilename;
+
+        if (!move_uploaded_file($file['tmp_name'], $tempPath)) {
+            $_SESSION['errors']['file'] = 'Не вдалося зберегти завантажений файл для обробки.';
+            header('Location: /lab-orders/import');
+            exit();
         }
 
-        $filename = uniqid('hl7_dicom_', true) . '_' . basename($file['name']);
-        $targetPath = $uploadDir . $filename;
-
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            $_SESSION['success_message'] = 'Файл ' . $file['name'] . ' успішно завантажено. Подальша обробка буде реалізована.';
-        } else {
-            $_SESSION['errors']['file'] = 'Не вдалося зберегти завантажений файл.';
+        try {
+            $parsedData = $this->labImportService->validateStructural($tempPath, $file['type']);
+            $_SESSION['hl7_dicom_parsed_data'] = $parsedData;
+            $_SESSION['hl7_dicom_temp_path'] = $tempPath;
+            $_SESSION['success_message'] = 'Файл успішно завантажено та пройшов структурну валідацію. Будь ласка, перегляньте дані перед імпортом.';
+            header('Location: /lab-orders/import/confirm');
+            exit();
+        } catch (\Exception $e) {
+            unlink($tempPath); // Clean up temp file
+            $_SESSION['errors']['file'] = 'Помилка структурної валідації: ' . $e->getMessage();
+            header('Location: /lab-orders/import');
+            exit();
         }
-
-        header('Location: /lab-orders/import');
-        exit();
     }
 }
