@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "twig/twig": "^3.22"
+        "twig/twig": "^3.22",
+        "symfony/yaml": "^7.3"
     },
     "autoload": {
         "psr-4": {
