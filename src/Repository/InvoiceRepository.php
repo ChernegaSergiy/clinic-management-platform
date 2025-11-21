@@ -46,4 +46,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ':notes' => $data['notes'] ?? null,
         ]);
     }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                i.*,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name
+            FROM invoices i
+            JOIN patients p ON i.patient_id = p.id
+            WHERE i.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
 }
