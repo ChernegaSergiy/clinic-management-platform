@@ -8,6 +8,7 @@ use App\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
 use App\Core\AttachmentService;
+use App\Core\AuditLogger;
 
 class MedicalRecordController
 {
@@ -16,6 +17,7 @@ class MedicalRecordController
     private LabOrderRepository $labOrderRepository;
     private IcdCodeRepository $icdCodeRepository;
     private AttachmentService $attachmentService;
+    private AuditLogger $auditLogger;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class MedicalRecordController
         $this->labOrderRepository = new LabOrderRepository();
         $this->icdCodeRepository = new IcdCodeRepository();
         $this->attachmentService = new AttachmentService();
+        $this->auditLogger = new AuditLogger();
     }
 
     public function create(): void
