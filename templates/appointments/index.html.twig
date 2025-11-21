@@ -30,45 +30,7 @@
             <a class="ui label grey">Інше</a>
         </div>
 
-        <div class="ui divider"></div>
-        <h3 class="ui header">Список записів</h3>
-        <table class="ui celled table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Пацієнт</th>
-                    <th>Лікар</th>
-                    <th>Час початку</th>
-                    <th>Час закінчення</th>
-                    <th>Статус</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for appointment in appointments %}
-                    <tr>
-                        <td>{{ appointment.id }}</td>
-                        <td>{{ appointment.patient_name }}</td>
-                        <td>{{ appointment.doctor_name }}</td>
-                        <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
-                        <td>{{ appointment.end_time|date('Y-m-d H:i') }}</td>
-                        <td>{{ appointment.status }}</td>
-                        <td>
-                            <a href="/appointments/show?id={{ appointment.id }}" class="ui icon button">
-                                <i class="eye icon"></i>
-                            </a>
-                            <a href="/appointments/edit?id={{ appointment.id }}" class="ui icon button">
-                                <i class="edit icon"></i>
-                            </a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="center aligned">Немає записів для відображення.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
     </div>
 {% endblock %}
 
