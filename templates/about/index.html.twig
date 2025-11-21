@@ -1,0 +1,105 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Про нас - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui vertical stripe segment">
+        <div class="ui text container">
+            <h2 class="ui header">Наша місія та бачення</h2>
+            <p>Ми прагнемо створити інноваційну платформу, яка трансформує управління медичними закладами в Україні, роблячи їх більш ефективними, прозорими та орієнтованими на пацієнта. Наше бачення — це майбутнє, де кожна клініка має доступ до передових технологій, що дозволяють надавати медичні послуги найвищої якості.</p>
+
+            <h3 class="ui header">Цінності проєкту</h3>
+            <div class="ui three column stackable grid">
+                <div class="column">
+                    <h4 class="ui header"><i class="lightbulb outline icon"></i> Інновації</h4>
+                    <p>Постійний пошук та впровадження нових рішень для покращення медичних процесів.</p>
+                </div>
+                <div class="column">
+                    <h4 class="ui header"><i class="handshake outline icon"></i> Довіра</h4>
+                    <p>Побудова довгострокових відносин з клієнтами та партнерами на основі відкритості та чесності.</p>
+                </div>
+                <div class="column">
+                    <h4 class="ui header"><i class="heartbeat icon"></i> Пацієнтоорієнтованість</h4>
+                    <p>Розробка рішень, що покращують досвід пацієнтів та якість їхнього лікування.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui vertical stripe segment">
+        <div class="ui text container">
+            <h2 class="ui header">Етапи реалізації проєкту</h2>
+            <div class="ui ordered list">
+                <div class="item">
+                    <div class="content">
+                        <div class="header">Тиждень 1-2: Планування та архітектура</div>
+                        <div class="description">Аналіз вимог, проєктування бази даних, вибір технологічного стеку, створення базового каркасу системи.</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="content">
+                        <div class="header">Тиждень 3-4: Розробка основних модулів</div>
+                        <div class="description">Реалізація модулів управління пацієнтами, розкладом, базової аутентифікації.</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="content">
+                        <div class="header">Тиждень 5-6: Інтеграція та тестування</div>
+                        <div class="description">Підключення зовнішніх сервісів, розробка звітів, тестування системи, підготовка до впровадження.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui vertical stripe segment">
+        <div class="ui text container">
+            <h2 class="ui header">Наша команда</h2>
+            <div class="ui three stackable cards">
+                <div class="card">
+                    <div class="image">
+                        <img src="https://via.placeholder.com/300x300?text=Team+Member+1" alt="Team Member 1">
+                    </div>
+                    <div class="content">
+                        <div class="header">Ім'я Прізвище 1</div>
+                        <div class="meta">
+                            <span class="date">Backend Developer</span>
+                        </div>
+                        <div class="description">
+                            Відповідальний за розробку серверної логіки, API та взаємодію з базою даних.
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="image">
+                        <img src="https://via.placeholder.com/300x300?text=Team+Member+2" alt="Team Member 2">
+                    </div>
+                    <div class="content">
+                        <div class="header">Ім'я Прізвище 2</div>
+                        <div class="meta">
+                            <span class="date">Frontend Developer / UX Designer</span>
+                        </div>
+                        <div class="description">
+                            Займається розробкою користувацького інтерфейсу, забезпечує зручність та естетику.
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="image">
+                        <img src="https://via.placeholder.com/300x300?text=Team+Member+3" alt="Team Member 3">
+                    </div>
+                    <div class="content">
+                        <div class="header">Ім'я Прізвище 3</div>
+                        <div class="meta">
+                            <span class="date">DevOps / QA Engineer</span>
+                        </div>
+                        <div class="description">
+                            Відповідальний за налаштування інфраструктури, автоматизацію тестування та забезпечення якості.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

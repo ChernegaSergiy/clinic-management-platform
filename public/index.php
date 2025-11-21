@@ -13,5 +13,18 @@ $twig = new Environment($loader, [
     // 'cache' => __DIR__ . '/../var/cache', // Розкоментуйте для кешування
 ]);
 
-// Рендеринг шаблону
-echo $twig->render('home/index.html.twig', ['name' => 'World']);
+
+$requestUri = $_SERVER['REQUEST_URI'];
+
+switch ($requestUri) {
+    case '/':
+        echo $twig->render('home/index.html.twig', ['name' => 'World']);
+        break;
+    case '/about':
+        echo $twig->render('about/index.html.twig');
+        break;
+    default:
+        header("HTTP/1.0 404 Not Found");
+        echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
+        break;
+}
