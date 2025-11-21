@@ -90,4 +90,10 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':notes' => $data['notes'] ?? null,
         ]);
     }
+
+    public function updateStatus(int $id, string $status): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE appointments SET status = :status WHERE id = :id");
+        return $stmt->execute([':status' => $status, ':id' => $id]);
+    }
 }
