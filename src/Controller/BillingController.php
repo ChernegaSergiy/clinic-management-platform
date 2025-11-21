@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Core\View;
+use App\Core\Validator;
 use App\Repository\AppointmentRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
+use App\Repository\ServiceRepository;
+use App\Repository\ServiceBundleRepository;
 
 class BillingController
 {
@@ -14,6 +17,8 @@ class BillingController
     private PatientRepository $patientRepository;
     private AppointmentRepository $appointmentRepository;
     private MedicalRecordRepository $medicalRecordRepository;
+    private ServiceRepository $serviceRepository;
+    private ServiceBundleRepository $serviceBundleRepository;
 
     public function __construct()
     {
@@ -21,6 +26,8 @@ class BillingController
         $this->patientRepository = new PatientRepository();
         $this->appointmentRepository = new AppointmentRepository();
         $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->serviceRepository = new ServiceRepository();
+        $this->serviceBundleRepository = new ServiceBundleRepository();
     }
 
     public function index(): void
@@ -31,6 +38,111 @@ class BillingController
         }
         $invoices = $this->invoiceRepository->findAll();
         View::render('billing/index.html.twig', ['invoices' => $invoices]);
+    }
+
+    // --- Service Management ---
+    public function listServices(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        $services = $this->serviceRepository->findAll();
+        View::render('billing/services/index.html.twig', ['services' => $services]);
+    }
+
+    public function createService(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        $categories = $this->serviceRepository->findCategories();
+        View::render('billing/services/new.html.twig', [
+            'categories' => $categories,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeService(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'price' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /billing/services/new');
+            exit();
+        }
+
+        $this->serviceRepository->save($_POST);
+        $_SESSION['success_message'] = "Послугу успішно додано.";
+        header('Location: /billing/services');
+        exit();
+    }
+
+    // --- Service Bundle Management ---
+    public function listServiceBundles(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        $bundles = $this->serviceBundleRepository->findAll();
+        View::render('billing/bundles/index.html.twig', ['bundles' => $bundles]);
+    }
+
+    public function createServiceBundle(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+        $services = $this->serviceRepository->findAll();
+        View::render('billing/bundles/new.html.twig', [
+            'services' => $services,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeServiceBundle(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new Validator();
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'services' => ['array'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /billing/bundles/new');
+            exit();
+        }
+
+        $this->serviceBundleRepository->save($_POST);
+        $_SESSION['success_message'] = "Пакет послуг успішно додано.";
+        header('Location: /billing/bundles');
+        exit();
     }
 
     public function create(): void
