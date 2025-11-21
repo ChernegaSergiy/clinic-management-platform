@@ -351,4 +351,20 @@ class AppointmentController
         header('Location: /appointments/waitlist');
         exit();
     }
+
+    public function showLoadAnalytics(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $date = $_GET['date'] ?? date('Y-m-d');
+        $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
+
+        View::render('appointments/load_analytics.html.twig', [
+            'date' => $date,
+            'doctorLoad' => $doctorLoad,
+        ]);
+    }
 }
