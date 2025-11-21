@@ -17,12 +17,18 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone FROM patients";
+        $sql = "SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone, status FROM patients";
         $params = [];
 
         if (!empty($searchTerm)) {
-            $sql .= " WHERE last_name LIKE :term OR first_name LIKE :term OR phone LIKE :term";
-            $params[':term'] = '%' . $searchTerm . '%';
+            // Use full-text search for relevant columns
+            $sql .= " WHERE MATCH(first_name, last_name, middle_name, address) AGAINST (:searchTerm IN BOOLEAN MODE)";
+            $params[':searchTerm'] = $searchTerm . '*'; // Adding wildcard for partial matches
+            
+            // Fallback for other fields if full-text index doesn't cover all search needs or for older MySQL versions
+            // Uncomment and adjust if needed
+            // $sql .= " OR last_name LIKE :term OR first_name LIKE :term OR phone LIKE :term";
+            // $params[':term'] = '%' . $searchTerm . '%';
         }
 
         $sql .= " ORDER BY last_name, first_name";
