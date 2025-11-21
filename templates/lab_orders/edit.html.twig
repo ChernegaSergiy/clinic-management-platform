@@ -15,10 +15,10 @@
             <p><strong>Медичний запис ID:</strong> {{ order.medical_record_id }}</p>
             <div class="ui divider"></div>
 
-            {{ forms.input('order_code', 'Код замовлення', order.order_code, 'text', 'Наприклад, Загальний аналіз крові', errors.order_code ?? null, {'required': 'required'}) }}
-            {{ forms.select('status', 'Статус', {'ordered': 'Замовлено', 'in_progress': 'В процесі', 'completed': 'Виконано', 'cancelled': 'Скасовано'}, order.status, errors.status ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('results', 'Результати', order.results, 'Введіть результати лабораторного дослідження') }}
-            {{ forms.textarea('notes', 'Примітки', order.notes, 'Додаткові примітки до замовлення') }}
+            {{ forms.input('order_code', 'Код замовлення', old.order_code ?? order.order_code, 'text', 'Наприклад, Загальний аналіз крові', errors.order_code ?? null, {'required': 'required'}) }}
+            {{ forms.select('status', 'Статус', {'ordered': 'Замовлено', 'in_progress': 'В процесі', 'completed': 'Виконано', 'cancelled': 'Скасовано'}, old.status ?? order.status, errors.status ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('results', 'Результати', old.results ?? order.results, 'Введіть результати лабораторного дослідження', errors.results ?? null) }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? order.notes, 'Додаткові примітки до замовлення', errors.notes ?? null) }}
 
             {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
             <a href="/lab-orders/show?id={{ order.id }}" class="ui button">Скасувати</a>
