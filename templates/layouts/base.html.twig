@@ -53,9 +53,27 @@
         </div>
     </div>
 
-    <div class="ui segment">
-        {% block body %}{% endblock %}
-    </div>
+        <div class="ui container">
+            {% if session.success_message %}
+                <div class="ui success message">
+                    <i class="close icon"></i>
+                    <div class="header">
+                        Успіх!
+                    </div>
+                    <p>{{ session.success_message }}</p>
+                </div>
+            {% endif %}
+            {% if session.error_message %}
+                <div class="ui error message">
+                    <i class="close icon"></i>
+                    <div class="header">
+                        Помилка!
+                    </div>
+                    <p>{{ session.error_message }}</p>
+                </div>
+            {% endif %}
+            {% block body %}{% endblock %}
+        </div>
 
     <div class="ui inverted vertical footer segment">
         <div class="ui center aligned container">
