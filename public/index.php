@@ -57,4 +57,7 @@ $router->add('GET', '/lab-orders/show', [LabOrderController::class, 'show']);
 $router->add('GET', '/lab-orders/edit', [LabOrderController::class, 'edit']);
 $router->add('POST', '/lab-orders/edit', [LabOrderController::class, 'update']);
 
+// Inventory routes
+$router->add('GET', '/inventory', [InventoryController::class, 'index']);
+
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
