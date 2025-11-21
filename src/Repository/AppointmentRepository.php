@@ -198,4 +198,25 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt->execute([':minutes_before' => $minutesBefore]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getDoctorDailyLoad(string $date): array
+    {
+        $sql = "
+            SELECT
+                u.id as doctor_id,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                COUNT(a.id) as total_appointments,
+                SUM(TIME_TO_SEC(TIMEDIFF(a.end_time, a.start_time))) / 3600 as total_hours_booked
+            FROM users u
+            LEFT JOIN appointments a ON u.id = a.doctor_id
+                AND DATE(a.start_time) = :date
+                AND a.status = 'scheduled'
+            WHERE u.role_id = (SELECT id FROM roles WHERE name = 'doctor')
+            GROUP BY u.id, u.first_name, u.last_name
+            ORDER BY total_appointments DESC;
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date' => $date]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
