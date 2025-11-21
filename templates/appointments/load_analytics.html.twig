@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Аналітика завантаження лікарів - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Аналітика завантаження лікарів</h2>
+
+        <div class="ui divider"></div>
+
+        <form class="ui form" action="/appointments/analytics" method="GET">
+            <div class="field">
+                <label>Дата</label>
+                <input type="date" name="date" value="{{ date }}">
+            </div>
+            <button class="ui primary button" type="submit">Показати</button>
+        </form>
+
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Завантаження лікарів на {{ date }}</h3>
+        {% if doctorLoad is empty %}
+            <p>Немає даних про завантаження на цю дату.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Лікар</th>
+                        <th>Кількість записів</th>
+                        <th>Загальні години заброньовано</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in doctorLoad %}
+                        <tr>
+                            <td>{{ entry.doctor_name }}</td>
+                            <td>{{ entry.total_appointments }}</td>
+                            <td>{{ entry.total_hours_booked | number_format(2) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
