@@ -1,0 +1,72 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Позиція складу #{{ item.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Деталі позиції складу #{{ item.id }}</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui definition table">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>{{ item.id }}</td>
+                </tr>
+                <tr>
+                    <td>Назва</td>
+                    <td>{{ item.name }}</td>
+                </tr>
+                <tr>
+                    <td>Опис</td>
+                    <td>{{ item.description|nl2br }}</td>
+                </tr>
+                <tr>
+                    <td>INN</td>
+                    <td>{{ item.inn }}</td>
+                </tr>
+                <tr>
+                    <td>Номер партії</td>
+                    <td>{{ item.batch_number }}</td>
+                </tr>
+                <tr>
+                    <td>Термін придатності</td>
+                    <td>{{ item.expiry_date }}</td>
+                </tr>
+                <tr>
+                    <td>Постачальник</td>
+                    <td>{{ item.supplier }}</td>
+                </tr>
+                <tr>
+                    <td>Вартість (за одиницю)</td>
+                    <td>{{ item.cost }}</td>
+                </tr>
+                <tr>
+                    <td>Кількість</td>
+                    <td>{{ item.quantity }}</td>
+                </tr>
+                <tr>
+                    <td>Мінімальний поріг запасу</td>
+                    <td>{{ item.min_stock_threshold }}</td>
+                </tr>
+                <tr>
+                    <td>Місце зберігання</td>
+                    <td>{{ item.location }}</td>
+                </tr>
+                <tr>
+                    <td>Створено</td>
+                    <td>{{ item.created_at|date('Y-m-d H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Оновлено</td>
+                    <td>{{ item.updated_at|date('Y-m-d H:i') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/inventory/edit?id={{ item.id }}" class="ui primary button">Редагувати</a>
+        <a href="/inventory" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}
