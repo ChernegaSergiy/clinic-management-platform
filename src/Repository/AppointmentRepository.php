@@ -137,4 +137,42 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         ]);
         return $stmt->fetchAll();
     }
+
+    public function addToWaitlist(array $data): bool
+    {
+        $sql = "INSERT INTO waitlists (patient_id, desired_doctor_id, desired_start_time, desired_end_time, notes) 
+                VALUES (:patient_id, :desired_doctor_id, :desired_start_time, :desired_end_time, :notes)";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':patient_id' => $data['patient_id'],
+            ':desired_doctor_id' => $data['desired_doctor_id'] ?? null,
+            ':desired_start_time' => $data['desired_start_time'] ?? null,
+            ':desired_end_time' => $data['desired_end_time'] ?? null,
+            ':notes' => $data['notes'] ?? null,
+        ]);
+    }
+
+    public function getWaitlistEntries(string $status = 'pending'): array
+    {
+        $sql = "SELECT 
+                    wl.id,
+                    CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                    CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                    wl.desired_start_time,
+                    wl.desired_end_time,
+                    wl.notes,
+                    wl.status,
+                    wl.created_at
+                FROM waitlists wl
+                JOIN patients p ON wl.patient_id = p.id
+                LEFT JOIN users u ON wl.desired_doctor_id = u.id
+                WHERE wl.status = :status
+                ORDER BY wl.created_at ASC";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':status' => $status]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
