@@ -40,9 +40,11 @@ class BillingController
             exit();
         }
 
+        $patientId = $_GET['patient_id'] ?? null;
+
         $patients = $this->patientRepository->findAllActive();
-        $appointments = $this->appointmentRepository->findAll(); // TODO: filter by patient
-        $medicalRecords = $this->medicalRecordRepository->findByPatientId(0); // TODO: filter by patient
+        $appointments = $patientId ? $this->appointmentRepository->findByPatientId((int)$patientId) : $this->appointmentRepository->findAll();
+        $medicalRecords = $patientId ? $this->medicalRecordRepository->findByPatientId((int)$patientId) : $this->medicalRecordRepository->findAll();
 
         $patientOptions = [];
         foreach ($patients as $patient) {
