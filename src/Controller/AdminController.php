@@ -24,6 +24,17 @@ class AdminController
             exit();
         }
         $users = $this->userRepository->findAll();
+        $roles = $this->roleRepository->findAll();
+        $roleMap = [];
+        foreach ($roles as $role) {
+            $roleMap[$role['id']] = $role['name'];
+        }
+
+        foreach ($users as &$user) {
+            $user['role_name'] = $roleMap[$user['role_id']] ?? 'Невідома';
+        }
+        unset($user); // Break the reference with the last element
+
         View::render('admin/users.html.twig', ['users' => $users]);
     }
 
