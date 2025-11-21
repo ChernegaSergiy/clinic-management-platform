@@ -52,6 +52,11 @@ switch ($requestUri) {
             echo $twig->render('auth/login.html.twig');
         }
         break;
+        break;
+    case '/logout':
+        session_destroy();
+        header('Location: /');
+        exit();
     default:
         header("HTTP/1.0 404 Not Found");
         echo $twig->render('404.html.twig'); // Потрібно буде створити 404.html.twig
