@@ -1,0 +1,43 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати позицію складу #{{ item.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати позицію складу #{{ item.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/inventory/edit?id={{ item.id }}">
+            <div class="two fields">
+                {{ forms.input('name', 'Назва', item.name, 'text', 'Назва позиції', errors.name ?? null, {'required': 'required'}) }}
+                {{ forms.input('inn', 'INN (Міжнародна непатентована назва)', item.inn, 'text', 'INN') }}
+            </div>
+            {{ forms.textarea('description', 'Опис', item.description, 'Детальний опис позиції') }}
+            <div class="three fields">
+                {{ forms.input('batch_number', 'Номер партії', item.batch_number, 'text', 'Номер партії') }}
+                {{ forms.input('expiry_date', 'Термін придатності', item.expiry_date, 'date', '') }}
+                {{ forms.input('supplier', 'Постачальник', item.supplier, 'text', 'Назва постачальника') }}
+            </div>
+            <div class="three fields">
+                {{ forms.input('cost', 'Вартість (за одиницю)', item.cost, 'number', '0.00', errors.cost ?? null, {'step': '0.01'}) }}
+                {{ forms.input('quantity', 'Кількість', item.quantity, 'number', '0', errors.quantity ?? null, {'required': 'required'}) }}
+                {{ forms.input('min_stock_threshold', 'Мінімальний поріг запасу', item.min_stock_threshold, 'number', '0') }}
+            </div>
+            {{ forms.input('location', 'Місце зберігання', item.location, 'text', 'Наприклад, Склад 1, полиця А') }}
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/inventory/show?id={{ item.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}
