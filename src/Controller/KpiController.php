@@ -46,7 +46,7 @@ class KpiController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
