@@ -29,7 +29,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): ?int
+    public function save(array $data): bool
     {
         $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, diagnosis_code, diagnosis_text, treatment, notes) 
                 VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, :diagnosis_code, :diagnosis_text, :treatment, :notes)";
@@ -52,9 +52,9 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
                 $this->attachIcdCodes((int)$medicalRecordId, $data['icd_codes']);
             }
-            return (int)$medicalRecordId;
+            return true;
         }
-        return null;
+        return false;
     }
 
     public function findById(int $id): ?array
