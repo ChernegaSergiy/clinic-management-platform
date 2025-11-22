@@ -6,7 +6,7 @@ use App\Core\Validator;
 use App\Core\View;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
-use App\Core\CSVExporter;
+use App\Core\CsvExporter;
 
 class PatientController
 {
