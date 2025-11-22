@@ -1,0 +1,72 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Словник: {{ dictionary.name }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Словник: {{ dictionary.name }}</h2>
+        <p>{{ dictionary.description }}</p>
+        <p><strong>Тип:</strong> {{ dictionary.type }}</p>
+        <div class="ui divider"></div>
+        <a href="/admin/dictionaries" class="ui button">Повернутися до списку</a>
+        <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui primary button">Редагувати словник</a>
+    </div>
+
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">Значення словника</h3>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/dictionaries/values/new?dictionary_id={{ dictionary.id }}" class="ui green button">
+                    <i class="plus icon"></i> Додати значення
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if values is empty %}
+            <p>Немає значень для цього словника.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Значення</th>
+                        <th>Мітка</th>
+                        <th>Порядок</th>
+                        <th>Активне</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for value in values %}
+                        <tr>
+                            <td>{{ value.id }}</td>
+                            <td>{{ value.value }}</td>
+                            <td>{{ value.label }}</td>
+                            <td>{{ value.order_num }}</td>
+                            <td>
+                                {% if value.is_active %}
+                                    <i class="check circle icon green"></i> Так
+                                {% else %}
+                                    <i class="times circle icon red"></i> Ні
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/dictionaries/values/edit?id={{ value.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <a href="/admin/dictionaries/values/delete?id={{ value.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
