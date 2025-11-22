@@ -58,7 +58,7 @@ class InstallController
         ];
         // Merge previously stored input to avoid losing values between steps
         if (!empty($_SESSION['install_input'])) {
-            $input = array_merge($_SESSION['install_input'], $input);
+            $input = array_merge($input, $_SESSION['install_input']);
         }
         // Snapshot after merge
         $inputToStore = $input;
