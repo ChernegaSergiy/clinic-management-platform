@@ -363,4 +363,37 @@ class AdminController
         header('Location: /admin/roles');
         exit();
     }
+
+    // --- Dictionary Management ---
+    public function listDictionaries(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $dictionaries = $this->dictionaryRepository->findAll();
+        View::render('admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
+    }
+
+    public function showDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $id = (int)($_GET['id'] ?? 0);
+        $dictionary = $this->dictionaryRepository->findById($id);
+
+        if (!$dictionary) {
+            http_response_code(404);
+            echo "Словник не знайдено";
+            return;
+        }
+
+        $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
+        View::render('admin/dictionaries/show.html.twig', [
+            'dictionary' => $dictionary,
+            'values' => $values,
+        ]);
+    }
 }
