@@ -36,6 +36,8 @@ $router->add('POST', '/patients/edit', [PatientController::class, 'update']);
 $router->add('GET', '/patients/toggle-status', [PatientController::class, 'toggleStatus']);
 $router->add('GET', '/patients/export-csv', [PatientController::class, 'exportCsv']);
 $router->add('GET', '/patients/export-json', [PatientController::class, 'exportPatientsToJson']);
+$router->add('GET', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
+$router->add('POST', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
 
 // Appointment routes
 $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
