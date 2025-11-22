@@ -48,9 +48,12 @@
                                 <a href="/admin/auth-configs/edit?id={{ config.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <a href="/admin/auth-configs/delete?id={{ config.id }}" class="ui icon button red">
-                                    <i class="trash icon"></i>
-                                </a>
+                                <form action="/admin/auth-configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?');">
+                                    <input type="hidden" name="id" value="{{ config.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
