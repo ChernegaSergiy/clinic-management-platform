@@ -45,7 +45,7 @@ class ContractController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],
@@ -141,7 +141,7 @@ class ContractController
             return;
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],
