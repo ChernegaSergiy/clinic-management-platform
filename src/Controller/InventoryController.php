@@ -57,7 +57,7 @@ class InventoryController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],
@@ -148,7 +148,7 @@ class InventoryController
         }
 
         // TODO: Add validation
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],
