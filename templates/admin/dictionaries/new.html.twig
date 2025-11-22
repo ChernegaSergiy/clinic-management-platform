@@ -1,0 +1,21 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати новий словник - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати новий словник</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/dictionaries/new">
+            {{ forms.input('name', 'Назва словника', old.name ?? '', 'text', 'Наприклад, Статуси записів', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис словника', old.description ?? '', 'Детальний опис словника', errors.description ?? null) }}
+            {{ forms.input('type', 'Тип словника (необов\'язково)', old.type ?? '', 'text', 'Наприклад, appointment_status', errors.type ?? null) }}
+
+            {{ ui.button('Зберегти словник', 'primary', 'large', 'save') }}
+            <a href="/admin/dictionaries" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
