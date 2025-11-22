@@ -136,12 +136,20 @@ class InstallController
 
     private function createPdo(array $input, bool $withDb = true): PDO
     {
-        $dsn = sprintf(
-            $withDb ? 'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4' : 'mysql:host=%s;port=%s;charset=utf8mb4',
-            $input['db_host'],
-            $input['db_port'],
-            $input['db_database']
-        );
+        if ($withDb) {
+            $dsn = sprintf(
+                'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
+                $input['db_host'],
+                $input['db_port'],
+                $input['db_database']
+            );
+        } else {
+            $dsn = sprintf(
+                'mysql:host=%s;port=%s;charset=utf8mb4',
+                $input['db_host'],
+                $input['db_port']
+            );
+        }
 
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
