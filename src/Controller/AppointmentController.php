@@ -245,7 +245,7 @@ class AppointmentController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
