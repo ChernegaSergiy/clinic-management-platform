@@ -2,78 +2,37 @@
 
 {% block title %}Встановлення платформи{% endblock %}
 
-{% block stylesheets %}
-    <style>
-        body {
-            background: linear-gradient(135deg, #f2f8ff 0%, #f9fbff 40%, #f5f7fa 100%);
-        }
-        .install-hero {
-            padding: 3rem 2rem;
-            border-radius: 18px;
-            background: white;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.06);
-            border: 1px solid #e7eef7;
-        }
-        .install-hero .header {
-            font-weight: 800;
-            letter-spacing: -0.03em;
-        }
-        .muted {
-            color: #6b7280;
-        }
-        .pill {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: #e7f2ff;
-            color: #2563eb;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        .segment-flat {
-            border: 1px solid #e7eef7 !important;
-            box-shadow: none !important;
-        }
-        .inline-help {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-    </style>
-{% endblock %}
+{% block stylesheets %}{% endblock %}
 
 {% block body %}
     <div class="ui grid stackable">
-        <div class="eight wide column">
-            <div class="install-hero">
-                <div class="pill">Step 1 of 1</div>
-                <h2 class="ui header">Швидке встановлення</h2>
-                <p class="muted">Сконфігуруйте базу та отримайте готовий демо‑набір даних для входу.</p>
-                <div class="ui relaxed list">
-                    <div class="item">
-                        <i class="database blue icon"></i>
-                        <div class="content">
-                            <div class="header">SQL міграції</div>
-                            <div class="description muted">Створимо таблиці з каталогу <code>database/migrations</code>.</div>
-                        </div>
+        <div class="six wide column">
+            <h2 class="ui header">Встановлення</h2>
+            <div class="ui list">
+                <div class="item">
+                    <i class="database blue icon"></i>
+                    <div class="content">
+                        <div class="header">SQL міграції</div>
+                        <div class="description">Створимо таблиці з <code>database/migrations</code>.</div>
                     </div>
-                    <div class="item">
-                        <i class="users teal icon"></i>
-                        <div class="content">
-                            <div class="header">Демо‑користувачі</div>
-                            <div class="description muted">За бажанням підсиплемо ролі й акаунти з <code>database/seeds</code>.</div>
-                        </div>
+                </div>
+                <div class="item">
+                    <i class="users teal icon"></i>
+                    <div class="content">
+                        <div class="header">Демо‑користувачі</div>
+                        <div class="description">Опційний посів з <code>database/seeds</code>.</div>
                     </div>
-                    <div class="item">
-                        <i class="settings orange icon"></i>
-                        <div class="content">
-                            <div class="header">.env</div>
-                            <div class="description muted">Створимо файл конфігурації з вашими параметрами.</div>
-                        </div>
+                </div>
+                <div class="item">
+                    <i class="settings orange icon"></i>
+                    <div class="content">
+                        <div class="header">.env</div>
+                        <div class="description">Створимо файл конфігурації з вашими параметрами.</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="eight wide column">
+        <div class="ten wide column">
             {% if feedback.errors %}
                 <div class="ui negative message">
                     <div class="header">Не вдалося завершити встановлення</div>
@@ -93,13 +52,13 @@
                 </div>
             {% endif %}
 
-            <form class="ui large form segment segment-flat" method="post" action="/install">
+            <form class="ui large form segment" method="post" action="/install">
                 <h4 class="ui dividing header">Загальні налаштування</h4>
                 <div class="two fields">
                     <div class="field">
                         <label>APP_ENV</label>
                         <input type="text" name="app_env" value="{{ defaults.APP_ENV|default('dev') }}">
-                        <div class="inline-help">dev / prod</div>
+                        <div class="ui tiny basic label">dev / prod</div>
                     </div>
                     <div class="field">
                         <div class="ui checkbox" style="margin-top: 1.9rem;">
@@ -110,13 +69,6 @@
                 </div>
 
                 <h4 class="ui dividing header">База даних</h4>
-                <div class="field">
-                    <label>Тип</label>
-                    <select name="db_connection" class="ui dropdown">
-                        <option value="mysql" {% if defaults.DB_CONNECTION == 'mysql' %}selected{% endif %}>MySQL / MariaDB</option>
-                        <option value="sqlite" {% if defaults.DB_CONNECTION == 'sqlite' %}selected{% endif %}>SQLite (файл у database/)</option>
-                    </select>
-                </div>
                 <div class="two fields">
                     <div class="field">
                         <label>Хост</label>
@@ -131,7 +83,6 @@
                     <div class="field">
                         <label>База / файл</label>
                         <input type="text" name="db_database" value="{{ defaults.DB_DATABASE|default('clinic') }}">
-                        <div class="inline-help">Для SQLite — назва файлу у <code>database/</code></div>
                     </div>
                     <div class="field">
                         <label>Користувач</label>
@@ -167,7 +118,7 @@
                 <div class="field">
                     <label>MAIL_ENCRYPTION</label>
                     <input type="text" name="mail_encryption" value="{{ defaults.MAIL_ENCRYPTION|default('') }}">
-                    <div class="inline-help">tls / ssl або залиште порожнім</div>
+                    <div class="ui tiny basic label">tls / ssl або порожнє</div>
                 </div>
 
                 <div class="field">
