@@ -1,0 +1,29 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати значення словника #{{ value.id }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати значення словника #{{ value.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/dictionaries/values/edit?id={{ value.id }}">
+            <input type="hidden" name="dictionary_id" value="{{ value.dictionary_id }}">
+            {{ forms.input('label', 'Мітка', old.label ?? value.label, 'text', 'Наприклад, Заплановано', errors.label ?? null, {'required': 'required'}) }}
+            {{ forms.input('value', 'Значення', old.value ?? value.value, 'text', 'Наприклад, scheduled', errors.value ?? null, {'required': 'required'}) }}
+            {{ forms.input('order_num', 'Порядковий номер', old.order_num ?? value.order_num, 'number', '0', errors.order_num ?? null) }}
+            
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {% if (old.is_active is defined and old.is_active) or (old.is_active is not defined and value.is_active) %}checked{% endif %} value="1">
+                    <label>Активне значення</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/admin/dictionaries/show?id={{ value.dictionary_id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
