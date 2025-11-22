@@ -1,33 +1,91 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Дашборд - Клініка{% endblock %}
+{% block title %}Панель управління - Клініка{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Вітаємо, {{ session.user.first_name }}! Це ваш дашборд.</h2>
+        <h2 class="ui header">Панель управління</h2>
         <div class="ui divider"></div>
 
-        <div class="ui three column grid">
-            <div class="column">
-                <div class="ui segment">
-                    <h3 class="ui header">Пацієнти</h3>
-                    <p>Загальна кількість пацієнтів: <strong>{{ patient_count }}</strong></p>
-                    <a href="/patients" class="ui primary button">Переглянути пацієнтів</a>
+        <div class="ui three statistics">
+            <div class="ui blue statistic">
+                <div class="value">
+                    {{ patient_count }}
+                </div>
+                <div class="label">
+                    Активних пацієнтів
                 </div>
             </div>
-            <div class="column">
-                <div class="ui segment">
-                    <h3 class="ui header">Записи</h3>
-                    <p>Майбутні записи: <strong>{{ upcoming_appointments_count }}</strong></p>
-                    <a href="/appointments" class="ui primary button">Переглянути записи</a>
+            <div class="ui green statistic">
+                <div class="value">
+                    {{ upcoming_appointments_count }}
+                </div>
+                <div class="label">
+                    Майбутніх записів
                 </div>
             </div>
-            <div class="column">
-                <div class="ui segment">
-                    <h3 class="ui header">Інвентар</h3>
-                    <p>Позицій з низьким запасом: <strong>{{ low_stock_items_count }}</strong></p>
-                    <a href="/inventory" class="ui primary button">Переглянути інвентар</a>
+            <div class="ui orange statistic">
+                <div class="value">
+                    {{ low_stock_items_count }}
                 </div>
+                <div class="label">
+                    Позицій з низьким запасом
+                </div>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui two column grid">
+            <div class="column">
+                <h3 class="ui header">Найближчі записи</h3>
+                {% if upcoming_appointments is empty %}
+                    <p>Немає майбутніх записів.</p>
+                {% else %}
+                    <table class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Пацієнт</th>
+                                <th>Лікар</th>
+                                <th>Час</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in upcoming_appointments %}
+                                <tr>
+                                    <td>{{ appointment.patient_name }}</td>
+                                    <td>{{ appointment.doctor_name }}</td>
+                                    <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            <div class="column">
+                <h3 class="ui header">Позиції з низьким запасом</h3>
+                {% if low_stock_items is empty %}
+                    <p>Наразі немає позицій з низьким запасом.</p>
+                {% else %}
+                    <table class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Назва</th>
+                                <th>Кількість</th>
+                                <th>Мін. рівень</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock_items %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.min_stock_level }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
         </div>
     </div>
