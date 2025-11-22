@@ -60,11 +60,12 @@ class InstallController
         if (!empty($_SESSION['install_input'])) {
             $input = array_merge($_SESSION['install_input'], $input);
         }
-        // Persist current input snapshot
-        $this->storeInput($input);
+        // Persist current input snapshot only after validation
+        $inputToStore = $input;
 
         $errors = $this->validate($input);
         if (!empty($errors)) {
+            $this->storeInput($inputToStore);
             $this->setFeedback(['errors' => $errors, 'success' => false]);
             $this->redirectWithStep($step);
             return;
@@ -77,7 +78,7 @@ class InstallController
         }
 
         if ($step < 3) {
-            $this->storeInput($input);
+            $this->storeInput($inputToStore);
             $this->redirectWithStep($step + 1);
             return;
         }
