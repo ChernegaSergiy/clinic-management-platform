@@ -12,17 +12,28 @@ class InstallController
         $feedback = $_SESSION['install_feedback'] ?? ['errors' => [], 'success' => false, 'details' => []];
         unset($_SESSION['install_feedback']);
 
+        $step = $this->resolveStep();
         $defaults = $this->loadEnvDefaults();
 
         View::render('install/index.html.twig', [
             'defaults' => $defaults,
             'feedback' => $feedback,
+            'step' => $step,
         ]);
     }
 
     public function install(): void
     {
+        $step = (int)($_POST['step'] ?? 1);
+
+        // Allow going back
+        if (isset($_POST['back'])) {
+            $this->redirectWithStep(max(1, $step - 1));
+            return;
+        }
+
         $input = [
+            'step' => $step,
             'app_env' => $this->clean($_POST['app_env'] ?? 'dev'),
             'app_debug' => isset($_POST['app_debug']) ? 'true' : 'false',
             'db_connection' => $this->clean($_POST['db_connection'] ?? 'mysql'),
@@ -31,6 +42,10 @@ class InstallController
             'db_database' => $this->clean($_POST['db_database'] ?? 'clinic'),
             'db_username' => $this->clean($_POST['db_username'] ?? 'root'),
             'db_password' => $_POST['db_password'] ?? '',
+            'admin_email' => $this->clean($_POST['admin_email'] ?? ''),
+            'admin_password' => $_POST['admin_password'] ?? '',
+            'admin_first_name' => $this->clean($_POST['admin_first_name'] ?? 'Адмін'),
+            'admin_last_name' => $this->clean($_POST['admin_last_name'] ?? 'Адміненко'),
             'mail_host' => $this->clean($_POST['mail_host'] ?? 'localhost'),
             'mail_port' => $this->clean($_POST['mail_port'] ?? '1025'),
             'mail_username' => $this->clean($_POST['mail_username'] ?? ''),
@@ -40,39 +55,24 @@ class InstallController
         ];
 
         $errors = $this->validate($input);
-
         if (!empty($errors)) {
             $this->setFeedback(['errors' => $errors, 'success' => false]);
-            header('Location: /install');
+            $this->redirectWithStep($step);
             return;
         }
 
-        try {
-            $this->writeEnv($input);
-            $pdo = $this->createPdo($input);
-            $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations');
-
-            if ($input['seed']) {
-                $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds');
-            }
-
-            $this->setFeedback([
-                'errors' => [],
-                'success' => true,
-                'details' => [
-                    'db' => $this->dsnSummary($input),
-                    'seeded' => $input['seed'],
-                    'default_admin' => 'admin / password',
-                ],
-            ]);
-        } catch (\Throwable $e) {
-            $this->setFeedback([
-                'errors' => ['Встановлення перервано: ' . $e->getMessage()],
-                'success' => false,
-            ]);
+        // Step-specific actions
+        if ($step === 2 && isset($_POST['test_db'])) {
+            $this->handleDbTest($input);
+            return;
         }
 
-        header('Location: /install');
+        if ($step < 3) {
+            $this->redirectWithStep($step + 1);
+            return;
+        }
+
+        $this->handleInstall($input);
     }
 
     private function clean(string $value): string
@@ -84,9 +84,20 @@ class InstallController
     {
         $errors = [];
 
-        foreach (['db_host', 'db_port', 'db_database', 'db_username'] as $field) {
-            if ($input[$field] === '') {
-                $errors[] = 'Поле ' . $field . ' обов\'язкове для MySQL.';
+        if ($input['step'] >= 2) {
+            foreach (['db_host', 'db_port', 'db_database', 'db_username'] as $field) {
+                if ($input[$field] === '') {
+                    $errors[] = 'Поле ' . $field . ' обов\'язкове для MySQL.';
+                }
+            }
+        }
+
+        if ($input['step'] >= 3) {
+            if ($input['admin_email'] === '' || !filter_var($input['admin_email'], FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Вкажіть коректний email адміністратора.';
+            }
+            if (strlen($input['admin_password']) < 8) {
+                $errors[] = 'Пароль адміністратора має містити щонайменше 8 символів.';
             }
         }
 
@@ -111,6 +122,9 @@ class InstallController
             'MAIL_USERNAME=' . $input['mail_username'],
             'MAIL_PASSWORD=' . $input['mail_password'],
             'MAIL_ENCRYPTION=' . $input['mail_encryption'],
+            'ADMIN_EMAIL=' . $input['admin_email'],
+            'ADMIN_FIRST_NAME=' . $input['admin_first_name'],
+            'ADMIN_LAST_NAME=' . $input['admin_last_name'],
         ];
 
         $envPath = $this->envPath();
@@ -120,10 +134,10 @@ class InstallController
         }
     }
 
-    private function createPdo(array $input): PDO
+    private function createPdo(array $input, bool $withDb = true): PDO
     {
         $dsn = sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
+            $withDb ? 'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4' : 'mysql:host=%s;port=%s;charset=utf8mb4',
             $input['db_host'],
             $input['db_port'],
             $input['db_database']
@@ -139,6 +153,85 @@ class InstallController
         }
 
         return new PDO($dsn, $input['db_username'], $input['db_password'], $options);
+    }
+
+    private function dropAndCreateDatabase(array $input): void
+    {
+        $pdo = $this->createPdo($input, false);
+        $dbName = $input['db_database'];
+        $pdo->exec("DROP DATABASE IF EXISTS `{$dbName}`");
+        $pdo->exec("CREATE DATABASE `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    }
+
+    private function createAdmin(PDO $pdo, array $input): void
+    {
+        $email = $input['admin_email'];
+        $first = $input['admin_first_name'];
+        $last = $input['admin_last_name'];
+        $passwordHash = password_hash($input['admin_password'], PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare("INSERT INTO users (username, password_hash, email, first_name, last_name, role_id) VALUES (:username, :password_hash, :email, :first_name, :last_name, :role_id)
+            ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), first_name = VALUES(first_name), last_name = VALUES(last_name)");
+        $stmt->execute([
+            ':username' => $email,
+            ':password_hash' => $passwordHash,
+            ':email' => $email,
+            ':first_name' => $first,
+            ':last_name' => $last,
+            ':role_id' => 1,
+        ]);
+    }
+
+    private function handleDbTest(array $input): void
+    {
+        try {
+            $pdo = $this->createPdo($input);
+            $pdo->query('SELECT 1');
+            $this->setFeedback(['success' => false, 'errors' => ['Підключення успішне. Продовжуйте до наступного кроку.']]);
+        } catch (\Throwable $e) {
+            $this->setFeedback(['success' => false, 'errors' => ['Не вдалося підключитись: ' . $e->getMessage()]]);
+        }
+        $this->redirectWithStep(2);
+    }
+
+    private function handleInstall(array $input): void
+    {
+        try {
+            // Write env first
+            $this->writeEnv($input);
+
+            // Drop and recreate DB
+            $this->dropAndCreateDatabase($input);
+
+            // Apply migrations
+            $pdo = $this->createPdo($input);
+            $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations');
+
+            // Seed if requested
+            if ($input['seed']) {
+                $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds');
+            }
+
+            // Ensure admin exists/updated with provided credentials
+            $this->createAdmin($pdo, $input);
+
+            $this->setFeedback([
+                'errors' => [],
+                'success' => true,
+                'details' => [
+                    'db' => $this->dsnSummary($input),
+                    'seeded' => $input['seed'],
+                    'admin_email' => $input['admin_email'],
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            $this->setFeedback([
+                'errors' => ['Встановлення перервано: ' . $e->getMessage()],
+                'success' => false,
+            ]);
+        }
+
+        $this->redirectWithStep(3);
     }
 
     private function runSqlDirectory(PDO $pdo, string $path): void
@@ -180,6 +273,9 @@ class InstallController
             'MAIL_USERNAME' => '',
             'MAIL_PASSWORD' => '',
             'MAIL_ENCRYPTION' => '',
+            'ADMIN_EMAIL' => 'admin@clinic.ua',
+            'ADMIN_FIRST_NAME' => 'Адмін',
+            'ADMIN_LAST_NAME' => 'Адміненко',
         ];
 
         if (!file_exists($envPath)) {
@@ -195,7 +291,6 @@ class InstallController
             $defaults[$key] = $value;
         }
 
-        // Якщо у старому .env був SQLite або файл, повертаємо рекомендовані MySQL значення
         if (($defaults['DB_CONNECTION'] ?? '') !== 'mysql') {
             $defaults['DB_CONNECTION'] = 'mysql';
             $defaults['DB_DATABASE'] = 'clinic';
@@ -225,5 +320,17 @@ class InstallController
             $input['db_port'],
             $input['db_database']
         );
+    }
+
+    private function resolveStep(): int
+    {
+        $step = (int)($_GET['step'] ?? 1);
+        return max(1, min(3, $step));
+    }
+
+    private function redirectWithStep(int $step): void
+    {
+        header('Location: /install?step=' . max(1, min(3, $step)));
+        exit;
     }
 }
