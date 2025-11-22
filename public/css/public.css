@@ -546,6 +546,34 @@ a { color: inherit; text-decoration: none; }
 .install__input { border: 2px solid var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; }
 .install__hint { color: var(--muted); font-size: 13px; }
 .install__checkbox { display: flex; align-items: center; gap: 8px; }
+.install__checkbox input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--card);
+    box-shadow: 3px 3px 0 var(--ink);
+    position: relative;
+    cursor: pointer;
+}
+.install__checkbox input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 4px;
+    height: 10px;
+    border: 2px solid var(--ink);
+    border-left: 0;
+    border-top: 0;
+    transform: rotate(20deg);
+    opacity: 0;
+}
+.install__checkbox input[type="checkbox"]:checked {
+    background: var(--accent);
+}
+.install__checkbox input[type="checkbox"]:checked::after { opacity: 1; }
 .install__footer { display: flex; flex-direction: column; gap: 10px; }
 .install__alert {
     border: 2px solid #b00020;
