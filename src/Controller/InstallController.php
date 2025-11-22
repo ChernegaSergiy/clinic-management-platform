@@ -50,10 +50,11 @@ class InstallController
         try {
             $this->writeEnv($input);
             $pdo = $this->createPdo($input);
-            $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations');
+            $isSqlite = $input['db_connection'] === 'sqlite';
+            $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations', $isSqlite);
 
             if ($input['seed']) {
-                $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds');
+                $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds', $isSqlite);
             }
 
             $this->setFeedback([
@@ -158,13 +159,16 @@ class InstallController
         return $pdo;
     }
 
-    private function runSqlDirectory(PDO $pdo, string $path): void
+    private function runSqlDirectory(PDO $pdo, string $path, bool $isSqlite = false): void
     {
         $files = glob($path . '/*.sql');
         sort($files);
 
         foreach ($files as $file) {
             $sql = file_get_contents($file);
+            if ($isSqlite) {
+                $sql = $this->normalizeForSqlite($sql);
+            }
             foreach ($this->splitStatements($sql) as $statement) {
                 if ($statement === '') {
                     continue;
@@ -172,6 +176,29 @@ class InstallController
                 $pdo->exec($statement);
             }
         }
+    }
+
+    private function normalizeForSqlite(string $sql): string
+    {
+        // Прибрати MySQL-специфічні конструкції для сумісності з SQLite
+        $patterns = [
+            '/INT\\s+AUTO_INCREMENT\\s+PRIMARY\\s+KEY/i' => 'INTEGER PRIMARY KEY AUTOINCREMENT',
+            '/INT\\s+AUTO_INCREMENT/i' => 'INTEGER PRIMARY KEY AUTOINCREMENT',
+            '/TIMESTAMP\\s+DEFAULT\\s+CURRENT_TIMESTAMP\\s+ON\\s+UPDATE\\s+CURRENT_TIMESTAMP/i' => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
+            '/DEFAULT\\s+CURRENT_TIMESTAMP\\s+ON\\s+UPDATE\\s+CURRENT_TIMESTAMP/i' => 'DEFAULT CURRENT_TIMESTAMP',
+            '/ON\\s+UPDATE\\s+CURRENT_TIMESTAMP/i' => '',
+            '/ENGINE=InnoDB.*;/i' => ';',
+        ];
+
+        $sql = preg_replace(array_keys($patterns), array_values($patterns), $sql) ?? $sql;
+
+        // Видаляємо FULLTEXT-індекси, яких немає у SQLite
+        $lines = explode("\n", $sql);
+        $filtered = array_filter($lines, static function ($line) {
+            return stripos($line, 'FULLTEXT') === false;
+        });
+
+        return implode("\n", $filtered);
     }
 
     private function splitStatements(string $sql): array
