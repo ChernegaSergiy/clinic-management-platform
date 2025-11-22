@@ -1,0 +1,20 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати роль #{{ role.id }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати роль #{{ role.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/roles/edit?id={{ role.id }}">
+            {{ forms.input('name', 'Назва ролі', old.name ?? role.name, 'text', 'Наприклад, Адміністратор, Лікар', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис ролі', old.description ?? role.description, 'Детальний опис прав та обов'язків', errors.description ?? null) }}
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/admin/roles" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
