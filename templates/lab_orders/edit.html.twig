@@ -9,7 +9,8 @@
         <h2 class="ui header">Редагувати лабораторне замовлення #{{ order.id }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/lab-orders/edit?id={{ order.id }}">
+        <form class="ui form" method="POST" action="/lab-orders/edit">
+            <input type="hidden" name="id" value="{{ order.id }}">
             <p><strong>Пацієнт:</strong> {{ order.patient_name }}</p>
             <p><strong>Лікар:</strong> {{ order.doctor_name }}</p>
             <p><strong>Медичний запис ID:</strong> {{ order.medical_record_id }}</p>
