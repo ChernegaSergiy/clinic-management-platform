@@ -1,0 +1,58 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Словники - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування словниками</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/dictionaries/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати словник
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if dictionaries is empty %}
+            <p>Немає словників для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Тип</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dictionary in dictionaries %}
+                        <tr>
+                            <td>{{ dictionary.id }}</td>
+                            <td>{{ dictionary.name }}</td>
+                            <td>{{ dictionary.description }}</td>
+                            <td>{{ dictionary.type }}</td>
+                            <td>
+                                <a href="/admin/dictionaries/show?id={{ dictionary.id }}" class="ui icon button">
+                                    <i class="eye icon"></i>
+                                </a>
+                                <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <a href="/admin/dictionaries/delete?id={{ dictionary.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
