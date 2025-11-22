@@ -77,7 +77,7 @@ class AppointmentController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
             'doctor_id' => ['required'],
@@ -315,7 +315,7 @@ class AppointmentController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
             // 'desired_start_time' => ['required', 'date'],
