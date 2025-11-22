@@ -6,10 +6,20 @@ use App\Core\Router;
 use App\Controller\PageController;
 use App\Controller\AuthController;
 use App\Controller\PatientController;
+use App\Controller\AppointmentController;
+use App\Controller\MedicalRecordController;
+use App\Controller\LabOrderController;
+use App\Controller\InventoryController;
+use App\Controller\BillingController;
+use App\Controller\AdminController;
+use App\Controller\DashboardController;
+use App\Controller\InstallController;
 
-// Завантаження .env файлу
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+// Завантаження .env файлу (може бути відсутній перед інсталяцією)
+$envPath = __DIR__ . '/../.env';
+if (file_exists($envPath)) {
+    Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
+}
 
 session_start();
 
@@ -19,6 +29,10 @@ $router = new Router();
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
 $router->add('GET', '/contact', [PageController::class, 'contact']);
+
+// Install routes
+$router->add('GET', '/install', [InstallController::class, 'form']);
+$router->add('POST', '/install', [InstallController::class, 'install']);
 
 // Auth routes
 $router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
@@ -137,5 +151,12 @@ $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, '
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
+
+// Якщо додаток не встановлено, перенаправляємо на /install (крім самого інсталятора)
+$installed = $_ENV['APP_INSTALLED'] ?? false;
+if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/install') {
+    header('Location: /install');
+    exit;
+}
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
