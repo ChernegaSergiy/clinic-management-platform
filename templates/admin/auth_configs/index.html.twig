@@ -1,0 +1,61 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Конфігурації аутентифікації - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування конфігураціями аутентифікації</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/auth-configs/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати конфігурацію
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if configs is empty %}
+            <p>Немає конфігурацій для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Провайдер</th>
+                        <th>Client ID</th>
+                        <th>Активна</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for config in configs %}
+                        <tr>
+                            <td>{{ config.id }}</td>
+                            <td>{{ config.provider }}</td>
+                            <td>{{ config.client_id ?: 'Не вказано' }}</td>
+                            <td>
+                                {% if config.is_active %}
+                                    <i class="check circle icon green"></i> Так
+                                {% else %}
+                                    <i class="times circle icon red"></i> Ні
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/auth-configs/edit?id={{ config.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <a href="/admin/auth-configs/delete?id={{ config.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
