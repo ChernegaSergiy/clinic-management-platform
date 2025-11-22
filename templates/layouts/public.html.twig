@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Клініка — турбота без зайвого{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    {% block stylesheets %}{% endblock %}
+    <style>
+        :root {
+            --bg: #f4f1eb;
+            --ink: #0f0f0f;
+            --accent: #ffd400;
+            --muted: #5f5f5f;
+            --card: #ffffff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+        }
+        a { color: var(--ink); text-decoration: none; }
+        header {
+            border-bottom: 3px solid var(--ink);
+            padding: 18px 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+        }
+        .brand {
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-badge {
+            background: var(--accent);
+            border: 2px solid var(--ink);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        nav {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+        nav a {
+            padding: 8px 12px;
+            border: 2px solid var(--ink);
+            border-radius: 12px;
+            font-weight: 500;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+        .layout {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 40px 24px 64px;
+        }
+        footer {
+            border-top: 3px solid var(--ink);
+            padding: 32px 24px;
+            background: var(--card);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .footer-title { font-weight: 700; margin-bottom: 8px; }
+        .footer-item { color: var(--muted); font-size: 14px; }
+        @media (max-width: 720px) {
+            header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            nav { width: 100%; flex-wrap: wrap; }
+            nav a { width: calc(50% - 9px); text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="brand">
+        Клініка
+        <span class="brand-badge">care</span>
+    </div>
+    <nav>
+        <a href="/about">Про клініку</a>
+        <a href="/contact">Контакти</a>
+        <a href="/appointments">Записатися</a>
+        <a href="/login">Вхід</a>
+    </nav>
+</header>
+
+<main class="layout">
+    {% block body %}{% endblock %}
+</main>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <div class="footer-title">Контакти</div>
+            <div class="footer-item">м. Київ, вул. Хрещатик, 1</div>
+            <div class="footer-item">+380 (44) 123-45-67</div>
+        </div>
+        <div>
+            <div class="footer-title">Години прийому</div>
+            <div class="footer-item">Пн-Пт: 08:00 — 20:00</div>
+            <div class="footer-item">Сб: 09:00 — 16:00</div>
+        </div>
+        <div>
+            <div class="footer-title">Швидкі посилання</div>
+            <div class="footer-item"><a href="/contact">Зв'язок</a></div>
+            <div class="footer-item"><a href="/appointments">Запис</a></div>
+            <div class="footer-item"><a href="/about">Команда</a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
