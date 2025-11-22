@@ -1,105 +1,125 @@
-{% extends "layouts/base.html.twig" %}
-{% import "components/ui.html.twig" as ui %}
+{% extends "layouts/public.html.twig" %}
 
-{% block title %}Про нас - Клініка{% endblock %}
+{% block title %}Про клініку — Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui vertical stripe segment">
-        <div class="ui text container">
-            <h2 class="ui header">Наша місія та бачення</h2>
-            <p>Ми прагнемо створити інноваційну платформу, яка трансформує управління медичними закладами в Україні, роблячи їх більш ефективними, прозорими та орієнтованими на пацієнта. Наше бачення — це майбутнє, де кожна клініка має доступ до передових технологій, що дозволяють надавати медичні послуги найвищої якості.</p>
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Про клініку</p>
+            <h1>Ми працюємо просто, прозоро і для людей</h1>
+            <p class="lede">Допомагаємо сім'ям отримувати своєчасну медичну допомогу без зайвих бюрократій. Від першого дзвінка до результатів аналізів — пояснюємо, що буде далі.</p>
+        </div>
+    </section>
 
-            <h3 class="ui header">Цінності проєкту</h3>
-            <div class="ui three column stackable grid">
-                <div class="column">
-                    <h4 class="ui header"><i class="lightbulb outline icon"></i> Інновації</h4>
-                    <p>Постійний пошук та впровадження нових рішень для покращення медичних процесів.</p>
-                </div>
-                <div class="column">
-                    <h4 class="ui header"><i class="handshake outline icon"></i> Довіра</h4>
-                    <p>Побудова довгострокових відносин з клієнтами та партнерами на основі відкритості та чесності.</p>
-                </div>
-                <div class="column">
-                    <h4 class="ui header"><i class="heartbeat icon"></i> Пацієнтоорієнтованість</h4>
-                    <p>Розробка рішень, що покращують досвід пацієнтів та якість їхнього лікування.</p>
-                </div>
+    <section class="section section--grid">
+        <div>
+            <h2>Місія</h2>
+            <p>Бути клінікою, де пацієнти знають, що їх чують: лікарі мають час пояснити, адміністратори — допомогти, а процеси — не виснажують.</p>
+        </div>
+        <div>
+            <h2>Підхід</h2>
+            <p>Приймаємо вчасно, не перевантажуємо зайвими дослідженнями, комбінуємо профілактику та лікування, щоб економити ваш час і сили.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section__head">
+            <h2>Цінності</h2>
+            <p>Зосереджені на тому, що справді важливо для пацієнтів.</p>
+        </div>
+        <div class="pill-grid">
+            <div class="pill-card">
+                <div class="pill-card__title">Простота</div>
+                <p>Говоримо зрозуміло, даємо чіткі інструкції без професійного шуму.</p>
+            </div>
+            <div class="pill-card">
+                <div class="pill-card__title">Повагa</div>
+                <p>Беремо пацієнта в партнерство: відповідаємо на запитання і слухаємо зворотний зв'язок.</p>
+            </div>
+            <div class="pill-card">
+                <div class="pill-card__title">Відповідальність</div>
+                <p>Дотримуємося плану лікування, фіксуємо результати та коригуємо, якщо потрібно.</p>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="ui vertical stripe segment">
-        <div class="ui text container">
-            <h2 class="ui header">Етапи реалізації проєкту</h2>
-            <div class="ui ordered list">
-                <div class="item">
-                    <div class="content">
-                        <div class="header">Тиждень 1-2: Планування та архітектура</div>
-                        <div class="description">Аналіз вимог, проєктування бази даних, вибір технологічного стеку, створення базового каркасу системи.</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <div class="content">
-                        <div class="header">Тиждень 3-4: Розробка основних модулів</div>
-                        <div class="description">Реалізація модулів управління пацієнтами, розкладом, базової аутентифікації.</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <div class="content">
-                        <div class="header">Тиждень 5-6: Інтеграція та тестування</div>
-                        <div class="description">Підключення зовнішніх сервісів, розробка звітів, тестування системи, підготовка до впровадження.</div>
-                    </div>
-                </div>
+    <section class="section">
+        <div class="section__head">
+            <h2>Команда</h2>
+            <p>Лікарі та адміністратори, які вміють пояснювати й підтримувати.</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-card__tag">Сімейна медицина</div>
+                <h3>Олена, лікар</h3>
+                <p>Консультує дорослих і дітей, веде пацієнтів з хронічними станами.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-card__tag">Діагностика</div>
+                <h3>Марко, лікар УЗД</h3>
+                <p>Пояснює результати простими словами та дає чіткі наступні кроки.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-card__tag">Адміністрація</div>
+                <h3>Ірина, координатор</h3>
+                <p>Планує графік, нагадує про візити, допомагає з документами.</p>
             </div>
         </div>
-    </div>
+    </section>
+{% endblock %}
 
-    <div class="ui vertical stripe segment">
-        <div class="ui text container">
-            <h2 class="ui header">Наша команда</h2>
-            <div class="ui three stackable cards">
-                <div class="card">
-                    <div class="image">
-                        <img src="https://via.placeholder.com/300x300?text=Team+Member+1" alt="Team Member 1">
-                    </div>
-                    <div class="content">
-                        <div class="header">Ім'я Прізвище 1</div>
-                        <div class="meta">
-                            <span class="date">Backend Developer</span>
-                        </div>
-                        <div class="description">
-                            Відповідальний за розробку серверної логіки, API та взаємодію з базою даних.
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="image">
-                        <img src="https://via.placeholder.com/300x300?text=Team+Member+2" alt="Team Member 2">
-                    </div>
-                    <div class="content">
-                        <div class="header">Ім'я Прізвище 2</div>
-                        <div class="meta">
-                            <span class="date">Frontend Developer / UX Designer</span>
-                        </div>
-                        <div class="description">
-                            Займається розробкою користувацького інтерфейсу, забезпечує зручність та естетику.
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="image">
-                        <img src="https://via.placeholder.com/300x300?text=Team+Member+3" alt="Team Member 3">
-                    </div>
-                    <div class="content">
-                        <div class="header">Ім'я Прізвище 3</div>
-                        <div class="meta">
-                            <span class="date">DevOps / QA Engineer</span>
-                        </div>
-                        <div class="description">
-                            Відповідальний за налаштування інфраструктури, автоматизацію тестування та забезпечення якості.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .section { margin-bottom: 50px; }
+        .section__head h1 { margin: 8px 0 12px; font-size: clamp(28px, 5vw, 44px); }
+        .section__head h2 { margin: 0 0 8px; font-size: 28px; }
+        .section__head p { margin: 0; color: #5f5f5f; max-width: 700px; }
+        .section--grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .section--grid h2 { margin: 0 0 8px; }
+        .lede { font-size: 18px; color: #3a3a3a; max-width: 760px; }
+        .pill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .pill-card {
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            padding: 16px;
+            background: #ffffff;
+            box-shadow: 6px 6px 0 #0f0f0f;
+        }
+        .pill-card__title { font-weight: 700; margin-bottom: 8px; }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .team-card {
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            padding: 16px;
+            background: linear-gradient(160deg, #fffefa, #f4f1eb);
+            box-shadow: 6px 6px 0 #0f0f0f;
+        }
+        .team-card__tag {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 2px solid #0f0f0f;
+            border-radius: 12px;
+            background: #ffd400;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .team-card h3 { margin: 0 0 8px; }
+        .team-card p { margin: 0; color: #3a3a3a; }
+    </style>
 {% endblock %}
