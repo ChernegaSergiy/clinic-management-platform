@@ -42,6 +42,8 @@ class KpiController
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
+            'target_value' => ['numeric', 'min_value:0'],
+            'unit' => ['required'],
         ]);
 
         if ($validator->hasErrors()) {
