@@ -11,7 +11,7 @@ class QrCodeGenerator
     {
         $options = new QROptions([
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel'   => QRCode::ECC_L_DEFAULT,
+            'eccLevel'   => QRCode::ECC_L,
             'scale'      => 5,
             'imageBase64' => true,
         ]);
