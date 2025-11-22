@@ -3,29 +3,15 @@
 {% block title %}Вітання — Клініка{% endblock %}
 
 {% block body %}
-    <section class="section">
-        <div class="section__head">
+    <section class="section-block">
+        <div class="section-block__head">
             <p class="eyebrow">Вітання</p>
-            <h1>Вітаємо, {{ name }}!</h1>
-            <p class="lede">Ця сторінка показує роботу публічного лейауту без Semantic UI.</p>
+            <h1 class="section-block__title">Вітаємо, {{ name }}!</h1>
+            <p class="section-block__subtitle lede">Ця сторінка показує роботу публічного лейауту без Semantic UI.</p>
         </div>
-        <div class="card">
+        <div class="content-card">
             <h3>Блоки шаблону</h3>
             <p>Використовуйте блоки <code>title</code>, <code>stylesheets</code> та <code>javascripts</code> для підключення контенту та стилів.</p>
         </div>
     </section>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .card {
-            background: #ffffff;
-            border: 3px solid #0f0f0f;
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 6px 6px 0 #0f0f0f;
-            margin-top: 16px;
-        }
-    </style>
 {% endblock %}
