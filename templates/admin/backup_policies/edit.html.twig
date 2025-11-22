@@ -1,0 +1,30 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати політику резервного копіювання #{{ policy.id }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати політику резервного копіювання #{{ policy.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/backup_policies/edit?id={{ policy.id }}">
+            {{ forms.input('name', 'Назва', old.name ?? policy.name, 'text', 'Наприклад, Daily Backup', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис', old.description ?? policy.description, 'Детальний опис політики', errors.description ?? null) }}
+            {{ forms.input('frequency', 'Частота', old.frequency ?? policy.frequency, 'text', 'Наприклад, daily, weekly, monthly', errors.frequency ?? null, {'required': 'required'}) }}
+            {{ forms.input('retention_days', 'Днів зберігання', old.retention_days ?? policy.retention_days, 'number', 'Кількість днів для зберігання резервних копій', errors.retention_days ?? null, {'required': 'required', 'min': '1'}) }}
+
+            <div class="field">
+                <label>Статус</label>
+                <select name="status" class="ui dropdown">
+                    <option value="active" {% if (old.status is defined and old.status == 'active') or (old.status is not defined and policy.status == 'active') %}selected{% endif %}>Активна</option>
+                    <option value="inactive" {% if (old.status is defined and old.status == 'inactive') or (old.status is not defined and policy.status == 'inactive') %}selected{% endif %}>Неактивна</option>
+                </select>
+            </div>
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/admin/backup_policies" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
