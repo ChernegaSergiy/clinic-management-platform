@@ -624,7 +624,7 @@ class AdminController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $value = $this->dictionaryRepository->findValueById($id);
         $dictionaryId = $value['dictionary_id'];
 
