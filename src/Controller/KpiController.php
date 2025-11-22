@@ -61,9 +61,13 @@ class KpiController
     public function listResults(): void
     {
         AuthGuard::check();
-        // For now, just show current user's results, or all results for admins
-        $userId = $_SESSION['user']['id'];
-        $results = $this->kpiRepository->findKpiResultsForUser($userId);
+        $results = [];
+        if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) { // Перевірка, чи користувач є адміністратором
+            $results = $this->kpiRepository->findAllKpiResults();
+        } else {
+            $userId = $_SESSION['user']['id'];
+            $results = $this->kpiRepository->findKpiResultsForUser($userId);
+        }
         View::render('kpi/results/index.html.twig', ['results' => $results]);
     }
 
