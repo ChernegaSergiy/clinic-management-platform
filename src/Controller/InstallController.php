@@ -188,6 +188,8 @@ class InstallController
             '/DEFAULT\\s+CURRENT_TIMESTAMP\\s+ON\\s+UPDATE\\s+CURRENT_TIMESTAMP/i' => 'DEFAULT CURRENT_TIMESTAMP',
             '/ON\\s+UPDATE\\s+CURRENT_TIMESTAMP/i' => '',
             '/ENGINE=InnoDB.*;/i' => ';',
+            '/ENUM\\(([^)]*)\\)/i' => 'TEXT CHECK (VALUE IN (\1))',
+            '/\\bUNSIGNED\\b/i' => '',
         ];
 
         $sql = preg_replace(array_keys($patterns), array_values($patterns), $sql) ?? $sql;
