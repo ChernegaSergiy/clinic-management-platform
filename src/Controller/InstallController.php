@@ -60,7 +60,7 @@ class InstallController
         if (!empty($_SESSION['install_input'])) {
             $input = array_merge($_SESSION['install_input'], $input);
         }
-        // Persist current input snapshot only after validation
+        // Snapshot after merge
         $inputToStore = $input;
 
         $errors = $this->validate($input);

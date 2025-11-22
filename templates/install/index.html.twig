@@ -89,6 +89,19 @@
                 </div>
             {% elseif step == 3 %}
                 <h3>Крок 3: Адміністратор</h3>
+                {# Hidden fields to carry DB/env values #}
+                <input type="hidden" name="app_env" value="{{ defaults.APP_ENV|default('dev') }}">
+                <input type="hidden" name="app_debug" value="{{ defaults.APP_DEBUG|default('true') == 'true' ? '1' : '' }}">
+                <input type="hidden" name="db_host" value="{{ defaults.DB_HOST|default('127.0.0.1') }}">
+                <input type="hidden" name="db_port" value="{{ defaults.DB_PORT|default('3306') }}">
+                <input type="hidden" name="db_database" value="{{ defaults.DB_DATABASE|default('clinic') }}">
+                <input type="hidden" name="db_username" value="{{ defaults.DB_USERNAME|default('root') }}">
+                <input type="hidden" name="db_password" value="{{ defaults.DB_PASSWORD|default('') }}">
+                <input type="hidden" name="mail_host" value="{{ defaults.MAIL_HOST|default('localhost') }}">
+                <input type="hidden" name="mail_port" value="{{ defaults.MAIL_PORT|default('1025') }}">
+                <input type="hidden" name="mail_username" value="{{ defaults.MAIL_USERNAME|default('') }}">
+                <input type="hidden" name="mail_password" value="{{ defaults.MAIL_PASSWORD|default('') }}">
+                <input type="hidden" name="mail_encryption" value="{{ defaults.MAIL_ENCRYPTION|default('') }}">
                 <div class="install__grid">
                     <label class="install__field">
                         <span class="install__label">Email адміністратора</span>
