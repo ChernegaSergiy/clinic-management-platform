@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Core\Validator;
 use App\Repository\KpiRepository;
+use App\Core\AuthGuard;
 
 class KpiController
 {
@@ -18,20 +19,14 @@ class KpiController
     // --- KPI Definitions ---
     public function listDefinitions(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
         View::render('kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createDefinition(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         View::render('kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -41,10 +36,7 @@ class KpiController
 
     public function storeDefinition(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -68,10 +60,7 @@ class KpiController
     // --- KPI Results ---
     public function listResults(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         // For now, just show current user's results, or all results for admins
         $userId = $_SESSION['user']['id'];
         $results = $this->kpiRepository->findKpiResultsForUser($userId);
