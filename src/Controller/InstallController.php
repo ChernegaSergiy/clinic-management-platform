@@ -262,10 +262,6 @@ class InstallController
 
     private function dsnSummary(array $input): string
     {
-        if ($input['db_connection'] === 'sqlite') {
-            return 'SQLite — ' . $input['db_database'];
-        }
-
         return sprintf(
             'MySQL — %s:%s/%s',
             $input['db_host'],
