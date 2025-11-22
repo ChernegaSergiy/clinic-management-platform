@@ -79,10 +79,10 @@ class AppointmentController
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
-            'patient_id' => ['required'],
-            'doctor_id' => ['required'],
-            'start_time' => ['required'],
-            'end_time' => ['required'],
+            'patient_id' => ['required', 'numeric'],
+            'doctor_id' => ['required', 'numeric'],
+            'start_time' => ['required', 'datetime'],
+            'end_time' => ['required', 'datetime'],
         ];
 
         if (!$validator->validate($_POST, $rules)) {
