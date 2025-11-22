@@ -1,0 +1,70 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Визначення KPI - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування визначеннями KPI</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/kpi_definitions/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати визначення
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if definitions is empty %}
+            <p>Немає визначень KPI для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Тип</th>
+                        <th>Цільове значення</th>
+                        <th>Одиниця</th>
+                        <th>Активний</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for definition in definitions %}
+                        <tr>
+                            <td>{{ definition.id }}</td>
+                            <td>{{ definition.name }}</td>
+                            <td>{{ definition.description ?: 'Не вказано' }}</td>
+                            <td>{{ definition.kpi_type }}</td>
+                            <td>{{ definition.target_value }}</td>
+                            <td>{{ definition.unit }}</td>
+                            <td>
+                                {% if definition.is_active %}
+                                    <i class="check circle icon green"></i> Так
+                                {% else %}
+                                    <i class="times circle icon red"></i> Ні
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/kpi_definitions/edit?id={{ definition.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <form action="/admin/kpi_definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити це визначення KPI?');">
+                                    <input type="hidden" name="id" value="{{ definition.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
