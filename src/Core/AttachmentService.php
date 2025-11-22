@@ -269,7 +269,7 @@ class AttachmentService
      * @param bool $canEdit
      * @return bool
      */
-    public function updateAccess(int $attachmentId, ?int $userId = null, ?int $roleId = null, bool $canView, bool $canEdit): bool
+    public function updateAccess(int $attachmentId, ?int $userId = null, ?int $roleId = null, bool $canView = false, bool $canEdit = false): bool
     {
         if ($userId === null && $roleId === null) {
             return false; // Must specify either user or role
