@@ -76,7 +76,7 @@ class LabOrderController
             return;
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
         ]);
@@ -180,7 +180,7 @@ class LabOrderController
         }
 
         // TODO: Add validation
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
             'status' => ['required', 'in:ordered,in_progress,completed,cancelled'],
