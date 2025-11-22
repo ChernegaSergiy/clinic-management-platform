@@ -10,7 +10,15 @@
                 <h2 class="ui header">Список пацієнтів</h2>
             </div>
             <div class="eight wide column right aligned">
-                {{ ui.button('Додати пацієнта', 'primary', '', 'plus') }}
+                <a href="/patients/export-csv" class="ui secondary button">
+                    <i class="file alternate outline icon"></i> Експорт в CSV
+                </a>
+                <a href="/patients/export-json" class="ui secondary button">
+                    <i class="file alternate outline icon"></i> Експорт в JSON
+                </a>
+                <a href="/patients/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати пацієнта
+                </a>
             </div>
         </div>
 
