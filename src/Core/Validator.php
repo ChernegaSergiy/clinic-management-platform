@@ -51,6 +51,13 @@ class Validator
                     }
                 }
 
+                if (is_string($rule) && str_starts_with($rule, 'in:')) {
+                    $options = explode(',', substr($rule, 3));
+                    if (!empty($value) && !in_array($value, $options)) {
+                        $this->errors[$field][] = "Поле '{$field}' повинно мати одне зі значень: " . implode(', ', $options) . ".";
+                    }
+                }
+
                 if (is_string($rule) && str_starts_with($rule, 'unique:')) {
                     [$ruleName, $table, $column, $ignoreId] = array_pad(explode(':', $rule), 4, null);
                     if (!empty($value)) {
