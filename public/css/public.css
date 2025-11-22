@@ -128,23 +128,27 @@ a { color: inherit; text-decoration: none; }
         position: static;
         box-shadow: none;
     }
-    .site-nav__item { width: auto; }
-    .site-nav__item + .site-nav__item { margin-left: 10px; }
-    .site-nav__link {
+    .site-nav__item {
         width: auto;
-        padding: 10px 12px;
-        border: 2px solid var(--ink);
-        border-radius: 12px;
-        font-weight: 600;
-        background: var(--card);
-        transition: transform 0.1s ease, box-shadow 0.1s ease;
-        box-shadow: 2px 2px 0 var(--ink);
+        border: none;
     }
-    .site-nav__link:hover {
-        transform: translateY(-2px);
-        box-shadow: 4px 4px 0 var(--ink);
-        text-decoration: none;
-    }
+    .site-nav__item + .site-nav__item { margin-left: 10px; }
+.site-nav__link {
+    width: auto;
+    padding: 10px 12px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    font-weight: 600;
+    background: var(--card);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    box-shadow: 2px 2px 0 var(--ink);
+    text-decoration: none;
+}
+.site-nav__link:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 var(--ink);
+    text-decoration: none;
+}
 }
 
 .site-footer {
