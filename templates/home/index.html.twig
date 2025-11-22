@@ -1,112 +1,241 @@
-{% extends "layouts/base.html.twig" %}
-{% import "components/ui.html.twig" as ui %}
+{% extends "layouts/public.html.twig" %}
 
-{% block title %}{{ page.hero.title }} - Клініка{% endblock %}
+{% block title %}{{ page.hero.title }} — Клініка{% endblock %}
 
 {% block body %}
-    {# Hero Section #}
-    <div class="ui inverted vertical masthead center aligned segment hero-section">
-        <div class="ui text container">
-            <h1 class="ui inverted header">
-                {{ page.hero.title }}
-            </h1>
-            <h2>{{ page.hero.subtitle }}</h2>
-            <a href="#" class="ui huge primary button">
-                {{ page.hero.cta_button }} <i class="right arrow icon"></i>
-            </a>
-        </div>
-    </div>
-
-    {# Services Teaser Grid #}
-    <div class="ui vertical stripe segment">
-        <div class="ui middle aligned stackable grid container">
-            <div class="row">
-                <div class="center aligned column">
-                    <h2 class="ui header">{{ page.advantages.title }}</h2>
-                    <p>{{ page.advantages.subtitle }}</p>
+    <section class="hero">
+        <div class="hero__badge">Міська сімейна клініка</div>
+        <div class="hero__content">
+            <div>
+                <p class="eyebrow">Здоров'я без зайвого шуму</p>
+                <h1>{{ page.hero.title }}</h1>
+                <p class="lede">{{ page.hero.subtitle }}</p>
+                <div class="hero__cta">
+                    <a href="/appointments" class="btn btn-primary">{{ page.hero.cta_button }}</a>
+                    <a href="/contact" class="btn btn-ghost">Поставити запитання</a>
                 </div>
             </div>
-            <div class="row">
-                {% for item in page.advantages.items %}
-                    <div class="four wide column">
-                        {{ ui.card(
-                            item.title,
-                            item.description,
-                            '',
-                            'https://via.placeholder.com/300x200?text=' ~ item.title|url_encode,
-                            '#'
-                        ) }}
-                    </div>
-                {% endfor %}
+            <div class="hero__card">
+                <div class="card__title">Найближчі вільні вікна</div>
+                <ul class="slots">
+                    <li>Сьогодні · 17:30</li>
+                    <li>Завтра · 09:10</li>
+                    <li>Ср · 14:20</li>
+                </ul>
+                <a href="/appointments" class="card__link">Переглянути графік →</a>
             </div>
         </div>
-    </div>
+    </section>
 
-    {# Testimonial/Trust Indicator Block #}
-    <div class="ui inverted vertical stripe segment">
-        <div class="ui text container">
-            <h2 class="ui header center aligned inverted">{{ page.trust.title }}</h2>
-            <div class="ui three column stackable grid">
-                {% for item in page.trust.items %}
-                    <div class="column">
-                        <h3 class="ui inverted header">
-                            <i class="users icon"></i> {{ item.value }}
-                        </h3>
-                        <p>{{ item.label }}</p>
-                    </div>
-                {% endfor %}
-            </div>
+    <section class="section section--split">
+        <div class="section__head">
+            <h2>{{ page.advantages.title }}</h2>
+            <p>{{ page.advantages.subtitle }}</p>
         </div>
-    </div>
+        <div class="cards">
+            {% for item in page.advantages.items %}
+                <article class="card">
+                    <div class="card__badge">#{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description }}</p>
+                    <span class="card__line"></span>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
 
-    {# Call to Action #}
-    <div class="ui vertical stripe segment">
-        <div class="ui text container center aligned">
-            <h2 class="ui header">{{ page.cta.title }}</h2>
+    <section class="section section--contrast">
+        <div class="section__head">
+            <h2>{{ page.trust.title }}</h2>
+            <p>Ми говоримо простою мовою та працюємо прозоро.</p>
+        </div>
+        <div class="stats">
+            {% for item in page.trust.items %}
+                <div class="stat">
+                    <div class="stat__value">{{ item.value }}</div>
+                    <div class="stat__label">{{ item.label }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section section--cta">
+        <div class="section__head">
+            <h2>{{ page.cta.title }}</h2>
             <p>{{ page.cta.subtitle }}</p>
-            <a href="#" class="ui huge button">{{ page.cta.button }}</a>
         </div>
-    </div>
+        <div class="cta-actions">
+            <a href="/appointments" class="btn btn-primary">{{ page.cta.button }}</a>
+            <a href="/contact" class="btn btn-ghost">Написати адміністратору</a>
+        </div>
+    </section>
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .hero-section {
-            min-height: 700px;
-            padding: 1em 0em;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1500x700?text=Clinic+Hero');
-            background-size: cover;
-            background-position: center;
-            display: flex;
+        .hero {
+            border: 3px solid #0f0f0f;
+            border-radius: 20px;
+            padding: 42px;
+            background: linear-gradient(145deg, #fff9e6, #f4f1eb);
+            box-shadow: 8px 8px 0 #0f0f0f;
+            margin-bottom: 56px;
+        }
+        .hero__badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 2px solid #0f0f0f;
+            border-radius: 999px;
+            font-weight: 700;
+            background: #ffd400;
+            margin-bottom: 18px;
+            letter-spacing: 0.2px;
+        }
+        .eyebrow {
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin: 0 0 10px;
+            font-weight: 700;
+        }
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 56px);
+            margin: 0 0 14px;
+            line-height: 1.05;
+        }
+        .lede {
+            max-width: 620px;
+            font-size: 18px;
+            color: #3a3a3a;
+            margin: 0 0 24px;
+        }
+        .hero__content {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 28px;
+            align-items: start;
+        }
+        .hero__cta { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 2px solid #0f0f0f;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
         }
-        .hero-section h1.header {
-            font-size: 4em;
-            font-weight: normal;
-            margin-bottom: 0em;
-            padding-bottom: 0em;
+        .btn-primary {
+            background: #0f0f0f;
+            color: #f4f1eb;
+            box-shadow: 6px 6px 0 #ffd400;
         }
-        .hero-section h2 {
-            font-size: 1.7em;
-            font-weight: normal;
-            margin-top: 1.5em;
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-ghost {
+            background: #ffd400;
+            color: #0f0f0f;
+            box-shadow: 4px 4px 0 #0f0f0f;
         }
-        .ui.vertical.stripe {
-            padding: 8em 0em;
+        .btn-ghost:hover { transform: translateY(-2px); }
+        .hero__card {
+            background: #ffffff;
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 6px 6px 0 #0f0f0f;
         }
-        .ui.inverted.vertical.stripe {
-            background-color: #2185d0; /* Primary Blue from design system */
-            padding: 8em 0em;
-            color: white;
+        .card__title { font-weight: 700; margin-bottom: 12px; }
+        .slots { list-style: none; padding: 0; margin: 0 0 18px; }
+        .slots li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #0f0f0f;
+            font-weight: 600;
         }
-        .ui.inverted.vertical.stripe h2.header,
-        .ui.inverted.vertical.stripe h3.header {
-            color: white;
+        .slots li:last-child { border-bottom: none; }
+        .card__link { font-weight: 700; text-decoration: underline; }
+
+        .section { margin-bottom: 60px; }
+        .section__head h2 { margin: 0 0 8px; font-size: 28px; }
+        .section__head p { margin: 0; color: #5f5f5f; max-width: 600px; }
+        .section--split .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 22px;
         }
-        .ui.inverted.vertical.stripe p {
-            color: rgba(255, 255, 255, .9);
+        .card {
+            background: #ffffff;
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            padding: 18px;
+            position: relative;
+            box-shadow: 6px 6px 0 #0f0f0f;
+            min-height: 200px;
+        }
+        .card__badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: #ffd400;
+            border: 2px solid #0f0f0f;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .card h3 { margin: 0 0 10px; }
+        .card p { margin: 0 0 18px; color: #3a3a3a; }
+        .card__line {
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: #0f0f0f;
+        }
+
+        .section--contrast {
+            background: #0f0f0f;
+            color: #f4f1eb;
+            border-radius: 18px;
+            padding: 32px;
+            border: 3px solid #f4f1eb;
+            box-shadow: 8px 8px 0 #ffd400;
+        }
+        .section--contrast .section__head p { color: #d8d2c2; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .stat {
+            padding: 16px;
+            border: 2px solid #f4f1eb;
+            border-radius: 14px;
+            background: #1c1c1c;
+        }
+        .stat__value { font-size: 28px; font-weight: 700; }
+        .stat__label { color: #d8d2c2; margin-top: 6px; }
+
+        .section--cta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            align-items: center;
+        }
+        .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        @media (max-width: 900px) {
+            .hero { padding: 28px; }
+            .hero__content { grid-template-columns: 1fr; }
+            .section--contrast { padding: 24px; }
+        }
+        @media (max-width: 560px) {
+            .hero { margin: 12px 0 48px; }
+            .btn { width: 100%; text-align: center; }
         }
     </style>
 {% endblock %}
