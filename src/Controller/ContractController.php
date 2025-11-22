@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Core\Validator;
 use App\Repository\ContractRepository;
+use App\Core\AuthGuard;
 
 class ContractController
 {
@@ -17,20 +18,14 @@ class ContractController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $contracts = $this->contractRepository->findAll();
         View::render('billing/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         View::render('billing/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -40,10 +35,7 @@ class ContractController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -84,10 +76,7 @@ class ContractController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -103,10 +92,7 @@ class ContractController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -127,10 +113,7 @@ class ContractController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -181,10 +164,7 @@ class ContractController
 
     public function delete(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -208,10 +188,7 @@ class ContractController
 
     public function downloadFile(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
