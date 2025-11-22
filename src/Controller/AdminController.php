@@ -229,4 +229,135 @@ class AdminController
         header('Location: /admin/users');
         exit();
     }
+
+    // --- Role Management ---
+    public function listRoles(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $roles = $this->roleRepository->findAll();
+        View::render('admin/roles.html.twig', ['roles' => $roles]);
+    }
+
+    public function createRole(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        View::render('admin/new_role.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeRole(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new \App\Core\Validator();
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:roles'], // Need to implement unique validation in Validator
+            'description' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/roles/new');
+            exit();
+        }
+
+        $this->roleRepository->save($_POST);
+        $_SESSION['success_message'] = "Роль успішно створено.";
+        header('Location: /admin/roles');
+        exit();
+    }
+
+    public function editRole(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $role = $this->roleRepository->findById($id);
+
+        if (!$role) {
+            http_response_code(404);
+            echo "Роль не знайдено";
+            return;
+        }
+
+        View::render('admin/edit_role.html.twig', [
+            'role' => $role,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateRole(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $role = $this->roleRepository->findById($id);
+
+        if (!$role) {
+            http_response_code(404);
+            echo "Роль не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator();
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:roles,name,' . $id], // Need to implement unique validation in Validator
+            'description' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/roles/edit?id=' . $id);
+            exit();
+        }
+
+        $this->roleRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Роль успішно оновлено.";
+        header('Location: /admin/roles');
+        exit();
+    }
+
+    public function deleteRole(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $role = $this->roleRepository->findById($id);
+
+        if (!$role) {
+            http_response_code(404);
+            echo "Роль не знайдено";
+            return;
+        }
+
+        $this->roleRepository->delete($id);
+        $_SESSION['success_message'] = "Роль успішно видалено.";
+        header('Location: /admin/roles');
+        exit();
+    }
 }
