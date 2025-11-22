@@ -14,7 +14,8 @@
         "symfony/yaml": "^7.3",
         "vlucas/phpdotenv": "^5.6",
         "chillerlan/php-qrcode": "^5.0",
-        "dompdf/dompdf": "^3.1"
+        "dompdf/dompdf": "^3.1",
+        "phpoffice/phpspreadsheet": "^5.2"
     },
     "autoload": {
         "psr-4": {
