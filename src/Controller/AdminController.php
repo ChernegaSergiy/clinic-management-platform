@@ -882,7 +882,128 @@ class AdminController
         $id = (int)($_POST['id'] ?? 0);
         $this->backupPolicyRepository->delete($id);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
-        header('Location: /admin/backup_policies');
+
+
+    // --- KPI Definition Management ---
+    public function listKpiDefinitions(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $definitions = $this->kpiRepository->findAllKpiDefinitions();
+        View::render('admin/kpi_definitions/index.html.twig', ['definitions' => $definitions]);
+    }
+
+    public function createKpiDefinition(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        View::render('admin/kpi_definitions/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeKpiDefinition(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:kpi_definitions,name'],
+            'kpi_type' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/kpi_definitions/new');
+            exit();
+        }
+
+        $this->kpiRepository->saveKpiDefinition($_POST);
+        $_SESSION['success_message'] = "Визначення KPI успішно створено.";
+        header('Location: /admin/kpi_definitions');
+        exit();
+    }
+
+    public function editKpiDefinition(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
+
+        if (!$definition) {
+            http_response_code(404);
+            echo "Визначення KPI не знайдено";
+            return;
+        }
+
+        View::render('admin/kpi_definitions/edit.html.twig', [
+            'definition' => $definition,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateKpiDefinition(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
+
+        if (!$definition) {
+            http_response_code(404);
+            echo "Визначення KPI не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:kpi_definitions,name,' . $id],
+            'kpi_type' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/kpi_definitions/edit?id=' . $id);
+            exit();
+        }
+
+        $this->kpiRepository->updateKpiDefinition($id, $_POST);
+        $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
+        header('Location: /admin/kpi_definitions');
+        exit();
+    }
+
+    public function deleteKpiDefinition(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->kpiRepository->deleteKpiDefinition($id);
+        $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
+        header('Location: /admin/kpi_definitions');
         exit();
     }
 }
