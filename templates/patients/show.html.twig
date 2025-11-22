@@ -57,7 +57,7 @@
                         </tr>
                         <tr>
                             <td>Статус</td>
-                            <td>{{ patient.active ? 'Активний' : 'Архівний' }}</td>
+                            <td>{{ patient.status == 'active' ? 'Активний' : 'Архівний' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -67,10 +67,16 @@
         <div class="ui divider"></div>
 
         <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">Редагувати</a>
-        {% if patient.active %}
-            <a href="/patients/toggle-status?id={{ patient.id }}" class="ui negative button">Архівувати</a>
+        {% if patient.status == 'active' %}
+            <form action="/patients/toggle-status" method="POST" style="display: inline;">
+                <input type="hidden" name="id" value="{{ patient.id }}">
+                <button type="submit" class="ui negative button">Архівувати</button>
+            </form>
         {% else %}
-            <a href="/patients/toggle-status?id={{ patient.id }}" class="ui positive button">Активувати</a>
+            <form action="/patients/toggle-status" method="POST" style="display: inline;">
+                <input type="hidden" name="id" value="{{ patient.id }}">
+                <button type="submit" class="ui positive button">Активувати</button>
+            </form>
         {% endif %}
         <a href="/patients" class="ui button">Повернутися до списку</a>
     </div>
