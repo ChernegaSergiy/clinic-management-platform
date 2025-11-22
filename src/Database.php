@@ -20,8 +20,13 @@ class Database
             $dbUser = $_ENV['DB_USERNAME'] ?? 'root';
             $dbPass = $_ENV['DB_PASSWORD'] ?? '';
             $dbPort = $_ENV['DB_PORT'] ?? '3306';
+            $dbConnection = $_ENV['DB_CONNECTION'] ?? 'mysql';
 
-            $dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
+            if ($dbConnection === 'sqlite') {
+                $dsn = "sqlite:" . __DIR__ . "/../database/" . $dbName; // Assuming $dbName is the file name, e.g., clinic.sqlite
+            } else {
+                $dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
+            }
 
             try {
                 self::$instance = new PDO($dsn, $dbUser, $dbPass, [
