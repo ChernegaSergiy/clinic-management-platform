@@ -1,0 +1,53 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Ролі користувачів - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Ролі користувачів</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/roles/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати роль
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if roles is empty %}
+            <p>Немає ролей для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in roles %}
+                        <tr>
+                            <td>{{ role.id }}</td>
+                            <td>{{ role.name }}</td>
+                            <td>{{ role.description }}</td>
+                            <td>
+                                <a href="/admin/roles/edit?id={{ role.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <a href="/admin/roles/delete?id={{ role.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
