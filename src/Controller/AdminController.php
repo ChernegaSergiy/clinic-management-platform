@@ -882,7 +882,9 @@ class AdminController
         $id = (int)($_POST['id'] ?? 0);
         $this->backupPolicyRepository->delete($id);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
-
+        header('Location: /admin/backup_policies');
+        exit();
+    }
 
     // --- KPI Definition Management ---
     public function listKpiDefinitions(): void
