@@ -46,7 +46,7 @@ $router->add('POST', '/appointments/new', [AppointmentController::class, 'store'
 $router->add('GET', '/appointments/show', [AppointmentController::class, 'show']);
 $router->add('GET', '/appointments/edit', [AppointmentController::class, 'edit']);
 $router->add('POST', '/appointments/edit', [AppointmentController::class, 'update']);
-$router->add('GET', '/appointments/cancel', [AppointmentController::class, 'cancel']);
+$router->add('POST', '/appointments/cancel', [AppointmentController::class, 'cancel']);
 $router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
 
 // Medical Record routes
