@@ -49,7 +49,7 @@ class PatientController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
@@ -138,7 +138,7 @@ class PatientController
             return;
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
