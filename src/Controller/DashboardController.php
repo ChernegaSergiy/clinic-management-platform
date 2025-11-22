@@ -6,6 +6,7 @@ use App\Core\View;
 use App\Repository\PatientRepository;
 use App\Repository\AppointmentRepository;
 use App\Repository\InventoryItemRepository;
+use App\Core\AuthGuard;
 
 class DashboardController
 {
@@ -22,10 +23,7 @@ class DashboardController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         // Fetch data for dashboard widgets
         $patientCount = count($this->patientRepository->findAllActive());
