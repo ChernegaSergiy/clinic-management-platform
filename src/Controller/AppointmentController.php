@@ -223,7 +223,7 @@ class AppointmentController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
@@ -232,7 +232,36 @@ class AppointmentController
             return;
         }
 
-        // TODO: Add validation
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $rules = [
+            'patient_id' => ['required', 'numeric'],
+            'doctor_id' => ['required', 'numeric'],
+            'start_time' => ['required', 'datetime'],
+            'end_time' => ['required', 'datetime'],
+            'status' => ['required', 'in:scheduled,completed,cancelled,no-show'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
+
+            View::render('appointments/edit.html.twig', [
+                'errors' => $validator->getErrors(),
+                'appointment' => array_merge($appointment, $_POST),
+                'patients' => $patientOptions,
+                'doctors' => $doctorOptions,
+            ]);
+            return;
+        }
+
         $this->appointmentRepository->update($id, $_POST);
         header('Location: /appointments/show?id=' . $id);
         exit();
