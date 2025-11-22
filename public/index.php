@@ -19,7 +19,21 @@ use App\Controller\InstallController;
 $requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $staticFile = realpath(__DIR__ . $requestedPath);
 if ($staticFile && str_starts_with($staticFile, realpath(__DIR__)) && is_file($staticFile)) {
-    $mime = mime_content_type($staticFile) ?: 'application/octet-stream';
+    $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
+    $mimeMap = [
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'svg' => 'image/svg+xml',
+        'gif' => 'image/gif',
+        'ico' => 'image/x-icon',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+    ];
+    $mime = $mimeMap[$ext] ?? mime_content_type($staticFile) ?: 'application/octet-stream';
     header('Content-Type: ' . $mime);
     readfile($staticFile);
     exit;
