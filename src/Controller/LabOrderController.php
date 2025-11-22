@@ -171,7 +171,7 @@ class LabOrderController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
 
         if (!$order) {
