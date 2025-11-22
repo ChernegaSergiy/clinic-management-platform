@@ -14,6 +14,9 @@ class InstallController
 
         $step = $this->resolveStep();
         $defaults = $this->loadEnvDefaults();
+        if (!empty($_SESSION['install_input'])) {
+            $defaults = array_merge($defaults, $_SESSION['install_input']);
+        }
 
         View::render('install/index.html.twig', [
             'defaults' => $defaults,
@@ -53,6 +56,10 @@ class InstallController
             'mail_encryption' => $this->clean($_POST['mail_encryption'] ?? ''),
             'seed' => isset($_POST['seed']),
         ];
+        // Merge previously stored input to avoid losing values between steps
+        if (!empty($_SESSION['install_input'])) {
+            $input = array_merge($_SESSION['install_input'], $input);
+        }
 
         $errors = $this->validate($input);
         if (!empty($errors)) {
@@ -68,6 +75,7 @@ class InstallController
         }
 
         if ($step < 3) {
+            $this->storeInput($input);
             $this->redirectWithStep($step + 1);
             return;
         }
@@ -200,6 +208,7 @@ class InstallController
                 'errors' => [],
                 'details' => ['info' => 'Підключення успішне. Продовжуйте до наступного кроку.'],
             ]);
+            $this->storeInput($input);
         } catch (\Throwable $e) {
             $this->setFeedback(['success' => false, 'errors' => ['Не вдалося підключитись: ' . $e->getMessage()]]);
         }
@@ -236,6 +245,7 @@ class InstallController
                     'admin_email' => $input['admin_email'],
                 ],
             ]);
+            unset($_SESSION['install_input']);
         } catch (\Throwable $e) {
             $this->setFeedback([
                 'errors' => ['Встановлення перервано: ' . $e->getMessage()],
@@ -322,6 +332,11 @@ class InstallController
     private function setFeedback(array $payload): void
     {
         $_SESSION['install_feedback'] = array_merge(['errors' => [], 'success' => false, 'details' => []], $payload);
+    }
+
+    private function storeInput(array $input): void
+    {
+        $_SESSION['install_input'] = $input;
     }
 
     private function dsnSummary(array $input): string
