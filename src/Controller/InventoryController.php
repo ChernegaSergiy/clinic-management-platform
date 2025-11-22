@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\View;
 use App\Repository\InventoryItemRepository;
+use App\Core\AuthGuard;
 
 class InventoryController
 {
@@ -16,10 +17,7 @@ class InventoryController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $items = $this->inventoryItemRepository->findAll();
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
@@ -33,10 +31,7 @@ class InventoryController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
@@ -52,10 +47,7 @@ class InventoryController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -79,10 +71,7 @@ class InventoryController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -103,10 +92,7 @@ class InventoryController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -133,10 +119,7 @@ class InventoryController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
