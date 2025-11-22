@@ -145,4 +145,19 @@ class PatientRepository implements PatientRepositoryInterface
         $stmt = $this->pdo->query("SELECT id, first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status, status FROM patients ORDER BY last_name, first_name");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function updateStatus(int $id, string $status): bool
+    {
+        $oldPatient = $this->findById($id);
+        $oldStatus = $oldPatient['status'] ?? null;
+
+        $stmt = $this->pdo->prepare("UPDATE patients SET status = :status WHERE id = :id");
+        $success = $stmt->execute([':status' => $status, ':id' => $id]);
+
+        if ($success && $oldStatus !== $status) {
+            $auditLogger = new AuditLogger();
+            $auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
+        }
+        return $success;
+    }
 }
