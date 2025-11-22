@@ -11,6 +11,7 @@ use App\Repository\PatientRepository;
 use App\Repository\ServiceRepository;
 use App\Repository\ServiceBundleRepository;
 use App\Core\CsvExporter;
+use App\Core\PdfExporter;
 
 class BillingController
 {
