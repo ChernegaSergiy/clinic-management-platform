@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Core\Validator;
 use App\Repository\UserRepository;
+use App\Core\AuthGuard;
 
 class AuthController
 {
@@ -75,10 +76,7 @@ class AuthController
 
     public function dashboard(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         header('Location: /dashboard');
         exit();
     }
