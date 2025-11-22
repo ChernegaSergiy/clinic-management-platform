@@ -755,22 +755,32 @@ class AdminController
         header('Location: /admin/auth_configs');
         exit();
     }
-}
 
-    public function createDictionary(): void
+    // --- Backup Policy Management ---
+    public function listBackupPolicies(): void
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
             header('Location: /login');
             exit();
         }
-        View::render('admin/dictionaries/new.html.twig', [
+        $policies = $this->backupPolicyRepository->findAll();
+        View::render('admin/backup_policies/index.html.twig', ['policies' => $policies]);
+    }
+
+    public function createBackupPolicy(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        View::render('admin/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
-    public function storeDictionary(): void
+    public function storeBackupPolicy(): void
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
             header('Location: /login');
@@ -779,23 +789,26 @@ class AdminController
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
-            'name' => ['required', 'unique:dictionaries,name'],
+            'name' => ['required', 'unique:backup_policies,name'],
+            'frequency' => ['required'],
+            'retention_days' => ['required', 'numeric', 'min:1'],
+            'status' => ['required'],
         ]);
 
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/new');
+            header('Location: /admin/backup_policies/new');
             exit();
         }
 
-        $this->dictionaryRepository->save($_POST);
-        $_SESSION['success_message'] = "Словник успішно створено.";
-        header('Location: /admin/dictionaries');
+        $this->backupPolicyRepository->save($_POST);
+        $_SESSION['success_message'] = "Політику резервного копіювання успішно створено.";
+        header('Location: /admin/backup_policies');
         exit();
     }
 
-    public function editDictionary(): void
+    public function editBackupPolicy(): void
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
             header('Location: /login');
@@ -803,23 +816,23 @@ class AdminController
         }
 
         $id = (int)($_GET['id'] ?? 0);
-        $dictionary = $this->dictionaryRepository->findById($id);
+        $policy = $this->backupPolicyRepository->findById($id);
 
-        if (!$dictionary) {
+        if (!$policy) {
             http_response_code(404);
-            echo "Словник не знайдено";
+            echo "Політику резервного копіювання не знайдено";
             return;
         }
 
-        View::render('admin/dictionaries/edit.html.twig', [
-            'dictionary' => $dictionary,
+        View::render('admin/backup_policies/edit.html.twig', [
+            'policy' => $policy,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
-    public function updateDictionary(): void
+    public function updateBackupPolicy(): void
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
             header('Location: /login');
@@ -827,159 +840,46 @@ class AdminController
         }
 
         $id = (int)($_GET['id'] ?? 0);
-        $dictionary = $this->dictionaryRepository->findById($id);
+        $policy = $this->backupPolicyRepository->findById($id);
 
-        if (!$dictionary) {
+        if (!$policy) {
             http_response_code(404);
-            echo "Словник не знайдено";
+            echo "Політику резервного копіювання не знайдено";
             return;
         }
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
-            'name' => ['required', 'unique:dictionaries,name,' . $id],
+            'name' => ['required', 'unique:backup_policies,name,' . $id],
+            'frequency' => ['required'],
+            'retention_days' => ['required', 'numeric', 'min:1'],
+            'status' => ['required'],
         ]);
 
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/edit?id=' . $id);
+            header('Location: /admin/backup_policies/edit?id=' . $id);
             exit();
         }
 
-        $this->dictionaryRepository->update($id, $_POST);
-        $_SESSION['success_message'] = "Словник успішно оновлено.";
-        header('Location: /admin/dictionaries');
+        $this->backupPolicyRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Політику резервного копіювання успішно оновлено.";
+        header('Location: /admin/backup_policies');
         exit();
     }
 
-    public function deleteDictionary(): void
+    public function deleteBackupPolicy(): void
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
             header('Location: /login');
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
-        $this->dictionaryRepository->delete($id);
-        $_SESSION['success_message'] = "Словник успішно видалено.";
-        header('Location: /admin/dictionaries');
-        exit();
-    }
-
-    // --- Dictionary Value Management ---
-    public function createDictionaryValue(): void
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
-            header('Location: /login');
-            exit();
-        }
-        $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        View::render('admin/dictionaries/values/new.html.twig', [
-            'dictionary_id' => $dictionaryId,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-    }
-
-    public function storeDictionaryValue(): void
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
-            header('Location: /login');
-            exit();
-        }
-
-        $dictionaryId = (int)($_POST['dictionary_id'] ?? 0);
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
-        $validator->validate($_POST, [
-            'dictionary_id' => ['required'],
-            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId],
-            'label' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
-            exit();
-        }
-
-        $this->dictionaryRepository->saveValue($_POST);
-        $_SESSION['success_message'] = "Значення словника успішно створено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
-        exit();
-    }
-
-    public function editDictionaryValue(): void
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
-            header('Location: /login');
-            exit();
-        }
-
-        $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-
-        if (!$value) {
-            http_response_code(404);
-            echo "Значення словника не знайдено";
-            return;
-        }
-
-        View::render('admin/dictionaries/values/edit.html.twig', [
-            'value' => $value,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-    }
-
-    public function updateDictionaryValue(): void
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
-            header('Location: /login');
-            exit();
-        }
-
-        $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-        $dictionaryId = $value['dictionary_id'];
-        
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
-        $validator->validate($_POST, [
-            'dictionary_id' => ['required'],
-            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId . ',id,' . $id],
-            'label' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/values/edit?id=' . $id);
-            exit();
-        }
-
-        $this->dictionaryRepository->updateValue($id, $_POST);
-        $_SESSION['success_message'] = "Значення словника успішно оновлено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
-        exit();
-    }
-
-    public function deleteDictionaryValue(): void
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
-            header('Location: /login');
-            exit();
-        }
-
-        $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-        $dictionaryId = $value['dictionary_id'];
-
-        $this->dictionaryRepository->deleteValue($id);
-        $_SESSION['success_message'] = "Значення словника успішно видалено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
+        $id = (int)($_POST['id'] ?? 0);
+        $this->backupPolicyRepository->delete($id);
+        $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
+        header('Location: /admin/backup_policies');
         exit();
     }
 }
