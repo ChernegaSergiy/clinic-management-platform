@@ -433,4 +433,37 @@ class BillingController
         $pdfExporter->render();
         $pdfExporter->download('invoices_export.pdf');
     }
+
+    public function exportInvoicesToExcel(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $invoices = $this->invoiceRepository->findAll();
+
+        if (empty($invoices)) {
+            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
+            header('Location: /billing');
+            exit();
+        }
+
+        $headers = [
+            'ID', 'Пацієнт', 'Сума', 'Статус', 'Дата виставлення'
+        ];
+        $data = [];
+        foreach ($invoices as $invoice) {
+            $data[] = [
+                $invoice['id'],
+                $invoice['patient_name'],
+                $invoice['amount'],
+                $invoice['status'],
+                $invoice['issued_date']
+            ];
+        }
+
+        $excelExporter = new ExcelExporter();
+        $excelExporter->export($headers, $data, 'invoices_export.xlsx');
+    }
 }
