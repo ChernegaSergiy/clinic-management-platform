@@ -6,122 +6,112 @@
     <section class="section-block">
         <div class="section-block__head">
             <p class="eyebrow">Інсталятор</p>
-            <h1 class="section-block__title">Налаштуйте підключення і створіть базу</h1>
-            <p class="section-block__subtitle">Заповніть параметри підключення до MySQL/MariaDB. За бажанням — створимо демо-дані.</p>
+            <h1 class="section-block__title">3 кроки до запуску</h1>
+            <p class="section-block__subtitle">Перевіримо середовище, підключимо базу та створимо адміністратора.</p>
         </div>
 
-        <div class="install">
-            <div class="install__panel">
-                <h2>Що буде зроблено</h2>
-                <ul class="install__list">
-                    <li class="install__item">
-                        <div class="install__item-title">SQL міграції</div>
-                        <div class="install__item-desc">Створимо таблиці з <code>database/migrations</code>.</div>
-                    </li>
-                    <li class="install__item">
-                        <div class="install__item-title">Демо-дані</div>
-                        <div class="install__item-desc">Опційно додамо ролі та користувачів з <code>database/seeds</code>.</div>
-                    </li>
-                    <li class="install__item">
-                        <div class="install__item-title">.env</div>
-                        <div class="install__item-desc">Збережемо файл конфігурації з вашими параметрами.</div>
-                    </li>
+        {% if feedback.errors %}
+            <div class="notice notice--error">
+                <div class="notice__badge">Збій</div>
+                <p class="notice__text">Не вдалося завершити крок. Перевірте деталі й спробуйте ще раз.</p>
+                <ul>
+                    {% for err in feedback.errors %}
+                        <li>{{ err }}</li>
+                    {% endfor %}
                 </ul>
             </div>
-
-            <div class="install__panel">
-                {% if feedback.errors %}
-                    <div class="install__alert">
-                        Не вдалося завершити встановлення:
-                        <ul>
-                            {% for err in feedback.errors %}
-                                <li>{{ err }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% elseif feedback.success %}
-                    <div class="install__success">
-                        Готово! Платформа налаштована.
-                        <div>База даних: {{ feedback.details.db }}</div>
-                        {% if feedback.details.seeded %}
-                            <div>Демо-логін: <strong>admin</strong> / <strong>password</strong></div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-
-                <form class="install__form" method="post" action="/install">
-                    <div class="install__grid">
-                        <label class="install__field">
-                            <span class="install__label">APP_ENV</span>
-                            <input class="install__input" type="text" name="app_env" value="{{ defaults.APP_ENV|default('dev') }}">
-                            <span class="install__hint">dev / prod</span>
-                        </label>
-                        <label class="install__field install__checkbox">
-                            <input type="checkbox" name="app_debug" {% if defaults.APP_DEBUG == 'true' %}checked{% endif %}>
-                            <span class="install__label">APP_DEBUG</span>
-                        </label>
-                    </div>
-
-                    <h3>База даних</h3>
-                    <div class="install__grid">
-                        <label class="install__field">
-                            <span class="install__label">Хост</span>
-                            <input class="install__input" type="text" name="db_host" value="{{ defaults.DB_HOST|default('127.0.0.1') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">Порт</span>
-                            <input class="install__input" type="text" name="db_port" value="{{ defaults.DB_PORT|default('3306') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">База даних</span>
-                            <input class="install__input" type="text" name="db_database" value="{{ defaults.DB_DATABASE|default('clinic') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">Користувач</span>
-                            <input class="install__input" type="text" name="db_username" value="{{ defaults.DB_USERNAME|default('root') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">Пароль</span>
-                            <input class="install__input" type="password" name="db_password" value="{{ defaults.DB_PASSWORD|default('') }}">
-                        </label>
-                    </div>
-
-                    <h3>Пошта (опційно)</h3>
-                    <div class="install__grid">
-                        <label class="install__field">
-                            <span class="install__label">MAIL_HOST</span>
-                            <input class="install__input" type="text" name="mail_host" value="{{ defaults.MAIL_HOST|default('localhost') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">MAIL_PORT</span>
-                            <input class="install__input" type="text" name="mail_port" value="{{ defaults.MAIL_PORT|default('1025') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">MAIL_USERNAME</span>
-                            <input class="install__input" type="text" name="mail_username" value="{{ defaults.MAIL_USERNAME|default('') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">MAIL_PASSWORD</span>
-                            <input class="install__input" type="password" name="mail_password" value="{{ defaults.MAIL_PASSWORD|default('') }}">
-                        </label>
-                        <label class="install__field">
-                            <span class="install__label">MAIL_ENCRYPTION</span>
-                            <input class="install__input" type="text" name="mail_encryption" value="{{ defaults.MAIL_ENCRYPTION|default('') }}">
-                            <span class="install__hint">tls / ssl або порожнє</span>
-                        </label>
-                    </div>
-
-                    <div class="install__footer">
-                        <label class="install__checkbox">
-                            <input type="checkbox" name="seed" checked>
-                            <span class="install__label">Імпортувати демо-дані (ролі, користувачі)</span>
-                        </label>
-                        <button class="button button--primary button--full" type="submit">
-                            Запустити встановлення
-                        </button>
-                    </div>
-                </form>
+        {% elseif feedback.success %}
+            <div class="notice notice--success">
+                <div class="notice__badge">Готово</div>
+                <p class="notice__text">Платформа налаштована.</p>
+                <div class="notice__detail">
+                    <div>База даних: {{ feedback.details.db }}</div>
+                    <div>Адміністратор: {{ feedback.details.admin_email }}</div>
+                </div>
+                <div class="notice__actions">
+                    <a class="button button--primary" href="/login">Перейти до входу</a>
+                </div>
             </div>
-        </div>
+        {% endif %}
+
+        <form class="install__form" method="post" action="/install">
+            <input type="hidden" name="step" value="{{ step }}">
+
+            {% if step == 1 %}
+                <h3>Крок 1: Середовище</h3>
+                <div class="install__grid">
+                    <label class="install__field">
+                        <span class="install__label">APP_ENV</span>
+                        <input class="install__input" type="text" name="app_env" value="{{ defaults.APP_ENV|default('dev') }}">
+                        <span class="install__hint">dev / prod</span>
+                    </label>
+                    <label class="install__field install__checkbox">
+                        <input type="checkbox" name="app_debug" {% if defaults.APP_DEBUG == 'true' %}checked{% endif %}>
+                        <span class="install__label">APP_DEBUG</span>
+                    </label>
+                </div>
+                <div class="install__actions">
+                    <button class="button button--primary button--full" type="submit">Далі: База даних</button>
+                </div>
+            {% elseif step == 2 %}
+                <h3>Крок 2: Підключення до БД</h3>
+                <div class="install__grid">
+                    <label class="install__field">
+                        <span class="install__label">Хост</span>
+                        <input class="install__input" type="text" name="db_host" value="{{ defaults.DB_HOST|default('127.0.0.1') }}">
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Порт</span>
+                        <input class="install__input" type="text" name="db_port" value="{{ defaults.DB_PORT|default('3306') }}">
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">База даних</span>
+                        <input class="install__input" type="text" name="db_database" value="{{ defaults.DB_DATABASE|default('clinic') }}">
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Користувач</span>
+                        <input class="install__input" type="text" name="db_username" value="{{ defaults.DB_USERNAME|default('root') }}">
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Пароль</span>
+                        <input class="install__input" type="password" name="db_password" value="{{ defaults.DB_PASSWORD|default('') }}">
+                    </label>
+                </div>
+                <div class="install__actions">
+                    <button class="button button--ghost" type="submit" name="back" value="1">Назад</button>
+                    <button class="button button--primary" type="submit" name="test_db" value="1">Перевірити підключення</button>
+                    <button class="button button--primary button--full" type="submit">Далі: Адміністратор</button>
+                </div>
+            {% elseif step == 3 %}
+                <h3>Крок 3: Адміністратор</h3>
+                <div class="install__grid">
+                    <label class="install__field">
+                        <span class="install__label">Email адміністратора</span>
+                        <input class="install__input" type="email" name="admin_email" value="{{ defaults.ADMIN_EMAIL|default('admin@clinic.ua') }}" required>
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Пароль</span>
+                        <input class="install__input" type="password" name="admin_password" required>
+                        <span class="install__hint">Мінімум 8 символів</span>
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Ім'я</span>
+                        <input class="install__input" type="text" name="admin_first_name" value="{{ defaults.ADMIN_FIRST_NAME|default('Адмін') }}">
+                    </label>
+                    <label class="install__field">
+                        <span class="install__label">Прізвище</span>
+                        <input class="install__input" type="text" name="admin_last_name" value="{{ defaults.ADMIN_LAST_NAME|default('Адміненко') }}">
+                    </label>
+                    <label class="install__checkbox">
+                        <input type="checkbox" name="seed" checked>
+                        <span class="install__label">Імпортувати демо-дані (ролі, користувачі)</span>
+                    </label>
+                </div>
+                <div class="install__actions">
+                    <button class="button button--ghost" type="submit" name="back" value="1">Назад</button>
+                    <button class="button button--primary button--full" type="submit">Фініш: створити БД та адміна</button>
+                </div>
+            {% endif %}
+        </form>
     </section>
 {% endblock %}
