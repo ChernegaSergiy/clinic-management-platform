@@ -1,0 +1,30 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нову політику резервного копіювання - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нову політику резервного копіювання</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/backup_policies/new">
+            {{ forms.input('name', 'Назва', old.name ?? '', 'text', 'Наприклад, Daily Backup', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис', old.description ?? '', 'Детальний опис політики', errors.description ?? null) }}
+            {{ forms.input('frequency', 'Частота', old.frequency ?? 'daily', 'text', 'Наприклад, daily, weekly, monthly', errors.frequency ?? null, {'required': 'required'}) }}
+            {{ forms.input('retention_days', 'Днів зберігання', old.retention_days ?? 30, 'number', 'Кількість днів для зберігання резервних копій', errors.retention_days ?? null, {'required': 'required', 'min': '1'}) }}
+
+            <div class="field">
+                <label>Статус</label>
+                <select name="status" class="ui dropdown">
+                    <option value="active" {% if old.status is defined and old.status == 'active' %}selected{% endif %}>Активна</option>
+                    <option value="inactive" {% if old.status is not defined or old.status == 'inactive' %}selected{% endif %}>Неактивна</option>
+                </select>
+            </div>
+
+            {{ ui.button('Зберегти політику', 'primary', 'large', 'save') }}
+            <a href="/admin/backup_policies" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
