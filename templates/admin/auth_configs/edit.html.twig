@@ -1,0 +1,29 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати конфігурацію аутентифікації #{{ config.id }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати конфігурацію аутентифікації #{{ config.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/auth-configs/edit?id={{ config.id }}">
+            {{ forms.input('provider', 'Провайдер', old.provider ?? config.provider, 'text', 'Наприклад, google, mfa_totp', errors.provider ?? null, {'required': 'required'}) }}
+            {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? config.client_id, 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}
+            {{ forms.input('client_secret', 'Client Secret (необов\'язково)', old.client_secret ?? config.client_secret, 'text', 'Client Secret для OAuth2', errors.client_secret ?? null) }}
+            {{ forms.textarea('config', 'Додаткова конфігурація (JSON, необов\'язково)', old.config ?? config.config, '{\"key\": \"value\"}', errors.config ?? null) }}
+
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {% if (old.is_active is defined and old.is_active) or (old.is_active is not defined and config.is_active) %}checked{% endif %} value="1">
+                    <label>Активна конфігурація</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/admin/auth-configs" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
