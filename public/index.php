@@ -33,7 +33,7 @@ $router->add('POST', '/patients/new', [PatientController::class, 'store']);
 $router->add('GET', '/patients/show', [PatientController::class, 'show']);
 $router->add('GET', '/patients/edit', [PatientController::class, 'edit']);
 $router->add('POST', '/patients/edit', [PatientController::class, 'update']);
-$router->add('GET', '/patients/toggle-status', [PatientController::class, 'toggleStatus']);
+$router->add('POST', '/patients/toggle-status', [PatientController::class, 'toggleStatus']);
 $router->add('GET', '/patients/export-csv', [PatientController::class, 'exportCsv']);
 $router->add('GET', '/patients/export-json', [PatientController::class, 'exportPatientsToJson']);
 $router->add('GET', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
