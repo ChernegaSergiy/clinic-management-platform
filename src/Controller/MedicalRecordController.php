@@ -9,6 +9,7 @@ use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
 use App\Core\AttachmentService;
 use App\Core\AuditLogger;
+use App\Core\AuthGuard;
 
 class MedicalRecordController
 {
@@ -31,10 +32,7 @@ class MedicalRecordController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -50,10 +48,7 @@ class MedicalRecordController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -96,10 +91,7 @@ class MedicalRecordController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
@@ -125,10 +117,7 @@ class MedicalRecordController
 
     public function getIcdCodes(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -139,10 +128,7 @@ class MedicalRecordController
 
     public function uploadAttachment(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $medicalRecordId = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
@@ -174,10 +160,7 @@ class MedicalRecordController
 
     public function downloadAttachment(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $medicalRecordId = (int)($_GET['record_id'] ?? 0);
         $attachmentId = (int)($_GET['attachment_id'] ?? 0);
