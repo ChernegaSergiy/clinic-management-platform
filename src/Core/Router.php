@@ -21,7 +21,17 @@ class Router
 
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && $route['path'] === $path) {
-                call_user_func($route['handler']);
+                $handler = $route['handler'];
+
+                // Якщо передано [ClassName, method], створюємо екземпляр контролера
+                if (is_array($handler) && is_string($handler[0])) {
+                    $controller = new $handler[0]();
+                    $callback = [$controller, $handler[1]];
+                } else {
+                    $callback = $handler;
+                }
+
+                call_user_func($callback);
                 return;
             }
         }
