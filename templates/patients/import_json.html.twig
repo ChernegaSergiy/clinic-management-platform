@@ -1,0 +1,39 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Імпорт пацієнтів з JSON - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Імпорт пацієнтів з JSON</h2>
+        <div class="ui divider"></div>
+
+        {% if success_message %}
+            <div class="ui success message">
+                <div class="header">Успіх!</div>
+                <p>{{ success_message }}</p>
+            </div>
+        {% endif %}
+
+        {% if errors %}
+            <div class="ui error message">
+                <div class="header">Помилка імпорту</div>
+                <ul class="list">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form class="ui form" method="POST" action="/patients/import-json" enctype="multipart/form-data">
+            <div class="field">
+                <label>Оберіть JSON файл</label>
+                <input type="file" name="json_file" accept=".json">
+            </div>
+
+            {{ ui.button('Імпортувати', 'primary', 'large', 'upload') }}
+            <a href="/patients" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
