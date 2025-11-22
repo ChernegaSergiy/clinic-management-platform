@@ -259,61 +259,62 @@ class LabOrderController
             unlink($tempPath); // Clean up temp file
             $_SESSION['errors']['file'] = 'Помилка структурної валідації: ' . $e->getMessage();
             header('Location: /lab-orders/import');
-                    exit();
-                }
+            exit();
+        }
+    }
+
+    public function confirmImport(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        if (empty($_SESSION['hl7_dicom_parsed_data'])) {
+            $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
+            header('Location: /lab-orders/import');
+            exit();
+        }
+
+        View::render('lab_orders/confirm_import.html.twig', [
+            'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['errors']);
+    }
+
+    public function finalizeImport(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
+            $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
+            header('Location: /lab-orders/import');
+            exit();
+        }
+
+        $parsedData = $_SESSION['hl7_dicom_parsed_data'];
+        $tempPath = $_SESSION['hl7_dicom_temp_path'];
+
+        try {
+            $validatedData = $this->labImportService->validateLogical($parsedData);
+            $orderId = $this->labImportService->importLabOrder($validatedData);
+
+            // Clean up session and temp file
+            unset($_SESSION['hl7_dicom_parsed_data']);
+            unset($_SESSION['hl7_dicom_temp_path']);
+            unlink($tempPath);
             
-                public function confirmImport(): void
-                {
-                    if (!isset($_SESSION['user'])) {
-                        header('Location: /login');
-                        exit();
-                    }
-            
-                    if (empty($_SESSION['hl7_dicom_parsed_data'])) {
-                        $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
-                        header('Location: /lab-orders/import');
-                        exit();
-                    }
-            
-                    View::render('lab_orders/confirm_import.html.twig', [
-                        'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
-                        'errors' => $_SESSION['errors'] ?? [],
-                    ]);
-                    unset($_SESSION['errors']);
-                }
-            
-                public function finalizeImport(): void
-                {
-                    if (!isset($_SESSION['user'])) {
-                        header('Location: /login');
-                        exit();
-                    }
-            
-                    if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
-                        $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
-                        header('Location: /lab-orders/import');
-                        exit();
-                    }
-            
-                    $parsedData = $_SESSION['hl7_dicom_parsed_data'];
-                    $tempPath = $_SESSION['hl7_dicom_temp_path'];
-            
-                    try {
-                        $validatedData = $this->labImportService->validateLogical($parsedData);
-                        $orderId = $this->labImportService->importLabOrder($validatedData);
-            
-                        // Clean up session and temp file
-                        unset($_SESSION['hl7_dicom_parsed_data']);
-                        unset($_SESSION['hl7_dicom_temp_path']);
-                        unlink($tempPath);
-                        
-                        $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
-                        header('Location: /lab-orders/show?id=' . $orderId); // Redirect to the new order
-                        exit();
-                    } catch (\Exception $e) {
-                        $_SESSION['errors']['import'] = 'Помилка логічної валідації або імпорту: ' . $e->getMessage();
-                        header('Location: /lab-orders/import/confirm');
-                        exit();
-                    }
-                }
-            }}
+            $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
+            header('Location: /lab-orders/show?id=' . $orderId); // Redirect to the new order
+            exit();
+        } catch (\Exception $e) {
+            $_SESSION['errors']['import'] = 'Помилка логічної валідації або імпорту: ' . $e->getMessage();
+            header('Location: /lab-orders/import/confirm');
+            exit();
+        }
+    }
+}
