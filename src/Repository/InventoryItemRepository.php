@@ -23,7 +23,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): ?int
+    public function save(array $data): bool
     {
         $this->pdo->beginTransaction();
         try {
@@ -51,14 +51,14 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                     $this->logMovement($itemId, $_SESSION['user']['id'] ?? null, 'in', $data['quantity'], $data['quantity'], 'Початковий запас', $data['cost'] ?? 0.00);
                 }
                 $this->pdo->commit();
-                return $itemId;
+                return true;
             }
             $this->pdo->rollBack();
-            return null;
+            return false;
         } catch (\PDOException $e) {
             $this->pdo->rollBack();
             // Log error
-            return null;
+            return false;
         }
     }
 
