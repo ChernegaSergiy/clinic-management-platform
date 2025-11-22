@@ -67,6 +67,12 @@ class KpiRepository
         ]);
     }
 
+    public function deleteKpiDefinition(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM kpi_definitions WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
+
     // --- KPI Results ---
     public function saveKpiResult(array $data): ?int
     {
