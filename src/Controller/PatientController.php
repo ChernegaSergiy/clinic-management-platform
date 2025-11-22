@@ -283,3 +283,4 @@ class PatientController
         header('Location: /patients');
         exit();
     }
+}
