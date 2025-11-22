@@ -283,4 +283,23 @@ class PatientController
         header('Location: /patients');
         exit();
     }
+
+    public function toggleStatus(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_POST['id'] ?? 0);
+        $patient = $this->patientRepository->findById($id);
+
+        if ($patient) {
+            $newStatus = $patient['status'] === 'active' ? 'archived' : 'active';
+            $this->patientRepository->updateStatus($id, $newStatus);
+        }
+
+        header('Location: /patients/show?id=' . $id);
+        exit();
+    }
 }
