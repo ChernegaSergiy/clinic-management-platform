@@ -480,10 +480,95 @@ a { color: inherit; text-decoration: none; }
     margin-top: 14px;
 }
 
+.notice {
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 18px;
+    background: var(--card);
+    box-shadow: 8px 8px 0 var(--ink);
+}
+
+.notice--error { border-color: #b00020; box-shadow: 8px 8px 0 #b00020; }
+.notice__badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: #ffd400;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.notice__title { margin: 0 0 8px; }
+.notice__text { margin: 0 0 12px; }
+.notice__detail {
+    border: 2px dashed var(--ink);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 0 0 12px;
+    background: #fff9e6;
+    overflow-x: auto;
+}
+.notice__detail pre { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; }
+.notice__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.install {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+.install__panel {
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 16px;
+    background: var(--card);
+    box-shadow: 6px 6px 0 var(--ink);
+}
+.install__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.install__item { display: grid; gap: 4px; }
+.install__item-title { font-weight: 700; }
+.install__item-desc { color: var(--muted); font-size: 14px; }
+.install__form {
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    padding: 16px;
+    background: var(--card);
+    box-shadow: 8px 8px 0 var(--ink);
+    display: grid;
+    gap: 14px;
+}
+.install__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+.install__field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.install__label { font-size: 14px; letter-spacing: 0.2px; }
+.install__input { border: 2px solid var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; }
+.install__hint { color: var(--muted); font-size: 13px; }
+.install__checkbox { display: flex; align-items: center; gap: 8px; }
+.install__footer { display: flex; flex-direction: column; gap: 10px; }
+.install__alert {
+    border: 2px solid #b00020;
+    border-radius: 12px;
+    padding: 12px;
+    background: #ffecec;
+    color: #2d0000;
+    font-weight: 700;
+}
+.install__success {
+    border: 2px solid #1c7c2f;
+    border-radius: 12px;
+    padding: 12px;
+    background: #e6f7eb;
+    color: #0f3d1a;
+    font-weight: 700;
+}
+
 @media (min-width: 720px) {
     .hero { padding: 32px; }
     .hero__content { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px; align-items: start; }
     .section-block--contrast { padding: 28px; }
+    .install { grid-template-columns: 0.9fr 1.1fr; align-items: start; }
 }
 
 @media (min-width: 900px) {
