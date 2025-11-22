@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-class CSVExporter
+class CsvExporter
 {
     private array $headers;
     private array $data;
