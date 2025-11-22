@@ -15,6 +15,16 @@ use App\Controller\AdminController;
 use App\Controller\DashboardController;
 use App\Controller\InstallController;
 
+// Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
+$requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$staticFile = realpath(__DIR__ . $requestedPath);
+if ($staticFile && str_starts_with($staticFile, realpath(__DIR__)) && is_file($staticFile)) {
+    $mime = mime_content_type($staticFile) ?: 'application/octet-stream';
+    header('Content-Type: ' . $mime);
+    readfile($staticFile);
+    exit;
+}
+
 // Завантаження .env файлу (може бути відсутній перед інсталяцією)
 $envPath = __DIR__ . '/../.env';
 if (file_exists($envPath)) {
