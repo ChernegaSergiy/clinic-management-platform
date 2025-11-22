@@ -1,32 +1,31 @@
-{% extends "layouts/base.html.twig" %}
+{% extends "layouts/public.html.twig" %}
 
-{% block title %}Головна сторінка{% endblock %}
+{% block title %}Вітання — Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h1 class="ui header">Вітаємо, {{ name }}!</h1>
-        <p>Це демонстраційна сторінка, що показує наслідування базового шаблону.</p>
-        
-        <h2 class="ui header">Слоти шаблону</h2>
-        <p>Цей контент знаходиться всередині блоку `body`.</p>
-        <p>Ви можете перевизначати блоки `title`, `stylesheets` та `javascripts`.</p>
-
-        <div class="ui message">
-            <div class="header">
-                Блок для флеш-повідомлень
-            </div>
-            <p>Тут можна відображати системні сповіщення (наприклад, після успішного збереження форми).</p>
+    <section class="section">
+        <div class="section__head">
+            <p class="eyebrow">Вітання</p>
+            <h1>Вітаємо, {{ name }}!</h1>
+            <p class="lede">Ця сторінка показує роботу публічного лейауту без Semantic UI.</p>
         </div>
-
-        <div class="ui grid">
-            <div class="twelve wide column">
-                <h3>Основний контент</h3>
-                <p>Це основна частина сторінки.</p>
-            </div>
-            <div class="four wide column">
-                <h4>Сайдбар</h4>
-                <p>Тут може бути додаткова навігація або контекстна інформація.</p>
-            </div>
+        <div class="card">
+            <h3>Блоки шаблону</h3>
+            <p>Використовуйте блоки <code>title</code>, <code>stylesheets</code> та <code>javascripts</code> для підключення контенту та стилів.</p>
         </div>
-    </div>
+    </section>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card {
+            background: #ffffff;
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 6px 6px 0 #0f0f0f;
+            margin-top: 16px;
+        }
+    </style>
 {% endblock %}
