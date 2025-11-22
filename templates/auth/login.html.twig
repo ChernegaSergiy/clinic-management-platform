@@ -1,34 +1,74 @@
-{% extends "layouts/base.html.twig" %}
-{% import "components/forms.html.twig" as forms %}
-{% import "components/ui.html.twig" as ui %}
+{% extends "layouts/public.html.twig" %}
 
-{% block title %}Вхід - Клініка{% endblock %}
+{% block title %}Вхід — Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui middle aligned center aligned grid">
-        <div class="column" style="max-width: 450px;">
-            <h2 class="ui teal image header">
-                <div class="content">
-                    Увійдіть до свого облікового запису
-                </div>
-            </h2>
-            <form class="ui large form" method="POST" action="/login">
-                <div class="ui stacked segment">
-                    {{ forms.input('email', 'Email', old.email ?? null, 'email', 'Ваш email', errors.email ?? null, {'required': 'required'}) }}
-                    {{ forms.input('password', 'Пароль', null, 'password', 'Ваш пароль', errors.password ?? null, {'required': 'required'}) }}
-                    {{ ui.button('Увійти', 'teal', 'fluid large', 'sign-in') }}
-                </div>
-
+    <section class="auth">
+        <div class="auth__card">
+            <p class="eyebrow">Вхід</p>
+            <h1>Увійдіть до облікового запису</h1>
+            <form method="POST" action="/login" class="auth__form">
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required>
+                    {% if errors.email %}<div class="error-text">{{ errors.email }}</div>{% endif %}
+                </label>
+                <label class="field">
+                    <span>Пароль</span>
+                    <input type="password" name="password" placeholder="Ваш пароль" required>
+                    {% if errors.password %}<div class="error-text">{{ errors.password }}</div>{% endif %}
+                </label>
                 {% if errors.login %}
-                    <div class="ui error message">
-                        <div class="header">Помилка входу</div>
-                        <p>{{ errors.login }}</p>
+                    <div class="error-box">
+                        <strong>Помилка входу:</strong> {{ errors.login }}
                     </div>
                 {% endif %}
+                <button type="submit" class="btn btn-primary btn-full">Увійти</button>
             </form>
-            <div class="ui message">
-                Новий користувач? <a href="#">Зареєструватися</a>
-            </div>
+            <p class="muted">Немає доступу? Зверніться до адміністратора клініки.</p>
         </div>
-    </div>
+    </section>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .auth {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+        }
+        .auth__card {
+            max-width: 440px;
+            width: 100%;
+            border: 3px solid #0f0f0f;
+            border-radius: 18px;
+            background: #ffffff;
+            padding: 24px;
+            box-shadow: 8px 8px 0 #0f0f0f;
+        }
+        .auth__card h1 { margin: 4px 0 16px; }
+        .auth__form { display: flex; flex-direction: column; gap: 14px; }
+        .field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+        .field span { font-size: 14px; letter-spacing: 0.2px; }
+        input {
+            border: 2px solid #0f0f0f;
+            border-radius: 12px;
+            padding: 12px;
+            font: inherit;
+            background: #fefefe;
+        }
+        .btn-full { width: 100%; justify-content: center; }
+        .error-box {
+            border: 2px solid #0f0f0f;
+            border-radius: 12px;
+            padding: 10px 12px;
+            background: #ffecec;
+            color: #2d0000;
+            font-weight: 700;
+        }
+        .error-text { color: #8b0000; font-size: 13px; }
+        .muted { margin-top: 12px; color: #5f5f5f; }
+    </style>
 {% endblock %}
