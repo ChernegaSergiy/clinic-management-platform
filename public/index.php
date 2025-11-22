@@ -14,6 +14,7 @@ use App\Controller\BillingController;
 use App\Controller\AdminController;
 use App\Controller\DashboardController;
 use App\Controller\InstallController;
+use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
 $requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -183,4 +184,13 @@ if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/instal
     exit;
 }
 
-$router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+try {
+    $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    $isDebug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+    View::render('errors/error.html.twig', [
+        'message' => 'Щось пішло не так. Ми вже розбираємося.',
+        'detail' => $isDebug ? $e->getMessage() : null,
+    ]);
+}
