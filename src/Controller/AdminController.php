@@ -511,7 +511,7 @@ class AdminController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $this->dictionaryRepository->delete($id);
         $_SESSION['success_message'] = "Словник успішно видалено.";
         header('Location: /admin/dictionaries');
