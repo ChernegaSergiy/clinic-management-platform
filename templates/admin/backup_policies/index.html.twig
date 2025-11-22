@@ -1,0 +1,70 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Політики резервного копіювання - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Керування політиками резервного копіювання</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/backup_policies/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати політику
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if policies is empty %}
+            <p>Немає політик резервного копіювання для відображення.</p>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Частота</th>
+                        <th>Днів зберігання</th>
+                        <th>Останній запуск</th>
+                        <th>Статус</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for policy in policies %}
+                        <tr>
+                            <td>{{ policy.id }}</td>
+                            <td>{{ policy.name }}</td>
+                            <td>{{ policy.description ?: 'Не вказано' }}</td>
+                            <td>{{ policy.frequency }}</td>
+                            <td>{{ policy.retention_days }}</td>
+                            <td>{{ policy.last_run_at ?: 'Ніколи' }}</td>
+                            <td>
+                                {% if policy.status == 'active' %}
+                                    <i class="check circle icon green"></i> Активна
+                                {% else %}
+                                    <i class="times circle icon red"></i> Неактивна
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/backup_policies/edit?id={{ policy.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <form action="/admin/backup_policies/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю політику резервного копіювання?');">
+                                    <input type="hidden" name="id" value="{{ policy.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
