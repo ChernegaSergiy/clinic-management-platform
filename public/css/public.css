@@ -534,7 +534,7 @@ a { color: inherit; text-decoration: none; }
     background: var(--card);
     box-shadow: 8px 8px 0 var(--ink);
     display: grid;
-    gap: 14px;
+    gap: 18px;
 }
 .install__grid {
     display: grid;
@@ -574,6 +574,10 @@ a { color: inherit; text-decoration: none; }
     background: var(--accent);
 }
 .install__checkbox input[type="checkbox"]:checked::after { opacity: 1; }
+.install__actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.install__actions .button--primary,
+.install__actions .button--ghost { margin: 0; }
+.install__actions .button--full { margin-top: 4px; }
 .install__footer { display: flex; flex-direction: column; gap: 10px; }
 .install__alert {
     border: 2px solid #b00020;
