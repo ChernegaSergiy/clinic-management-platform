@@ -195,7 +195,11 @@ class InstallController
         try {
             $pdo = $this->createPdo($input);
             $pdo->query('SELECT 1');
-            $this->setFeedback(['success' => false, 'errors' => ['Підключення успішне. Продовжуйте до наступного кроку.']]);
+            $this->setFeedback([
+                'success' => false,
+                'errors' => [],
+                'details' => ['info' => 'Підключення успішне. Продовжуйте до наступного кроку.'],
+            ]);
         } catch (\Throwable $e) {
             $this->setFeedback(['success' => false, 'errors' => ['Не вдалося підключитись: ' . $e->getMessage()]]);
         }

@@ -489,6 +489,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .notice--error { border-color: #b00020; box-shadow: 8px 8px 0 #b00020; }
+.notice--info { border-color: #0f0f0f; box-shadow: 8px 8px 0 var(--accent); }
 .notice__badge {
     display: inline-block;
     padding: 6px 10px;

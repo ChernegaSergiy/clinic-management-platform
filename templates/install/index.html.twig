@@ -32,6 +32,11 @@
                     <a class="button button--primary" href="/login">Перейти до входу</a>
                 </div>
             </div>
+        {% elseif feedback.details.info is defined %}
+            <div class="notice notice--info">
+                <div class="notice__badge">Перевірка</div>
+                <p class="notice__text">{{ feedback.details.info }}</p>
+            </div>
         {% endif %}
 
         <form class="install__form" method="post" action="/install">
