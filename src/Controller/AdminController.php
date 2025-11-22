@@ -752,7 +752,7 @@ class AdminController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $this->authConfigRepository->delete($id);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
         header('Location: /admin/auth_configs');
