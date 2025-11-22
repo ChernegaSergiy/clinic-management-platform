@@ -30,7 +30,7 @@ class AuthController
 
     public function login(): void
     {
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'email' => ['required', 'email'],
             'password' => ['required'],
