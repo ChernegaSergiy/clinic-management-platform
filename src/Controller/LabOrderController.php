@@ -11,6 +11,7 @@ use App\Core\NotificationService;
 use App\Core\QrCodeGenerator;
 use App\Core\LabImportService;
 use App\Repository\LabResourceRepository;
+use App\Core\AuthGuard;
 
 class LabOrderController
 {
@@ -35,10 +36,7 @@ class LabOrderController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -63,10 +61,7 @@ class LabOrderController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -113,10 +108,7 @@ class LabOrderController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -138,10 +130,7 @@ class LabOrderController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -166,10 +155,7 @@ class LabOrderController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_POST['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -201,10 +187,7 @@ class LabOrderController
 
     public function import(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         View::render('lab_orders/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -215,10 +198,7 @@ class LabOrderController
 
     public function processImport(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -265,10 +245,7 @@ class LabOrderController
 
     public function confirmImport(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -285,10 +262,7 @@ class LabOrderController
 
     public function finalizeImport(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
