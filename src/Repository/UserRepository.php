@@ -16,7 +16,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function findByEmail(string $email): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt = $this->pdo->prepare("SELECT *, password_hash AS password FROM users WHERE email = :email");
         $stmt->execute([':email' => $email]);
         $result = $stmt->fetch();
         return $result === false ? null : $result;
@@ -46,8 +46,8 @@ class UserRepository implements UserRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO users (first_name, last_name, email, password, role_id) 
-                VALUES (:first_name, :last_name, :email, :password, :role_id)";
+        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role_id) 
+                VALUES (:first_name, :last_name, :email, :password_hash, :role_id)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -55,7 +55,7 @@ class UserRepository implements UserRepositoryInterface
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
             ':email' => $data['email'],
-            ':password' => password_hash($data['password'], PASSWORD_DEFAULT),
+            ':password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
             ':role_id' => $data['role_id'],
         ]);
     }
@@ -77,8 +77,8 @@ class UserRepository implements UserRepositoryInterface
         ];
 
         if (!empty($data['password'])) {
-            $sql .= ", password = :password";
-            $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            $sql .= ", password_hash = :password_hash";
+            $params[':password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
         
         $sql .= " WHERE id = :id";
