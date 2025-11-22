@@ -72,6 +72,7 @@ $router->add('POST', '/billing/new', [BillingController::class, 'store']);
 $router->add('GET', '/billing/show', [BillingController::class, 'show']);
 $router->add('GET', '/billing/edit', [BillingController::class, 'edit']);
 $router->add('POST', '/billing/edit', [BillingController::class, 'update']);
+$router->add('GET', '/billing/export-pdf', [BillingController::class, 'exportInvoicesToPdf']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
