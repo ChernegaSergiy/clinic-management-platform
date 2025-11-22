@@ -70,7 +70,7 @@ class AdminController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -170,7 +170,7 @@ class AdminController
         }
 
         // TODO: Add validation
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
