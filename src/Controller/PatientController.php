@@ -168,7 +168,7 @@ class PatientController
             exit();
         }
 
-        $patients = $this->patientRepository->getAllForExport();
+        $patients = $this->patientRepository->findAll();
 
         if (empty($patients)) {
             // Optionally handle cases with no data to export
@@ -188,7 +188,7 @@ class PatientController
             exit();
         }
 
-        $patients = $this->patientRepository->getAllForExport();
+        $patients = $this->patientRepository->findAll();
 
         if (empty($patients)) {
             $_SESSION['errors']['export'] = 'Немає пацієнтів для експорту.';
