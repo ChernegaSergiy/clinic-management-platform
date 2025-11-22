@@ -6,18 +6,21 @@ use App\Core\View;
 use App\Repository\UserRepository;
 use App\Repository\RoleRepository;
 use App\Repository\DictionaryRepository;
+use App\Repository\AuthConfigRepository;
 
 class AdminController
 {
     private UserRepository $userRepository;
     private RoleRepository $roleRepository;
     private DictionaryRepository $dictionaryRepository;
+    private AuthConfigRepository $authConfigRepository;
 
     public function __construct()
     {
         $this->userRepository = new UserRepository();
         $this->roleRepository = new RoleRepository();
         $this->dictionaryRepository = new DictionaryRepository();
+        $this->authConfigRepository = new AuthConfigRepository();
     }
 
     public function users(): void
