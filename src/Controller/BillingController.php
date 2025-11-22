@@ -13,6 +13,7 @@ use App\Repository\ServiceBundleRepository;
 use App\Core\CsvExporter;
 use App\Core\PdfExporter;
 use App\Core\ExcelExporter;
+use App\Core\AuthGuard;
 
 class BillingController
 {
@@ -35,10 +36,7 @@ class BillingController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $invoices = $this->invoiceRepository->findAll();
         View::render('billing/index.html.twig', ['invoices' => $invoices]);
     }
@@ -46,20 +44,14 @@ class BillingController
     // --- Service Management ---
     public function listServices(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $services = $this->serviceRepository->findAll();
         View::render('billing/services/index.html.twig', ['services' => $services]);
     }
 
     public function createService(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $categories = $this->serviceRepository->findCategories();
         View::render('billing/services/new.html.twig', [
             'categories' => $categories,
@@ -71,10 +63,7 @@ class BillingController
 
     public function storeService(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -98,20 +87,14 @@ class BillingController
     // --- Service Bundle Management ---
     public function listServiceBundles(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $bundles = $this->serviceBundleRepository->findAll();
         View::render('billing/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
     public function createServiceBundle(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $services = $this->serviceRepository->findAll();
         View::render('billing/bundles/new.html.twig', [
             'services' => $services,
@@ -123,10 +106,7 @@ class BillingController
 
     public function storeServiceBundle(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -150,10 +130,7 @@ class BillingController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $patientId = $_GET['patient_id'] ?? null;
 
@@ -192,10 +169,7 @@ class BillingController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -219,10 +193,7 @@ class BillingController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -242,10 +213,7 @@ class BillingController
 
     public function addPayment(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $invoiceId = (int)($_POST['invoice_id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($invoiceId);
@@ -284,10 +252,7 @@ class BillingController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -336,10 +301,7 @@ class BillingController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -375,10 +337,7 @@ class BillingController
 
     public function exportInvoicesToCsv(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         // Fetch all invoices
         $invoices = $this->invoiceRepository->findAll();
@@ -413,10 +372,7 @@ class BillingController
 
     public function exportInvoicesToPdf(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $invoices = $this->invoiceRepository->findAll();
 
@@ -436,10 +392,7 @@ class BillingController
 
     public function exportInvoicesToExcel(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $invoices = $this->invoiceRepository->findAll();
 
