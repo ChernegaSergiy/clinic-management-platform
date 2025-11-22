@@ -373,7 +373,7 @@ class BillingController
         exit();
     }
 
-    public function exportInvoices(): void
+    public function exportInvoicesToCsv(): void
     {
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
