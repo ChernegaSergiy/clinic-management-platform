@@ -82,6 +82,44 @@ $router->add('GET', '/admin/users/edit', [AdminController::class, 'editUser']);
 $router->add('POST', '/admin/users/edit', [AdminController::class, 'updateUser']);
 $router->add('POST', '/admin/users/delete', [AdminController::class, 'deleteUser']);
 
+// Admin Role routes
+$router->add('GET', '/admin/roles', [AdminController::class, 'listRoles']);
+$router->add('GET', '/admin/roles/new', [AdminController::class, 'createRole']);
+$router->add('POST', '/admin/roles/new', [AdminController::class, 'storeRole']);
+$router->add('GET', '/admin/roles/edit', [AdminController::class, 'editRole']);
+$router->add('POST', '/admin/roles/edit', [AdminController::class, 'updateRole']);
+$router->add('POST', '/admin/roles/delete', [AdminController::class, 'deleteRole']);
+
+// Admin Dictionary routes
+$router->add('GET', '/admin/dictionaries', [AdminController::class, 'listDictionaries']);
+$router->add('GET', '/admin/dictionaries/new', [AdminController::class, 'createDictionary']);
+$router->add('POST', '/admin/dictionaries/new', [AdminController::class, 'storeDictionary']);
+$router->add('GET', '/admin/dictionaries/show', [AdminController::class, 'showDictionary']);
+$router->add('GET', '/admin/dictionaries/edit', [AdminController::class, 'editDictionary']);
+$router->add('POST', '/admin/dictionaries/edit', [AdminController::class, 'updateDictionary']);
+$router->add('POST', '/admin/dictionaries/delete', [AdminController::class, 'deleteDictionary']);
+$router->add('GET', '/admin/dictionaries/values/new', [AdminController::class, 'createDictionaryValue']);
+$router->add('POST', '/admin/dictionaries/values/new', [AdminController::class, 'storeDictionaryValue']);
+$router->add('GET', '/admin/dictionaries/values/edit', [AdminController::class, 'editDictionaryValue']);
+$router->add('POST', '/admin/dictionaries/values/edit', [AdminController::class, 'updateDictionaryValue']);
+$router->add('POST', '/admin/dictionaries/values/delete', [AdminController::class, 'deleteDictionaryValue']);
+
+// Admin Auth Config routes
+$router->add('GET', '/admin/auth_configs', [AdminController::class, 'listAuthConfigs']);
+$router->add('GET', '/admin/auth_configs/new', [AdminController::class, 'createAuthConfig']);
+$router->add('POST', '/admin/auth_configs/new', [AdminController::class, 'storeAuthConfig']);
+$router->add('GET', '/admin/auth_configs/edit', [AdminController::class, 'editAuthConfig']);
+$router->add('POST', '/admin/auth_configs/edit', [AdminController::class, 'updateAuthConfig']);
+$router->add('POST', '/admin/auth_configs/delete', [AdminController::class, 'deleteAuthConfig']);
+
+// Admin Backup Policy routes
+$router->add('GET', '/admin/backup_policies', [AdminController::class, 'listBackupPolicies']);
+$router->add('GET', '/admin/backup_policies/new', [AdminController::class, 'createBackupPolicy']);
+$router->add('POST', '/admin/backup_policies/new', [AdminController::class, 'storeBackupPolicy']);
+$router->add('GET', '/admin/backup_policies/edit', [AdminController::class, 'editBackupPolicy']);
+$router->add('POST', '/admin/backup_policies/edit', [AdminController::class, 'updateBackupPolicy']);
+$router->add('POST', '/admin/backup_policies/delete', [AdminController::class, 'deleteBackupPolicy']);
+
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
 
