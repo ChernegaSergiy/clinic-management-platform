@@ -422,6 +422,360 @@ class AdminController
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
+            'name' => ['required', 'unique:dictionaries,name'], // Corrected unique validation
+            'description' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/dictionaries/new');
+            exit();
+        }
+
+        $this->dictionaryRepository->save($_POST);
+        $_SESSION['success_message'] = "Словник успішно створено.";
+        header('Location: /admin/dictionaries');
+        exit();
+    }
+
+    public function editDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $dictionary = $this->dictionaryRepository->findById($id);
+
+        if (!$dictionary) {
+            http_response_code(404);
+            echo "Словник не знайдено";
+            return;
+        }
+
+        View::render('admin/dictionaries/edit.html.twig', [
+            'dictionary' => $dictionary,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $dictionary = $this->dictionaryRepository->findById($id);
+
+        if (!$dictionary) {
+            http_response_code(404);
+            echo "Словник не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:dictionaries,name,' . $id], // Corrected unique validation
+            'description' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/dictionaries/edit?id=' . $id);
+            exit();
+        }
+
+        $this->dictionaryRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Словник успішно оновлено.";
+        header('Location: /admin/dictionaries');
+        exit();
+    }
+
+    public function deleteDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $this->dictionaryRepository->delete($id);
+        $_SESSION['success_message'] = "Словник успішно видалено.";
+        header('Location: /admin/dictionaries');
+        exit();
+    }
+
+    // --- Dictionary Value Management ---
+    public function createDictionaryValue(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
+        View::render('admin/dictionaries/values/new.html.twig', [
+            'dictionary_id' => $dictionaryId,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeDictionaryValue(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $dictionaryId = (int)($_POST['dictionary_id'] ?? 0);
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'dictionary_id' => ['required'],
+            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId],
+            'label' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
+            exit();
+        }
+
+        $this->dictionaryRepository->saveValue($_POST);
+        $_SESSION['success_message'] = "Значення словника успішно створено.";
+        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
+        exit();
+    }
+
+    public function editDictionaryValue(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $value = $this->dictionaryRepository->findValueById($id);
+
+        if (!$value) {
+            http_response_code(404);
+            echo "Значення словника не знайдено";
+            return;
+        }
+
+        View::render('admin/dictionaries/values/edit.html.twig', [
+            'value' => $value,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateDictionaryValue(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $value = $this->dictionaryRepository->findValueById($id);
+        $dictionaryId = $value['dictionary_id'];
+        
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'dictionary_id' => ['required'],
+            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId . ',id,' . $id],
+            'label' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/dictionaries/values/edit?id=' . $id);
+            exit();
+        }
+
+        $this->dictionaryRepository->updateValue($id, $_POST);
+        $_SESSION['success_message'] = "Значення словника успішно оновлено.";
+        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
+        exit();
+    }
+
+    public function deleteDictionaryValue(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $value = $this->dictionaryRepository->findValueById($id);
+        $dictionaryId = $value['dictionary_id'];
+
+        $this->dictionaryRepository->deleteValue($id);
+        $_SESSION['success_message'] = "Значення словника успішно видалено.";
+        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
+        exit();
+    }
+
+    // --- Auth Configuration Management ---
+    public function listAuthConfigs(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        $configs = $this->authConfigRepository->findAll();
+        View::render('admin/auth_configs/index.html.twig', ['configs' => $configs]);
+    }
+
+    public function createAuthConfig(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        View::render('admin/auth_configs/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeAuthConfig(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'provider' => ['required', 'unique:auth_configs,provider'],
+            // 'client_id' => ['required'],
+            // 'client_secret' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/auth_configs/new');
+            exit();
+        }
+
+        $this->authConfigRepository->save($_POST);
+        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно створено.";
+        header('Location: /admin/auth_configs');
+        exit();
+    }
+
+    public function editAuthConfig(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $config = $this->authConfigRepository->findById($id);
+
+        if (!$config) {
+            http_response_code(404);
+            echo "Конфігурацію аутентифікації не знайдено";
+            return;
+        }
+
+        View::render('admin/auth_configs/edit.html.twig', [
+            'config' => $config,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateAuthConfig(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $config = $this->authConfigRepository->findById($id);
+
+        if (!$config) {
+            http_response_code(404);
+            echo "Конфігурацію аутентифікації не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'provider' => ['required', 'unique:auth_configs,provider,' . $id],
+            // 'client_id' => ['required'],
+            // 'client_secret' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/auth_configs/edit?id=' . $id);
+            exit();
+        }
+
+        $this->authConfigRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно оновлено.";
+        header('Location: /admin/auth_configs');
+        exit();
+    }
+
+    public function deleteAuthConfig(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $this->authConfigRepository->delete($id);
+        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
+        header('Location: /admin/auth_configs');
+        exit();
+    }
+}
+
+    public function createDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+        View::render('admin/dictionaries/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeDictionary(): void
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role_id'] !== 1) {
+            header('Location: /login');
+            exit();
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
             'name' => ['required', 'unique:dictionaries,name'],
         ]);
 
