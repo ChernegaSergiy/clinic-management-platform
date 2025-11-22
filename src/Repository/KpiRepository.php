@@ -117,4 +117,21 @@ class KpiRepository
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findAllKpiResults(): array
+    {
+        $sql = "
+            SELECT 
+                kr.*,
+                kd.name as kpi_name,
+                kd.unit,
+                CONCAT(u.last_name, ' ', u.first_name) as user_name
+            FROM kpi_results kr
+            JOIN kpi_definitions kd ON kr.kpi_id = kd.id
+            JOIN users u ON kr.user_id = u.id
+            ORDER BY kr.period_start DESC
+        ";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
