@@ -140,12 +140,6 @@ class PatientRepository implements PatientRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function getAllForExport(): array
-    {
-        $stmt = $this->pdo->query("SELECT id, first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status, status FROM patients ORDER BY last_name, first_name");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     public function updateStatus(int $id, string $status): bool
     {
         $oldPatient = $this->findById($id);
