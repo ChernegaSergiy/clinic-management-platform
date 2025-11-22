@@ -6,69 +6,26 @@
     <section class="auth">
         <div class="auth__card">
             <p class="eyebrow">Вхід</p>
-            <h1>Увійдіть до облікового запису</h1>
+            <h1 class="auth__title">Увійдіть до облікового запису</h1>
             <form method="POST" action="/login" class="auth__form">
-                <label class="field">
-                    <span>Email</span>
-                    <input type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required>
-                    {% if errors.email %}<div class="error-text">{{ errors.email }}</div>{% endif %}
+                <label class="auth__field">
+                    <span class="auth__label">Email</span>
+                    <input class="auth__input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required>
+                    {% if errors.email %}<div class="auth__error">{{ errors.email }}</div>{% endif %}
                 </label>
-                <label class="field">
-                    <span>Пароль</span>
-                    <input type="password" name="password" placeholder="Ваш пароль" required>
-                    {% if errors.password %}<div class="error-text">{{ errors.password }}</div>{% endif %}
+                <label class="auth__field">
+                    <span class="auth__label">Пароль</span>
+                    <input class="auth__input" type="password" name="password" placeholder="Ваш пароль" required>
+                    {% if errors.password %}<div class="auth__error">{{ errors.password }}</div>{% endif %}
                 </label>
                 {% if errors.login %}
-                    <div class="error-box">
+                    <div class="auth__error-box">
                         <strong>Помилка входу:</strong> {{ errors.login }}
                     </div>
                 {% endif %}
-                <button type="submit" class="btn btn-primary btn-full">Увійти</button>
+                <button type="submit" class="button button--primary button--full">Увійти</button>
             </form>
-            <p class="muted">Немає доступу? Зверніться до адміністратора клініки.</p>
+            <p class="auth__muted">Немає доступу? Зверніться до адміністратора клініки.</p>
         </div>
     </section>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .auth {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 60vh;
-        }
-        .auth__card {
-            max-width: 440px;
-            width: 100%;
-            border: 3px solid #0f0f0f;
-            border-radius: 18px;
-            background: #ffffff;
-            padding: 24px;
-            box-shadow: 8px 8px 0 #0f0f0f;
-        }
-        .auth__card h1 { margin: 4px 0 16px; }
-        .auth__form { display: flex; flex-direction: column; gap: 14px; }
-        .field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
-        .field span { font-size: 14px; letter-spacing: 0.2px; }
-        input {
-            border: 2px solid #0f0f0f;
-            border-radius: 12px;
-            padding: 12px;
-            font: inherit;
-            background: #fefefe;
-        }
-        .btn-full { width: 100%; justify-content: center; }
-        .error-box {
-            border: 2px solid #0f0f0f;
-            border-radius: 12px;
-            padding: 10px 12px;
-            background: #ffecec;
-            color: #2d0000;
-            font-weight: 700;
-        }
-        .error-text { color: #8b0000; font-size: 13px; }
-        .muted { margin-top: 12px; color: #5f5f5f; }
-    </style>
 {% endblock %}
