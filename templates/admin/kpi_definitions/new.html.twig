@@ -1,0 +1,30 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нове визначення KPI - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нове визначення KPI</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/kpi_definitions/new">
+            {{ forms.input('name', 'Назва', old.name ?? '', 'text', 'Наприклад, Patient Wait Time', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис', old.description ?? '', 'Детальний опис KPI', errors.description ?? null) }}
+            {{ forms.input('kpi_type', 'Тип KPI', old.kpi_type ?? '', 'text', 'Наприклад, average, percentage, count', errors.kpi_type ?? null, {'required': 'required'}) }}
+            {{ forms.input('target_value', 'Цільове значення', old.target_value ?? '', 'text', 'Наприклад, 15, 95%, 100', errors.target_value ?? null) }}
+            {{ forms.input('unit', 'Одиниця виміру', old.unit ?? '', 'text', 'Наприклад, minutes, %, patients', errors.unit ?? null) }}
+
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
+                    <label>Активне визначення</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти визначення', 'primary', 'large', 'save') }}
+            <a href="/admin/kpi_definitions" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
