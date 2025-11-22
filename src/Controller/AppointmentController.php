@@ -8,6 +8,7 @@ use App\Repository\AppointmentRepository;
 use App\Repository\PatientRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
+use App\Core\AuthGuard;
 
 class AppointmentController
 {
@@ -26,10 +27,7 @@ class AppointmentController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         //$appointments = $this->appointmentRepository->findAll(); // Removed, will be fetched via JSON
         $doctors = $this->userRepository->findAllDoctors();
 
@@ -46,10 +44,7 @@ class AppointmentController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
@@ -72,10 +67,7 @@ class AppointmentController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -163,10 +155,7 @@ class AppointmentController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
@@ -182,10 +171,7 @@ class AppointmentController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
@@ -218,10 +204,7 @@ class AppointmentController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_POST['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
@@ -269,10 +252,7 @@ class AppointmentController
 
     public function cancel(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_POST['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
@@ -311,10 +291,7 @@ class AppointmentController
 
     public function showWaitlist(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -339,10 +316,7 @@ class AppointmentController
 
     public function addPatientToWaitlist(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -383,10 +357,7 @@ class AppointmentController
 
     public function showLoadAnalytics(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
