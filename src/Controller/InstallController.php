@@ -200,7 +200,12 @@ class InstallController
             return stripos($line, 'FULLTEXT') === false;
         });
 
-        return implode("\n", $filtered);
+        $normalized = implode("\n", $filtered);
+
+        // SQLite не підтримує ALTER COLUMN SET DEFAULT — прибираємо такі рядки
+        $normalized = preg_replace('/ALTER\\s+TABLE\\s+[^;]+ALTER\\s+COLUMN[^;]+;/i', '', $normalized) ?? $normalized;
+
+        return $normalized;
     }
 
     private function splitStatements(string $sql): array
