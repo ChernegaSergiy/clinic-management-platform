@@ -7,7 +7,10 @@
         <div class="notice notice--error">
             <div class="notice__badge">Помилка</div>
             <h1 class="notice__title">Щось пішло не так</h1>
-            <p class="notice__text">{{ message }}</p>
+            <p class="notice__text">Ми не змогли відобразити цю сторінку. Спробуйте оновити або поверніться пізніше.</p>
+            {% if message %}
+                <p class="notice__text muted">{{ message }}</p>
+            {% endif %}
             {% if detail %}
                 <div class="notice__detail">
                     <strong>Деталі:</strong>
@@ -16,6 +19,7 @@
             {% endif %}
             <div class="notice__actions">
                 <a class="button button--primary" href="/">Повернутися на головну</a>
+                <a class="button button--ghost" href="/contact">Написати адміністратору</a>
             </div>
         </div>
     </section>
