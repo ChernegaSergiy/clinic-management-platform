@@ -134,7 +134,7 @@ class PatientRepository implements PatientRepositoryInterface
         return $success;
     }
 
-    public function getAllActive(): array
+    public function findAllActive(): array
     {
         $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as full_name FROM patients WHERE status = 'active' ORDER BY last_name, first_name");
         return $stmt->fetchAll();
