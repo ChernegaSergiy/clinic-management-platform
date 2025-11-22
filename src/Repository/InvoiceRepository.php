@@ -136,4 +136,3 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-    }
