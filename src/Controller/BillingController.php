@@ -405,7 +405,7 @@ class BillingController
             ];
         }
 
-        $exporter = new \App\Core\CSVExporter($headers, $exportData);
+        $exporter = new \App\Core\CsvExporter($headers, $exportData);
         $exporter->download('invoices_export.csv');
     }
 }
