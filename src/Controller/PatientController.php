@@ -8,6 +8,7 @@ use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;
+use App\Core\AuthGuard;
 
 class PatientController
 {
@@ -22,10 +23,7 @@ class PatientController
 
     public function index(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         $searchTerm = $_GET['search'] ?? '';
         $patients = $this->patientRepository->findAll($searchTerm);
         View::render('patients/index.html.twig', [
@@ -36,19 +34,13 @@ class PatientController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
         View::render('patients/new.html.twig');
     }
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -82,10 +74,7 @@ class PatientController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -106,10 +95,7 @@ class PatientController
 
     public function edit(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -125,10 +111,7 @@ class PatientController
 
     public function update(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -163,10 +146,7 @@ class PatientController
 
     public function exportCsv(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $patients = $this->patientRepository->findAll();
 
@@ -183,10 +163,7 @@ class PatientController
 
     public function exportPatientsToJson(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $patients = $this->patientRepository->findAll();
 
@@ -202,10 +179,7 @@ class PatientController
 
     public function importPatientsFromJson(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         // Handle GET request (display import form)
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -286,10 +260,7 @@ class PatientController
 
     public function toggleStatus(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
