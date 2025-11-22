@@ -170,7 +170,6 @@ class InstallController
         $defaults = [
             'APP_ENV' => 'dev',
             'APP_DEBUG' => 'true',
-            'DB_CONNECTION' => 'mysql',
             'DB_HOST' => '127.0.0.1',
             'DB_PORT' => '3306',
             'DB_DATABASE' => 'clinic',
@@ -194,6 +193,15 @@ class InstallController
             }
             [$key, $value] = explode('=', $line, 2);
             $defaults[$key] = $value;
+        }
+
+        // Якщо у старому .env був SQLite або файл, повертаємо рекомендовані MySQL значення
+        if (($defaults['DB_CONNECTION'] ?? '') !== 'mysql') {
+            $defaults['DB_CONNECTION'] = 'mysql';
+            $defaults['DB_DATABASE'] = 'clinic';
+        }
+        if (str_contains($defaults['DB_DATABASE'] ?? '', '.sqlite')) {
+            $defaults['DB_DATABASE'] = 'clinic';
         }
 
         return $defaults;
