@@ -7,6 +7,7 @@ use App\Core\View;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
 use App\Core\CsvExporter;
+use App\Core\JsonExporter;
 
 class PatientController
 {
@@ -176,7 +177,26 @@ class PatientController
         }
 
         $headers = array_keys($patients[0]);
-        $exporter = new CSVExporter($headers, $patients);
+        $exporter = new CsvExporter($headers, $patients);
         $exporter->download('patients_export.csv');
+    }
+
+    public function exportPatientsToJson(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $patients = $this->patientRepository->getAllForExport();
+
+        if (empty($patients)) {
+            $_SESSION['errors']['export'] = 'Немає пацієнтів для експорту.';
+            header('Location: /patients');
+            exit();
+        }
+
+        $jsonExporter = new JsonExporter();
+        $jsonExporter->export($patients, 'patients_export.json');
     }
 }
