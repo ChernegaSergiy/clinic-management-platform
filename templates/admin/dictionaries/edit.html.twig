@@ -1,0 +1,21 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати словник #{{ dictionary.id }} - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати словник #{{ dictionary.id }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/dictionaries/edit?id={{ dictionary.id }}">
+            {{ forms.input('name', 'Назва словника', old.name ?? dictionary.name, 'text', 'Наприклад, Статуси записів', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис словника', old.description ?? dictionary.description, 'Детальний опис словника', errors.description ?? null) }}
+            {{ forms.input('type', 'Тип словника (необов\'язково)', old.type ?? dictionary.type, 'text', 'Наприклад, appointment_status', errors.type ?? null) }}
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/admin/dictionaries" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
