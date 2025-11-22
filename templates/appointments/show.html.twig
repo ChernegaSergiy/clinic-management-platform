@@ -45,7 +45,10 @@
         <a href="/appointments/edit?id={{ appointment.id }}" class="ui primary button">Редагувати</a>
         {% if appointment.status == 'scheduled' %}
             <a href="/medical-records/new?appointment_id={{ appointment.id }}" class="ui green button">Створити медичний запис</a>
-            <a href="/appointments/cancel?id={{ appointment.id }}" class="ui negative button">Скасувати</a>
+            <form action="/appointments/cancel" method="POST" style="display: inline;">
+                <input type="hidden" name="id" value="{{ appointment.id }}">
+                <button type="submit" class="ui negative button">Скасувати</button>
+            </form>
         {% endif %}
         <a href="/appointments" class="ui button">Повернутися до списку</a>
     </div>
