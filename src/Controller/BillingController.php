@@ -10,7 +10,7 @@ use App\Repository\MedicalRecordRepository;
 use App\Repository\PatientRepository;
 use App\Repository\ServiceRepository;
 use App\Repository\ServiceBundleRepository;
-use App\Core\CSVExporter;
+use App\Core\CsvExporter;
 
 class BillingController
 {
