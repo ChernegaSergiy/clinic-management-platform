@@ -409,4 +409,27 @@ class BillingController
         $exporter = new \App\Core\CsvExporter($headers, $exportData);
         $exporter->download('invoices_export.csv');
     }
+
+    public function exportInvoicesToPdf(): void
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit();
+        }
+
+        $invoices = $this->invoiceRepository->findAll();
+
+        if (empty($invoices)) {
+            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
+            header('Location: /billing');
+            exit();
+        }
+
+        $html = View::renderToString('billing/export_pdf.html.twig', ['invoices' => $invoices]);
+
+        $pdfExporter = new PdfExporter();
+        $pdfExporter->loadHtml($html);
+        $pdfExporter->render();
+        $pdfExporter->download('invoices_export.pdf');
+    }
 }
