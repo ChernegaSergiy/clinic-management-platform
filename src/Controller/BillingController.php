@@ -74,7 +74,7 @@ class BillingController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -126,7 +126,7 @@ class BillingController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -195,7 +195,7 @@ class BillingController
             exit();
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
@@ -254,7 +254,7 @@ class BillingController
             return;
         }
 
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'payment_method' => ['required'],
@@ -349,7 +349,7 @@ class BillingController
         }
 
         // TODO: Add validation
-        $validator = new Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
