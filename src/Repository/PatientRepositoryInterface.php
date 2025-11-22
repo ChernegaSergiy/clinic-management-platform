@@ -9,7 +9,7 @@ interface PatientRepositoryInterface
     public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array;
     public function findById(int $id): ?array;
     public function update(int $id, array $data): bool;
-    public function updateStatus(int $id, bool $status): bool;
+    public function updateStatus(int $id, string $status): bool;
     public function findAllActive(): array;
     // public function delete(int $id): bool;
 }
