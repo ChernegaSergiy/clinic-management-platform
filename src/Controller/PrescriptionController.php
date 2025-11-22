@@ -9,6 +9,7 @@ use App\Repository\PrescriptionRepository;
 use App\Repository\MedicalRecordRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryItemRepository;
+use App\Core\AuthGuard;
 
 class PrescriptionController
 {
@@ -29,10 +30,7 @@ class PrescriptionController
 
     public function create(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -61,10 +59,7 @@ class PrescriptionController
 
     public function store(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -128,10 +123,7 @@ class PrescriptionController
 
     public function show(): void
     {
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit();
-        }
+        AuthGuard::check();
 
         $id = (int)($_GET['id'] ?? 0);
         $prescription = $this->prescriptionRepository->findById($id);
