@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoices</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Рахунки</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Пацієнт</th>
+                <th>Сума</th>
+                <th>Статус</th>
+                <th>Дата виставлення</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.id }}</td>
+                    <td>{{ invoice.patient_name }}</td>
+                    <td>{{ invoice.amount }}</td>
+                    <td>{{ invoice.status }}</td>
+                    <td>{{ invoice.issued_date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
