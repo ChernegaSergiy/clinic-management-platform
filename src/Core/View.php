@@ -25,4 +25,9 @@ class View
     {
         echo self::getTwig()->render($template, $data);
     }
+
+    public static function renderToString(string $template, array $data = []): string
+    {
+        return self::getTwig()->render($template, $data);
+    }
 }
