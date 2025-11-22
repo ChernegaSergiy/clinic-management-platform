@@ -358,7 +358,7 @@ class AdminController
             exit();
         }
 
-        $id = (int)($_GET['id'] ?? 0);
+        $id = (int)($_POST['id'] ?? 0);
         $role = $this->roleRepository->findById($id);
 
         if (!$role) {
