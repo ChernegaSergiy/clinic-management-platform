@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 use App\Repository\RoleRepository;
 use App\Repository\DictionaryRepository;
 use App\Repository\AuthConfigRepository;
+use App\Repository\BackupPolicyRepository;
 
 class AdminController
 {
@@ -14,6 +15,7 @@ class AdminController
     private RoleRepository $roleRepository;
     private DictionaryRepository $dictionaryRepository;
     private AuthConfigRepository $authConfigRepository;
+    private BackupPolicyRepository $backupPolicyRepository;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class AdminController
         $this->roleRepository = new RoleRepository();
         $this->dictionaryRepository = new DictionaryRepository();
         $this->authConfigRepository = new AuthConfigRepository();
+        $this->backupPolicyRepository = new BackupPolicyRepository();
     }
 
     public function users(): void
