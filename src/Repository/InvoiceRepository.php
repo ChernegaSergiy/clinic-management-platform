@@ -30,7 +30,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): ?int
+    public function save(array $data): bool
     {
         $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
                 VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
@@ -46,7 +46,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ':notes' => $data['notes'] ?? null,
             ':type' => $data['type'] ?? 'invoice',
         ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        return $success; // Return true on success, false on failure
     }
 
     public function findById(int $id): ?array
