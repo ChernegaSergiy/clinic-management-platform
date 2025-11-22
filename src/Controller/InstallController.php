@@ -174,12 +174,11 @@ class InstallController
         return new PDO($dsn, $input['db_username'], $input['db_password'], $options);
     }
 
-    private function dropAndCreateDatabase(array $input): void
+    private function ensureDatabaseExists(array $input): void
     {
         $pdo = $this->createPdo($input, false);
         $dbName = $input['db_database'];
-        $pdo->exec("DROP DATABASE IF EXISTS `{$dbName}`");
-        $pdo->exec("CREATE DATABASE `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     }
 
     private function createAdmin(PDO $pdo, array $input): void
@@ -224,8 +223,8 @@ class InstallController
             // Write env first
             $this->writeEnv($input);
 
-            // Drop and recreate DB
-            $this->dropAndCreateDatabase($input);
+            // Ensure DB exists (no destructive drop)
+            $this->ensureDatabaseExists($input);
 
             // Apply migrations
             $pdo = $this->createPdo($input);
