@@ -1,0 +1,186 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Встановлення платформи{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #f2f8ff 0%, #f9fbff 40%, #f5f7fa 100%);
+        }
+        .install-hero {
+            padding: 3rem 2rem;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.06);
+            border: 1px solid #e7eef7;
+        }
+        .install-hero .header {
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        .muted {
+            color: #6b7280;
+        }
+        .pill {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #e7f2ff;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .segment-flat {
+            border: 1px solid #e7eef7 !important;
+            box-shadow: none !important;
+        }
+        .inline-help {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="ui grid stackable">
+        <div class="eight wide column">
+            <div class="install-hero">
+                <div class="pill">Step 1 of 1</div>
+                <h2 class="ui header">Швидке встановлення</h2>
+                <p class="muted">Сконфігуруйте базу та отримайте готовий демо‑набір даних для входу.</p>
+                <div class="ui relaxed list">
+                    <div class="item">
+                        <i class="database blue icon"></i>
+                        <div class="content">
+                            <div class="header">SQL міграції</div>
+                            <div class="description muted">Створимо таблиці з каталогу <code>database/migrations</code>.</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="users teal icon"></i>
+                        <div class="content">
+                            <div class="header">Демо‑користувачі</div>
+                            <div class="description muted">За бажанням підсиплемо ролі й акаунти з <code>database/seeds</code>.</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="settings orange icon"></i>
+                        <div class="content">
+                            <div class="header">.env</div>
+                            <div class="description muted">Створимо файл конфігурації з вашими параметрами.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            {% if feedback.errors %}
+                <div class="ui negative message">
+                    <div class="header">Не вдалося завершити встановлення</div>
+                    <ul class="list">
+                        {% for err in feedback.errors %}
+                            <li>{{ err }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% elseif feedback.success %}
+                <div class="ui positive message">
+                    <div class="header">Готово! Платформа налаштована.</div>
+                    <p>База даних: {{ feedback.details.db }}</p>
+                    {% if feedback.details.seeded %}
+                        <p>Демо‑логін: <strong>admin</strong> / <strong>password</strong></p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <form class="ui large form segment segment-flat" method="post" action="/install">
+                <h4 class="ui dividing header">Загальні налаштування</h4>
+                <div class="two fields">
+                    <div class="field">
+                        <label>APP_ENV</label>
+                        <input type="text" name="app_env" value="{{ defaults.APP_ENV|default('dev') }}">
+                        <div class="inline-help">dev / prod</div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox" style="margin-top: 1.9rem;">
+                            <input type="checkbox" name="app_debug" {% if defaults.APP_DEBUG == 'true' %}checked{% endif %}>
+                            <label>APP_DEBUG</label>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="ui dividing header">База даних</h4>
+                <div class="field">
+                    <label>Тип</label>
+                    <select name="db_connection" class="ui dropdown">
+                        <option value="mysql" {% if defaults.DB_CONNECTION == 'mysql' %}selected{% endif %}>MySQL / MariaDB</option>
+                        <option value="sqlite" {% if defaults.DB_CONNECTION == 'sqlite' %}selected{% endif %}>SQLite (файл у database/)</option>
+                    </select>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Хост</label>
+                        <input type="text" name="db_host" value="{{ defaults.DB_HOST|default('127.0.0.1') }}">
+                    </div>
+                    <div class="field">
+                        <label>Порт</label>
+                        <input type="text" name="db_port" value="{{ defaults.DB_PORT|default('3306') }}">
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>База / файл</label>
+                        <input type="text" name="db_database" value="{{ defaults.DB_DATABASE|default('clinic') }}">
+                        <div class="inline-help">Для SQLite — назва файлу у <code>database/</code></div>
+                    </div>
+                    <div class="field">
+                        <label>Користувач</label>
+                        <input type="text" name="db_username" value="{{ defaults.DB_USERNAME|default('root') }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input type="password" name="db_password" value="{{ defaults.DB_PASSWORD|default('') }}">
+                </div>
+
+                <h4 class="ui dividing header">Пошта (опційно)</h4>
+                <div class="two fields">
+                    <div class="field">
+                        <label>MAIL_HOST</label>
+                        <input type="text" name="mail_host" value="{{ defaults.MAIL_HOST|default('localhost') }}">
+                    </div>
+                    <div class="field">
+                        <label>MAIL_PORT</label>
+                        <input type="text" name="mail_port" value="{{ defaults.MAIL_PORT|default('1025') }}">
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>MAIL_USERNAME</label>
+                        <input type="text" name="mail_username" value="{{ defaults.MAIL_USERNAME|default('') }}">
+                    </div>
+                    <div class="field">
+                        <label>MAIL_PASSWORD</label>
+                        <input type="password" name="mail_password" value="{{ defaults.MAIL_PASSWORD|default('') }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>MAIL_ENCRYPTION</label>
+                    <input type="text" name="mail_encryption" value="{{ defaults.MAIL_ENCRYPTION|default('') }}">
+                    <div class="inline-help">tls / ssl або залиште порожнім</div>
+                </div>
+
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="seed" checked>
+                        <label>Імпортувати демо‑дані (ролі, користувачі)</label>
+                    </div>
+                </div>
+
+                <button class="ui fluid huge primary button" type="submit">
+                    Запустити встановлення
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
