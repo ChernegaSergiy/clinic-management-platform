@@ -39,10 +39,13 @@
                             <td>
                                 <a href="/admin/roles/edit?id={{ role.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
-                                </a>
-                                <a href="/admin/roles/delete?id={{ role.id }}" class="ui icon button red">
-                                    <i class="trash icon"></i>
-                                </a>
+                                a>
+                                <form action="/admin/roles/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю роль?');">
+                                    <input type="hidden" name="id" value="{{ role.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
