@@ -53,8 +53,9 @@
                             <a href="/admin/users/edit?id={{ user.id }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
-                            <form action="/admin/users/delete?id={{ user.id }}" method="POST" style="display: inline;">
-                                <button type="submit" class="ui icon button red" onclick="return confirm('Ви впевнені, що хочете видалити цього користувача?');">
+                            <form action="/admin/users/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цього користувача?');">
+                                <input type="hidden" name="id" value="{{ user.id }}">
+                                <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>
                                 </button>
                             </form>
