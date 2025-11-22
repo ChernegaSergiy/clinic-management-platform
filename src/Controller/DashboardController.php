@@ -29,12 +29,16 @@ class DashboardController
 
         // Fetch data for dashboard widgets
         $patientCount = count($this->patientRepository->findAllActive());
-        $upcomingAppointmentsCount = count($this->appointmentRepository->findUpcoming()); // Need to implement this method
-        $lowStockItemsCount = count($this->inventoryItemRepository->findLowStock()); // Need to implement this method
+        $upcomingAppointments = $this->appointmentRepository->findUpcoming(); 
+        $upcomingAppointmentsCount = count($upcomingAppointments);
+        $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
+        $lowStockItemsCount = count($lowStockItems);
 
         View::render('dashboard/index.html.twig', [
             'patient_count' => $patientCount,
+            'upcoming_appointments' => $upcomingAppointments,
             'upcoming_appointments_count' => $upcomingAppointmentsCount,
+            'low_stock_items' => $lowStockItems,
             'low_stock_items_count' => $lowStockItemsCount,
         ]);
     }
