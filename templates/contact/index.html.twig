@@ -3,43 +3,43 @@
 {% block title %}Контакти — Клініка{% endblock %}
 
 {% block body %}
-    <section class="section">
-        <div class="section__head">
+    <section class="section-block">
+        <div class="section-block__head">
             <p class="eyebrow">Зв'язок</p>
-            <h1>Запишіться або поставте запитання</h1>
-            <p class="lede">Залиште контакти — адміністратор відповість протягом робочого дня та підбере зручний час.</p>
+            <h1 class="section-block__title">Запишіться або поставте запитання</h1>
+            <p class="section-block__subtitle lede">Залиште контакти — адміністратор відповість протягом робочого дня та підбере зручний час.</p>
         </div>
-        <form class="form-grid">
-            <label class="field">
-                <span>Ваше ім'я</span>
-                <input type="text" name="name" placeholder="Ім'я Прізвище" required>
+        <form class="contact-form">
+            <label class="contact-form__field">
+                <span class="contact-form__label">Ваше ім'я</span>
+                <input class="contact-form__input" type="text" name="name" placeholder="Ім'я Прізвище" required>
             </label>
-            <label class="field">
-                <span>Ваш Email</span>
-                <input type="email" name="email" placeholder="example@email.com" required>
+            <label class="contact-form__field">
+                <span class="contact-form__label">Ваш Email</span>
+                <input class="contact-form__input" type="email" name="email" placeholder="example@email.com" required>
             </label>
-            <label class="field">
-                <span>Номер телефону</span>
-                <input type="tel" name="phone" placeholder="+380 XX XXX XX XX" required>
+            <label class="contact-form__field">
+                <span class="contact-form__label">Номер телефону</span>
+                <input class="contact-form__input" type="tel" name="phone" placeholder="+380 XX XXX XX XX" required>
             </label>
-            <label class="field">
-                <span>Бажана дата</span>
-                <input type="date" name="appointment_date">
+            <label class="contact-form__field">
+                <span class="contact-form__label">Бажана дата</span>
+                <input class="contact-form__input" type="date" name="appointment_date">
             </label>
-            <label class="field field--full">
-                <span>Ваше повідомлення</span>
-                <textarea name="message" rows="4" placeholder="Опишіть питання чи симптоми"></textarea>
+            <label class="contact-form__field contact-form__field--full">
+                <span class="contact-form__label">Ваше повідомлення</span>
+                <textarea class="contact-form__textarea" name="message" rows="4" placeholder="Опишіть питання чи симптоми"></textarea>
             </label>
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Надіслати запит</button>
-                <span class="muted">Залишаючи контакти, ви погоджуєтесь на зворотній дзвінок.</span>
+            <div class="contact-form__actions">
+                <button type="submit" class="button button--primary">Надіслати запит</button>
+                <span class="contact-form__hint">Залишаючи контакти, ви погоджуєтесь на зворотній дзвінок.</span>
             </div>
         </form>
     </section>
 
-    <section class="section section--grid">
+    <section class="section-block section-block--split">
         <div>
-            <h2>Контакти</h2>
+            <h2 class="section-block__title">Контакти</h2>
             <p><strong>Адреса:</strong> м. Київ, вул. Хрещатик, 1</p>
             <p><strong>Телефон:</strong> +380 (44) 123-45-67</p>
             <p><strong>Email:</strong> info@clinic.ua</p>
@@ -52,69 +52,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-            margin-top: 20px;
-            background: #ffffff;
-            border: 3px solid #0f0f0f;
-            border-radius: 18px;
-            padding: 18px;
-            box-shadow: 8px 8px 0 #0f0f0f;
-        }
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-weight: 600;
-        }
-        .field--full { grid-column: 1 / -1; }
-        .field span { font-size: 14px; letter-spacing: 0.2px; }
-        input, textarea {
-            border: 2px solid #0f0f0f;
-            border-radius: 12px;
-            padding: 10px 12px;
-            font: inherit;
-            background: #fefefe;
-        }
-        textarea { resize: vertical; }
-        .actions {
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .muted { color: #5f5f5f; font-size: 14px; }
-        .map-card {
-            border: 3px solid #0f0f0f;
-            border-radius: 18px;
-            background: #ffffff;
-            padding: 16px;
-            box-shadow: 6px 6px 0 #0f0f0f;
-        }
-        .map-card__label {
-            display: inline-block;
-            padding: 6px 10px;
-            border: 2px solid #0f0f0f;
-            border-radius: 12px;
-            background: #ffd400;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        .map-card__placeholder {
-            border: 2px dashed #0f0f0f;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            font-weight: 600;
-            background: #f4f1eb;
-        }
-    </style>
 {% endblock %}
