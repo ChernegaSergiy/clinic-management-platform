@@ -273,7 +273,7 @@ class AdminController
             exit();
         }
 
-        $validator = new \App\Core\Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:roles'], // Need to implement unique validation in Validator
             'description' => ['required'],
@@ -332,7 +332,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator();
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:roles,name,' . $id], // Need to implement unique validation in Validator
             'description' => ['required'],
