@@ -120,6 +120,14 @@ $router->add('GET', '/admin/backup_policies/edit', [AdminController::class, 'edi
 $router->add('POST', '/admin/backup_policies/edit', [AdminController::class, 'updateBackupPolicy']);
 $router->add('POST', '/admin/backup_policies/delete', [AdminController::class, 'deleteBackupPolicy']);
 
+// Admin KPI Definition routes
+$router->add('GET', '/admin/kpi_definitions', [AdminController::class, 'listKpiDefinitions']);
+$router->add('GET', '/admin/kpi_definitions/new', [AdminController::class, 'createKpiDefinition']);
+$router->add('POST', '/admin/kpi_definitions/new', [AdminController::class, 'storeKpiDefinition']);
+$router->add('GET', '/admin/kpi_definitions/edit', [AdminController::class, 'editKpiDefinition']);
+$router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'updateKpiDefinition']);
+$router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
+
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
 
