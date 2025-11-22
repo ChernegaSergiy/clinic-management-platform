@@ -71,6 +71,13 @@ class Validator
                     }
                 }
 
+                if (is_string($rule) && str_starts_with($rule, 'max_value:')) {
+                    $maxValue = (float)explode(':', $rule)[1];
+                    if (!empty($value) && is_numeric($value) && (float)$value > $maxValue) {
+                        $this->errors[$field][] = "Поле '{$field}' повинно бути не більше {$maxValue}.";
+                    }
+                }
+
                 if (is_string($rule) && str_starts_with($rule, 'array')) {
                     if (!empty($value) && !is_array($value)) {
                         $this->errors[$field][] = "Поле '{$field}' повинно бути масивом.";
