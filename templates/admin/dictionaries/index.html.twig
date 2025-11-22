@@ -45,9 +45,12 @@
                                 <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <a href="/admin/dictionaries/delete?id={{ dictionary.id }}" class="ui icon button red">
-                                    <i class="trash icon"></i>
-                                </a>
+                                <form action="/admin/dictionaries/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цей словник?');">
+                                    <input type="hidden" name="id" value="{{ dictionary.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
