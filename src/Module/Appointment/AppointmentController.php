@@ -28,8 +28,8 @@ class AppointmentController
     public function index(): void
     {
         AuthGuard::check();
-        //$appointments = $this->appointmentRepository->findAll(); // Removed, will be fetched via JSON
         $doctors = $this->userRepository->findAllDoctors();
+        $waitlist = $this->appointmentRepository->getWaitlistEntries();
 
         $doctorOptions = [];
         foreach ($doctors as $doctor) {
@@ -37,8 +37,8 @@ class AppointmentController
         }
 
         View::render('@modules/Appointment/templates/index.html.twig', [
-            //'appointments' => $appointments, // Removed, will be fetched via JSON
             'doctors' => $doctorOptions,
+            'waitlist' => $waitlist,
         ]);
     }
 

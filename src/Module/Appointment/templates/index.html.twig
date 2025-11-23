@@ -29,6 +29,37 @@
             <a class="ui label yellow">Не з'явився</a>
             <a class="ui label grey">Інше</a>
         </div>
+
+        <div class="ui divider"></div>
+        <h3 class="ui header">Заявки з публічної форми (waitlist)</h3>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пацієнт</th>
+                    <th>Бажаний лікар</th>
+                    <th>Дата</th>
+                    <th>Нотатки</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in waitlist %}
+                    <tr>
+                        <td>{{ entry.id }}</td>
+                        <td>{{ entry.patient_name ?? 'Невідомо' }}</td>
+                        <td>{{ entry.doctor_name ?? 'Будь-який' }}</td>
+                        <td>{{ entry.desired_start_time ?: '—' }}</td>
+                        <td>{{ entry.notes ?: '—' }}</td>
+                        <td>{{ entry.status }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає заявок у списку очікування.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
 
