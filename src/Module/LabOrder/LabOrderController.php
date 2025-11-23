@@ -5,7 +5,7 @@ namespace App\Module\LabOrder;
 use App\Core\View;
 use App\Core\Validator;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Repository\LabOrderRepository;
+use App\Module\LabOrder\Repository\LabOrderRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\QrCodeGenerator;
