@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Module\Prescription\Repository;
 
 use App\Database;
 use PDO;

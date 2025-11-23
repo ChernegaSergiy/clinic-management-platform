@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Prescription;
 
 use App\Core\Validator;
 use App\Core\View;
 use App\Module\Patient\Repository\PatientRepository;
-use App\Repository\PrescriptionRepository;
+use App\Module\Prescription\Repository\PrescriptionRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
@@ -49,7 +49,7 @@ class PrescriptionController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('prescriptions/new.html.twig', [
+        View::render('@modules/Prescription/templates/new.html.twig', [
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
@@ -82,7 +82,7 @@ class PrescriptionController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('prescriptions/new.html.twig', [
+        View::render('@modules/Prescription/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -134,7 +134,7 @@ class PrescriptionController
             return;
         }
 
-        View::render('prescriptions/show.html.twig', [
+        View::render('@modules/Prescription/templates/show.html.twig', [
             'prescription' => $prescription,
         ]);
     }
