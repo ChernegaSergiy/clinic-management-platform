@@ -13,6 +13,7 @@ class View
     {
         if (self::$twig === null) {
             $loader = new FilesystemLoader(__DIR__ . '/../../templates');
+            $loader->addPath(__DIR__ . '/../../src/Module', 'modules');
             self::$twig = new Environment($loader, [
                 // 'cache' => __DIR__ . '/../../var/cache',
             ]);

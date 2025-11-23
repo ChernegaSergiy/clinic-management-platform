@@ -5,7 +5,7 @@ namespace App\Module\Patient;
 use App\Core\Validator;
 use App\Core\View;
 use App\Repository\MedicalRecordRepository;
-use App\Repository\PatientRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;
 use App\Core\AuthGuard;
@@ -26,7 +26,7 @@ class PatientController
         AuthGuard::check();
         $searchTerm = $_GET['search'] ?? '';
         $patients = $this->patientRepository->findAll($searchTerm);
-        View::render('patients/index.html.twig', [
+        View::render('@modules/Patient/templates/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,
         ]);
@@ -35,7 +35,7 @@ class PatientController
     public function create(): void
     {
         AuthGuard::check();
-        View::render('patients/new.html.twig');
+        View::render('@modules/Patient/templates/new.html.twig');
     }
 
     public function store(): void
@@ -52,7 +52,7 @@ class PatientController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-            View::render('patients/new.html.twig', [
+            View::render('@modules/Patient/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
             ]);
@@ -61,7 +61,7 @@ class PatientController
 
         if (!$this->patientRepository->save($_POST)) {
             $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
-            View::render('patients/new.html.twig', [
+            View::render('@modules/Patient/templates/new.html.twig', [
                 'errors' => $errors,
                 'old' => $_POST,
             ]);
@@ -87,7 +87,7 @@ class PatientController
 
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
 
-        View::render('patients/show.html.twig', [
+        View::render('@modules/Patient/templates/show.html.twig', [
             'patient' => $patient,
             'medical_records' => $medicalRecords,
         ]);
@@ -106,7 +106,7 @@ class PatientController
             return;
         }
 
-        View::render('patients/edit.html.twig', ['patient' => $patient]);
+        View::render('@modules/Patient/templates/edit.html.twig', ['patient' => $patient]);
     }
 
     public function update(): void
@@ -132,7 +132,7 @@ class PatientController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-            View::render('patients/edit.html.twig', [
+            View::render('@modules/Patient/templates/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'patient' => array_merge($patient, $_POST),
             ]);
@@ -183,7 +183,7 @@ class PatientController
 
         // Handle GET request (display import form)
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            View::render('patients/import_json.html.twig', [
+            View::render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
                 'success_message' => $_SESSION['success_message'] ?? null,
             ]);
