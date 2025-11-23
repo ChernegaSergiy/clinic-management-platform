@@ -4,17 +4,17 @@ namespace App\Module\Inventory\Repository;
 
 use App\Database;
 use PDO;
-use App\Repository\InvoiceRepository; // Додано InvoiceRepository
+use App\Module\Billing\Repository\InvoiceRepository;
 
 class InventoryItemRepository implements InventoryItemRepositoryInterface
 {
     private PDO $pdo;
-    private InvoiceRepository $invoiceRepository; // Ініціалізація
+    private InvoiceRepository $invoiceRepository;
 
     public function __construct()
     {
         $this->pdo = Database::getInstance();
-        $this->invoiceRepository = new InvoiceRepository(); // Ініціалізація
+        $this->invoiceRepository = new InvoiceRepository();
     }
 
     public function findAll(): array
