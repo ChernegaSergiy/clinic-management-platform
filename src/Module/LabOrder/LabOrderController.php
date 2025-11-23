@@ -52,7 +52,7 @@ class LabOrderController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('lab_orders/new.html.twig', [
+        View::render('@modules/LabOrder/templates/new.html.twig', [
             'medical_record' => $medicalRecord,
             'old' => $old,
             'errors' => $errors,
@@ -122,7 +122,7 @@ class LabOrderController
         $qrCodeData = $_SERVER['HTTP_HOST'] . '/lab-orders/show?id=' . $id; // URL to the order details
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
-        View::render('lab_orders/show.html.twig', [
+        View::render('@modules/LabOrder/templates/show.html.twig', [
             'order' => $order,
             'qrCodeImage' => $qrCodeImage,
         ]);
@@ -146,7 +146,7 @@ class LabOrderController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('lab_orders/edit.html.twig', [
+        View::render('@modules/LabOrder/templates/edit.html.twig', [
             'order' => $order,
             'old' => $old,
             'errors' => $errors,
@@ -189,7 +189,7 @@ class LabOrderController
     {
         AuthGuard::check();
 
-        View::render('lab_orders/import.html.twig', [
+        View::render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
@@ -253,7 +253,7 @@ class LabOrderController
             exit();
         }
 
-        View::render('lab_orders/confirm_import.html.twig', [
+        View::render('@modules/LabOrder/templates/confirm_import.html.twig', [
             'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
