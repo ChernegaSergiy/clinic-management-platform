@@ -7,7 +7,7 @@ use App\Controller\PageController;
 use App\Controller\AuthController;
 use App\Module\Patient\PatientController;
 use App\Module\Appointment\AppointmentController;
-use App\Controller\MedicalRecordController;
+use App\Module\MedicalRecord\MedicalRecordController;
 use App\Controller\LabOrderController;
 use App\Controller\InventoryController;
 use App\Controller\BillingController;

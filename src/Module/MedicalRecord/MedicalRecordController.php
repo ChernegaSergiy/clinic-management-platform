@@ -43,7 +43,7 @@ class MedicalRecordController
             return;
         }
 
-        View::render('medical_records/new.html.twig', ['appointment' => $appointment]);
+        View::render('@modules/MedicalRecord/templates/new.html.twig', ['appointment' => $appointment]);
     }
 
     public function store(): void
@@ -108,7 +108,7 @@ class MedicalRecordController
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
         $attachments = $this->attachmentService->getAttachmentsForEntity('medical_record', $id);
 
-        View::render('medical_records/show.html.twig', [
+        View::render('@modules/MedicalRecord/templates/show.html.twig', [
             'record' => $record,
             'lab_orders' => $labOrders,
             'attachments' => $attachments,
