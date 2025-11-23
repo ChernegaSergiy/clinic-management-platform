@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Admin;
 
 use App\Core\View;
 use App\Core\Validator;
-use App\Repository\KpiRepository;
+use App\Module\Admin\Repository\KpiRepository;
 use App\Core\AuthGuard;
 
 class KpiController
@@ -21,13 +21,13 @@ class KpiController
     {
         AuthGuard::check();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('kpi/definitions/index.html.twig', ['definitions' => $definitions]);
+        View::render('@modules/Admin/templates/kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createDefinition(): void
     {
         AuthGuard::check();
-        View::render('kpi/definitions/new.html.twig', [
+        View::render('@modules/Admin/templates/kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -70,7 +70,7 @@ class KpiController
             $userId = $_SESSION['user']['id'];
             $results = $this->kpiRepository->findKpiResultsForUser($userId);
         }
-        View::render('kpi/results/index.html.twig', ['results' => $results]);
+        View::render('@modules/Admin/templates/kpi/results/index.html.twig', ['results' => $results]);
     }
 
     // This would be called by a cron job or background process

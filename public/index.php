@@ -14,6 +14,7 @@ use App\Module\Billing\BillingController;
 use App\Module\Admin\AdminController;
 use App\Module\Dashboard\DashboardController;
 use App\Controller\InstallController;
+use App\Module\Admin\KpiController;
 use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
@@ -176,6 +177,13 @@ $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, '
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
+
+// KPI routes (legacy)
+$router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
+$router->add('GET', '/kpi/definitions/new', [KpiController::class, 'createDefinition']);
+$router->add('POST', '/kpi/definitions/new', [KpiController::class, 'storeDefinition']);
+$router->add('GET', '/kpi/results', [KpiController::class, 'listResults']);
+$router->add('POST', '/kpi/calculate', [KpiController::class, 'calculateResults']);
 
 // Якщо додаток не встановлено, перенаправляємо на /install (крім самого інсталятора)
 $installed = $_ENV['APP_INSTALLED'] ?? false;
