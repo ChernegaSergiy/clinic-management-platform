@@ -349,6 +349,11 @@ class AppointmentController
         }
 
         if (!$validator->validate($_POST, $rules)) {
+            $errors = [];
+            foreach ($validator->getErrors() as $key => $messages) {
+                $errors[$key] = is_array($messages) ? reset($messages) : $messages;
+            }
+
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
             $patientOptions = [];
@@ -361,7 +366,7 @@ class AppointmentController
             }
 
             View::render('@modules/Appointment/templates/edit.html.twig', [
-                'errors' => $validator->getErrors(),
+                'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
                     'start_time' => $_POST['start_time_input'] ?? $rawInput['start_time'] ?? null,
