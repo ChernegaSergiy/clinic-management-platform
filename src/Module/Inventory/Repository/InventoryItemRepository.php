@@ -23,6 +23,28 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function findItemsBelowMinStock(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT * 
+            FROM inventory_items 
+            WHERE quantity < min_stock_level 
+            ORDER BY name
+        ");
+        return $stmt->fetchAll();
+    }
+
+    public function findItemsAboveMaxStock(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT * 
+            FROM inventory_items 
+            WHERE quantity > max_stock_level 
+            ORDER BY name
+        ");
+        return $stmt->fetchAll();
+    }
+
     public function save(array $data): bool
     {
         $this->pdo->beginTransaction();
