@@ -4,7 +4,7 @@ namespace App\Module\MedicalRecord;
 
 use App\Core\View;
 use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Repository\IcdCodeRepository;
+use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Core\AttachmentService;
