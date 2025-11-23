@@ -9,7 +9,7 @@ use App\Module\LabOrder\Repository\LabOrderRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\QrCodeGenerator;
-use App\Core\LabImportService;
+use App\Module\LabOrder\Service\LabImportService;
 use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Core\AuthGuard;
 

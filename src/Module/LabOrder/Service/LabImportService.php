@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core;
+namespace App\Module\LabOrder\Service;
 
 use App\Module\LabOrder\Repository\LabOrderRepository;
 use Exception;
