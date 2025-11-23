@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Appointment;
 
-use App\Core\Validator;
-use App\Core\View;
-use App\Repository\AppointmentRepository;
-use App\Repository\PatientRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\AuthGuard;
