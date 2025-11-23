@@ -38,7 +38,7 @@ class BillingController
     {
         AuthGuard::check();
         $invoices = $this->invoiceRepository->findAll();
-        View::render('billing/index.html.twig', ['invoices' => $invoices]);
+        View::render('@modules/Billing/templates/billing/index.html.twig', ['invoices' => $invoices]);
     }
 
     // --- Service Management ---
@@ -46,14 +46,14 @@ class BillingController
     {
         AuthGuard::check();
         $services = $this->serviceRepository->findAll();
-        View::render('billing/services/index.html.twig', ['services' => $services]);
+        View::render('@modules/Billing/templates/billing/services/index.html.twig', ['services' => $services]);
     }
 
     public function createService(): void
     {
         AuthGuard::check();
         $categories = $this->serviceRepository->findCategories();
-        View::render('billing/services/new.html.twig', [
+        View::render('@modules/Billing/templates/billing/services/new.html.twig', [
             'categories' => $categories,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -89,14 +89,14 @@ class BillingController
     {
         AuthGuard::check();
         $bundles = $this->serviceBundleRepository->findAll();
-        View::render('billing/bundles/index.html.twig', ['bundles' => $bundles]);
+        View::render('@modules/Billing/templates/billing/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
     public function createServiceBundle(): void
     {
         AuthGuard::check();
         $services = $this->serviceRepository->findAll();
-        View::render('billing/bundles/new.html.twig', [
+        View::render('@modules/Billing/templates/billing/bundles/new.html.twig', [
             'services' => $services,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -158,7 +158,7 @@ class BillingController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('billing/new.html.twig', [
+        View::render('@modules/Billing/templates/billing/new.html.twig', [
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
             'medical_records' => $medicalRecordOptions,
@@ -204,7 +204,7 @@ class BillingController
             return;
         }
 
-        View::render('billing/show.html.twig', [
+        View::render('@modules/Billing/templates/billing/show.html.twig', [
             'invoice' => $invoice,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -289,7 +289,7 @@ class BillingController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('billing/edit.html.twig', [
+        View::render('@modules/Billing/templates/billing/edit.html.twig', [
             'invoice' => $invoice,
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
