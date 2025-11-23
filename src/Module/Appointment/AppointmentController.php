@@ -309,6 +309,21 @@ class AppointmentController
     {
         AuthGuard::check();
 
+        $rawInput = $_POST;
+
+        // Normalize datetime inputs
+        foreach (['start_time', 'end_time'] as $field) {
+            if (!empty($_POST[$field])) {
+                try {
+                    $dt = $this->normalizeDateTime($_POST[$field]);
+                    $_POST[$field] = $dt->format('Y-m-d H:i:s');
+                    $_POST[$field . '_input'] = $dt->format('Y-m-d\TH:i');
+                } catch (\Exception $e) {
+                    // keep raw
+                }
+            }
+        }
+
         $id = (int)($_POST['id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -327,6 +342,12 @@ class AppointmentController
             'status' => ['required', 'in:scheduled,completed,cancelled,no-show'],
         ];
 
+        if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
+            if (strtotime($_POST['end_time']) <= strtotime($_POST['start_time'])) {
+                $validator->addError('end_time', 'Час закінчення має бути пізніше за час початку.');
+            }
+        }
+
         if (!$validator->validate($_POST, $rules)) {
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
@@ -341,7 +362,11 @@ class AppointmentController
 
             View::render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $validator->getErrors(),
-                'appointment' => array_merge($appointment, $_POST),
+                'appointment' => $appointment,
+                'old' => array_merge($rawInput, [
+                    'start_time' => $_POST['start_time_input'] ?? $rawInput['start_time'] ?? null,
+                    'end_time' => $_POST['end_time_input'] ?? $rawInput['end_time'] ?? null,
+                ]),
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
             ]);
