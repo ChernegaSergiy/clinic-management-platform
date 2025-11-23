@@ -11,7 +11,7 @@ use App\Module\MedicalRecord\MedicalRecordController;
 use App\Module\LabOrder\LabOrderController;
 use App\Module\Inventory\InventoryController;
 use App\Module\Billing\BillingController;
-use App\Controller\AdminController;
+use App\Module\Admin\AdminController;
 use App\Controller\DashboardController;
 use App\Controller\InstallController;
 use App\Core\View;
