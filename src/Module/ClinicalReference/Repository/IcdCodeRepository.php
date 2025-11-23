@@ -32,11 +32,21 @@ class IcdCodeRepository
             $this->pdo->exec("DELETE FROM icd_codes");
             $stmt = $this->pdo->prepare("INSERT INTO icd_codes (code, description) VALUES (:code, :description)");
             $count = 0;
+            $seen = [];
             foreach ($rows as $row) {
+                $code = trim($row['code'] ?? '');
+                if ($code === '' || $code === '-') {
+                    continue; // пропускаємо пусті/технічні коди
+                }
+                if (isset($seen[$code])) {
+                    continue; // уникаємо дублювання
+                }
+                $description = $row['description'] ?? '';
                 $stmt->execute([
-                    ':code' => $row['code'],
-                    ':description' => $row['description'],
+                    ':code' => $code,
+                    ':description' => $description,
                 ]);
+                $seen[$code] = true;
                 $count++;
             }
             $this->pdo->commit();
