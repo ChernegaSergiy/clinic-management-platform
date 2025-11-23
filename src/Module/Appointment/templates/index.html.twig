@@ -41,6 +41,7 @@
                     <th>Дата</th>
                     <th>Нотатки</th>
                     <th>Статус</th>
+                    <th>Дії</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,10 +53,11 @@
                         <td>{{ entry.desired_start_time ?: '—' }}</td>
                         <td>{{ entry.notes ?: '—' }}</td>
                         <td>{{ entry.status }}</td>
+                        <td><a class="ui mini button" href="/appointments/edit?id={{ entry.id }}">Деталі</a></td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="center aligned">Немає заявок у списку очікування.</td>
+                        <td colspan="7" class="center aligned">Немає заявок у списку очікування.</td>
                     </tr>
                 {% endfor %}
             </tbody>
