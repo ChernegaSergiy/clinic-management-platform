@@ -3,7 +3,7 @@
 namespace App\Module\Inventory;
 
 use App\Core\View;
-use App\Repository\InventoryItemRepository;
+use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
 
 class InventoryController

@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Core\View;
 use App\Repository\PatientRepository;
 use App\Repository\AppointmentRepository;
-use App\Repository\InventoryItemRepository;
+use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
 
 class DashboardController
