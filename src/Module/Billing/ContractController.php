@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Billing;
 
 use App\Core\View;
 use App\Core\Validator;
@@ -103,7 +103,7 @@ class ContractController
             return;
         }
 
-        View::render('billing/contracts/edit.html.twig', [
+        View::render('@modules/Billing/templates/contracts/edit.html.twig', [
             'contract' => $contract,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

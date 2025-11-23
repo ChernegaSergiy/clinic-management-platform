@@ -11,6 +11,7 @@ use App\Module\MedicalRecord\MedicalRecordController;
 use App\Module\LabOrder\LabOrderController;
 use App\Module\Inventory\InventoryController;
 use App\Module\Billing\BillingController;
+use App\Module\Billing\ContractController;
 use App\Module\Admin\AdminController;
 use App\Module\Dashboard\DashboardController;
 use App\Controller\InstallController;
@@ -119,6 +120,15 @@ $router->add('POST', '/billing/edit', [BillingController::class, 'update']);
 $router->add('GET', '/billing/export-pdf', [BillingController::class, 'exportInvoicesToPdf']);
 $router->add('GET', '/billing/export-excel', [BillingController::class, 'exportInvoicesToExcel']);
 $router->add('GET', '/billing/export-csv', [BillingController::class, 'exportInvoicesToCsv']);
+
+// Contract routes
+$router->add('GET', '/billing/contracts', [ContractController::class, 'index']);
+$router->add('GET', '/billing/contracts/new', [ContractController::class, 'create']);
+$router->add('POST', '/billing/contracts/new', [ContractController::class, 'store']);
+$router->add('GET', '/billing/contracts/show', [ContractController::class, 'show']);
+$router->add('GET', '/billing/contracts/edit', [ContractController::class, 'edit']);
+$router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
+$router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
