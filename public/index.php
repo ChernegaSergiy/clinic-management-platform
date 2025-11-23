@@ -4,7 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Core\Router;
 use App\Controller\PageController;
-use App\Controller\AuthController;
+use App\Module\User\AuthController;
 use App\Module\Patient\PatientController;
 use App\Module\Appointment\AppointmentController;
 use App\Module\MedicalRecord\MedicalRecordController;
