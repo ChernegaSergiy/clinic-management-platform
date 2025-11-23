@@ -28,6 +28,29 @@ class UserRepository implements UserRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function findAllActive(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name
+            FROM users 
+            WHERE role_id IS NOT NULL
+            ORDER BY last_name, first_name
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function findAllDoctors(): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name
+            FROM users 
+            WHERE role_id = (SELECT id FROM roles WHERE name = 'doctor' LIMIT 1)
+            ORDER BY last_name, first_name
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("SELECT id, first_name, last_name, email, role_id FROM users WHERE id = :id");
