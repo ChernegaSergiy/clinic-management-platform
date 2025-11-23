@@ -39,15 +39,15 @@ class Validator
                     }
                 }
 
-                if (is_string($rule) && str_starts_with($rule, 'date')) {
-                    if (!empty($value) && !\DateTime::createFromFormat('Y-m-d', $value)) {
-                        $this->errors[$field][] = "Поле '{$field}' повинно бути у форматі YYYY-MM-DD.";
-                    }
-                }
-
                 if (is_string($rule) && str_starts_with($rule, 'datetime')) {
                     if (!empty($value) && !\DateTime::createFromFormat('Y-m-d H:i:s', $value) && !\DateTime::createFromFormat('Y-m-d H:i', $value)) {
                         $this->errors[$field][] = "Поле '{$field}' повинно бути у форматі YYYY-MM-DD HH:MM:SS або YYYY-MM-DD HH:MM.";
+                    }
+                }
+
+                if (is_string($rule) && str_starts_with($rule, 'date')) {
+                    if (!empty($value) && !\DateTime::createFromFormat('Y-m-d', $value)) {
+                        $this->errors[$field][] = "Поле '{$field}' повинно бути у форматі YYYY-MM-DD.";
                     }
                 }
 
