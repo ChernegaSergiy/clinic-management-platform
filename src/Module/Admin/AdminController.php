@@ -781,13 +781,13 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('@modules/Admin/templates/kpi_definitions/index.html.twig', ['definitions' => $definitions]);
+        View::render('@modules/Admin/templates/kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createKpiDefinition(): void
     {
         AuthGuard::isAdmin();
-        View::render('@modules/Admin/templates/kpi_definitions/new.html.twig', [
+        View::render('@modules/Admin/templates/kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -830,7 +830,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/kpi_definitions/edit.html.twig', [
+        View::render('@modules/Admin/templates/kpi/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

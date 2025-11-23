@@ -21,13 +21,13 @@ class KpiController
     {
         AuthGuard::check();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('@modules/Admin/templates/kpi_definitions/index.html.twig', ['definitions' => $definitions]);
+        View::render('@modules/Admin/templates/kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createDefinition(): void
     {
         AuthGuard::check();
-        View::render('@modules/Admin/templates/kpi_definitions/new.html.twig', [
+        View::render('@modules/Admin/templates/kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
