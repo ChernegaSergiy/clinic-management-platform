@@ -154,21 +154,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         ]);
     }
 
-    public function getWaitlistEntries(string $status = 'pending'): array
+    public function getWaitlistEntries(?string $status = 'pending'): array
     {
         $sql = "SELECT 
                     wl.id,
-                    CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                    CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                    COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name,
+                    COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name,
                     wl.desired_start_time,
                     wl.desired_end_time,
                     wl.notes,
                     wl.status,
                     wl.created_at
                 FROM waitlists wl
-                JOIN patients p ON wl.patient_id = p.id
+                LEFT JOIN patients p ON wl.patient_id = p.id
                 LEFT JOIN users u ON wl.desired_doctor_id = u.id
-                WHERE wl.status = :status
+                WHERE (:status IS NULL OR wl.status = :status)
                 ORDER BY wl.created_at ASC";
         
         $stmt = $this->pdo->prepare($sql);
