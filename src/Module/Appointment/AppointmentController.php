@@ -49,9 +49,9 @@ class AppointmentController
             'doctors' => $doctors,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
-            'success_message' => $_SESSION['success_message'] ?? null,
+            'success_message' => $_SESSION['public_success_message'] ?? null,
         ]);
-        unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['success_message']);
+        unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['public_success_message']);
     }
 
     public function submitPublicForm(): void
@@ -79,7 +79,7 @@ class AppointmentController
             'notes' => sprintf("Заявка з публічної форми. Контакт: %s, Email: %s. Коментар: %s", $_POST['phone'], $_POST['email'] ?? '', $_POST['notes'] ?? ''),
         ]);
 
-        $_SESSION['success_message'] = 'Заявку на прийом надіслано. Ми зв\'яжемося для підтвердження.';
+        $_SESSION['public_success_message'] = 'Заявку на прийом надіслано. Ми зв\'яжемося для підтвердження.';
         header('Location: /book-appointment');
         exit();
     }
