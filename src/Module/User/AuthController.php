@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\User;
 
 use App\Core\View;
 use App\Core\Validator;
-use App\Repository\UserRepository;
+use App\Module\User\Repository\UserRepository;
 use App\Core\AuthGuard;
 
 class AuthController
