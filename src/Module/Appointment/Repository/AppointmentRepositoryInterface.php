@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Module\Appointment\Repository;
 
 interface AppointmentRepositoryInterface
 {
