@@ -111,12 +111,16 @@ class AppointmentController
     {
         AuthGuard::check();
 
-        // Normalize HTML datetime-local to DB format before validation
+        $rawInput = $_POST;
+
+        // Normalize HTML datetime-local (or localized input) to DB format before validation
         foreach (['start_time', 'end_time'] as $field) {
             if (!empty($_POST[$field])) {
                 try {
-                    $dt = new \DateTime($_POST[$field]);
+                    $dt = $this->normalizeDateTime($_POST[$field]);
                     $_POST[$field] = $dt->format('Y-m-d H:i:s');
+                    // Save back a value suitable for datetime-local input
+                    $_POST[$field . '_input'] = $dt->format('Y-m-d\TH:i');
                 } catch (\Exception $e) {
                     // leave as is; validator will catch format issues
                 }
@@ -130,6 +134,13 @@ class AppointmentController
             'start_time' => ['required', 'datetime'],
             'end_time' => ['required', 'datetime'],
         ];
+
+        // Validate end after start
+        if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
+            if (strtotime($_POST['end_time']) <= strtotime($_POST['start_time'])) {
+                $validator->addError('end_time', 'Час закінчення має бути пізніше за час початку.');
+            }
+        }
 
         if (!$validator->validate($_POST, $rules)) {
             $errors = [];
@@ -151,7 +162,10 @@ class AppointmentController
 
             View::render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
-                'old' => $_POST,
+                'old' => array_merge($rawInput, [
+                    'start_time' => $_POST['start_time_input'] ?? $rawInput['start_time'] ?? null,
+                    'end_time' => $_POST['end_time_input'] ?? $rawInput['end_time'] ?? null,
+                ]),
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
             ]);
@@ -174,6 +188,27 @@ class AppointmentController
 
         header('Location: /appointments');
         exit();
+    }
+
+    private function normalizeDateTime(string $value): \DateTime
+    {
+        // Try common formats: datetime-local (with T), locale with comma, plain
+        $formats = [
+            'Y-m-d\TH:i',
+            'Y-m-d H:i',
+            'Y-m-d H:i:s',
+            'd.m.Y, H:i',
+            'd.m.Y H:i',
+            'd.m.Y',
+        ];
+        foreach ($formats as $format) {
+            $dt = \DateTime::createFromFormat($format, $value);
+            if ($dt instanceof \DateTime) {
+                return $dt;
+            }
+        }
+        // Fallback to PHP's parser
+        return new \DateTime($value);
     }
 
     public function json(): void
