@@ -71,7 +71,7 @@ class AppointmentController
 
         // For now, just enqueue to waitlist with minimal fields
         $this->appointmentRepository->addToWaitlist([
-            'patient_id' => 0,
+            'patient_id' => null,
             'desired_doctor_id' => $_POST['doctor_id'] ?: null,
             'desired_start_time' => $_POST['desired_date'],
             'desired_end_time' => null,
