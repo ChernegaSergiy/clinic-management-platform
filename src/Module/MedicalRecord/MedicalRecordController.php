@@ -43,7 +43,12 @@ class MedicalRecordController
             return;
         }
 
-        View::render('@modules/MedicalRecord/templates/new.html.twig', ['appointment' => $appointment]);
+        View::render('@modules/MedicalRecord/templates/new.html.twig', [
+            'appointment' => $appointment,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
     }
 
     public function store(): void
@@ -57,6 +62,29 @@ class MedicalRecordController
             http_response_code(404);
             echo "Запис не знайдено";
             return;
+        }
+
+        // Normalize visit_date to DB format
+        if (!empty($_POST['visit_date'])) {
+            try {
+                $dt = new \DateTime($_POST['visit_date']);
+                $_POST['visit_date'] = $dt->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                // let validator catch it
+            }
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'diagnosis_code' => ['required'],
+            'visit_date' => ['required', 'datetime'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /medical-records/new?appointment_id=' . $appointmentId);
+            exit();
         }
 
         $data = $_POST;

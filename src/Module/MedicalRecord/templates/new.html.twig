@@ -14,8 +14,8 @@
 
         <form class="ui form" method="POST" action="/medical-records/new?appointment_id={{ appointment.id }}">
             <div class="two fields">
-                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', '', 'text', 'Наприклад, J03.9', {'required': 'required'}) }}
-                {{ forms.input('visit_date', 'Дата візиту', appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', {}, {'required': 'required'})
+                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', old.diagnosis_code ?? '', 'text', 'Наприклад, J03.9', errors.diagnosis_code ?? null, {'required': 'required'}) }}
+                {{ forms.input('visit_date', 'Дата візиту', old.visit_date ?? appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
  }}
             </div>
             <div class="field">
