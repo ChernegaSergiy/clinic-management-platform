@@ -101,6 +101,7 @@ $router->add('POST', '/medical-records/new', [MedicalRecordController::class, 's
 $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);
 $router->add('GET', '/medical-records/edit', [MedicalRecordController::class, 'edit']);
 $router->add('POST', '/medical-records/edit', [MedicalRecordController::class, 'update']);
+$router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
 
 // Lab Order routes
 $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
