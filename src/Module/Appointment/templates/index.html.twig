@@ -76,7 +76,7 @@
             var resources = {{ doctors|json_encode|raw }} || [];
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-                plugins: [ FullCalendar.ResourceTimeline, FullCalendar.DayGrid, FullCalendar.TimeGrid ],
+                plugins: [ FullCalendarResourceTimeline, FullCalendarDayGrid, FullCalendarTimeGrid ],
                 initialView: 'resourceTimelineDay',
                 headerToolbar: {
                     left: 'prev,next today',
