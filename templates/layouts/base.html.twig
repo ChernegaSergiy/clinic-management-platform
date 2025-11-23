@@ -12,7 +12,39 @@
 <div class="ui container">
     <div class="ui stackable secondary menu">
         <a class="header item" href="/dashboard">Клініка Admin</a>
+        <a class="item mobile only" id="mobile-menu-toggle"><i class="bars icon"></i> Меню</a>
+        <div class="item mobile only right floated">
+            {% if session.user is defined %}
+                <a class="item" href="/logout">Вихід</a>
+            {% else %}
+                <a class="item" href="/login">Вхід</a>
+            {% endif %}
+        </div>
         {% if session.user is defined %}
+            <div class="computer only content">
+                <a class="item" href="/dashboard">Панель</a>
+                <a class="item" href="/patients">Пацієнти</a>
+                <a class="item" href="/appointments">Записи</a>
+                <a class="item" href="/inventory">Склад</a>
+                <a class="item" href="/billing">Рахунки</a>
+                <a class="item" href="/admin/users">Користувачі</a>
+                {% if session.user.role_id == 1 %}
+                    <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+                {% endif %}
+            </div>
+            <div class="right menu computer only">
+                <div class="item">Вітаю, {{ session.user.first_name }}</div>
+                <a class="item" href="/logout">Вихід</a>
+            </div>
+        {% else %}
+            <div class="right menu computer only">
+                <a class="item" href="/login">Вхід</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if session.user is defined %}
+        <div class="ui vertical inverted sidebar menu" id="mobile-sidebar">
             <a class="item" href="/dashboard">Панель</a>
             <a class="item" href="/patients">Пацієнти</a>
             <a class="item" href="/appointments">Записи</a>
@@ -22,16 +54,9 @@
             {% if session.user.role_id == 1 %}
                 <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
             {% endif %}
-            <div class="right menu">
-                <div class="item">Вітаю, {{ session.user.first_name }}</div>
-                <a class="item" href="/logout">Вихід</a>
-            </div>
-        {% else %}
-            <div class="right menu">
-                <a class="item" href="/login">Вхід</a>
-            </div>
-        {% endif %}
-    </div>
+            <a class="item" href="/logout">Вихід</a>
+        </div>
+    {% endif %}
 
     {% if session.success_message %}
         <div class="ui success message">
@@ -85,6 +110,12 @@
                     ;
                 })
             ;
+            $('#mobile-menu-toggle').on('click', function() {
+                $('#mobile-sidebar')
+                    .sidebar({ transition: 'overlay' })
+                    .sidebar('toggle')
+                ;
+            });
         });
     </script>
 {% endblock %}
