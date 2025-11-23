@@ -65,7 +65,6 @@ $router->add('POST', '/install', [InstallController::class, 'install']);
 $router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
 $router->add('POST', '/login', [AuthController::class, 'login']);
 $router->add('GET', '/logout', [AuthController::class, 'logout']);
-$router->add('GET', '/dashboard', [AuthController::class, 'dashboard']);
 
 // Patient routes
 $router->add('GET', '/patients', [PatientController::class, 'index']);
