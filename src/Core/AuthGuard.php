@@ -7,6 +7,8 @@ class AuthGuard
     public static function check(): void
     {
         if (!isset($_SESSION['user'])) {
+            // Remember intended URL to return after login
+            $_SESSION['intended_url'] = $_SERVER['REQUEST_URI'] ?? '/dashboard';
             header('Location: /login');
             exit();
         }

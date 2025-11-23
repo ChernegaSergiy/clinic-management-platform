@@ -60,7 +60,9 @@ class AuthController
                 'email' => $user['email'],
                 'role_id' => $user['role_id'],
             ];
-            header('Location: /dashboard');
+            $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+            unset($_SESSION['intended_url']);
+            header('Location: ' . $redirect);
             exit();
         } else {
             $_SESSION['errors'] = ['login' => 'Невірний email або пароль.'];
