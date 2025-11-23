@@ -29,8 +29,6 @@
             <a class="ui label yellow">Не з'явився</a>
             <a class="ui label grey">Інше</a>
         </div>
-
-
     </div>
 {% endblock %}
 
@@ -42,8 +40,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives', // For non-commercial use
-                plugins: [ 'dayGridMonth', 'timeGridWeek', 'timeGridDay', 'resourceTimelinePlugin' ],
+                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                plugins: [ 'resourceTimelinePlugin', 'dayGridMonth', 'timeGridWeek', 'timeGridDay' ],
                 initialView: 'resourceTimelineDay',
                 headerToolbar: {
                     left: 'prev,next today',
@@ -52,15 +50,7 @@
                 },
                 resourceAreaHeaderContent: 'Лікарі',
                 resources: {{ doctors|json_encode|raw }},
-                events: '/api/appointments', // API endpoint for events
-                eventDidMount: function(info) {
-                    // Додаємо tooltip або іншу інформацію при наведенні
-                    $(info.el).popup({
-                        title: info.event.title,
-                        content: 'Час: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end.toLocaleTimeString(),
-                        position: 'top center'
-                    });
-                }
+                events: '/api/appointments',
             });
             calendar.render();
         });

@@ -1,0 +1,62 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}Записатися на прийом — Клініка{% endblock %}
+
+{% block body %}
+    <section class="section-block">
+        <div class="section-block__head">
+            <p class="eyebrow">Онлайн-запис</p>
+            <h1 class="section-block__title">Запишіться на прийом</h1>
+            <p class="section-block__subtitle lede">Оберіть лікаря, бажану дату та залиште контакти — ми підтвердимо запис.</p>
+        </div>
+        <div class="content-card">
+            {% if errors is defined and errors %}
+                <div class="alert alert--error">
+                    <ul>
+                        {% for field, messages in errors %}
+                            {% for msg in messages %}
+                                <li>{{ msg }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form class="form-grid" method="POST" action="/book-appointment">
+                <div class="form-grid__row">
+                    <label>Ваше ім'я</label>
+                    <input type="text" name="name" value="{{ old.name ?? '' }}" required>
+                </div>
+                <div class="form-grid__row">
+                    <label>Телефон</label>
+                    <input type="tel" name="phone" value="{{ old.phone ?? '' }}" required>
+                </div>
+                <div class="form-grid__row">
+                    <label>Email (необов'язково)</label>
+                    <input type="email" name="email" value="{{ old.email ?? '' }}">
+                </div>
+                <div class="form-grid__row">
+                    <label>Лікар</label>
+                    <select name="doctor_id">
+                        <option value="">Будь-який доступний</option>
+                        {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}" {% if old.doctor_id is defined and old.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-grid__row">
+                    <label>Бажана дата</label>
+                    <input type="date" name="desired_date" value="{{ old.desired_date ?? '' }}" required>
+                </div>
+                <div class="form-grid__row">
+                    <label>Коментар</label>
+                    <textarea name="notes" rows="3" placeholder="Симптоми чи побажання">{{ old.notes ?? '' }}</textarea>
+                </div>
+                <div class="form-grid__actions">
+                    <button type="submit" class="button button--primary">Надіслати запит</button>
+                    <a href="/" class="button button--ghost">На головну</a>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

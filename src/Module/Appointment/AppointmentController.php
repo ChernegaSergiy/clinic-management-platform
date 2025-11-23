@@ -42,6 +42,47 @@ class AppointmentController
         ]);
     }
 
+    public function publicForm(): void
+    {
+        $doctors = $this->userRepository->findAllDoctors();
+        View::render('@modules/Appointment/templates/public/book.html.twig', [
+            'doctors' => $doctors,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function submitPublicForm(): void
+    {
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'phone' => ['required'],
+            'desired_date' => ['required', 'date'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /book-appointment');
+            exit();
+        }
+
+        // For now, just enqueue to waitlist with minimal fields
+        $this->appointmentRepository->addToWaitlist([
+            'patient_id' => 0,
+            'desired_doctor_id' => $_POST['doctor_id'] ?: null,
+            'desired_start_time' => $_POST['desired_date'],
+            'desired_end_time' => null,
+            'notes' => sprintf("Заявка з публічної форми. Контакт: %s, Email: %s. Коментар: %s", $_POST['phone'], $_POST['email'] ?? '', $_POST['notes'] ?? ''),
+        ]);
+
+        $_SESSION['success_message'] = 'Заявку на прийом надіслано. Ми зв\'яжемося для підтвердження.';
+        header('Location: /book-appointment');
+        exit();
+    }
+
     public function create(): void
     {
         AuthGuard::check();
