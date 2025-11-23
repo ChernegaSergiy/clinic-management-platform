@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\MedicalRecord;
 
 use App\Core\View;
-use App\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\MedicalRecordRepository;
