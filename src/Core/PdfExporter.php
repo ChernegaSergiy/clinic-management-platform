@@ -14,7 +14,10 @@ class PdfExporter
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'dejavusans');
         $this->dompdf = new Dompdf($options);
+        // Ensure UTF-8 handling
+        $this->dompdf->setPaper('A4', 'portrait');
     }
 
     public function loadHtml(string $html): void
