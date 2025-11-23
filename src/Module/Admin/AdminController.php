@@ -5,10 +5,10 @@ namespace App\Module\Admin;
 use App\Core\View;
 use App\Repository\UserRepository;
 use App\Repository\RoleRepository;
-use App\Repository\DictionaryRepository;
-use App\Repository\AuthConfigRepository;
-use App\Repository\BackupPolicyRepository;
-use App\Repository\KpiRepository;
+use App\Module\Admin\Repository\DictionaryRepository;
+use App\Module\Admin\Repository\AuthConfigRepository;
+use App\Module\Admin\Repository\BackupPolicyRepository;
+use App\Module\Admin\Repository\KpiRepository;
 use App\Core\AuthGuard;
 
 class AdminController
