@@ -382,7 +382,7 @@ class BillingController
             exit();
         }
 
-        $html = View::renderToString('billing/export_pdf.html.twig', ['invoices' => $invoices]);
+        $html = View::renderToString('@modules/Billing/templates/export_pdf.html.twig', ['invoices' => $invoices]);
 
         $pdfExporter = new PdfExporter();
         $pdfExporter->loadHtml($html);
