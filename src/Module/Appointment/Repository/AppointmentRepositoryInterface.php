@@ -11,4 +11,6 @@ interface AppointmentRepositoryInterface
     public function update(int $id, array $data): bool;
     public function updateStatus(int $id, string $status): bool;
     // public function delete(int $id): bool;
+    public function findWaitlistById(int $id): ?array;
+    public function updateWaitlistStatus(int $id, string $status): bool;
 }

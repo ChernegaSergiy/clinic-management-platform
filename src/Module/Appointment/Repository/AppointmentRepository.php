@@ -97,6 +97,29 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return $stmt->execute([':status' => $status, ':id' => $id]);
     }
 
+    public function findWaitlistById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                wl.*,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM waitlists wl
+            LEFT JOIN patients p ON wl.patient_id = p.id
+            LEFT JOIN users u ON wl.desired_doctor_id = u.id
+            WHERE wl.id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result === false ? null : $result;
+    }
+
+    public function updateWaitlistStatus(int $id, string $status): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE waitlists SET status = :status WHERE id = :id");
+        return $stmt->execute([':status' => $status, ':id' => $id]);
+    }
+
     public function findByPatientId(int $patientId): array
     {
         $stmt = $this->pdo->prepare("

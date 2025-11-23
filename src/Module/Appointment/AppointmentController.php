@@ -90,6 +90,25 @@ class AppointmentController
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
+        $waitlistId = (int)($_GET['waitlist_id'] ?? 0);
+        $prefill = [];
+        if ($waitlistId) {
+            $entry = $this->appointmentRepository->findWaitlistById($waitlistId);
+            if ($entry) {
+                $prefill['waitlist_id'] = $waitlistId;
+                if (!empty($entry['desired_doctor_id'])) {
+                    $prefill['doctor_id'] = $entry['desired_doctor_id'];
+                }
+                if (!empty($entry['desired_start_time'])) {
+                    try {
+                        $dt = $this->normalizeDateTime($entry['desired_start_time']);
+                        $prefill['start_time'] = $dt->format('Y-m-d\TH:i');
+                    } catch (\Exception $e) {
+                        // ignore
+                    }
+                }
+            }
+        }
 
         $patientOptions = [];
         foreach ($patients as $patient) {
@@ -104,6 +123,7 @@ class AppointmentController
         View::render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
+            'old' => $prefill,
         ]);
     }
 
@@ -379,6 +399,10 @@ class AppointmentController
         }
 
         $this->appointmentRepository->update($id, $_POST);
+        // If this came from waitlist conversion, mark entry fulfilled
+        if (!empty($_POST['waitlist_id'])) {
+            $this->appointmentRepository->updateWaitlistStatus((int)$_POST['waitlist_id'], 'fulfilled');
+        }
         header('Location: /appointments/show?id=' . $id);
         exit();
     }
