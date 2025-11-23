@@ -78,11 +78,28 @@ class AppointmentController
             'desired_doctor_id' => $_POST['doctor_id'] ?: null,
             'desired_start_time' => $_POST['desired_date'],
             'desired_end_time' => null,
-            'notes' => sprintf("Заявка з публічної форми. Контакт: %s, Email: %s. Коментар: %s", $_POST['phone'], $_POST['email'] ?? '', $_POST['notes'] ?? ''),
+            'contact_phone' => $_POST['phone'] ?? null,
+            'contact_email' => $_POST['email'] ?? null,
+            'notes' => $_POST['notes'] ?? null,
         ]);
 
         $_SESSION['public_success_message'] = 'Заявку на прийом надіслано. Ми зв\'яжемося для підтвердження.';
         header('Location: /book-appointment');
+        exit();
+    }
+
+    public function rejectWaitlist(): void
+    {
+        AuthGuard::check();
+        $id = (int)($_POST['id'] ?? 0);
+        $entry = $this->appointmentRepository->findWaitlistById($id);
+        if (!$entry) {
+            http_response_code(404);
+            echo "Заявку не знайдено";
+            return;
+        }
+        $this->appointmentRepository->updateWaitlistStatus($id, 'rejected');
+        header('Location: /appointments');
         exit();
     }
 
@@ -401,10 +418,6 @@ class AppointmentController
         }
 
         $this->appointmentRepository->update($id, $_POST);
-        // If this came from waitlist conversion, mark entry fulfilled
-        if (!empty($_POST['waitlist_id'])) {
-            $this->appointmentRepository->updateWaitlistStatus((int)$_POST['waitlist_id'], 'fulfilled');
-        }
         header('Location: /appointments/show?id=' . $id);
         exit();
     }

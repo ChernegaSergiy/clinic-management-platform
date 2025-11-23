@@ -38,9 +38,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Пацієнт</th>
+                            <th>Номер</th>
                             <th>Бажаний лікар</th>
                             <th>Дата</th>
                             <th>Нотатки</th>
+                            <th>Контакт</th>
                             <th>Статус</th>
                             <th>Дії</th>
                         </tr>
@@ -50,18 +52,25 @@
                             <tr>
                                 <td>{{ entry.id }}</td>
                                 <td>{{ entry.patient_name ?? 'Невідомо' }}</td>
+                                <td>{{ entry.ticket_number ?? '—' }}</td>
                                 <td>{{ entry.doctor_name ?? 'Будь-який' }}</td>
                                 <td>{{ entry.desired_start_time ?: '—' }}</td>
                                 <td>{{ entry.notes ?: '—' }}</td>
+                                <td>
+                                    {% if entry.contact_phone %}<div>{{ entry.contact_phone }}</div>{% endif %}
+                                    {% if entry.contact_email %}<div>{{ entry.contact_email }}</div>{% endif %}
+                                </td>
                                 <td>{{ entry.status }}</td>
                                 <td>
                                     <a class="ui tiny primary button" href="/appointments/new?waitlist_id={{ entry.id }}">Створити запис</a>
+                                    <form action="/appointments/waitlist/reject" method="POST" style="display:inline;">
+                                        <input type="hidden" name="id" value="{{ entry.id }}">
+                                        <button type="submit" class="ui tiny negative button">Відхилити</button>
+                                    </form>
                                 </td>
                             </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="7" class="center aligned">Немає заявок у списку очікування.</td>
-                            </tr>
+                            <tr><td colspan="8" class="center aligned">Немає заявок у списку очікування.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

@@ -13,4 +13,5 @@ interface AppointmentRepositoryInterface
     // public function delete(int $id): bool;
     public function findWaitlistById(int $id): ?array;
     public function updateWaitlistStatus(int $id, string $status): bool;
+    public function generateWaitlistTicket(): string;
 }

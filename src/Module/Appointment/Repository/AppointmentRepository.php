@@ -35,8 +35,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes) 
-                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes)";
+        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id) 
+                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -47,6 +47,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':end_time' => $data['end_time'],
             ':status' => $data['status'] ?? 'scheduled', // Встановлюємо статус за замовчуванням
             ':notes' => $data['notes'] ?? null,
+            ':waitlist_id' => $data['waitlist_id'] ?? null,
         ]);
     }
 
@@ -102,8 +103,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt = $this->pdo->prepare("
             SELECT 
                 wl.*,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+                COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name,
+                COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name
             FROM waitlists wl
             LEFT JOIN patients p ON wl.patient_id = p.id
             LEFT JOIN users u ON wl.desired_doctor_id = u.id
@@ -147,7 +148,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 a.start_time, 
                 a.end_time, 
                 a.status,
-                a.doctor_id
+                a.doctor_id,
+                a.waitlist_id
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
@@ -163,17 +165,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
     public function addToWaitlist(array $data): bool
     {
-        $sql = "INSERT INTO waitlists (patient_id, desired_doctor_id, desired_start_time, desired_end_time, notes) 
-                VALUES (:patient_id, :desired_doctor_id, :desired_start_time, :desired_end_time, :notes)";
+        $ticket = $data['ticket_number'] ?? $this->generateWaitlistTicket();
+        $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, desired_start_time, desired_end_time, notes, contact_phone, contact_email) 
+                VALUES (:ticket_number, :patient_id, :desired_doctor_id, :desired_start_time, :desired_end_time, :notes, :contact_phone, :contact_email)";
         
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
+            ':ticket_number' => $ticket,
             ':patient_id' => $data['patient_id'],
             ':desired_doctor_id' => $data['desired_doctor_id'] ?? null,
             ':desired_start_time' => $data['desired_start_time'] ?? null,
             ':desired_end_time' => $data['desired_end_time'] ?? null,
             ':notes' => $data['notes'] ?? null,
+            ':contact_phone' => $data['contact_phone'] ?? null,
+            ':contact_email' => $data['contact_email'] ?? null,
         ]);
     }
 
@@ -181,11 +187,14 @@ class AppointmentRepository implements AppointmentRepositoryInterface
     {
         $sql = "SELECT 
                     wl.id,
+                    wl.ticket_number,
                     COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name,
                     COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name,
                     wl.desired_start_time,
                     wl.desired_end_time,
                     wl.notes,
+                    wl.contact_phone,
+                    wl.contact_email,
                     wl.status,
                     wl.created_at
                 FROM waitlists wl
@@ -197,6 +206,15 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':status' => $status]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function generateWaitlistTicket(): string
+    {
+        $year = date('Y');
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM waitlists WHERE YEAR(created_at) = :year");
+        $stmt->execute([':year' => $year]);
+        $count = (int)$stmt->fetchColumn() + 1;
+        return sprintf('WL-%s-%05d', $year, $count);
     }
 
     public function findAppointmentsForReminder(int $minutesBefore): array
