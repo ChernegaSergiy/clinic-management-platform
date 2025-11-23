@@ -4,7 +4,7 @@ namespace App\Module\Patient;
 
 use App\Core\Validator;
 use App\Core\View;
-use App\Repository\MedicalRecordRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\Patient\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;

@@ -10,7 +10,7 @@ use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\QrCodeGenerator;
 use App\Core\LabImportService;
-use App\Repository\LabResourceRepository;
+use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Core\AuthGuard;
 
 class LabOrderController

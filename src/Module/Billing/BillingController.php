@@ -4,10 +4,10 @@ namespace App\Module\Billing;
 
 use App\Core\View;
 use App\Core\Validator;
-use App\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Repository\MedicalRecordRepository;
-use App\Repository\PatientRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
 use App\Core\CsvExporter;

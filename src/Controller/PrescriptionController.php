@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Core\Validator;
 use App\Core\View;
-use App\Repository\PatientRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use App\Repository\PrescriptionRepository;
-use App\Repository\MedicalRecordRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;

@@ -3,8 +3,8 @@
 namespace App\Module\Dashboard;
 
 use App\Core\View;
-use App\Repository\PatientRepository;
-use App\Repository\AppointmentRepository;
+use App\Module\Patient\Repository\PatientRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
 
