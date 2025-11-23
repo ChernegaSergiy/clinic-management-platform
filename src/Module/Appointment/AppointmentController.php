@@ -111,6 +111,18 @@ class AppointmentController
     {
         AuthGuard::check();
 
+        // Normalize HTML datetime-local to DB format before validation
+        foreach (['start_time', 'end_time'] as $field) {
+            if (!empty($_POST[$field])) {
+                try {
+                    $dt = new \DateTime($_POST[$field]);
+                    $_POST[$field] = $dt->format('Y-m-d H:i:s');
+                } catch (\Exception $e) {
+                    // leave as is; validator will catch format issues
+                }
+            }
+        }
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
@@ -120,6 +132,11 @@ class AppointmentController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
+            $errors = [];
+            foreach ($validator->getErrors() as $key => $messages) {
+                $errors[$key] = is_array($messages) ? reset($messages) : $messages;
+            }
+
             // Повторне завантаження даних для форми у випадку помилки
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
@@ -133,7 +150,7 @@ class AppointmentController
             }
 
             View::render('@modules/Appointment/templates/new.html.twig', [
-                'errors' => $validator->getErrors(),
+                'errors' => $errors,
                 'old' => $_POST,
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
