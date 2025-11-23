@@ -82,7 +82,7 @@ class PrescriptionController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-        View::render('@modules/Prescription/templates/new.html.twig', [
+            View::render('@modules/Prescription/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
