@@ -6,7 +6,7 @@ use App\Core\Router;
 use App\Controller\PageController;
 use App\Controller\AuthController;
 use App\Module\Patient\PatientController;
-use App\Controller\AppointmentController;
+use App\Module\Appointment\AppointmentController;
 use App\Controller\MedicalRecordController;
 use App\Controller\LabOrderController;
 use App\Controller\InventoryController;

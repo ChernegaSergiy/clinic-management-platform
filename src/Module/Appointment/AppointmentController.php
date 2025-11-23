@@ -33,7 +33,7 @@ class AppointmentController
             $doctorOptions[] = ['id' => $doctor['id'], 'title' => $doctor['full_name']];
         }
 
-        View::render('appointments/index.html.twig', [
+        View::render('@modules/Appointment/templates/index.html.twig', [
             //'appointments' => $appointments, // Removed, will be fetched via JSON
             'doctors' => $doctorOptions,
         ]);
@@ -56,7 +56,7 @@ class AppointmentController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('appointments/new.html.twig', [
+        View::render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
         ]);
@@ -87,7 +87,7 @@ class AppointmentController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('appointments/new.html.twig', [
+            View::render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patients' => $patientOptions,
@@ -163,7 +163,7 @@ class AppointmentController
             return;
         }
 
-        View::render('appointments/show.html.twig', ['appointment' => $appointment]);
+        View::render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
     }
 
     public function edit(): void
@@ -192,7 +192,7 @@ class AppointmentController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('appointments/edit.html.twig', [
+        View::render('@modules/Appointment/templates/edit.html.twig', [
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -233,7 +233,7 @@ class AppointmentController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('appointments/edit.html.twig', [
+            View::render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'appointment' => array_merge($appointment, $_POST),
                 'patients' => $patientOptions,
@@ -304,7 +304,7 @@ class AppointmentController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('appointments/waitlist.html.twig', [
+        View::render('@modules/Appointment/templates/waitlist.html.twig', [
             'waitlistEntries' => $waitlistEntries,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -337,7 +337,7 @@ class AppointmentController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('appointments/waitlist.html.twig', [
+            View::render('@modules/Appointment/templates/waitlist.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'waitlistEntries' => $waitlistEntries,
@@ -359,7 +359,7 @@ class AppointmentController
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
 
-        View::render('appointments/load_analytics.html.twig', [
+        View::render('@modules/Appointment/templates/load_analytics.html.twig', [
             'date' => $date,
             'doctorLoad' => $doctorLoad,
         ]);
