@@ -30,38 +30,75 @@
             <a class="ui label grey">Інше</a>
         </div>
 
-        <div class="ui divider"></div>
-        <h3 class="ui header">Заявки з публічної форми (waitlist)</h3>
-        <table class="ui celled table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Пацієнт</th>
-                    <th>Бажаний лікар</th>
-                    <th>Дата</th>
-                    <th>Нотатки</th>
-                    <th>Статус</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in waitlist %}
-                    <tr>
-                        <td>{{ entry.id }}</td>
-                        <td>{{ entry.patient_name ?? 'Невідомо' }}</td>
-                        <td>{{ entry.doctor_name ?? 'Будь-який' }}</td>
-                        <td>{{ entry.desired_start_time ?: '—' }}</td>
-                        <td>{{ entry.notes ?: '—' }}</td>
-                        <td>{{ entry.status }}</td>
-                        <td><a class="ui mini button" href="/appointments/edit?id={{ entry.id }}">Деталі</a></td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="center aligned">Немає заявок у списку очікування.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">Заявки з публічної форми (waitlist)</h3>
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Пацієнт</th>
+                            <th>Бажаний лікар</th>
+                            <th>Дата</th>
+                            <th>Нотатки</th>
+                            <th>Статус</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in waitlist %}
+                            <tr>
+                                <td>{{ entry.id }}</td>
+                                <td>{{ entry.patient_name ?? 'Невідомо' }}</td>
+                                <td>{{ entry.doctor_name ?? 'Будь-який' }}</td>
+                                <td>{{ entry.desired_start_time ?: '—' }}</td>
+                                <td>{{ entry.notes ?: '—' }}</td>
+                                <td>{{ entry.status }}</td>
+                                <td>
+                                    <a class="ui tiny primary button" href="/appointments/new?waitlist_id={{ entry.id }}">Створити запис</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="center aligned">Немає заявок у списку очікування.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="eight wide column">
+                <h3 class="ui header">Список записів</h3>
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Пацієнт</th>
+                            <th>Лікар</th>
+                            <th>Початок</th>
+                            <th>Статус</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                            <tr>
+                                <td>{{ appt.id }}</td>
+                                <td>{{ appt.patient_name }}</td>
+                                <td>{{ appt.doctor_name }}</td>
+                                <td>{{ appt.start_time|date('Y-m-d H:i') }}</td>
+                                <td>{{ appt.status }}</td>
+                                <td>
+                                    <a class="ui tiny button" href="/appointments/show?id={{ appt.id }}">Переглянути</a>
+                                    <a class="ui tiny primary button" href="/appointments/edit?id={{ appt.id }}">Редагувати</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="6" class="center aligned">Немає записів.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

@@ -30,6 +30,7 @@ class AppointmentController
         AuthGuard::check();
         $doctors = $this->userRepository->findAllDoctors();
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
+        $appointments = $this->appointmentRepository->findAll();
 
         $doctorOptions = [];
         foreach ($doctors as $doctor) {
@@ -39,6 +40,7 @@ class AppointmentController
         View::render('@modules/Appointment/templates/index.html.twig', [
             'doctors' => $doctorOptions,
             'waitlist' => $waitlist,
+            'appointments' => $appointments,
         ]);
     }
 
