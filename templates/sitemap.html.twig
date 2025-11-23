@@ -1,16 +1,35 @@
-{% extends "layouts/base.html.twig" %}
+{% extends "layouts/public.html.twig" %}
 
 {% block title %}Карта сайту — Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h2 class="ui header">Карта сайту</h2>
-        <div class="ui list">
-            <a class="item" href="/">Головна</a>
-            <a class="item" href="/about">Про клініку</a>
-            <a class="item" href="/contact">Контакти</a>
-            <a class="item" href="/book-appointment">Записатися</a>
-            <a class="item" href="/appointments">Календар записів (персонал)</a>
+    <section class="section-block">
+        <div class="section-block__head">
+            <p class="eyebrow">Навігація</p>
+            <h1 class="section-block__title">Карта сайту</h1>
+            <p class="section-block__subtitle lede">Швидкі посилання на основні розділи клініки.</p>
         </div>
-    </div>
+        <div class="content-card">
+            <div class="grid grid--two">
+                <div>
+                    <div class="site-footer__title">Публічні сторінки</div>
+                    <ul class="legend-list">
+                        <li><a href="/">Головна</a></li>
+                        <li><a href="/about">Про клініку</a></li>
+                        <li><a href="/contact">Контакти</a></li>
+                        <li><a href="/book-appointment">Записатися</a></li>
+                        <li><a href="/privacy">Політика конфіденційності</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="site-footer__title">Службові</div>
+                    <ul class="legend-list">
+                        <li><a href="/login">Вхід для персоналу</a></li>
+                        <li><a href="/appointments">Календар записів</a></li>
+                        <li><a href="/dashboard">Дашборд</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

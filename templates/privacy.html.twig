@@ -1,11 +1,18 @@
-{% extends "layouts/base.html.twig" %}
+{% extends "layouts/public.html.twig" %}
 
 {% block title %}Політика конфіденційності — Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h2 class="ui header">Політика конфіденційності</h2>
-        <p>Це демонстраційна сторінка. Ми дбаємо про захист ваших даних та використовуємо їх лише для надання послуг клініки.</p>
-        <p>Для деталей зв'яжіться з адміністратором: <a href="mailto:admin@clinic.ua">admin@clinic.ua</a>.</p>
-    </div>
+    <section class="section-block">
+        <div class="section-block__head">
+            <p class="eyebrow">Юридична інформація</p>
+            <h1 class="section-block__title">Політика конфіденційності</h1>
+            <p class="section-block__subtitle lede">Як ми працюємо з персональними даними пацієнтів та відвідувачів сайту.</p>
+        </div>
+        <div class="content-card">
+            <p>Ми збираємо мінімально необхідні дані (ПІБ, контактні дані, інформацію про запис) для надання медичних послуг і комунікації щодо них. Дані не передаються третім сторонам без вашої згоди, окрім випадків, передбачених законом.</p>
+            <p>Ви можете звернутися із запитом на зміну або видалення даних за адресою <a href="mailto:admin@clinic.ua">admin@clinic.ua</a>.</p>
+            <p>Ця сторінка демонстраційна; адаптуйте текст під реальні вимоги клініки та законодавства.</p>
+        </div>
+    </section>
 {% endblock %}
