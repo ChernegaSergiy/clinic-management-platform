@@ -69,8 +69,10 @@ class UserRepository implements UserRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role_id) 
-                VALUES (:first_name, :last_name, :email, :password_hash, :role_id)";
+        $username = $data['username'] ?? $data['email'];
+
+        $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
+                VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
         
         $stmt = $this->pdo->prepare($sql);
 
@@ -78,6 +80,7 @@ class UserRepository implements UserRepositoryInterface
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
             ':email' => $data['email'],
+            ':username' => $username,
             ':password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
             ':role_id' => $data['role_id'],
         ]);
