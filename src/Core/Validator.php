@@ -43,9 +43,7 @@ class Validator
                     if (!empty($value) && !\DateTime::createFromFormat('Y-m-d H:i:s', $value) && !\DateTime::createFromFormat('Y-m-d H:i', $value)) {
                         $this->errors[$field][] = "Поле '{$field}' повинно бути у форматі YYYY-MM-DD HH:MM:SS або YYYY-MM-DD HH:MM.";
                     }
-                }
-
-                if (is_string($rule) && str_starts_with($rule, 'date')) {
+                } elseif (is_string($rule) && $rule === 'date') {
                     if (!empty($value) && !\DateTime::createFromFormat('Y-m-d', $value)) {
                         $this->errors[$field][] = "Поле '{$field}' повинно бути у форматі YYYY-MM-DD.";
                     }
