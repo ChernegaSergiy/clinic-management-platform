@@ -49,8 +49,9 @@ class AppointmentController
             'doctors' => $doctors,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
+            'success_message' => $_SESSION['success_message'] ?? null,
         ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
+        unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['success_message']);
     }
 
     public function submitPublicForm(): void
@@ -240,6 +241,15 @@ class AppointmentController
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
+        ]);
+    }
+
+    public function waitlist(): void
+    {
+        AuthGuard::check();
+        $entries = $this->appointmentRepository->getWaitlistEntries();
+        View::render('@modules/Appointment/templates/waitlist.html.twig', [
+            'entries' => $entries,
         ]);
     }
 

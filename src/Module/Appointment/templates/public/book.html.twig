@@ -21,6 +21,9 @@
                     </ul>
                 </div>
             {% endif %}
+            {% if success_message %}
+                <div class="alert alert--success">{{ success_message }}</div>
+            {% endif %}
 
             <form class="form-grid" method="POST" action="/book-appointment">
                 <div class="form-grid__row">
