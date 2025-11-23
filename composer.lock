@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c28bdef2219e9ecd1b1d24317ba87da5",
+    "content-hash": "1fb5ac6d00b20026cfd6b35c806a446b",
     "packages": [
+        {
+            "name": "chernegasergiy/nk-025-2021-parser",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ChernegaSergiy/nk-025-2021-parser.git",
+                "reference": "cf236e0efb0b4369f5d59cd0fa45ddde09d6e506"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ChernegaSergiy/nk-025-2021-parser/zipball/cf236e0efb0b4369f5d59cd0fa45ddde09d6e506",
+                "reference": "cf236e0efb0b4369f5d59cd0fa45ddde09d6e506",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChernegaSergiy\\Nk0252021Parser\\": "src/",
+                    "ChernegaSergiy\\Nk0252021Parser\\Dto\\": "src/Dto/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LicenseRef-CSSM-Unlimited-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Serhii Cherneha",
+                    "email": "chernegasergiy3@gmail.com"
+                }
+            ],
+            "description": "A PHP library to parse the NK-025-2021 medical classifications from meddata.pp.ua.",
+            "support": {
+                "issues": "https://github.com/ChernegaSergiy/nk-025-2021-parser/issues",
+                "source": "https://github.com/ChernegaSergiy/nk-025-2021-parser/tree/v0.1.0"
+            },
+            "time": "2025-11-23T20:21:40+00:00"
+        },
         {
             "name": "chillerlan/php-qrcode",
             "version": "5.0.4",
