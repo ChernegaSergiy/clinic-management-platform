@@ -32,7 +32,7 @@ class DashboardController
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $lowStockItemsCount = count($lowStockItems);
 
-        View::render('dashboard/index.html.twig', [
+        View::render('@modules/Dashboard/templates/index.html.twig', [
             'patient_count' => $patientCount,
             'upcoming_appointments' => $upcomingAppointments,
             'upcoming_appointments_count' => $upcomingAppointmentsCount,
