@@ -1,0 +1,34 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати медичний запис #{{ record.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати медичний запис #{{ record.id }}</h2>
+        <p><strong>Пацієнт:</strong> {{ record.patient_name ?? '' }}</p>
+        <p><strong>Лікар:</strong> {{ record.doctor_name ?? '' }}</p>
+        <p><strong>Час прийому:</strong> {{ record.start_time|date('Y-m-d H:i') }}</p>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/medical-records/edit?id={{ record.id }}">
+            <input type="hidden" name="id" value="{{ record.id }}">
+            <div class="two fields">
+                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', old.diagnosis_code ?? record.diagnosis_code, 'text', 'Наприклад, J03.9', errors.diagnosis_code ?? null, {'required': 'required'}) }}
+                {{ forms.input('visit_date', 'Дата візиту', old.visit_date ?? record.visit_date|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
+ }}
+            </div>
+            {{ forms.textarea('diagnosis_text', 'Діагноз', old.diagnosis_text ?? record.diagnosis_text, 'Опишіть діагноз') }}
+            {{ forms.textarea('treatment', 'Лікування', old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? record.notes, 'Додаткові примітки') }}
+
+            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <a href="/medical-records/show?id={{ record.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

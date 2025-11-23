@@ -154,6 +154,73 @@ class MedicalRecordController
         echo json_encode($codes);
     }
 
+    public function edit(): void
+    {
+        AuthGuard::check();
+
+        $id = (int)($_GET['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
+        View::render('@modules/MedicalRecord/templates/edit.html.twig', [
+            'record' => $record,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function update(): void
+    {
+        AuthGuard::check();
+
+        $id = (int)($_POST['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
+        if (!empty($_POST['visit_date'])) {
+            try {
+                $dt = new \DateTime($_POST['visit_date']);
+                $_POST['visit_date'] = $dt->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                // let validator handle
+            }
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'diagnosis_code' => ['required'],
+            'visit_date' => ['required', 'datetime'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /medical-records/edit?id=' . $id);
+            exit();
+        }
+
+        $data = $_POST;
+        $data['patient_id'] = $record['patient_id'];
+        $data['appointment_id'] = $record['appointment_id'];
+        $data['doctor_id'] = $record['doctor_id'];
+
+        $this->medicalRecordRepository->update($id, $data);
+
+        header('Location: /medical-records/show?id=' . $id);
+        exit();
+    }
+
     public function uploadAttachment(): void
     {
         AuthGuard::check();
