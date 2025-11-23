@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Core\View;
 use App\Core\Validator;
-use App\Repository\ContractRepository;
+use App\Module\Billing\Repository\ContractRepository;
 use App\Core\AuthGuard;
 
 class ContractController

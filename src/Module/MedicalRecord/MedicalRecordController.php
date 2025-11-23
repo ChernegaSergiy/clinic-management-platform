@@ -6,7 +6,7 @@ use App\Core\View;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Repository\IcdCodeRepository;
 use App\Repository\LabOrderRepository;
-use App\Repository\MedicalRecordRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Core\AttachmentService;
 use App\Core\AuditLogger;
 use App\Core\AuthGuard;

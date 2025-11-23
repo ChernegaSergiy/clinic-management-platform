@@ -2,6 +2,9 @@
 
 namespace App\Module\Appointment;
 
+use App\Core\Validator;
+use App\Core\View;
+use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Patient\Repository\PatientRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
