@@ -20,13 +20,13 @@ class ContractController
     {
         AuthGuard::check();
         $contracts = $this->contractRepository->findAll();
-        View::render('@modules/Billing/templates/billing/contracts/index.html.twig', ['contracts' => $contracts]);
+        View::render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
     public function create(): void
     {
         AuthGuard::check();
-        View::render('@modules/Billing/templates/billing/contracts/new.html.twig', [
+        View::render('@modules/Billing/templates/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -87,7 +87,7 @@ class ContractController
             return;
         }
 
-        View::render('@modules/Billing/templates/billing/contracts/show.html.twig', ['contract' => $contract]);
+        View::render('@modules/Billing/templates/contracts/show.html.twig', ['contract' => $contract]);
     }
 
     public function edit(): void
