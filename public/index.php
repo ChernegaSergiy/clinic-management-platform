@@ -56,6 +56,8 @@ $router = new Router();
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
 $router->add('GET', '/contact', [PageController::class, 'contact']);
+$router->add('GET', '/sitemap', [PageController::class, 'sitemap']);
+$router->add('GET', '/privacy', [PageController::class, 'privacy']);
 
 // Install routes
 $router->add('GET', '/install', [InstallController::class, 'form']);

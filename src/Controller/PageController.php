@@ -22,4 +22,14 @@ class PageController
     {
         View::render('contact/index.html.twig');
     }
+
+    public function sitemap(): void
+    {
+        View::render('sitemap.html.twig');
+    }
+
+    public function privacy(): void
+    {
+        View::render('privacy.html.twig');
+    }
 }
