@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Dashboard;
 
 use App\Core\View;
 use App\Repository\PatientRepository;

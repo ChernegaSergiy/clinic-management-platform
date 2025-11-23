@@ -12,7 +12,7 @@ use App\Module\LabOrder\LabOrderController;
 use App\Module\Inventory\InventoryController;
 use App\Module\Billing\BillingController;
 use App\Module\Admin\AdminController;
-use App\Controller\DashboardController;
+use App\Module\Dashboard\DashboardController;
 use App\Controller\InstallController;
 use App\Core\View;
 
