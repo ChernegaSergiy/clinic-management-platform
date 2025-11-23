@@ -45,7 +45,7 @@ class AdminController
         }
         unset($user); // Break the reference with the last element
 
-        View::render('admin/users.html.twig', ['users' => $users]);
+        View::render('@modules/Admin/templates/admin/users.html.twig', ['users' => $users]);
     }
 
     public function createUser(): void
@@ -63,7 +63,7 @@ class AdminController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('admin/new_user.html.twig', [
+        View::render('@modules/Admin/templates/admin/new_user.html.twig', [
             'roles' => $roleOptions,
             'old' => $old,
             'errors' => $errors,
@@ -116,7 +116,7 @@ class AdminController
         $role = $this->roleRepository->findById($user['role_id']);
         $user['role_name'] = $role['name'] ?? 'Невідома';
 
-        View::render('admin/show_user.html.twig', ['user' => $user]);
+        View::render('@modules/Admin/templates/admin/show_user.html.twig', ['user' => $user]);
     }
 
     public function editUser(): void
@@ -143,7 +143,7 @@ class AdminController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('admin/edit_user.html.twig', [
+        View::render('@modules/Admin/templates/admin/edit_user.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
             'old' => $old,
@@ -227,13 +227,13 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $roles = $this->roleRepository->findAll();
-        View::render('admin/roles.html.twig', ['roles' => $roles]);
+        View::render('@modules/Admin/templates/admin/roles.html.twig', ['roles' => $roles]);
     }
 
     public function createRole(): void
     {
         AuthGuard::isAdmin();
-        View::render('admin/new_role.html.twig', [
+        View::render('@modules/Admin/templates/admin/new_role.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -276,7 +276,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/edit_role.html.twig', [
+        View::render('@modules/Admin/templates/admin/edit_role.html.twig', [
             'role' => $role,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -340,7 +340,7 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $dictionaries = $this->dictionaryRepository->findAll();
-        View::render('admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
+        View::render('@modules/Admin/templates/admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
     public function showDictionary(): void
@@ -356,7 +356,7 @@ class AdminController
         }
 
         $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
-        View::render('admin/dictionaries/show.html.twig', [
+        View::render('@modules/Admin/templates/admin/dictionaries/show.html.twig', [
             'dictionary' => $dictionary,
             'values' => $values,
         ]);
@@ -365,7 +365,7 @@ class AdminController
     public function createDictionary(): void
     {
         AuthGuard::isAdmin();
-        View::render('admin/dictionaries/new.html.twig', [
+        View::render('@modules/Admin/templates/admin/dictionaries/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -408,7 +408,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/dictionaries/edit.html.twig', [
+        View::render('@modules/Admin/templates/admin/dictionaries/edit.html.twig', [
             'dictionary' => $dictionary,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -464,7 +464,7 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        View::render('admin/dictionaries/values/new.html.twig', [
+        View::render('@modules/Admin/templates/admin/dictionaries/values/new.html.twig', [
             'dictionary_id' => $dictionaryId,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -510,7 +510,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/dictionaries/values/edit.html.twig', [
+        View::render('@modules/Admin/templates/admin/dictionaries/values/edit.html.twig', [
             'value' => $value,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -565,13 +565,13 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $configs = $this->authConfigRepository->findAll();
-        View::render('admin/auth_configs/index.html.twig', ['configs' => $configs]);
+        View::render('@modules/Admin/templates/admin/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
     public function createAuthConfig(): void
     {
         AuthGuard::isAdmin();
-        View::render('admin/auth_configs/new.html.twig', [
+        View::render('@modules/Admin/templates/admin/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -615,7 +615,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/auth_configs/edit.html.twig', [
+        View::render('@modules/Admin/templates/admin/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -672,13 +672,13 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $policies = $this->backupPolicyRepository->findAll();
-        View::render('admin/backup_policies/index.html.twig', ['policies' => $policies]);
+        View::render('@modules/Admin/templates/admin/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
     public function createBackupPolicy(): void
     {
         AuthGuard::isAdmin();
-        View::render('admin/backup_policies/new.html.twig', [
+        View::render('@modules/Admin/templates/admin/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -723,7 +723,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/backup_policies/edit.html.twig', [
+        View::render('@modules/Admin/templates/admin/backup_policies/edit.html.twig', [
             'policy' => $policy,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -781,13 +781,13 @@ class AdminController
     {
         AuthGuard::isAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('admin/kpi_definitions/index.html.twig', ['definitions' => $definitions]);
+        View::render('@modules/Admin/templates/admin/kpi_definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createKpiDefinition(): void
     {
         AuthGuard::isAdmin();
-        View::render('admin/kpi_definitions/new.html.twig', [
+        View::render('@modules/Admin/templates/admin/kpi_definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -830,7 +830,7 @@ class AdminController
             return;
         }
 
-        View::render('admin/kpi_definitions/edit.html.twig', [
+        View::render('@modules/Admin/templates/admin/kpi_definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
