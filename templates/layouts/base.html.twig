@@ -10,102 +10,45 @@
 <body>
 
 <div class="ui container">
-    <div class="ui secondary pointing menu">
-                    <a class="item" href="/dashboard">
-                        Дашборд
-                    </a>        <a class="item" href="/about">
-            Про нас
-        </a>
-        <a class="item" href="#">
-            Послуги
-        </a>
-        <a class="item" href="/contact">
-            Контакти
-        </a>
+    <div class="ui stackable secondary pointing menu">
+        <a class="header item" href="/dashboard">Клініка Admin</a>
         {% if session.user is defined %}
-            <a class="item" href="/patients">
-                Пацієнти
-            </a>
-            <a class="item" href="/appointments">
-                Записи
-            </a>
-            <a class="item" href="/inventory">
-                Склад
-            </a>
-            <a class="item" href="/billing">
-                Рахунки
-            </a>
-            <a class="item" href="/admin/users">
-                Користувачі
-            </a>
+            <a class="item" href="/dashboard">Дашборд</a>
+            <a class="item" href="/patients">Пацієнти</a>
+            <a class="item" href="/appointments">Записи</a>
+            <a class="item" href="/inventory">Склад</a>
+            <a class="item" href="/billing">Рахунки</a>
+            <a class="item" href="/admin/users">Користувачі</a>
+            {% if session.user.role_id == 1 %}
+                <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+            {% endif %}
+            <div class="right menu">
+                <div class="item">Вітаю, {{ session.user.first_name }}</div>
+                <a class="item" href="/logout">Вихід</a>
+            </div>
+        {% else %}
+            <div class="right menu">
+                <a class="item" href="/login">Вхід</a>
+            </div>
         {% endif %}
-        <div class="right menu">
-            {% if session.user is defined %}
-                <a class="ui item" href="/logout">
-                    Вийти ({{ session.user.first_name }})
-                </a>
-            {% else %}
-                <a class="ui item" href="/login">
-                    Вхід
-                </a>
-            {% endif %}
-        </div>
     </div>
 
-        <div class="ui container">
-            {% if session.success_message %}
-                <div class="ui success message">
-                    <i class="close icon"></i>
-                    <div class="header">
-                        Успіх!
-                    </div>
-                    <p>{{ session.success_message }}</p>
-                </div>
-            {% endif %}
-            {% if session.error_message %}
-                <div class="ui error message">
-                    <i class="close icon"></i>
-                    <div class="header">
-                        Помилка!
-                    </div>
-                    <p>{{ session.error_message }}</p>
-                </div>
-            {% endif %}
-            {% block body %}{% endblock %}
+    {% if session.success_message %}
+        <div class="ui success message">
+            <i class="close icon"></i>
+            <div class="header">Успіх!</div>
+            <p>{{ session.success_message }}</p>
         </div>
+    {% endif %}
+    {% if session.error_message %}
+        <div class="ui error message">
+            <i class="close icon"></i>
+            <div class="header">Помилка!</div>
+            <p>{{ session.error_message }}</p>
+        </div>
+    {% endif %}
 
-    <div class="ui inverted vertical footer segment">
-        <div class="ui center aligned container">
-            <div class="ui stackable inverted divided grid">
-                <div class="three wide column">
-                    <h4 class="ui inverted header">Клініка</h4>
-                    <div class="ui inverted link list">
-                        <a href="#" class="item">Про нас</a>
-                        <a href="#" class="item">Послуги</a>
-                        <a href="#" class="item">Контакти</a>
-                    </div>
-                </div>
-                <div class="three wide column">
-                    <h4 class="ui inverted header">Пацієнтам</h4>
-                    <div class="ui inverted link list">
-                        <a href="#" class="item">Запис на прийом</a>
-                        <a href="#" class="item">Особистий кабінет</a>
-                        <a href="#" class="item">Питання та відповіді</a>
-                    </div>
-                </div>
-                <div class="seven wide column">
-                    <h4 class="ui inverted header">Контактна інформація</h4>
-                    <p>м. Київ, вул. Хрещатик, 1</p>
-                    <p>+380 (44) 123-45-67</p>
-                </div>
-            </div>
-            <div class="ui inverted section divider"></div>
-            <div class="ui horizontal inverted small divided link list">
-                <a class="item" href="/sitemap">Карта сайту</a>
-                <a class="item" href="/privacy">Політика конфіденційності</a>
-            </div>
-        </div>
-    </div>
+    {% block body %}{% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
