@@ -22,7 +22,7 @@ class InventoryController
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
 
-        View::render('inventory/index.html.twig', [
+        View::render('@modules/Inventory/templates/index.html.twig', [
             'items' => $items,
             'lowStockItems' => $lowStockItems,
             'overStockedItems' => $overStockedItems,
@@ -37,7 +37,7 @@ class InventoryController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('inventory/new.html.twig', [
+        View::render('@modules/Inventory/templates/new.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'min_stock_level' => $old['min_stock_level'] ?? 0,
@@ -84,7 +84,7 @@ class InventoryController
 
         $movementHistory = $this->inventoryItemRepository->getMovementHistory($id);
 
-        View::render('inventory/show.html.twig', [
+        View::render('@modules/Inventory/templates/show.html.twig', [
             'item' => $item,
             'movementHistory' => $movementHistory,
         ]);
@@ -108,7 +108,7 @@ class InventoryController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('inventory/edit.html.twig', [
+        View::render('@modules/Inventory/templates/edit.html.twig', [
             'item' => $item,
             'old' => $old,
             'errors' => $errors,
