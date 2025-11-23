@@ -9,7 +9,7 @@ use App\Module\Patient\PatientController;
 use App\Module\Appointment\AppointmentController;
 use App\Module\MedicalRecord\MedicalRecordController;
 use App\Module\LabOrder\LabOrderController;
-use App\Controller\InventoryController;
+use App\Module\Inventory\InventoryController;
 use App\Controller\BillingController;
 use App\Controller\AdminController;
 use App\Controller\DashboardController;
