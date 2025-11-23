@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Repository\LabOrderRepository;
+use App\Module\LabOrder\Repository\LabOrderRepository;
 use Exception;
 
 class LabImportService
