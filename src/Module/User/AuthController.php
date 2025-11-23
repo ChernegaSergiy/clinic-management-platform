@@ -31,6 +31,9 @@ class AuthController
 
     public function login(): void
     {
+        // Ensure at least one admin exists (useful for fresh installs without seeding)
+        $this->userRepository->ensureDefaultAdminExists();
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'email' => ['required', 'email'],

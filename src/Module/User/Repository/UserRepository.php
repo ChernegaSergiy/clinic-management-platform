@@ -93,4 +93,32 @@ class UserRepository implements UserRepositoryInterface
         $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = :id");
         return $stmt->execute([':id' => $id]);
     }
+
+    public function countUsers(): int
+    {
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    }
+
+    public function ensureDefaultAdminExists(): void
+    {
+        if ($this->countUsers() > 0) {
+            return;
+        }
+
+        $email = $_ENV['ADMIN_EMAIL'] ?? 'admin@clinic.ua';
+        $password = $_ENV['ADMIN_PASSWORD'] ?? 'password';
+
+        $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
+                VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':first_name' => 'Адмін',
+            ':last_name' => 'Адміненко',
+            ':email' => $email,
+            ':username' => 'admin',
+            ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            ':role_id' => 1,
+        ]);
+    }
 }
