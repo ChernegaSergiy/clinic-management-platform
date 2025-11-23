@@ -29,7 +29,7 @@ class IcdCodeRepository
     {
         $this->pdo->beginTransaction();
         try {
-            $this->pdo->exec("TRUNCATE TABLE icd_codes");
+            $this->pdo->exec("DELETE FROM icd_codes");
             $stmt = $this->pdo->prepare("INSERT INTO icd_codes (code, description) VALUES (:code, :description)");
             $count = 0;
             foreach ($rows as $row) {
