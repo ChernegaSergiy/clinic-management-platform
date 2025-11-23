@@ -13,20 +13,15 @@
     <div class="ui stackable secondary menu">
         <a class="header item" href="/dashboard">Клініка Admin</a>
         {% if session.user is defined %}
-            <div class="ui simple dropdown item">
-                Меню <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a class="item" href="/dashboard">Панель</a>
-                    <a class="item" href="/patients">Пацієнти</a>
-                    <a class="item" href="/appointments">Записи</a>
-                    <a class="item" href="/inventory">Склад</a>
-                    <a class="item" href="/billing">Рахунки</a>
-                    <a class="item" href="/admin/users">Користувачі</a>
-                    {% if session.user.role_id == 1 %}
-                        <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
-                    {% endif %}
-                </div>
-            </div>
+            <a class="item" href="/dashboard">Панель</a>
+            <a class="item" href="/patients">Пацієнти</a>
+            <a class="item" href="/appointments">Записи</a>
+            <a class="item" href="/inventory">Склад</a>
+            <a class="item" href="/billing">Рахунки</a>
+            <a class="item" href="/admin/users">Користувачі</a>
+            {% if session.user.role_id == 1 %}
+                <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+            {% endif %}
             <div class="right menu">
                 <div class="item">Вітаю, {{ session.user.first_name }}</div>
                 <a class="item" href="/logout">Вихід</a>
