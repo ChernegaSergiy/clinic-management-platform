@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\LabOrder;
 
 use App\Core\View;
 use App\Core\Validator;
-use App\Repository\MedicalRecordRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Repository\LabOrderRepository;
 use App\Repository\UserRepository;
 use App\Core\NotificationService;
