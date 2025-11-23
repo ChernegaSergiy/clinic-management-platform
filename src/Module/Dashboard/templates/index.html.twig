@@ -1,48 +1,62 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Панель управління - Клініка{% endblock %}
+{% block title %}Панель - Клініка{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h2 class="ui header">Панель управління</h2>
-        <div class="ui divider"></div>
-
-        <div class="ui three statistics">
-            <div class="ui blue statistic">
-                <div class="value">
-                    {{ patient_count }}
-                </div>
-                <div class="label">
-                    Активних пацієнтів
-                </div>
-            </div>
-            <div class="ui green statistic">
-                <div class="value">
-                    {{ upcoming_appointments_count }}
-                </div>
-                <div class="label">
-                    Майбутніх записів
-                </div>
-            </div>
-            <div class="ui orange statistic">
-                <div class="value">
-                    {{ low_stock_items_count }}
-                </div>
-                <div class="label">
-                    Позицій з низьким запасом
+    <div class="ui stackable grid">
+        <div class="eight wide column">
+            <div class="ui top attached header">Панель</div>
+            <div class="ui attached segment">
+                <div class="ui three stackable cards">
+                    <div class="blue card">
+                        <div class="content">
+                            <div class="header">Пацієнти</div>
+                            <div class="description">Активних: {{ patient_count }}</div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/patients" class="ui button fluid">Відкрити</a>
+                        </div>
+                    </div>
+                    <div class="green card">
+                        <div class="content">
+                            <div class="header">Записи</div>
+                            <div class="description">Майбутніх: {{ upcoming_appointments_count }}</div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/appointments" class="ui button fluid">Календар</a>
+                        </div>
+                    </div>
+                    <div class="orange card">
+                        <div class="content">
+                            <div class="header">Склад</div>
+                            <div class="description">Низький запас: {{ low_stock_items_count }}</div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/inventory" class="ui button fluid">До складу</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="eight wide column">
+            <div class="ui top attached header">Заявки</div>
+            <div class="ui attached segment">
+                <div class="ui relaxed divided list">
+                    <div class="item">Заявки з waitlist дивіться на сторінці записів.</div>
+                    <div class="item">Імпорт ICD: <a href="/admin/clinical/icd-import">оновити довідник</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="ui divider"></div>
-
-        <div class="ui two column grid">
+    <div class="ui segment">
+        <div class="ui two column stackable grid">
             <div class="column">
                 <h3 class="ui header">Найближчі записи</h3>
                 {% if upcoming_appointments is empty %}
-                    <p>Немає майбутніх записів.</p>
+                    <div class="ui message">Немає майбутніх записів.</div>
                 {% else %}
-                    <table class="ui celled table">
+                    <table class="ui very basic table">
                         <thead>
                             <tr>
                                 <th>Пацієнт</th>
@@ -65,9 +79,9 @@
             <div class="column">
                 <h3 class="ui header">Позиції з низьким запасом</h3>
                 {% if low_stock_items is empty %}
-                    <p>Наразі немає позицій з низьким запасом.</p>
+                    <div class="ui message">Наразі немає позицій з низьким запасом.</div>
                 {% else %}
-                    <table class="ui celled table">
+                    <table class="ui very basic table">
                         <thead>
                             <tr>
                                 <th>Назва</th>
