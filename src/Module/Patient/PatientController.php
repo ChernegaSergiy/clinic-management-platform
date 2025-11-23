@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Module\Patient;
 
 use App\Core\Validator;
 use App\Core\View;
