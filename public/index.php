@@ -16,6 +16,7 @@ use App\Module\Admin\AdminController;
 use App\Module\Dashboard\DashboardController;
 use App\Controller\InstallController;
 use App\Module\Admin\KpiController;
+use App\Module\ClinicalReference\ClinicalReferenceController;
 use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
@@ -102,6 +103,10 @@ $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 's
 $router->add('GET', '/medical-records/edit', [MedicalRecordController::class, 'edit']);
 $router->add('POST', '/medical-records/edit', [MedicalRecordController::class, 'update']);
 $router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
+
+// Clinical reference routes
+$router->add('GET', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportForm']);
+$router->add('POST', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportRun']);
 
 // Lab Order routes
 $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);

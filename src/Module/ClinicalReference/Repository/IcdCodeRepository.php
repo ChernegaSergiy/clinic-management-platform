@@ -20,6 +20,33 @@ class IcdCodeRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function countAll(): int
+    {
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM icd_codes")->fetchColumn();
+    }
+
+    public function replaceAll(array $rows): int
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $this->pdo->exec("TRUNCATE TABLE icd_codes");
+            $stmt = $this->pdo->prepare("INSERT INTO icd_codes (code, description) VALUES (:code, :description)");
+            $count = 0;
+            foreach ($rows as $row) {
+                $stmt->execute([
+                    ':code' => $row['code'],
+                    ':description' => $row['description'],
+                ]);
+                $count++;
+            }
+            $this->pdo->commit();
+            return $count;
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
+    }
+
     public function searchByCodeOrDescription(string $searchTerm): array
     {
         $sql = "SELECT id, code, description FROM icd_codes WHERE code LIKE :term OR description LIKE :term ORDER BY code ASC LIMIT 20";
