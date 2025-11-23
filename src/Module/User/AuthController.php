@@ -23,7 +23,7 @@ class AuthController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('auth/login.html.twig', [
+        View::render('@modules/User/templates/login.html.twig', [
             'old' => $old,
             'errors' => $errors,
         ]);

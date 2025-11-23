@@ -6,7 +6,7 @@ use App\Core\View;
 use App\Core\Validator;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\LabOrder\Repository\LabOrderRepository;
-use App\Repository\UserRepository;
+use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\QrCodeGenerator;
 use App\Core\LabImportService;

@@ -7,7 +7,7 @@ use App\Core\View;
 use App\Repository\PatientRepository;
 use App\Repository\PrescriptionRepository;
 use App\Repository\MedicalRecordRepository;
-use App\Repository\UserRepository;
+use App\Module\User\Repository\UserRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
 

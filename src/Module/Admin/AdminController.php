@@ -3,8 +3,8 @@
 namespace App\Module\Admin;
 
 use App\Core\View;
-use App\Repository\UserRepository;
-use App\Repository\RoleRepository;
+use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\RoleRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
