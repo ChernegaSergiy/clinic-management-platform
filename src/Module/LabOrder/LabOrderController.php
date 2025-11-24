@@ -20,7 +20,6 @@ class LabOrderController
     private UserRepository $userRepository;
     private NotificationService $notificationService;
     private QrCodeGenerator $qrCodeGenerator;
-    private LabResourceRepository $labResourceRepository;
     private LabImportService $labImportService;
 
     public function __construct()
@@ -30,7 +29,6 @@ class LabOrderController
         $this->userRepository = new UserRepository();
         $this->notificationService = new NotificationService();
         $this->qrCodeGenerator = new QrCodeGenerator();
-        $this->labResourceRepository = new LabResourceRepository();
         $this->labImportService = new LabImportService();
     }
 

@@ -297,7 +297,7 @@ class MedicalRecordController
 
         $fullPath = null;
         foreach ($candidates as $path) {
-            if (!empty($path) && file_exists($path)) {
+            if (file_exists($path)) {
                 $fullPath = $path;
                 break;
             }

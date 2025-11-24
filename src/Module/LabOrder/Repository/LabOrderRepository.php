@@ -26,25 +26,27 @@ class LabOrderRepository implements LabOrderRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|false
     {
         $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, order_code, qr_code_hash, results, status) 
                 VALUES (:patient_id, :doctor_id, :medical_record_id, :order_code, :qr_code_hash, :results, :status)";
         
         $stmt = $this->pdo->prepare($sql);
 
-        // Генерація QR-коду (просто хеш для прототипу)
-        $qrCodeHash = hash('sha256', uniqid(mt_rand(), true));
-
-        return $stmt->execute([
+        $success = $stmt->execute([
             ':patient_id' => $data['patient_id'],
             ':doctor_id' => $data['doctor_id'],
             ':medical_record_id' => $data['medical_record_id'],
             ':order_code' => $data['order_code'],
-            ':qr_code_hash' => $qrCodeHash,
+            ':qr_code_hash' => $data['qr_code_hash'],
             ':results' => $data['results'] ?? null,
             ':status' => $data['status'] ?? 'ordered',
         ]);
+
+        if ($success) {
+            return (int)$this->pdo->lastInsertId();
+        }
+        return false;
     }
 
     public function findById(int $id): ?array

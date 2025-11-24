@@ -44,7 +44,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|false
     {
         $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, diagnosis_code, diagnosis_text, treatment, notes) 
                 VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, :diagnosis_code, :diagnosis_text, :treatment, :notes)";
@@ -63,14 +63,14 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         ]);
 
         if ($success) {
-            $medicalRecordId = $this->pdo->lastInsertId();
+            $medicalRecordId = (int)$this->pdo->lastInsertId();
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
-                $this->attachIcdCodes((int)$medicalRecordId, $data['icd_codes']);
+                $this->attachIcdCodes($medicalRecordId, $data['icd_codes']);
             }
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
-                $this->attachInterventionCodes((int)$medicalRecordId, $data['intervention_codes']);
+                $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
-            return true;
+            return $medicalRecordId;
         }
         return false;
     }
