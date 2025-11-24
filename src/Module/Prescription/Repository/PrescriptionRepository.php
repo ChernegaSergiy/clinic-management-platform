@@ -19,7 +19,14 @@ class PrescriptionRepository
         $this->pdo->beginTransaction();
         try {
             $sql = "INSERT INTO prescriptions (patient_id, doctor_id, medical_record_id, issue_date, expiry_date, notes) 
-                    VALUES (:patient_id, :doctor_id, :medical_record_id, :issue_date, :expiry_date, :notes)";
+                    VALUES (
+                        :patient_id, 
+                        :doctor_id, 
+                        :medical_record_id, 
+                        :issue_date, 
+                        :expiry_date, 
+                        :notes
+                    )";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -65,16 +72,16 @@ class PrescriptionRepository
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                p.*,
-                CONCAT(pat.last_name, ' ', pat.first_name) as patient_name,
-                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name
-            FROM prescriptions p
-            JOIN patients pat ON p.patient_id = pat.id
-            JOIN users doc ON p.doctor_id = doc.id
-            WHERE p.id = :id
-        ");
+        $stmt = $this->pdo->prepare(
+            "SELECT "
+            . "p.*, "
+            . "CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, "
+            . "CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name "
+            . "FROM prescriptions p "
+            . "JOIN patients pat ON p.patient_id = pat.id "
+            . "JOIN users doc ON p.doctor_id = doc.id "
+            . "WHERE p.id = :id"
+        );
         $stmt->execute([':id' => $id]);
         $prescription = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -93,15 +100,15 @@ class PrescriptionRepository
 
     public function findByPatientId(int $patientId): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                p.id, p.issue_date, p.expiry_date,
-                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name
-            FROM prescriptions p
-            JOIN users doc ON p.doctor_id = doc.id
-            WHERE p.patient_id = :patient_id
-            ORDER BY p.issue_date DESC
-        ");
+        $stmt = $this->pdo->prepare(
+            "SELECT "
+            . "p.id, p.issue_date, p.expiry_date, "
+            . "CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name "
+            . "FROM prescriptions p "
+            . "JOIN users doc ON p.doctor_id = doc.id "
+            . "WHERE p.patient_id = :patient_id "
+            . "ORDER BY p.issue_date DESC"
+        );
         $stmt->execute([':patient_id' => $patientId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
