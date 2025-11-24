@@ -139,8 +139,12 @@ class BillingController
         $patientId = $_GET['patient_id'] ?? null;
 
         $patients = $this->patientRepository->findAllActive();
-        $appointments = $patientId ? $this->appointmentRepository->findByPatientId((int)$patientId) : $this->appointmentRepository->findAll();
-        $medicalRecords = $patientId ? $this->medicalRecordRepository->findByPatientId((int)$patientId) : $this->medicalRecordRepository->findAll();
+        $appointments = $patientId 
+            ? $this->appointmentRepository->findByPatientId((int)$patientId) 
+            : $this->appointmentRepository->findAll();
+        $medicalRecords = $patientId 
+            ? $this->medicalRecordRepository->findByPatientId((int)$patientId) 
+            : $this->medicalRecordRepository->findAll();
 
         $patientOptions = [];
         foreach ($patients as $patient) {
@@ -149,12 +153,14 @@ class BillingController
 
         $appointmentOptions = [];
         foreach ($appointments as $appointment) {
-            $appointmentOptions[$appointment['id']] = 'Запис #' . $appointment['id'] . ' - ' . $appointment['patient_name'] . ' (' . $appointment['start_time'] . ')';
+            $appointmentOptions[$appointment['id']] = 'Запис #' . $appointment['id'] 
+            . ' - ' . $appointment['patient_name'] . ' (' . $appointment['start_time'] . ')';
         }
 
         $medicalRecordOptions = [];
         foreach ($medicalRecords as $record) {
-            $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id'] . ' - ' . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
+            $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id'] 
+            . ' - ' . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
         }
 
         $old = $_SESSION['old'] ?? [];
@@ -270,8 +276,12 @@ class BillingController
         $patientId = $invoice['patient_id'];
 
         $patients = $this->patientRepository->findAllActive();
-        $appointments = $this->appointmentRepository->findByPatientId((int)$patientId);
-        $medicalRecords = $this->medicalRecordRepository->findByPatientId((int)$patientId);
+        $appointments = $this->appointmentRepository->findByPatientId(
+            (int)$patientId
+        );
+        $medicalRecords = $this->medicalRecordRepository->findByPatientId(
+            (int)$patientId
+        );
 
         $patientOptions = [];
         foreach ($patients as $patient) {
