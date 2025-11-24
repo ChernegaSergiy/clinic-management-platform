@@ -15,6 +15,8 @@
         {% if session.user.role_id == 1 %}
             <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
             <a class="item" href="/admin/clinical/intervention-import">Імпорт інтервенцій</a>
+        {% endif %}
+        <div class="item">Вітаю, {{ session.user.first_name }}</div>
         <a class="item" href="/logout">Вихід</a>
     {% else %}
         <a class="item" href="/login">Вхід</a>
