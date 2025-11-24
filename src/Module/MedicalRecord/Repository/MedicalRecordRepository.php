@@ -67,6 +67,9 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
                 $this->attachIcdCodes((int)$medicalRecordId, $data['icd_codes']);
             }
+            if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
+                $this->attachInterventionCodes((int)$medicalRecordId, $data['intervention_codes']);
+            }
             return true;
         }
         return false;
@@ -89,6 +92,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 
         if ($result) {
             $result['icd_codes'] = $this->getIcdCodesForMedicalRecord($id);
+            $result['intervention_codes'] = $this->getInterventionCodesForMedicalRecord($id);
         }
         return $result === false ? null : $result;
     }
@@ -128,6 +132,48 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
                 ic.description
             FROM medical_record_icd mri
             JOIN icd_codes ic ON mri.icd_code_id = ic.id
+            WHERE mri.medical_record_id = :medical_record_id
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':medical_record_id' => $medicalRecordId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function attachInterventionCodes(int $medicalRecordId, array $interventionCodeIds): bool
+    {
+        // First, remove existing associations for this medical record
+        $deleteSql = "DELETE FROM medical_record_intervention WHERE medical_record_id = :medical_record_id";
+        $deleteStmt = $this->pdo->prepare($deleteSql);
+        $deleteStmt->execute([':medical_record_id' => $medicalRecordId]);
+
+        if (empty($interventionCodeIds)) {
+            return true; // No codes to attach, but delete was successful
+        }
+
+        // Prepare for batch insert
+        $insertSql = "INSERT INTO medical_record_intervention (medical_record_id, intervention_code_id) VALUES ";
+        $values = [];
+        $params = [];
+        foreach ($interventionCodeIds as $index => $interventionCodeId) {
+            $values[] = "(:medical_record_id_{$index}, :intervention_code_id_{$index})";
+            $params[":medical_record_id_{$index}"] = $medicalRecordId;
+            $params[":intervention_code_id_{$index}"] = $interventionCodeId;
+        }
+        $insertSql .= implode(', ', $values);
+        
+        $insertStmt = $this->pdo->prepare($insertSql);
+        return $insertStmt->execute($params);
+    }
+
+    public function getInterventionCodesForMedicalRecord(int $medicalRecordId): array
+    {
+        $sql = "
+            SELECT 
+                ic.id,
+                ic.code,
+                ic.description
+            FROM medical_record_intervention mri
+            JOIN intervention_codes ic ON mri.intervention_code_id = ic.id
             WHERE mri.medical_record_id = :medical_record_id
         ";
         $stmt = $this->pdo->prepare($sql);
