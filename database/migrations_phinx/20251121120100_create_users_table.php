@@ -8,7 +8,7 @@ class CreateUsersTable extends AbstractMigration
     {
         $table = $this->table('users', ['id' => false, 'primary_key' => 'id']);
         $table->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-        $table->addColumn('username', 'string', ['limit' => 255])
+              ->addColumn('username', 'string', ['limit' => 255])
               ->addColumn('password_hash', 'string', ['limit' => 255])
               ->addColumn('email', 'string', ['limit' => 255])
               ->addColumn('first_name', 'string', ['limit' => 255, 'null' => true])
