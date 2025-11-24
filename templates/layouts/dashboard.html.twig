@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no">
+    <meta name="description" content="Адмін-панель клініки на базі Semantic UI.">
+    <meta name="keywords" content="Semantic-UI, Dashboard, Admin">
+    <meta name="author" content="Clinic Management Platform">
+    <meta name="theme-color" content="#ffffff">
+    <title>{% block title %}Панель управління{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE0x1pHRP4lgI4CkXlrnkpR5V0j1lrjx96aG8mkz7X+Ysb9AA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/dashboard.css" type="text/css">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body id="root">
+    <div class="ui tablet computer only padded grid">
+        <div class="ui inverted borderless top fixed fluid menu">
+            <a class="header item" href="#">{% block brand %}Clinic Admin{% endblock %}</a>
+            <div class="right menu">
+                {% block top_menu %}
+                    <a class="item">Панель</a>
+                    <a class="item">Налаштування</a>
+                    <a class="item">Профіль</a>
+                    <a class="item">Довідка</a>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    <div class="ui mobile only padded grid">
+        <div class="ui top fixed borderless fluid inverted menu">
+            <a class="header item" href="#">{% block mobile_brand %}Clinic Admin{% endblock %}</a>
+            <div class="right menu">
+                <div class="item">
+                    <button class="ui icon toggle basic inverted button">
+                        <i class="content icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ui vertical borderless inverted fluid menu">
+                {% block mobile_menu %}
+                    <a class="item">Панель</a>
+                    <a class="item">Налаштування</a>
+                    <a class="item">Профіль</a>
+                    <a class="item">Довідка</a>
+                    <div class="ui fitted divider"></div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    <div class="ui padded grid">
+        <div class="three wide tablet only three wide computer only column" id="sidebar">
+            <div class="ui vertical borderless fluid text menu">
+                {% block sidebar %}
+                    <a class="active item">Огляд</a>
+                    <a class="item">Звіти</a>
+                    <a class="item">Аналітика</a>
+                    <a class="item">Експорт</a>
+                    <div class="ui hidden divider"></div>
+                    <a class="item">Навігація</a>
+                    <a class="item">Ще пункт</a>
+                    <a class="item">Налаштування</a>
+                    <div class="ui hidden divider"></div>
+                    <a class="item">Macintosh</a>
+                    <a class="item">Linux</a>
+                    <a class="item">Windows</a>
+                {% endblock %}
+            </div>
+        </div>
+        <div class="sixteen wide mobile thirteen wide tablet thirteen wide computer right floated column" id="content">
+            {% if session.success_message %}
+                <div class="ui success message">
+                    <i class="close icon"></i>
+                    <div class="header">Успіх!</div>
+                    <p>{{ session.success_message }}</p>
+                </div>
+            {% endif %}
+            {% if session.error_message %}
+                <div class="ui error message">
+                    <i class="close icon"></i>
+                    <div class="header">Помилка!</div>
+                    <p>{{ session.error_message }}</p>
+                </div>
+            {% endif %}
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    {% block javascripts %}
+        <script>
+            $(document).ready(function() {
+                $('.ui.toggle.button').click(function() {
+                    $('.ui.mobile.only.grid .ui.vertical.menu').toggle(100);
+                });
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

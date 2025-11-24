@@ -1,124 +1,68 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Clinic Management Platform{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
-    {% block stylesheets %}{% endblock %}
-</head>
-<body>
+{% extends "layouts/dashboard.html.twig" %}
 
-<div class="ui container">
-    <div class="ui stackable secondary menu">
-        <a class="header item" href="/dashboard">Клініка Admin</a>
-        <a class="item mobile only" id="mobile-menu-toggle"><i class="bars icon"></i> Меню</a>
-        <div class="item mobile only right floated">
-            {% if session.user is defined %}
-                <a class="item" href="/logout">Вихід</a>
-            {% else %}
-                <a class="item" href="/login">Вхід</a>
-            {% endif %}
-        </div>
-        {% if session.user is defined %}
-            <div class="computer only content">
-                <a class="item" href="/dashboard">Панель</a>
-                <a class="item" href="/patients">Пацієнти</a>
-                <a class="item" href="/appointments">Записи</a>
-                <a class="item" href="/inventory">Склад</a>
-                <a class="item" href="/billing">Рахунки</a>
-                <a class="item" href="/admin/users">Користувачі</a>
-                {% if session.user.role_id == 1 %}
-                    <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
-                {% endif %}
-            </div>
-            <div class="right menu computer only">
-                <div class="item">Вітаю, {{ session.user.first_name }}</div>
-                <a class="item" href="/logout">Вихід</a>
-            </div>
-        {% else %}
-            <div class="right menu computer only">
-                <a class="item" href="/login">Вхід</a>
-            </div>
-        {% endif %}
-    </div>
+{% block title %}Clinic Management Platform{% endblock %}
 
+{% block brand %}Клініка Admin{% endblock %}
+
+{% block top_menu %}
     {% if session.user is defined %}
-        <div class="ui vertical inverted sidebar menu" id="mobile-sidebar">
-            <a class="item" href="/dashboard">Панель</a>
-            <a class="item" href="/patients">Пацієнти</a>
-            <a class="item" href="/appointments">Записи</a>
-            <a class="item" href="/inventory">Склад</a>
-            <a class="item" href="/billing">Рахунки</a>
-            <a class="item" href="/admin/users">Користувачі</a>
-            {% if session.user.role_id == 1 %}
-                <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
-            {% endif %}
-            <a class="item" href="/logout">Вихід</a>
-        </div>
+        <a class="item" href="/dashboard">Панель</a>
+        <a class="item" href="/patients">Пацієнти</a>
+        <a class="item" href="/appointments">Записи</a>
+        <a class="item" href="/inventory">Склад</a>
+        <a class="item" href="/billing">Рахунки</a>
+        <a class="item" href="/admin/users">Користувачі</a>
+        {% if session.user.role_id == 1 %}
+            <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+        {% endif %}
+        <div class="item">Вітаю, {{ session.user.first_name }}</div>
+        <a class="item" href="/logout">Вихід</a>
+    {% else %}
+        <a class="item" href="/login">Вхід</a>
     {% endif %}
+{% endblock %}
 
-    {% if session.success_message %}
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">Успіх!</div>
-            <p>{{ session.success_message }}</p>
-        </div>
+{% block mobile_menu %}
+    {% if session.user is defined %}
+        <a class="item" href="/dashboard">Панель</a>
+        <a class="item" href="/patients">Пацієнти</a>
+        <a class="item" href="/appointments">Записи</a>
+        <a class="item" href="/inventory">Склад</a>
+        <a class="item" href="/billing">Рахунки</a>
+        <a class="item" href="/admin/users">Користувачі</a>
+        {% if session.user.role_id == 1 %}
+            <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+        {% endif %}
+        <div class="ui fitted divider"></div>
+        <a class="item" href="/logout">Вихід</a>
+    {% else %}
+        <a class="item" href="/login">Вхід</a>
     {% endif %}
-    {% if session.error_message %}
-        <div class="ui error message">
-            <i class="close icon"></i>
-            <div class="header">Помилка!</div>
-            <p>{{ session.error_message }}</p>
-        </div>
+{% endblock %}
+
+{% block sidebar %}
+    {% if session.user is defined %}
+        <a class="item" href="/dashboard">Панель</a>
+        <a class="item" href="/patients">Пацієнти</a>
+        <a class="item" href="/appointments">Записи</a>
+        <a class="item" href="/inventory">Склад</a>
+        <a class="item" href="/billing">Рахунки</a>
+        <a class="item" href="/admin/users">Користувачі</a>
+        {% if session.user.role_id == 1 %}
+            <a class="item" href="/admin/clinical/icd-import">Імпорт ICD</a>
+        {% endif %}
+    {% else %}
+        <a class="item" href="/login">Вхід</a>
     {% endif %}
+{% endblock %}
 
-    {% block body %}{% endblock %}
-</div>
-
-<div class="ui inverted vertical segment" style="margin-top: 24px;">
-    <div class="ui stackable grid container">
-        <div class="eight wide column">
-            <h4 class="ui inverted header">Контакти</h4>
-            <p>м. Київ, вул. Хрещатик, 1<br>+380 (44) 123-45-67<br>admin@clinic.ua</p>
-        </div>
-        <div class="five wide column">
-            <h4 class="ui inverted header">Швидкі посилання</h4>
-            <div class="ui inverted link list">
-                <a class="item" href="/about">Про нас</a>
-                <a class="item" href="/contact">Контакти</a>
-                <a class="item" href="/privacy">Політика конфіденційності</a>
-            </div>
-        </div>
-        <div class="three wide column">
-            <h4 class="ui inverted header">Версія</h4>
-            <p>v1.0.0</p>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
 {% block javascripts %}
+    {{ parent() }}
     <script>
         $(document).ready(function() {
-            $('.message .close')
-                .on('click', function() {
-                    $(this)
-                        .closest('.message')
-                        .transition('fade')
-                    ;
-                })
-            ;
-            $('#mobile-menu-toggle').on('click', function() {
-                $('#mobile-sidebar')
-                    .sidebar({ transition: 'overlay' })
-                    .sidebar('toggle')
-                ;
+            $('.message .close').on('click', function() {
+                $(this).closest('.message').transition('fade');
             });
         });
     </script>
 {% endblock %}
-
-</body>
-</html>

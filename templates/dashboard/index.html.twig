@@ -1,0 +1,72 @@
+{% extends "layouts/dashboard.html.twig" %}
+
+{% block title %}Панель клініки{% endblock %}
+
+{% block body %}
+    {% set cards = [
+        { label: 'Лікарі', text: 'Активні зміни сьогодні' },
+        { label: 'Пацієнти', text: 'Нові звернення' },
+        { label: 'Зміни', text: 'Заплановано на тиждень' },
+        { label: 'Операції', text: 'У підготовці' }
+    ] %}
+
+    <div class="ui padded grid">
+        <div class="row">
+            <h1 class="ui huge dividing header">Панель</h1>
+        </div>
+        <div class="center aligned row">
+            {% for card in cards %}
+                <div class="eight wide mobile four wide tablet four wide computer column">
+                    <img class="ui centered small circular image" src="/assets/dashboard/wireframe/square-image.png" alt="{{ card.label }}">
+                    <div class="ui large basic label">{{ card.label }}</div>
+                    <p>{{ card.text }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="ui hidden section divider"></div>
+        <div class="row">
+            <h1 class="ui huge dividing header">Зведена таблиця</h1>
+        </div>
+        <div class="row">
+            <table class="ui single line striped selectable unstackable table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Показник</th>
+                    <th>Поточне</th>
+                    <th>Зміна</th>
+                    <th>Коментар</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set rows = [
+                    { id: '1,001', metric: 'Прийоми', current: '128', delta: '+12%', note: 'Пік уранці' },
+                    { id: '1,002', metric: 'Нові пацієнти', current: '42', delta: '+4%', note: 'Активна реклама' },
+                    { id: '1,003', metric: 'Виписки', current: '18', delta: '-2%', note: 'Стабільно' },
+                    { id: '1,004', metric: 'Склад', current: '86%', delta: '+3%', note: 'Реєстрація поставки' },
+                    { id: '1,005', metric: 'Борги', current: '₴12k', delta: '-6%', note: 'Покращення' },
+                    { id: '1,006', metric: 'Коментарі', current: '34', delta: '+1%', note: 'Зворотний звʼязок' },
+                    { id: '1,007', metric: 'Операції', current: '9', delta: '+2%', note: 'Два перенесено' },
+                    { id: '1,008', metric: 'Швидкі записи', current: '23', delta: '+9%', note: 'Онлайн-форма' },
+                    { id: '1,009', metric: 'Вакцини', current: '73%', delta: '-1%', note: 'Очікується поставка' },
+                    { id: '1,010', metric: 'Лаб. аналізи', current: '54', delta: '+5%', note: 'Новий апарат' },
+                    { id: '1,011', metric: 'Черги', current: '6 хв', delta: '-8%', note: 'Оптимізація' },
+                    { id: '1,012', metric: 'Дзвінки', current: '312', delta: '+11%', note: 'Пік зранку' },
+                    { id: '1,013', metric: 'Задоволеність', current: '4.7/5', delta: '+0.1', note: 'Опитування' },
+                    { id: '1,014', metric: 'Лікарняні', current: '3', delta: '0%', note: 'Без змін' },
+                    { id: '1,015', metric: 'Перевірки', current: '2', delta: '-1', note: 'Закрито одну' }
+                ] %}
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.metric }}</td>
+                        <td>{{ row.current }}</td>
+                        <td>{{ row.delta }}</td>
+                        <td>{{ row.note }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
