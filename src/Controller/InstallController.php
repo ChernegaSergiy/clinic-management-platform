@@ -227,12 +227,13 @@ class InstallController
             $this->ensureDatabaseExists($input);
 
             // Apply migrations
-            $pdo = $this->createPdo($input);
-            $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations');
+            // $this->runSqlDirectory($pdo, __DIR__ . '/../../database/migrations'); // Old method
+            $this->executeComposerCommand('db:migrate');
 
             // Seed if requested
             if ($input['seed']) {
-                $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds');
+                // $this->runSqlDirectory($pdo, __DIR__ . '/../../database/seeds'); // Old method
+                $this->executeComposerCommand('db:seed');
             }
 
             // Ensure admin exists/updated with provided credentials
@@ -258,27 +259,22 @@ class InstallController
         $this->redirectWithStep(3);
     }
 
-    private function runSqlDirectory(PDO $pdo, string $path): void
+    private function executeComposerCommand(string $command): void
     {
-        $files = glob($path . '/*.sql');
-        sort($files);
+        $output = [];
+        $returnVar = 0;
+        $commandPath = realpath(__DIR__ . '/../../vendor/bin/composer');
+        // Need to ensure phinx.php is picked up, so run from project root
+        $projectRoot = __DIR__ . '/../..';
 
-        foreach ($files as $file) {
-            $sql = file_get_contents($file);
-            foreach ($this->splitStatements($sql) as $statement) {
-                if ($statement === '') {
-                    continue;
-                }
-                $pdo->exec($statement);
-            }
+        $fullCommand = sprintf('php %s %s --working-dir=%s', $commandPath, $command, $projectRoot);
+
+        exec($fullCommand, $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            $errorOutput = implode(PHP_EOL, $output);
+            throw new \RuntimeException("Composer command '$command' failed: " . $errorOutput);
         }
-    }
-
-    private function splitStatements(string $sql): array
-    {
-        $parts = array_map('trim', explode(';', $sql));
-
-        return array_values(array_filter($parts, static fn($part) => $part !== ''));
     }
 
     private function loadEnvDefaults(): array
