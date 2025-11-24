@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1fb5ac6d00b20026cfd6b35c806a446b",
+    "content-hash": "4dc49f438f4ef6077df23c2c5b002323",
     "packages": [
         {
             "name": "chernegasergiy/nk-025-2021-parser",
@@ -46,6 +46,47 @@
                 "source": "https://github.com/ChernegaSergiy/nk-025-2021-parser/tree/v0.1.0"
             },
             "time": "2025-11-23T20:21:40+00:00"
+        },
+        {
+            "name": "chernegasergiy/nk-026-2021-parser",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ChernegaSergiy/nk-026-2021-parser.git",
+                "reference": "a0d8d8ec8293500b3f071b4fd9059458f03ee62e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ChernegaSergiy/nk-026-2021-parser/zipball/a0d8d8ec8293500b3f071b4fd9059458f03ee62e",
+                "reference": "a0d8d8ec8293500b3f071b4fd9059458f03ee62e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChernegaSergiy\\Nk0262021Parser\\": "src/",
+                    "ChernegaSergiy\\Nk0262021Parser\\Dto\\": "src/Dto/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LicenseRef-CSSM-Unlimited-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Serhii Cherneha",
+                    "email": "chernegasergiy3@gmail.com"
+                }
+            ],
+            "description": "A PHP library to parse the NK-026-2021 (Classifier of Medical Interventions) from meddata.pp.ua.",
+            "support": {
+                "issues": "https://github.com/ChernegaSergiy/nk-026-2021-parser/issues",
+                "source": "https://github.com/ChernegaSergiy/nk-026-2021-parser/tree/v0.1.0"
+            },
+            "time": "2025-11-24T11:08:17+00:00"
         },
         {
             "name": "chillerlan/php-qrcode",
