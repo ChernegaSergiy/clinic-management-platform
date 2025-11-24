@@ -29,7 +29,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $params = [];
         if (!empty($searchTerm)) {
-            $sql .= " WHERE (p.last_name LIKE :term OR p.first_name LIKE :term OR CONCAT(p.last_name, ' ', p.first_name) LIKE :term OR i.status LIKE :term";
+            $sql .= " WHERE (p.last_name LIKE :term OR p.first_name LIKE :term"
+                . " OR CONCAT(p.last_name, ' ', p.first_name) LIKE :term OR i.status LIKE :term";
             if (is_numeric($searchTerm)) {
                 $sql .= " OR i.id = :idExact";
                 $params[':idExact'] = (int)$searchTerm;
@@ -100,20 +101,28 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
-            ':id' => $id,
-            ':patient_id' => $data['patient_id'],
-            ':appointment_id' => $data['appointment_id'] ?? null,
-            ':medical_record_id' => $data['medical_record_id'] ?? null,
-            ':amount' => $data['amount'],
-            ':status' => $data['status'],
-            ':notes' => $data['notes'] ?? null,
-            ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
-            ':type' => $data['type'] ?? 'invoice',
-        ]);
+        return $stmt->execute(
+            [
+                ':id' => $id,
+                ':patient_id' => $data['patient_id'],
+                ':appointment_id' => $data['appointment_id'] ?? null,
+                ':medical_record_id' => $data['medical_record_id'] ?? null,
+                ':amount' => $data['amount'],
+                ':status' => $data['status'],
+                ':notes' => $data['notes'] ?? null,
+                ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+                ':type' => $data['type'] ?? 'invoice',
+            ]
+        );
     }
 
-    public function addPayment(int $invoiceId, float $amount, string $paymentMethod, string $transactionId = null, string $notes = null): bool
+    public function addPayment(
+        int $invoiceId,
+        float $amount,
+        string $paymentMethod,
+        ?string $transactionId = null,
+        ?string $notes = null
+    ): bool
     {
         $this->pdo->beginTransaction();
         try {
