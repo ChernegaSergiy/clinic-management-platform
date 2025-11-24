@@ -78,7 +78,19 @@ class UserRepository implements UserRepositoryInterface
         ");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        if ($result === false) {
+            return null;
+        }
+
+        // Cast timestamps to DateTime objects for safer usage in views.
+        if (!empty($result['created_at'])) {
+            $result['created_at'] = new \DateTimeImmutable($result['created_at']);
+        }
+        if (!empty($result['updated_at'])) {
+            $result['updated_at'] = new \DateTimeImmutable($result['updated_at']);
+        }
+
+        return $result;
     }
 
     public function findByEmailExcludingId(string $email, int $id): ?array
