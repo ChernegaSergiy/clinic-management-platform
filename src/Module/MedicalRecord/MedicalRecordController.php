@@ -5,6 +5,7 @@ namespace App\Module\MedicalRecord;
 use App\Core\View;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
+use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Core\AttachmentService;
@@ -17,6 +18,7 @@ class MedicalRecordController
     private AppointmentRepository $appointmentRepository;
     private LabOrderRepository $labOrderRepository;
     private IcdCodeRepository $icdCodeRepository;
+    private InterventionCodeRepository $interventionCodeRepository;
     private AttachmentService $attachmentService;
     private AuditLogger $auditLogger;
 
@@ -26,6 +28,7 @@ class MedicalRecordController
         $this->appointmentRepository = new AppointmentRepository();
         $this->labOrderRepository = new LabOrderRepository();
         $this->icdCodeRepository = new IcdCodeRepository();
+        $this->interventionCodeRepository = new InterventionCodeRepository();
         $this->attachmentService = new AttachmentService();
         $this->auditLogger = new AuditLogger();
     }
@@ -149,6 +152,17 @@ class MedicalRecordController
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
+        
+        header('Content-Type: application/json');
+        echo json_encode($codes);
+    }
+
+    public function getInterventionCodes(): void
+    {
+        AuthGuard::check();
+
+        $searchTerm = $_GET['search'] ?? '';
+        $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
         
         header('Content-Type: application/json');
         echo json_encode($codes);
