@@ -18,7 +18,8 @@ class InventoryController
     public function index(): void
     {
         AuthGuard::check();
-        $items = $this->inventoryItemRepository->findAll();
+        $searchTerm = $_GET['search'] ?? '';
+        $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
 
@@ -26,6 +27,7 @@ class InventoryController
             'items' => $items,
             'lowStockItems' => $lowStockItems,
             'overStockedItems' => $overStockedItems,
+            'searchTerm' => $searchTerm,
         ]);
     }
 

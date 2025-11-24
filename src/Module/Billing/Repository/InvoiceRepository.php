@@ -14,9 +14,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $this->pdo = Database::getInstance();
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("
+        $sql = "
             SELECT 
                 i.id, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -25,8 +25,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 i.issued_date
             FROM invoices i
             JOIN patients p ON i.patient_id = p.id
-            ORDER BY i.issued_date DESC
-        ");
+        ";
+
+        $params = [];
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE (p.last_name LIKE :term OR p.first_name LIKE :term OR CONCAT(p.last_name, ' ', p.first_name) LIKE :term OR i.status LIKE :term";
+            if (is_numeric($searchTerm)) {
+                $sql .= " OR i.id = :idExact";
+                $params[':idExact'] = (int)$searchTerm;
+            }
+            $sql .= ")";
+            $params[':term'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY i.issued_date DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -134,5 +149,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $stmt = $this->pdo->prepare("SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC");
         $stmt->execute([':invoice_id' => $invoiceId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Placeholder for inventory movements until proper finance ledger is implemented.
+     */
+    public function logFinancialTransaction(int $patientId, float $amount, string $transactionType, string $description, ?int $entityId = null): bool
+    {
+        // No-op stub to avoid runtime errors from inventory module.
+        return true;
     }
 }

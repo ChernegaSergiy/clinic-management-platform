@@ -4,7 +4,7 @@ namespace App\Module\Inventory\Repository;
 
 interface InventoryItemRepositoryInterface
 {
-    public function findAll(): array;
+    public function findAll(string $searchTerm = ''): array;
     public function save(array $data): bool;
     public function findById(int $id): ?array;
     public function update(int $id, array $data): bool;

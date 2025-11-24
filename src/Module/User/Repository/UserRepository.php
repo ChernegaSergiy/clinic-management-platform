@@ -22,9 +22,20 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("SELECT id, first_name, last_name, email, role_id FROM users ORDER BY last_name, first_name");
+        $sql = "SELECT id, first_name, last_name, email, role_id FROM users";
+        $params = [];
+
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term OR CONCAT(first_name, ' ', last_name) LIKE :term";
+            $params[':term'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY last_name, first_name";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

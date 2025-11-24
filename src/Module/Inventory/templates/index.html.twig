@@ -42,14 +42,14 @@
             </div>
         {% endif %}
 
-        <div class="ui form">
+        <form class="ui form" method="get" action="/inventory">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" placeholder="Пошук позицій...">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="Пошук позицій...">
                     <i class="search icon"></i>
                 </div>
             </div>
-        </div>
+        </form>
 
         <table class="ui celled table">
             <thead>

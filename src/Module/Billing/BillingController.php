@@ -37,8 +37,12 @@ class BillingController
     public function index(): void
     {
         AuthGuard::check();
-        $invoices = $this->invoiceRepository->findAll();
-        View::render('@modules/Billing/templates/index.html.twig', ['invoices' => $invoices]);
+        $searchTerm = $_GET['search'] ?? '';
+        $invoices = $this->invoiceRepository->findAll($searchTerm);
+        View::render('@modules/Billing/templates/index.html.twig', [
+            'invoices' => $invoices,
+            'searchTerm' => $searchTerm,
+        ]);
     }
 
     // --- Service Management ---

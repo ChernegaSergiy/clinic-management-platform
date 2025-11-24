@@ -27,14 +27,14 @@
 
         <div class="ui divider"></div>
 
-        <div class="ui form">
+        <form class="ui form" method="get" action="/billing">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" placeholder="Пошук рахунків...">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="Пошук рахунків...">
                     <i class="search icon"></i>
                 </div>
             </div>
-        </div>
+        </form>
 
         <table class="ui celled table">
             <thead>

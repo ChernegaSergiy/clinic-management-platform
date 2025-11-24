@@ -33,7 +33,8 @@ class AdminController
     public function users(): void
     {
         AuthGuard::isAdmin();
-        $users = $this->userRepository->findAll();
+        $searchTerm = $_GET['search'] ?? '';
+        $users = $this->userRepository->findAll($searchTerm);
         $roles = $this->roleRepository->findAll();
         $roleMap = [];
         foreach ($roles as $role) {
@@ -45,7 +46,10 @@ class AdminController
         }
         unset($user); // Break the reference with the last element
 
-        View::render('@modules/Admin/templates/users.html.twig', ['users' => $users]);
+        View::render('@modules/Admin/templates/users.html.twig', [
+            'users' => $users,
+            'searchTerm' => $searchTerm,
+        ]);
     }
 
     public function createUser(): void

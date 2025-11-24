@@ -17,9 +17,20 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         $this->invoiceRepository = new InvoiceRepository();
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM inventory_items ORDER BY name");
+        $sql = "SELECT * FROM inventory_items";
+        $params = [];
+
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE name LIKE :term OR inn LIKE :term OR supplier LIKE :term OR batch_number LIKE :term";
+            $params[':term'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY name";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
