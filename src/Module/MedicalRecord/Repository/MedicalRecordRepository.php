@@ -75,6 +75,45 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         return false;
     }
 
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE medical_records SET
+                    patient_id = :patient_id,
+                    appointment_id = :appointment_id,
+                    doctor_id = :doctor_id,
+                    visit_date = :visit_date,
+                    diagnosis_code = :diagnosis_code,
+                    diagnosis_text = :diagnosis_text,
+                    treatment = :treatment,
+                    notes = :notes
+                WHERE id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        $success = $stmt->execute([
+            ':patient_id' => $data['patient_id'],
+            ':appointment_id' => $data['appointment_id'],
+            ':doctor_id' => $data['doctor_id'],
+            ':visit_date' => $data['visit_date'],
+            ':diagnosis_code' => $data['diagnosis_code'] ?? null,
+            ':diagnosis_text' => $data['diagnosis_text'] ?? null,
+            ':treatment' => $data['treatment'] ?? null,
+            ':notes' => $data['notes'] ?? null,
+            ':id' => $id,
+        ]);
+
+        if ($success) {
+            if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
+                $this->attachIcdCodes($id, $data['icd_codes']);
+            }
+            if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
+                $this->attachInterventionCodes($id, $data['intervention_codes']);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
