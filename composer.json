@@ -32,8 +32,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "cs": "phpcbf --standard=phpcs.xml --ignore=vendor/",
-        "cs-check": "phpcs --standard=phpcs.xml --ignore=vendor/",
+        "cs": "phpcbf --standard=PSR12 --ignore=vendor/",
+        "cs-check": "phpcs --standard=PSR12 --ignore=vendor/",
         "stan": "phpstan analyse",
         "db:migrate": "phinx migrate",
         "db:rollback": "phinx rollback",
