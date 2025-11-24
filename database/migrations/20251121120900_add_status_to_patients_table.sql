@@ -1,1 +1,0 @@
-ALTER TABLE patients ADD COLUMN status ENUM('active', 'archived', 'needs_review') NOT NULL DEFAULT 'active';
