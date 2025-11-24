@@ -6,7 +6,7 @@ class CreateKpiDefinitionsTable extends AbstractMigration
     {
         $table = $this->table('kpi_definitions', ['id' => false, 'primary_key' => 'id']);
         $table->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-        $table->addColumn('name', 'string', ['limit' => 255])
+              ->addColumn('name', 'string', ['limit' => 255])
               ->addColumn('description', 'text', ['null' => true])
               ->addColumn('kpi_type', 'enum', ['values' => ['appointments_count', 'revenue_generated', 'patient_satisfaction']])
               ->addColumn('target_value', 'decimal', ['precision' => 10, 'scale' => 2, 'null' => true])
