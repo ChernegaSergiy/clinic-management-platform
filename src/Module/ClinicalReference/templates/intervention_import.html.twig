@@ -1,0 +1,25 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Імпорт НК 026:2021 (Класифікатор медичних інтервенцій){% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Імпорт НК 026:2021 (Класифікатор медичних інтервенцій)</h2>
+        <div class="ui divider"></div>
+
+        {% if errors.import is defined %}
+            <div class="ui negative message">{{ errors.import }}</div>
+        {% endif %}
+        {% if success_message %}
+            <div class="ui positive message">{{ success_message }}</div>
+        {% endif %}
+
+        <p>Поточна кількість кодів у базі: <strong>{{ count }}</strong></p>
+        <p>Дані беруться з офіційного JSON <code>NK-026-2021</code> (meddata.pp.ua) через пакет <code>chernegasergiy/nk-026-2021-parser</code>.</p>
+
+        <form class="ui form" method="POST" action="/admin/clinical/intervention-import">
+            <button type="submit" class="ui primary button">Оновити довідник</button>
+            <a href="/medical-records/new" class="ui button">До медичних записів</a>
+        </form>
+    </div>
+{% endblock %}
