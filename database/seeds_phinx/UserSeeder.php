@@ -4,7 +4,7 @@ use Phinx\Seed\AbstractSeed;
 
 class UserSeeder extends AbstractSeed
 {
-    public function run()
+    public function run(): void
     {
         $password_hash = password_hash('password', PASSWORD_DEFAULT);
 
