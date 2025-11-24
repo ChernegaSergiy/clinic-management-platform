@@ -4,7 +4,8 @@ class CreatePatientsTable extends AbstractMigration
 {
     public function change()
     {
-        $table = $this->table('patients');
+        $table = $this->table('patients', ['id' => false, 'primary_key' => 'id']);
+        $table->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
         $table->addColumn('first_name', 'string', ['limit' => 255])
               ->addColumn('last_name', 'string', ['limit' => 255])
               ->addColumn('middle_name', 'string', ['limit' => 255, 'null' => true])
