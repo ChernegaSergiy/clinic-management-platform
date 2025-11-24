@@ -41,6 +41,18 @@
                     </td>
                 </tr>
                 {% endif %}
+                {% if record.intervention_codes is not empty %}
+                <tr>
+                    <td>Коди медичних інтервенцій (НК 026:2021)</td>
+                    <td>
+                        <div class="ui labels">
+                            {% for intervention in record.intervention_codes %}
+                                <a class="ui label">{{ intervention.code }} - {{ intervention.description }}</a>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td>Діагноз</td>
                     <td>{{ record.diagnosis_text|nl2br }}</td>
