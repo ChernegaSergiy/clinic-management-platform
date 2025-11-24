@@ -9,6 +9,7 @@ use App\Core\AuditLogger;
 class PatientRepository implements PatientRepositoryInterface
 {
     private PDO $pdo;
+    private ?string $lastError = null;
 
     public function __construct()
     {
@@ -40,9 +41,17 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function save(array $data): bool
     {
+        $this->lastError = null;
+
         // Check for duplicate patient before saving
         if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
             // Patient with same first name, last name, and birth date already exists
+            $this->lastError = 'patient_exists';
+            return false;
+        }
+
+        if (!empty($data['tax_id']) && $this->findByTaxId($data['tax_id'])) {
+            $this->lastError = 'tax_id_exists';
             return false;
         }
 
@@ -51,20 +60,28 @@ class PatientRepository implements PatientRepositoryInterface
         
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':middle_name' => $data['middle_name'] ?? null,
-            ':birth_date' => $data['birth_date'],
-            ':gender' => $data['gender'],
-            ':phone' => $data['phone'],
-            ':email' => $data['email'] ?? null,
-            ':address' => $data['address'] ?? null,
-            ':tax_id' => $data['tax_id'] ?? null,
-            ':document_id' => $data['document_id'] ?? null,
-            ':marital_status' => $data['marital_status'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-        ]);
+        try {
+            return $stmt->execute([
+                ':first_name' => $data['first_name'],
+                ':last_name' => $data['last_name'],
+                ':middle_name' => $data['middle_name'] ?? null,
+                ':birth_date' => $data['birth_date'],
+                ':gender' => $data['gender'],
+                ':phone' => $data['phone'],
+                ':email' => $data['email'] ?? null,
+                ':address' => $data['address'] ?? null,
+                ':tax_id' => $data['tax_id'] ?? null,
+                ':document_id' => $data['document_id'] ?? null,
+                ':marital_status' => $data['marital_status'] ?? null,
+                ':status' => $data['status'] ?? 'active',
+            ]);
+        } catch (\PDOException $e) {
+            if ($e->getCode() === '23000') {
+                $this->lastError = 'duplicate_key';
+                return false;
+            }
+            throw $e;
+        }
     }
 
     public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array
@@ -87,10 +104,33 @@ class PatientRepository implements PatientRepositoryInterface
         return $result === false ? null : $result;
     }
 
+    public function findByTaxId(string $taxId, ?int $excludeId = null): ?array
+    {
+        $sql = "SELECT * FROM patients WHERE tax_id = :tax_id";
+        $params = [':tax_id' => $taxId];
+
+        if ($excludeId !== null) {
+            $sql .= " AND id != :exclude_id";
+            $params[':exclude_id'] = $excludeId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+
     public function update(int $id, array $data): bool
     {
+        $this->lastError = null;
+
         $oldPatient = $this->findById($id);
         $oldStatus = $oldPatient['status'] ?? null;
+
+        if (!empty($data['tax_id']) && $this->findByTaxId($data['tax_id'], $id)) {
+            $this->lastError = 'tax_id_exists';
+            return false;
+        }
 
         $sql = "UPDATE patients SET 
                     first_name = :first_name, 
@@ -109,21 +149,29 @@ class PatientRepository implements PatientRepositoryInterface
         
         $stmt = $this->pdo->prepare($sql);
 
-        $success = $stmt->execute([
-            ':id' => $id,
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':middle_name' => $data['middle_name'] ?? null,
-            ':birth_date' => $data['birth_date'],
-            ':gender' => $data['gender'],
-            ':phone' => $data['phone'],
-            ':email' => $data['email'] ?? null,
-            ':address' => $data['address'] ?? null,
-            ':tax_id' => $data['tax_id'] ?? null,
-            ':document_id' => $data['document_id'] ?? null,
-            ':marital_status' => $data['marital_status'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-        ]);
+        try {
+            $success = $stmt->execute([
+                ':id' => $id,
+                ':first_name' => $data['first_name'],
+                ':last_name' => $data['last_name'],
+                ':middle_name' => $data['middle_name'] ?? null,
+                ':birth_date' => $data['birth_date'],
+                ':gender' => $data['gender'],
+                ':phone' => $data['phone'],
+                ':email' => $data['email'] ?? null,
+                ':address' => $data['address'] ?? null,
+                ':tax_id' => $data['tax_id'] ?? null,
+                ':document_id' => $data['document_id'] ?? null,
+                ':marital_status' => $data['marital_status'] ?? null,
+                ':status' => $data['status'] ?? 'active',
+            ]);
+        } catch (\PDOException $e) {
+            if ($e->getCode() === '23000') {
+                $this->lastError = 'duplicate_key';
+                return false;
+            }
+            throw $e;
+        }
 
         if ($success && $oldStatus !== ($data['status'] ?? 'active')) {
             $auditLogger = new AuditLogger();
@@ -132,6 +180,11 @@ class PatientRepository implements PatientRepositoryInterface
         }
 
         return $success;
+    }
+
+    public function getLastError(): ?string
+    {
+        return $this->lastError;
     }
 
     public function findAllActive(): array
