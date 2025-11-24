@@ -282,7 +282,7 @@ class PatientController
         }
 
         $_SESSION['success_message'] = "Імпортовано {$importedCount} пацієнтів. Не вдалося імпортувати: {$failedCount}.";
-        header('Location: /patients');
+        header('Location: /patients/import-json');
         exit();
     }
 
