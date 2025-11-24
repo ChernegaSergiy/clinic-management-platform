@@ -237,6 +237,7 @@ class InstallController
             }
 
             // Ensure admin exists/updated with provided credentials
+            $pdo = $this->createPdo($input);
             $this->createAdmin($pdo, $input);
 
             $this->setFeedback([
