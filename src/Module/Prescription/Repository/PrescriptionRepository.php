@@ -20,7 +20,7 @@ class PrescriptionRepository
         try {
             $sql = "INSERT INTO prescriptions (patient_id, doctor_id, medical_record_id, issue_date, expiry_date, notes) 
                     VALUES (:patient_id, :doctor_id, :medical_record_id, :issue_date, :expiry_date, :notes)";
-            
+
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 ':patient_id' => $data['patient_id'],

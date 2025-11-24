@@ -212,7 +212,7 @@ class AppointmentController
         }
 
         $this->appointmentRepository->save($_POST);
-        
+
         $patient = $this->patientRepository->findById($_POST['patient_id']);
         $doctor = $this->userRepository->findById($_POST['doctor_id']);
         if ($patient && $doctor) {
@@ -261,7 +261,7 @@ class AppointmentController
         } else {
             $appointments = $this->appointmentRepository->findAll();
         }
-        
+
         $events = [];
 
         $statusColors = [

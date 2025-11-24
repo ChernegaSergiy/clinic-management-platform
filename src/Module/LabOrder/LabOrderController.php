@@ -88,7 +88,7 @@ class LabOrderController
         $data['medical_record_id'] = $recordId;
 
         $this->labOrderRepository->save($data);
-        
+
         $doctor = $this->userRepository->findById($medicalRecord['doctor_id']);
         if ($doctor) {
             $message = sprintf(
@@ -279,7 +279,7 @@ class LabOrderController
             unset($_SESSION['hl7_dicom_parsed_data']);
             unset($_SESSION['hl7_dicom_temp_path']);
             unlink($tempPath);
-            
+
             $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
             header('Location: /lab-orders/show?id=' . $orderId); // Redirect to the new order
             exit();

@@ -18,7 +18,7 @@ class AuditLogger
     {
         $sql = "INSERT INTO audit_logs (entity_type, entity_id, user_id, action, old_value, new_value) 
                 VALUES (:entity_type, :entity_id, :user_id, :action, :old_value, :new_value)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([

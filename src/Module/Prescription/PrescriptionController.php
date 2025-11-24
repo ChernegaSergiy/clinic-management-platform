@@ -94,22 +94,22 @@ class PrescriptionController
         }
 
         $prescriptionId = $this->prescriptionRepository->save($_POST);
-        
+
         if ($prescriptionId && !empty($_POST['items'])) {
             foreach ($_POST['items'] as $itemData) {
                 // Find inventory item by medication name
                 // This is a simplified approach. In a real system, you'd link by ID.
-                $inventoryItem = $this->inventoryItemRepository->findByName($itemData['medication_name']); 
-                
+                $inventoryItem = $this->inventoryItemRepository->findByName($itemData['medication_name']);
+
                 if ($inventoryItem && isset($itemData['dosage'])) {
                     // Assuming dosage is a simple number for quantity to deduct
                     // Or, more complex logic to parse dosage to quantity
-                    $quantityToDeduct = (int)$itemData['dosage']; 
-                    
+                    $quantityToDeduct = (int)$itemData['dosage'];
+
                     if ($quantityToDeduct > 0) {
                         $this->inventoryItemRepository->decreaseQuantity(
-                            $inventoryItem['id'], 
-                            $quantityToDeduct, 
+                            $inventoryItem['id'],
+                            $quantityToDeduct,
                             $_SESSION['user']['id'] ?? null,
                             'Виконання рецепту #' . $prescriptionId
                         );

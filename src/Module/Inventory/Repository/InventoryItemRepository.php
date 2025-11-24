@@ -62,7 +62,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         try {
             $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, supplier, cost, quantity, min_stock_level, max_stock_level, location) 
                     VALUES (:name, :description, :inn, :batch_number, :expiry_date, :supplier, :cost, :quantity, :min_stock_level, :max_stock_level, :location)";
-            
+
             $stmt = $this->pdo->prepare($sql);
             $success = $stmt->execute([
                 ':name' => $data['name'],
@@ -131,7 +131,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                         max_stock_level = :max_stock_level, 
                         location = :location 
                     WHERE id = :id";
-            
+
             $stmt = $this->pdo->prepare($sql);
 
             $success = $stmt->execute([
@@ -183,14 +183,16 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         if ($success) {
             $amount = $quantityChange * $itemCost;
             $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue'; // Assuming 'revenue' for 'out'
-            if ($movementType === 'out') $amount = -$amount; // Negative for cost deduction
-            
+            if ($movementType === 'out') {
+                $amount = -$amount; // Negative for cost deduction
+            }
+
             $itemDetails = $this->findById($itemId);
             $patientId = 0; // Placeholder, as inventory movement might not directly link to a patient
             if (isset($_SESSION['current_patient_id'])) { // If there's a context of a patient
                 $patientId = $_SESSION['current_patient_id'];
             }
-            
+
             $this->invoiceRepository->logFinancialTransaction(
                 $patientId, // Need a patient ID, might be a system patient or context specific
                 $amount,

@@ -32,7 +32,7 @@ class ContractRepository
     {
         $sql = "INSERT INTO contracts (title, description, start_date, end_date, party_a, party_b, file_path, status) 
                 VALUES (:title, :description, :start_date, :end_date, :party_a, :party_b, :file_path, :status)";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $success = $stmt->execute([
             ':title' => $data['title'],
@@ -59,7 +59,7 @@ class ContractRepository
                     file_path = :file_path, 
                     status = :status 
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([

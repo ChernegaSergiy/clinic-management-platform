@@ -75,7 +75,7 @@ class PatientController
             ]);
             return;
         }
-        
+
         header('Location: /patients');
         exit();
     }

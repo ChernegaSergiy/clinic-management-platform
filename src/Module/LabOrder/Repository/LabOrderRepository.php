@@ -30,7 +30,7 @@ class LabOrderRepository implements LabOrderRepositoryInterface
     {
         $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, order_code, qr_code_hash, results, status) 
                 VALUES (:patient_id, :doctor_id, :medical_record_id, :order_code, :qr_code_hash, :results, :status)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         $success = $stmt->execute([
@@ -74,7 +74,7 @@ class LabOrderRepository implements LabOrderRepositoryInterface
                     results = :results, 
                     notes = :notes 
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([

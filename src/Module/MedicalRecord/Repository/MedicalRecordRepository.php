@@ -48,7 +48,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
     {
         $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, diagnosis_code, diagnosis_text, treatment, notes) 
                 VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, :diagnosis_code, :diagnosis_text, :treatment, :notes)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         $success = $stmt->execute([
@@ -87,7 +87,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
                     treatment = :treatment,
                     notes = :notes
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         $success = $stmt->execute([
@@ -157,7 +157,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             $params[":icd_code_id_{$index}"] = $icdCodeId;
         }
         $insertSql .= implode(', ', $values);
-        
+
         $insertStmt = $this->pdo->prepare($insertSql);
         return $insertStmt->execute($params);
     }
@@ -199,7 +199,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             $params[":intervention_code_id_{$index}"] = $interventionCodeId;
         }
         $insertSql .= implode(', ', $values);
-        
+
         $insertStmt = $this->pdo->prepare($insertSql);
         return $insertStmt->execute($params);
     }

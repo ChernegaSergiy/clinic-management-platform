@@ -27,7 +27,7 @@ class DashboardController
 
         // Fetch data for dashboard widgets
         $patientCount = count($this->patientRepository->findAllActive());
-        $upcomingAppointments = $this->appointmentRepository->findUpcoming(); 
+        $upcomingAppointments = $this->appointmentRepository->findUpcoming();
         $upcomingAppointmentsCount = count($upcomingAppointments);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $lowStockItemsCount = count($lowStockItems);

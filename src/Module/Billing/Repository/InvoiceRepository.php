@@ -49,7 +49,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
                 VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         $success = $stmt->execute([
@@ -97,7 +97,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     paid_date = :paid_date,
                     type = :type
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([

@@ -94,7 +94,7 @@ class MedicalRecordController
         $data['patient_id'] = $appointment['patient_id'];
         $data['appointment_id'] = $appointmentId;
         $data['doctor_id'] = $appointment['doctor_id'];
-        
+
         $medicalRecordId = $this->medicalRecordRepository->save($data);
 
         if ($medicalRecordId && !empty($_FILES['attachments']['name'][0])) {
@@ -152,7 +152,7 @@ class MedicalRecordController
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
-        
+
         header('Content-Type: application/json');
         echo json_encode($codes);
     }
@@ -163,7 +163,7 @@ class MedicalRecordController
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
-        
+
         header('Content-Type: application/json');
         echo json_encode($codes);
     }

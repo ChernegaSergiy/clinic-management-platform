@@ -55,7 +55,7 @@ class LabResourceRepository
             ':notes' => $data['notes'] ?? null,
         ]);
     }
-    
+
     // Check if a resource is available and has capacity for a given time slot
     public function checkResourceAvailability(int $resourceId, string $startTime, string $endTime, int $requiredCapacity = 1): bool
     {
@@ -75,7 +75,7 @@ class LabResourceRepository
             ':end_time' => $endTime,
         ]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         return ($result && $result['remaining_capacity'] >= $requiredCapacity);
     }
 }

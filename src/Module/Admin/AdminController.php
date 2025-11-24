@@ -529,7 +529,7 @@ class AdminController
         $id = (int)($_GET['id'] ?? 0);
         $value = $this->dictionaryRepository->findValueById($id);
         $dictionaryId = $value['dictionary_id'];
-        
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'dictionary_id' => ['required'],

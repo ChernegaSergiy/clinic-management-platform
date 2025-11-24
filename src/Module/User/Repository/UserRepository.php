@@ -107,7 +107,7 @@ class UserRepository implements UserRepositoryInterface
 
         $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
                 VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -127,7 +127,7 @@ class UserRepository implements UserRepositoryInterface
                     last_name = :last_name, 
                     email = :email, 
                     role_id = :role_id";
-        
+
         $params = [
             ':id' => $id,
             ':first_name' => $data['first_name'],
@@ -140,9 +140,9 @@ class UserRepository implements UserRepositoryInterface
             $sql .= ", password_hash = :password_hash";
             $params[':password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
-        
+
         $sql .= " WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute($params);

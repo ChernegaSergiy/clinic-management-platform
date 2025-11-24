@@ -126,7 +126,7 @@ class ServiceBundleRepository
             $params[":service_id_{$index}"] = $serviceId;
         }
         $insertSql .= implode(', ', $values);
-        
+
         $insertStmt = $this->pdo->prepare($insertSql);
         $insertStmt->execute($params);
     }

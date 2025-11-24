@@ -25,7 +25,7 @@ class PatientRepository implements PatientRepositoryInterface
             // Use full-text search for relevant columns
             $sql .= " WHERE MATCH(first_name, last_name, middle_name, address) AGAINST (:searchTerm IN BOOLEAN MODE)";
             $params[':searchTerm'] = $searchTerm . '*'; // Adding wildcard for partial matches
-            
+
             // Fallback for other fields if full-text index doesn't cover all search needs or for older MySQL versions
             // Uncomment and adjust if needed
             // $sql .= " OR last_name LIKE :term OR first_name LIKE :term OR phone LIKE :term";
@@ -57,7 +57,7 @@ class PatientRepository implements PatientRepositoryInterface
 
         $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status, status) 
                 VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status, :status)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         try {
@@ -146,7 +146,7 @@ class PatientRepository implements PatientRepositoryInterface
                     marital_status = :marital_status,
                     status = :status
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         try {

@@ -37,7 +37,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
     {
         $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id) 
                 VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -78,7 +78,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                     status = :status, 
                     notes = :notes 
                 WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -168,7 +168,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $ticket = $data['ticket_number'] ?? $this->generateWaitlistTicket();
         $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, desired_start_time, desired_end_time, notes, contact_phone, contact_email) 
                 VALUES (:ticket_number, :patient_id, :desired_doctor_id, :desired_start_time, :desired_end_time, :notes, :contact_phone, :contact_email)";
-        
+
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -202,7 +202,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 LEFT JOIN users u ON wl.desired_doctor_id = u.id
                 WHERE (:status IS NULL OR wl.status = :status)
                 ORDER BY wl.created_at ASC";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':status' => $status]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -234,7 +234,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE a.status = 'scheduled' 
               AND a.start_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL :minutes_before MINUTE)
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':minutes_before' => $minutesBefore]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
