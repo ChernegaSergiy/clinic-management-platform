@@ -27,4 +27,31 @@ class RoleRepository implements RoleRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function save(array $data): bool
+    {
+        $sql = "INSERT INTO roles (name, description) VALUES (:name, :description)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':name' => $data['name'],
+            ':description' => $data['description'] ?? null,
+        ]);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE roles SET name = :name, description = :description WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id,
+            ':name' => $data['name'],
+            ':description' => $data['description'] ?? null,
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM roles WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }
