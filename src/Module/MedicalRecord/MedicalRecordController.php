@@ -108,7 +108,10 @@ class MedicalRecordController
                         'size' => $_FILES['attachments']['size'][$key],
                     ];
                     $this->attachmentService->uploadAttachment(
-                        $fileData, 'medical_record', $medicalRecordId, $_SESSION['user']['id'] ?? null
+                        $fileData,
+                        'medical_record',
+                        $medicalRecordId,
+                        $_SESSION['user']['id'] ?? null
                     );
                 }
             }
@@ -135,7 +138,14 @@ class MedicalRecordController
         }
 
         // Log the view event
-        $this->auditLogger->log('medical_record', $id, 'view', null, null, $_SESSION['user']['id'] ?? null);
+        $this->auditLogger->log(
+            'medical_record',
+            $id,
+            'view',
+            null,
+            null,
+            $_SESSION['user']['id'] ?? null
+        );
 
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
         $attachments = $this->attachmentService->getAttachmentsForEntity('medical_record', $id);
@@ -267,7 +277,12 @@ class MedicalRecordController
                         'error' => $_FILES['attachments']['error'][$key],
                         'size' => $_FILES['attachments']['size'][$key],
                     ];
-                    $this->attachmentService->uploadAttachment($fileData, 'medical_record', $medicalRecordId, $_SESSION['user']['id'] ?? null);
+                    $this->attachmentService->uploadAttachment(
+                        $fileData,
+                        'medical_record',
+                        $medicalRecordId,
+                        $_SESSION['user']['id'] ?? null
+                    );
                 }
             }
         }
@@ -285,7 +300,11 @@ class MedicalRecordController
 
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
-        if (!$attachment || $attachment['entity_type'] !== 'medical_record' || $attachment['entity_id'] !== $medicalRecordId) {
+        if (
+            !$attachment ||
+            $attachment['entity_type'] !== 'medical_record' ||
+            $attachment['entity_id'] !== $medicalRecordId
+        ) {
             http_response_code(404);
             echo "Вкладення не знайдено або доступ заборонено";
             return;
@@ -300,7 +319,9 @@ class MedicalRecordController
             $candidates[] = $uploadBase . ltrim($attachment['filepath'], '/');
         }
         // Fallback: search by filename within entity folder (in case filepath stored differently)
-        $candidates[] = $uploadBase . 'medical_record/' . $medicalRecordId . '/' . ($attachment['filename'] ?? '');
+        $path = $uploadBase . 'medical_record/' . $medicalRecordId . '/';
+        $path .= ($attachment['filename'] ?? '');
+        $candidates[] = $path;
 
         $fullPath = null;
         foreach ($candidates as $path) {

@@ -110,7 +110,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ':amount' => $data['amount'],
                 ':status' => $data['status'],
                 ':notes' => $data['notes'] ?? null,
-                ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+                ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date']))
+                    ? $data['paid_date']
+                    : null,
                 ':type' => $data['type'] ?? 'invoice',
             ]
         );
@@ -122,8 +124,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         string $paymentMethod,
         ?string $transactionId = null,
         ?string $notes = null
-    ): bool
-    {
+    ): bool {
         $this->pdo->beginTransaction();
         try {
             $sql = "INSERT INTO payments (invoice_id, amount, payment_method, transaction_id, notes) 
@@ -140,8 +141,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($success) {
                 // Update invoice status if fully paid
                 $invoice = $this->findById($invoiceId);
-                if ($invoice && $invoice['remaining_amount'] <= 0.01 && $invoice['status'] !== 'paid') {
-                    $this->update($invoiceId, array_merge($invoice, ['status' => 'paid', 'paid_date' => date('Y-m-d H:i:s')]));
+                if (
+                    $invoice &&
+                    $invoice['remaining_amount'] <= 0.01 &&
+                    $invoice['status'] !== 'paid'
+                ) {
+                    $updateData = array_merge($invoice, [
+                        'status' => 'paid',
+                        'paid_date' => date('Y-m-d H:i:s')
+                    ]);
+                    $this->update($invoiceId, $updateData);
                 }
             }
             $this->pdo->commit();
@@ -163,8 +172,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     /**
      * Placeholder for inventory movements until proper finance ledger is implemented.
      */
-    public function logFinancialTransaction(int $patientId, float $amount, string $transactionType, string $description, ?int $entityId = null): bool
-    {
+    public function logFinancialTransaction(
+        int $patientId,
+        float $amount,
+        string $transactionType,
+        string $description,
+        ?int $entityId = null
+    ): bool {
         // No-op stub to avoid runtime errors from inventory module.
         return true;
     }

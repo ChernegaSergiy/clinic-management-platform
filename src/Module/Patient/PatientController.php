@@ -257,10 +257,12 @@ class PatientController
                 'phone' => ['required'],
             ];
 
-            if (!$validator->validate(
-                $patientData,
-                $rules
-            )) {
+            if (
+                !$validator->validate(
+                    $patientData,
+                    $rules
+                )
+            ) {
                 $failedCount++;
                 $errorMessages = [];
                 foreach ($validator->getErrors() as $fieldErrors) {
@@ -268,7 +270,10 @@ class PatientController
                         $errorMessages[] = $error;
                     }
                 }
-                $errors[] = 'Некоректні дані для пацієнта ' . ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '') . ': ' . implode(', ', $errorMessages);
+                $errorMsg = 'Некоректні дані для пацієнта ';
+                $errorMsg .= ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '');
+                $errorMsg .= ': ' . implode(', ', $errorMessages);
+                $errors[] = $errorMsg;
                 continue;
             }
 
@@ -276,7 +281,10 @@ class PatientController
                 $importedCount++;
             } else {
                 $failedCount++;
-                $errors[] = 'Не вдалося зберегти пацієнта ' . ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '') . ' (можливо, дублікат).';
+                $errorMsg = 'Не вдалося зберегти пацієнта ';
+                $errorMsg .= ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '');
+                $errorMsg .= ' (можливо, дублікат).';
+                $errors[] = $errorMsg;
             }
         }
 
