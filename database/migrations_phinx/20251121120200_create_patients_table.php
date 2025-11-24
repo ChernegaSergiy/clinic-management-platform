@@ -6,7 +6,7 @@ class CreatePatientsTable extends AbstractMigration
     {
         $table = $this->table('patients', ['id' => false, 'primary_key' => 'id']);
         $table->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-        $table->addColumn('first_name', 'string', ['limit' => 255])
+              ->addColumn('first_name', 'string', ['limit' => 255])
               ->addColumn('last_name', 'string', ['limit' => 255])
               ->addColumn('middle_name', 'string', ['limit' => 255, 'null' => true])
               ->addColumn('birth_date', 'date')
