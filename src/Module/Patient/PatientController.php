@@ -60,7 +60,15 @@ class PatientController
         }
 
         if (!$this->patientRepository->save($_POST)) {
-            $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
+            $errorCode = $this->patientRepository->getLastError();
+            $errors = [];
+            if ($errorCode === 'tax_id_exists') {
+                $errors['tax_id'] = 'РНОКПП вже використовується іншим пацієнтом.';
+            } elseif ($errorCode === 'patient_exists') {
+                $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
+            } else {
+                $errors['save'] = 'Не вдалося зберегти пацієнта. Спробуйте ще раз.';
+            }
             View::render('@modules/Patient/templates/new.html.twig', [
                 'errors' => $errors,
                 'old' => $_POST,
@@ -139,7 +147,21 @@ class PatientController
             return;
         }
 
-        $this->patientRepository->update($id, $_POST);
+        if (!$this->patientRepository->update($id, $_POST)) {
+            $errorCode = $this->patientRepository->getLastError();
+            $errors = [];
+            if ($errorCode === 'tax_id_exists') {
+                $errors['tax_id'] = 'РНОКПП вже використовується іншим пацієнтом.';
+            } else {
+                $errors['update'] = 'Не вдалося оновити дані пацієнта. Спробуйте ще раз.';
+            }
+
+            View::render('@modules/Patient/templates/edit.html.twig', [
+                'errors' => $errors,
+                'patient' => array_merge($patient, $_POST),
+            ]);
+            return;
+        }
         header('Location: /patients/show?id=' . $id);
         exit();
     }
