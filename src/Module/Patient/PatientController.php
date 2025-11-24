@@ -237,7 +237,13 @@ class PatientController
 
             if (!$validator->validate($patientData, $rules)) {
                 $failedCount++;
-                $errors[] = 'Некоректні дані для пацієнта ' . ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '') . ': ' . implode(', ', $validator->getErrors());
+                $errorMessages = [];
+                foreach ($validator->getErrors() as $fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        $errorMessages[] = $error;
+                    }
+                }
+                $errors[] = 'Некоректні дані для пацієнта ' . ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '') . ': ' . implode(', ', $errorMessages);
                 continue;
             }
 
