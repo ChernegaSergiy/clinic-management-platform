@@ -34,6 +34,10 @@
         "test": "phpunit",
         "cs": "phpcbf --standard=phpcs.xml --exclude=vendor",
         "cs-check": "phpcs --standard=phpcs.xml --exclude=vendor",
-        "stan": "phpstan analyse"
+        "stan": "phpstan analyse",
+        "db:migrate": "phinx migrate",
+        "db:rollback": "phinx rollback",
+        "db:create": "phinx create",
+        "db:seed": "phinx seed:run"
     }
 }
