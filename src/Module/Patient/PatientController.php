@@ -226,18 +226,6 @@ class PatientController
         $errors = [];
 
         foreach ($patientsData as $patientData) {
-            // If 'name' field exists, split it into 'first_name' and 'last_name'
-            if (isset($patientData['name']) && !isset($patientData['first_name']) && !isset($patientData['last_name'])) {
-                $nameParts = explode(' ', $patientData['name'], 2);
-                $patientData['last_name'] = $nameParts[0] ?? '';
-                $patientData['first_name'] = $nameParts[1] ?? '';
-            }
-            
-            // If 'gender' is not set, default to 'unknown'
-            if (!isset($patientData['gender'])) {
-                $patientData['gender'] = 'unknown';
-            }
-
             $validator = new \App\Core\Validator(\App\Database::getInstance());
             $rules = [
                 'last_name' => ['required'],

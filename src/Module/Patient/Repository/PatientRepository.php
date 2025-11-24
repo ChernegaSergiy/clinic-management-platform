@@ -17,7 +17,7 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "SELECT id, CONCAT(last_name, ' ', first_name) as name, birth_date, phone, status FROM patients";
+        $sql = "SELECT * FROM patients";
         $params = [];
 
         if (!empty($searchTerm)) {
