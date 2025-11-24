@@ -207,8 +207,11 @@ class MedicalRecordController
                 $dt = new \DateTime($_POST['visit_date']);
                 $_POST['visit_date'] = $dt->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
-        $validator = new \App\Core\Validator(\App
-::getInstance());
+                // Let validator handle invalid date.
+            }
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'diagnosis_code' => ['required'],
             'visit_date' => ['required', 'datetime'],
