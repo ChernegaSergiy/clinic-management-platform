@@ -270,9 +270,24 @@ class MedicalRecordController
 
         // Check ACL (simplified for now, assuming only uploader can download or public)
         // More complex ACL check would go here, using AttachmentService::checkViewAccess
-        $fullPath = __DIR__ . '/../../uploads/' . $attachment['filepath'];
+        $uploadBase = dirname(__DIR__, 3) . '/uploads/';
+        $candidates = [];
+        // Stored relative filepath from AttachmentService (expected)
+        if (!empty($attachment['filepath'])) {
+            $candidates[] = $uploadBase . ltrim($attachment['filepath'], '/');
+        }
+        // Fallback: search by filename within entity folder (in case filepath stored differently)
+        $candidates[] = $uploadBase . 'medical_record/' . $medicalRecordId . '/' . ($attachment['filename'] ?? '');
 
-        if (!file_exists($fullPath)) {
+        $fullPath = null;
+        foreach ($candidates as $path) {
+            if (!empty($path) && file_exists($path)) {
+                $fullPath = $path;
+                break;
+            }
+        }
+
+        if (!$fullPath) {
             http_response_code(404);
             echo "Файл не знайдено на сервері";
             return;

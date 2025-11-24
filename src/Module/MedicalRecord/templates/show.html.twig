@@ -64,7 +64,7 @@
 
     <div class="ui segment">
         <h3 class="ui header">Вкладення</h3>
-        <form class="ui form" action="/medical-records/{{ record.id }}/attachments/upload" method="POST" enctype="multipart/form-data">
+        <form class="ui form" action="/medical-records/attachments/upload?id={{ record.id }}" method="POST" enctype="multipart/form-data">
             <div class="field">
                 <label>Завантажити новий файл</label>
                 <input type="file" name="attachments[]" multiple>
@@ -95,7 +95,7 @@
                             <td>{{ attachment.mime_type }}</td>
                             <td>{{ attachment.created_at|date('Y-m-d H:i') }}</td>
                             <td>
-                                <a href="/medical-records/{{ record.id }}/attachments/{{ attachment.id }}/download" class="ui icon button">
+                                <a href="/medical-records/attachments/download?record_id={{ record.id }}&attachment_id={{ attachment.id }}" class="ui icon button">
                                     <i class="download icon"></i> Завантажити
                                 </a>
                                 {# <a href="/attachments/{{ attachment.id }}/versions" class="ui icon button">

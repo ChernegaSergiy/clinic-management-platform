@@ -102,6 +102,8 @@ $router->add('POST', '/medical-records/new', [MedicalRecordController::class, 's
 $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);
 $router->add('GET', '/medical-records/edit', [MedicalRecordController::class, 'edit']);
 $router->add('POST', '/medical-records/edit', [MedicalRecordController::class, 'update']);
+$router->add('POST', '/medical-records/attachments/upload', [MedicalRecordController::class, 'uploadAttachment']);
+$router->add('GET', '/medical-records/attachments/download', [MedicalRecordController::class, 'downloadAttachment']);
 $router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
 
 // Clinical reference routes
