@@ -15,6 +15,7 @@
         "vlucas/phpdotenv": "^5.6",
         "chillerlan/php-qrcode": "^5.0",
         "dompdf/dompdf": "^3.1",
+        "maennchen/zipstream-php": "^3.1",
         "phpoffice/phpspreadsheet": "^5.2",
         "chernegasergiy/nk-025-2021-parser": "^0.1.0",
         "chernegasergiy/nk-026-2021-parser": "^0.1.0",
