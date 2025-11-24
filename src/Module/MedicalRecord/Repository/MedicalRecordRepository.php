@@ -51,16 +51,18 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        $success = $stmt->execute([
-            ':patient_id' => $data['patient_id'],
-            ':appointment_id' => $data['appointment_id'],
-            ':doctor_id' => $data['doctor_id'],
-            ':visit_date' => $data['visit_date'],
-            ':diagnosis_code' => $data['diagnosis_code'] ?? null,
-            ':diagnosis_text' => $data['diagnosis_text'] ?? null,
-            ':treatment' => $data['treatment'] ?? null,
-            ':notes' => $data['notes'] ?? null,
-        ]);
+        $success = $stmt->execute(
+            [
+                ':patient_id' => $data['patient_id'],
+                ':appointment_id' => $data['appointment_id'],
+                ':doctor_id' => $data['doctor_id'],
+                ':visit_date' => $data['visit_date'],
+                ':diagnosis_code' => $data['diagnosis_code'] ?? null,
+                ':diagnosis_text' => $data['diagnosis_text'] ?? null,
+                ':treatment' => $data['treatment'] ?? null,
+                ':notes' => $data['notes'] ?? null,
+            ]
+        );
 
         if ($success) {
             $medicalRecordId = (int)$this->pdo->lastInsertId();
@@ -90,17 +92,19 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        $success = $stmt->execute([
-            ':patient_id' => $data['patient_id'],
-            ':appointment_id' => $data['appointment_id'],
-            ':doctor_id' => $data['doctor_id'],
-            ':visit_date' => $data['visit_date'],
-            ':diagnosis_code' => $data['diagnosis_code'] ?? null,
-            ':diagnosis_text' => $data['diagnosis_text'] ?? null,
-            ':treatment' => $data['treatment'] ?? null,
-            ':notes' => $data['notes'] ?? null,
-            ':id' => $id,
-        ]);
+        $success = $stmt->execute(
+            [
+                ':patient_id' => $data['patient_id'],
+                ':appointment_id' => $data['appointment_id'],
+                ':doctor_id' => $data['doctor_id'],
+                ':visit_date' => $data['visit_date'],
+                ':diagnosis_code' => $data['diagnosis_code'] ?? null,
+                ':diagnosis_text' => $data['diagnosis_text'] ?? null,
+                ':treatment' => $data['treatment'] ?? null,
+                ':notes' => $data['notes'] ?? null,
+                ':id' => $id,
+            ]
+        );
 
         if ($success) {
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
