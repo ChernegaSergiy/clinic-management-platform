@@ -107,8 +107,9 @@ class MedicalRecordController
                         'error' => $_FILES['attachments']['error'][$key],
                         'size' => $_FILES['attachments']['size'][$key],
                     ];
-                    // Assuming current user ID is available in session
-                    $this->attachmentService->uploadAttachment($fileData, 'medical_record', $medicalRecordId, $_SESSION['user']['id'] ?? null);
+                    $this->attachmentService->uploadAttachment(
+                        $fileData, 'medical_record', $medicalRecordId, $_SESSION['user']['id'] ?? null
+                    );
                 }
             }
         }
@@ -212,12 +213,15 @@ class MedicalRecordController
         }
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
-        $validator->validate($_POST, [
-            'diagnosis_code' => ['required'],
-            'visit_date' => ['required', 'datetime'],
-            'icd_codes' => ['array'],
-            'intervention_codes' => ['array'],
-        ]);
+        $validator->validate(
+            $_POST,
+            [
+                'diagnosis_code' => ['required'],
+                'visit_date' => ['required', 'datetime'],
+                'icd_codes' => ['array'],
+                'intervention_codes' => ['array'],
+            ]
+        );
 
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
@@ -231,7 +235,10 @@ class MedicalRecordController
         $data['appointment_id'] = $record['appointment_id'];
         $data['doctor_id'] = $record['doctor_id'];
 
-        $this->medicalRecordRepository->update($id, $data);
+        $this->medicalRecordRepository->update(
+            $id,
+            $data
+        );
 
         header('Location: /medical-records/show?id=' . $id);
         exit();
