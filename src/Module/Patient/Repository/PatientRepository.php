@@ -61,20 +61,22 @@ class PatientRepository implements PatientRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
 
         try {
-            return $stmt->execute([
-                ':first_name' => $data['first_name'],
-                ':last_name' => $data['last_name'],
-                ':middle_name' => $data['middle_name'] ?? null,
-                ':birth_date' => $data['birth_date'],
-                ':gender' => $data['gender'],
-                ':phone' => $data['phone'],
-                ':email' => $data['email'] ?? null,
-                ':address' => $data['address'] ?? null,
-                ':tax_id' => $data['tax_id'] ?? null,
-                ':document_id' => $data['document_id'] ?? null,
-                ':marital_status' => $data['marital_status'] ?? null,
-                ':status' => $data['status'] ?? 'active',
-            ]);
+            return $stmt->execute(
+                [
+                    ':first_name' => $data['first_name'],
+                    ':last_name' => $data['last_name'],
+                    ':middle_name' => $data['middle_name'] ?? null,
+                    ':birth_date' => $data['birth_date'],
+                    ':gender' => $data['gender'],
+                    ':phone' => $data['phone'],
+                    ':email' => $data['email'] ?? null,
+                    ':address' => $data['address'] ?? null,
+                    ':tax_id' => $data['tax_id'] ?? null,
+                    ':document_id' => $data['document_id'] ?? null,
+                    ':marital_status' => $data['marital_status'] ?? null,
+                    ':status' => $data['status'] ?? 'active',
+                ]
+            );
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000') {
                 $this->lastError = 'duplicate_key';
@@ -150,21 +152,23 @@ class PatientRepository implements PatientRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
 
         try {
-            $success = $stmt->execute([
-                ':id' => $id,
-                ':first_name' => $data['first_name'],
-                ':last_name' => $data['last_name'],
-                ':middle_name' => $data['middle_name'] ?? null,
-                ':birth_date' => $data['birth_date'],
-                ':gender' => $data['gender'],
-                ':phone' => $data['phone'],
-                ':email' => $data['email'] ?? null,
-                ':address' => $data['address'] ?? null,
-                ':tax_id' => $data['tax_id'] ?? null,
-                ':document_id' => $data['document_id'] ?? null,
-                ':marital_status' => $data['marital_status'] ?? null,
-                ':status' => $data['status'] ?? 'active',
-            ]);
+            $success = $stmt->execute(
+                [
+                    ':id' => $id,
+                    ':first_name' => $data['first_name'],
+                    ':last_name' => $data['last_name'],
+                    ':middle_name' => $data['middle_name'] ?? null,
+                    ':birth_date' => $data['birth_date'],
+                    ':gender' => $data['gender'],
+                    ':phone' => $data['phone'],
+                    ':email' => $data['email'] ?? null,
+                    ':address' => $data['address'] ?? null,
+                    ':tax_id' => $data['tax_id'] ?? null,
+                    ':document_id' => $data['document_id'] ?? null,
+                    ':marital_status' => $data['marital_status'] ?? null,
+                    ':status' => $data['status'] ?? 'active',
+                ]
+            );
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000') {
                 $this->lastError = 'duplicate_key';
