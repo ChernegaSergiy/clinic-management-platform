@@ -28,7 +28,8 @@ class UserRepository implements UserRepositoryInterface
         $params = [];
 
         if (!empty($searchTerm)) {
-            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term OR CONCAT(first_name, ' ', last_name) LIKE :term";
+            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
+                . " OR CONCAT(first_name, ' ', last_name) LIKE :term";
             $params[':term'] = '%' . $searchTerm . '%';
         }
 
