@@ -28,6 +28,16 @@
                     </div>
                 </div>
             </div>
+            <div class="field">
+                <label>Коди медичних інтервенцій (НК 026:2021)</label>
+                <div class="ui fluid search multiple selection dropdown" id="intervention-codes-dropdown">
+                    <input type="hidden" name="intervention_codes">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть коди інтервенцій</div>
+                    <div class="menu">
+                    </div>
+                </div>
+            </div>
             {{ forms.textarea('diagnosis_text', 'Діагноз', '', 'Опишіть діагноз') }}
             {{ forms.textarea('treatment', 'Лікування', '', 'Опишіть призначене лікування') }}
             {{ forms.textarea('notes', 'Примітки', '', 'Додаткові примітки') }}
@@ -45,6 +55,32 @@
             $('#icd-codes-dropdown').dropdown({
                 apiSettings: {
                     url: '/medical-records/icd-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact'
+            });
+
+            $('#intervention-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/intervention-codes?search={query}',
                     onResponse: function (response) {
                         var codes = [];
                         $.each(response, function (index, item) {
