@@ -257,7 +257,10 @@ class PatientController
                 'phone' => ['required'],
             ];
 
-            if (!$validator->validate($patientData, $rules)) {
+            if (!$validator->validate(
+                $patientData,
+                $rules
+            )) {
                 $failedCount++;
                 $errorMessages = [];
                 foreach ($validator->getErrors() as $fieldErrors) {
@@ -273,7 +276,7 @@ class PatientController
                 $importedCount++;
             } else {
                 $failedCount++;
-                $errors[] = 'Не вдалося зберегти пацієнта ' . $patientData['first_name'] . ' ' . $patientData['last_name'] . ' (можливо, дублікат).';
+                $errors[] = 'Не вдалося зберегти пацієнта ' . ($patientData['first_name'] ?? '') . ' ' . ($patientData['last_name'] ?? '') . ' (можливо, дублікат).';
             }
         }
 
