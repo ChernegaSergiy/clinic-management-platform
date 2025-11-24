@@ -19,6 +19,32 @@
                 {{ forms.input('visit_date', 'Дата візиту', old.visit_date ?? record.visit_date|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
  }}
             </div>
+            <div class="field">
+                <label>ICD-10 Коди</label>
+                <div class="ui fluid search multiple selection dropdown" id="icd-codes-dropdown">
+                    <input type="hidden" name="icd_codes" value="{{ record.icd_codes|map(c => c.id)|join(',') }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть ICD-10 коди</div>
+                    <div class="menu">
+                        {% for icd in record.icd_codes %}
+                            <div class="item" data-value="{{ icd.id }}">{{ icd.code }} - {{ icd.description }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Коди медичних інтервенцій (НК 026:2021)</label>
+                <div class="ui fluid search multiple selection dropdown" id="intervention-codes-dropdown">
+                    <input type="hidden" name="intervention_codes" value="{{ record.intervention_codes|map(c => c.id)|join(',') }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть коди інтервенцій</div>
+                    <div class="menu">
+                        {% for intervention in record.intervention_codes %}
+                            <div class="item" data-value="{{ intervention.id }}">{{ intervention.code }} - {{ intervention.description }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
             {{ forms.textarea('diagnosis_text', 'Діагноз', old.diagnosis_text ?? record.diagnosis_text, 'Опишіть діагноз') }}
             {{ forms.textarea('treatment', 'Лікування', old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
             {{ forms.textarea('notes', 'Примітки', old.notes ?? record.notes, 'Додаткові примітки') }}
@@ -31,4 +57,75 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('#icd-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/icd-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact',
+                // Pre-select existing codes
+                {% if record.icd_codes is not empty %}
+                setValues: [
+                    {% for icd in record.icd_codes %}
+                        '{{ icd.id }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                {% endif %}
+            });
+
+            $('#intervention-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/intervention-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact',
+                // Pre-select existing codes
+                {% if record.intervention_codes is not empty %}
+                setValues: [
+                    {% for intervention in record.intervention_codes %}
+                        '{{ intervention.id }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                {% endif %}
+            });
+        });
+    </script>
 {% endblock %}
