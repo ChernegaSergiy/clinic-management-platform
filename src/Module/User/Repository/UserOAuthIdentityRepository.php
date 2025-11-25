@@ -51,4 +51,11 @@ class UserOAuthIdentityRepository
         $stmt = $this->pdo->prepare("DELETE FROM user_oauth_identities WHERE user_id = :user_id AND provider = :provider");
         return $stmt->execute([':user_id' => $userId, ':provider' => $provider]);
     }
+
+    public function findAllByUserId(int $userId): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM user_oauth_identities WHERE user_id = :user_id");
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
