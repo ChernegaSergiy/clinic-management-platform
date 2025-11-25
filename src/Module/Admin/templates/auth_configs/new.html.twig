@@ -9,6 +9,12 @@
         <h2 class="ui header">Додати нову конфігурацію аутентифікації</h2>
         <div class="ui divider"></div>
 
+        <div class="ui info message">
+            <div class="header">URL зворотного виклику (Redirect URI)</div>
+            <p>Вкажіть наступний URL у налаштуваннях вашого OAuth-провайдера. Замініть `[provider_name]` на назву провайдера, яку ви вказуєте нижче (наприклад, 'google').</p>
+            <code>{{ redirectUri }}</code>
+        </div>
+
         <form class="ui form" method="POST" action="/admin/auth_configs/new">
             {{ forms.input('provider', 'Провайдер', old.provider ?? '', 'text', 'Наприклад, google, mfa_totp', errors.provider ?? null, {'required': 'required'}) }}
             {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? '', 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}

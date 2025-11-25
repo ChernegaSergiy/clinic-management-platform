@@ -575,9 +575,12 @@ class AdminController
     public function createAuthConfig(): void
     {
         AuthGuard::isAdmin();
+        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/[provider_name]';
+
         View::render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
+            'redirectUri' => $redirectUri,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -619,11 +622,14 @@ class AdminController
             echo "Конфігурацію аутентифікації не знайдено";
             return;
         }
+        
+        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/' . $config['provider'];
 
         View::render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
+            'redirectUri' => $redirectUri,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
