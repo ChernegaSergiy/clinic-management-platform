@@ -134,19 +134,9 @@ class OAuthController
 
     public static function getSupportedProviders(): array
     {
-        // To add a new provider:
-        // 1. Install its league/oauth2-* Composer package (e.g., composer require league/oauth2-facebook)
-        // 2. Add a 'case' statement in the getProvider() method below.
-        // 3. Add its name to this array.
         return [
             'google',
             'facebook',
-            // 'github',
-            // 'linkedin',
-            // 'microsoft',
-            // 'gitlab',
-            // 'discord',
-            // 'apple',
         ];
     }
 }
