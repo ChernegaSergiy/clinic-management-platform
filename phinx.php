@@ -4,7 +4,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Load .env file
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
+$dotenv->load();
 
 return [
     'paths' => [
@@ -15,12 +15,12 @@ return [
         'default_migration_table' => 'phinxlog',
         'default_environment' => 'production',
         'production' => [
-            'adapter' => $_ENV['DB_CONNECTION'] ?? 'mysql',
-            'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
-            'name' => $_ENV['DB_DATABASE'] ?? 'clinic',
-            'user' => $_ENV['DB_USERNAME'] ?? 'root',
-            'pass' => $_ENV['DB_PASSWORD'] ?? '',
-            'port' => $_ENV['DB_PORT'] ?? 3306,
+            'adapter' => getenv('DB_CONNECTION') ?: 'mysql',
+            'host' => getenv('DB_HOST') ?: '127.0.0.1',
+            'name' => getenv('DB_DATABASE') ?: 'clinic',
+            'user' => getenv('DB_USERNAME') ?: 'root',
+            'pass' => getenv('DB_PASSWORD') ?: '',
+            'port' => getenv('DB_PORT') ?: 3306,
             'charset' => 'utf8',
         ],
         'development' => [
