@@ -34,21 +34,37 @@
             <div class="ui divider"></div>
 
             <h2 class="ui header">Зв'язані акаунти</h2>
-            {% if user.provider == 'google' %}
-                <div class="ui green label">
-                    <i class="google icon"></i>
-                    Google-акаунт прив'язано
-                </div>
-                <form action="/user/profile/unlink-provider" method="POST" style="display: inline; margin-left: 10px;" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій Google-акаунт?');">
-                    <button type="submit" class="ui mini red button">Відв'язати</button>
-                </form>
-            {% else %}
-                <p>Ви можете прив'язати свій Google-акаунт для швидкого входу.</p>
-                <a href="/login/google" class="ui google plus button">
-                    <i class="google icon"></i>
-                    Прив'язати Google
-                </a>
-            {% endif %}
+            <div class="ui relaxed divided list">
+                {% if user.provider == 'google' %}
+                    <div class="item">
+                        <div class="right floated content">
+                            <form action="/user/profile/unlink-provider" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій Google-акаунт?');">
+                                <button type="submit" class="ui small red button">Відв'язати</button>
+                            </form>
+                        </div>
+                        <i class="large google middle aligned icon"></i>
+                        <div class="content">
+                            <div class="header">Google</div>
+                            <div class="description">Акаунт прив'язано</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="item">
+                        <div class="right floated content">
+                             <a href="/login/google" class="ui google plus button">
+                                <i class="google icon"></i>
+                                Прив'язати Google
+                            </a>
+                        </div>
+                         <i class="large google middle aligned icon"></i>
+                        <div class="content">
+                            <div class="header">Google</div>
+                            <div class="description">Не прив'язано</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {# Add other providers here in the future #}
+            </div>
         </div>
     </div>
 {% endblock %}
