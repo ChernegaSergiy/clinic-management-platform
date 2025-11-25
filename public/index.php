@@ -96,7 +96,7 @@ $router->add('GET', '/user/profile', [UserController::class, 'profile']);
 $router->add('POST', '/user/profile/unlink-provider/{provider}', [UserController::class, 'unlinkProvider']);
 
 // OAuth routes
-$router->add('GET', '/login/{provider}', [AuthController::class, 'redirectToProvider']);
+$router->add('GET', '/oauth/redirect/{provider}', [AuthController::class, 'redirectToProvider']);
 $router->add('GET', '/oauth/callback/{provider}', [OAuthController::class, 'callback']);
 
 // Patient routes
