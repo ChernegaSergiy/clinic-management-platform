@@ -28,10 +28,10 @@ class OAuthController
             die("Provider not supported or inactive.");
         }
 
-        $provider = $this->getProvider($provider, $providerConfig);
+        $providerObj = $this->getProvider($provider, $providerConfig);
 
-        $authUrl = $provider->getAuthorizationUrl();
-        $_SESSION['oauth2state'] = $provider->getState();
+        $authUrl = $providerObj->getAuthorizationUrl();
+        $_SESSION['oauth2state'] = $providerObj->getState();
 
         header('Location: ' . $authUrl);
         exit();
@@ -45,7 +45,7 @@ class OAuthController
             die("Provider not supported or inactive.");
         }
 
-        $provider = $this->getProvider($provider, $providerConfig);
+        $providerObj = $this->getProvider($provider, $providerConfig);
 
         if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
             unset($_SESSION['oauth2state']);
@@ -53,11 +53,11 @@ class OAuthController
         }
 
         try {
-            $token = $provider->getAccessToken('authorization_code', [
+            $token = $providerObj->getAccessToken('authorization_code', [
                 'code' => $_GET['code']
             ]);
 
-            $ownerDetails = $provider->getResourceOwner($token);
+            $ownerDetails = $providerObj->getResourceOwner($token);
             
             // Check if user is already logged in to link account
             if (isset($_SESSION['user']['id'])) {
