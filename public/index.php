@@ -142,6 +142,7 @@ $router->add(
 );
 
 // Clinical reference routes
+$router->add('GET', '/admin/clinical', [ClinicalReferenceController::class, 'clinicalIndex']);
 $router->add('GET', '/admin/clinical/icd-import', [
     ClinicalReferenceController::class, 'icdImportForm'
 ]);

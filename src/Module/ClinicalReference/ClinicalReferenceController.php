@@ -114,4 +114,17 @@ class ClinicalReferenceController
         header('Location: /admin/clinical/intervention-import');
         exit();
     }
+
+    public function clinicalIndex(): void
+    {
+        AuthGuard::isAdmin();
+
+        $icdCount = $this->icdCodeRepository->countAll();
+        $interventionCount = $this->interventionCodeRepository->countAll();
+
+        View::render('@modules/ClinicalReference/templates/index.html.twig', [
+            'icdCount' => $icdCount,
+            'interventionCount' => $interventionCount,
+        ]);
+    }
 }

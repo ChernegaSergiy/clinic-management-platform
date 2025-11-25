@@ -1,0 +1,40 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Клінічні довідники - Адмінка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Клінічні довідники</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui two column very relaxed grid">
+            <div class="column">
+                <h3 class="ui header">НК 025:2021 (МКХ-10)</h3>
+                <p>Класифікатор хвороб та споріднених проблем охорони здоров'я.</p>
+                <p>Кількість записів: <strong>{{ icdCount }}</strong></p>
+                <a href="/admin/clinical/icd-import" class="ui primary button">Керувати імпортом МКХ-10</a>
+            </div>
+            <div class="column">
+                <h3 class="ui header">НК 026:2021</h3>
+                <p>Класифікатор медичних інтервенцій.</p>
+                <p>Кількість записів: <strong>{{ interventionCount }}</strong></p>
+                <a href="/admin/clinical/intervention-import" class="ui primary button">Керувати імпортом інтервенцій</a>
+            </div>
+        </div>
+
+        {% if success_message %}
+            <div class="ui success message">
+                <i class="close icon"></i>
+                <div class="header">Успіх!</div>
+                <p>{{ success_message }}</p>
+            </div>
+        {% endif %}
+        {% if errors.import %}
+            <div class="ui error message">
+                <i class="close icon"></i>
+                <div class="header">Помилка!</div>
+                <p>{{ errors.import }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
