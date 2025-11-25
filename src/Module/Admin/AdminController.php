@@ -575,12 +575,9 @@ class AdminController
     public function createAuthConfig(): void
     {
         AuthGuard::isAdmin();
-        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/[provider_name]';
-
         View::render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
-            'redirectUri' => $redirectUri,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -622,14 +619,11 @@ class AdminController
             echo "Конфігурацію аутентифікації не знайдено";
             return;
         }
-        
-        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/' . $config['provider'];
 
         View::render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
-            'redirectUri' => $redirectUri,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -677,6 +671,27 @@ class AdminController
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
         header('Location: /admin/auth_configs');
         exit();
+    }
+
+    public function showAuthConfig(): void
+    {
+        AuthGuard::isAdmin();
+
+        $id = (int)($_GET['id'] ?? 0);
+        $config = $this->authConfigRepository->findById($id);
+
+        if (!$config) {
+            http_response_code(404);
+            echo "Конфігурацію аутентифікації не знайдено";
+            return;
+        }
+
+        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/' . $config['provider'];
+
+        View::render('@modules/Admin/templates/auth_configs/show.html.twig', [
+            'config' => $config,
+            'redirectUri' => $redirectUri,
+        ]);
     }
 
     // --- Backup Policy Management ---

@@ -1,0 +1,64 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Перегляд конфігурації #{{ config.id }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Перегляд конфігурації аутентифікації #{{ config.id }}</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui info message">
+            <div class="header">URL зворотного виклику (Redirect URI)</div>
+            <p>Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:</p>
+            <code>{{ redirectUri }}</code>
+        </div>
+
+        <table class="ui celled table">
+            <tbody>
+                <tr>
+                    <td><strong>ID</strong></td>
+                    <td>{{ config.id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Провайдер</strong></td>
+                    <td>{{ config.provider }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Client ID</strong></td>
+                    <td>{{ config.client_id ?: 'Не вказано' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Client Secret</strong></td>
+                    <td>{{ config.client_secret ? '********' : 'Не вказано' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Активна</strong></td>
+                    <td>
+                        {% if config.is_active %}
+                            <i class="check circle icon green"></i> Так
+                        {% else %}
+                            <i class="times circle icon red"></i> Ні
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Додаткова конфігурація</strong></td>
+                    <td><pre>{{ config.config ? config.config|json_encode(constant('JSON_PRETTY_PRINT')) : 'Немає' }}</pre></td>
+                </tr>
+                <tr>
+                    <td><strong>Створено</strong></td>
+                    <td>{{ config.created_at }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Оновлено</strong></td>
+                    <td>{{ config.updated_at }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/admin/auth_configs/edit?id={{ config.id }}" class="ui primary button">Редагувати</a>
+        <a href="/admin/auth_configs" class="ui button">Повернутися до списку</a>
+    </div>
+{% endblock %}

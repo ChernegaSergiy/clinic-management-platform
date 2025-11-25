@@ -9,12 +9,6 @@
         <h2 class="ui header">Редагувати конфігурацію аутентифікації #{{ config.id }}</h2>
         <div class="ui divider"></div>
 
-        <div class="ui info message">
-            <div class="header">URL зворотного виклику (Redirect URI)</div>
-            <p>Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:</p>
-            <code>{{ redirectUri }}</code>
-        </div>
-
         <form class="ui form" method="POST" action="/admin/auth_configs/edit?id={{ config.id }}">
             {{ forms.input('provider', 'Провайдер', old.provider ?? config.provider, 'text', 'Наприклад, google, mfa_totp', errors.provider ?? null, {'required': 'required'}) }}
             {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? config.client_id, 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}

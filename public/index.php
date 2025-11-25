@@ -202,6 +202,7 @@ $router->add('POST', '/admin/dictionaries/values/delete', [AdminController::clas
 
 // Admin Auth Config routes
 $router->add('GET', '/admin/auth_configs', [AdminController::class, 'listAuthConfigs']);
+$router->add('GET', '/admin/auth_configs/show', [AdminController::class, 'showAuthConfig']);
 $router->add('GET', '/admin/auth_configs/new', [AdminController::class, 'createAuthConfig']);
 $router->add('POST', '/admin/auth_configs/new', [AdminController::class, 'storeAuthConfig']);
 $router->add('GET', '/admin/auth_configs/edit', [AdminController::class, 'editAuthConfig']);
