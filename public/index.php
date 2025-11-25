@@ -127,6 +127,7 @@ $router->add('GET', '/book-appointment', [AppointmentController::class, 'publicF
 $router->add('POST', '/book-appointment', [AppointmentController::class, 'submitPublicForm']);
 
 // Medical Record routes
+$router->add('GET', '/medical-records', [MedicalRecordController::class, 'index']);
 $router->add('GET', '/medical-records/new', [MedicalRecordController::class, 'create']);
 $router->add('POST', '/medical-records/new', [MedicalRecordController::class, 'store']);
 $router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);

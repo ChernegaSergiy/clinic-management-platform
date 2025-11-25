@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Медичні записи{% endblock %}
+
+{% block body %}
+    <h1 class="ui header">Медичні записи</h1>
+
+    <div class="ui segment">
+        <a href="/medical-records/new" class="ui primary button">Створити новий запис</a>
+    </div>
+
+    {% if records is empty %}
+        <div class="ui info message">
+            <div class="header">Немає медичних записів</div>
+            <p>Наразі в системі немає медичних записів.</p>
+        </div>
+    {% else %}
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Дата візиту</th>
+                    <th>Діагноз</th>
+                    <th>Пацієнт</th>
+                    <th>Лікар</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.visit_date|date('Y-m-d H:i') }}</td>
+                        <td>{{ record.diagnosis_code }}</td>
+                        <td>{{ record.patient_id }}</td> {# Placeholder, ideally show patient name #}
+                        <td>{{ record.doctor_id }}</td> {# Placeholder, ideally show doctor name #}
+                        <td>
+                            <a href="/medical-records/show?id={{ record.id }}" class="ui small button">Переглянути</a>
+                            <a href="/medical-records/edit?id={{ record.id }}" class="ui small button">Редагувати</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

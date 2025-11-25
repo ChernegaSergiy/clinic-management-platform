@@ -54,6 +54,16 @@ class MedicalRecordController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    public function index(): void
+    {
+        AuthGuard::check();
+        $records = $this->medicalRecordRepository->findAll();
+
+        View::render('@modules/MedicalRecord/templates/index.html.twig', [
+            'records' => $records,
+        ]);
+    }
+
     public function store(): void
     {
         AuthGuard::check();
