@@ -5,14 +5,17 @@ namespace App\Module\User;
 use App\Core\AuthGuard;
 use App\Core\View;
 use App\Module\User\Repository\UserRepository;
+use App\Module\Admin\Repository\AuthConfigRepository;
 
 class UserController
 {
     private UserRepository $userRepository;
+    private AuthConfigRepository $authConfigRepository;
 
     public function __construct()
     {
         $this->userRepository = new UserRepository();
+        $this->authConfigRepository = new AuthConfigRepository();
     }
 
     public function profile(): void
@@ -30,10 +33,13 @@ class UserController
 
         $successMessage = $_SESSION['success_message'] ?? null;
         unset($_SESSION['success_message']);
+        
+        $authConfigs = $this->authConfigRepository->findAll();
 
         View::render('@modules/User/templates/profile.html.twig', [
             'user' => $user,
-            'successMessage' => $successMessage
+            'successMessage' => $successMessage,
+            'authConfigs' => array_filter($authConfigs, fn($config) => $config['is_active']),
         ]);
     }
 
