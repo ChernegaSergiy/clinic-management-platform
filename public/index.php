@@ -51,6 +51,26 @@ if (file_exists($envPath)) {
     Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
 }
 
+if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
+    $appUrlParts = parse_url($_ENV['APP_BASE_URL']);
+    if (isset($appUrlParts['host'])) {
+        $cookieDomain = $appUrlParts['host'];
+        // Prepend a dot to the domain to make it valid for all subdomains
+        if (substr_count($cookieDomain, '.') > 1) {
+             $cookieDomain = '.' . $cookieDomain;
+        }
+
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'domain' => $cookieDomain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
+}
+
 session_start();
 
 $router = new Router();
