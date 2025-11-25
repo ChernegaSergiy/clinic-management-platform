@@ -26,7 +26,7 @@ class Router
 
             if ($route['method'] === $method && preg_match($pattern, $path, $matches)) {
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                
+
                 $handler = $route['handler'];
 
                 if (is_array($handler) && is_string($handler[0])) {

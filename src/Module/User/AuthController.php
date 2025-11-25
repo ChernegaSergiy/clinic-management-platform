@@ -75,7 +75,7 @@ class AuthController
     /**
      * Redirects to the specified OAuth provider for authentication.
      *
-     * @param string $providerName
+     * @param string $provider
      * @return void
      */
     public function redirectToProvider(string $provider): void

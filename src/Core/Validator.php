@@ -86,14 +86,14 @@ class Validator
                     $paramsStr = substr($rule, 7); // Get "table,column,ignoreId"
                     $params = explode(',', $paramsStr);
 
-                    $table = $params[0] ?? null;
+                    $table = $params[0];
                     $column = $params[1] ?? $field;
                     $ignoreId = $params[2] ?? null;
 
                     if ($table && $column && !empty($value)) {
                         $sql = "SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` = :value";
                         $queryParams = [':value' => $value];
-                        
+
                         if ($ignoreId !== null) {
                             $sql .= " AND `id` != :ignore_id";
                             $queryParams[':ignore_id'] = $ignoreId;
