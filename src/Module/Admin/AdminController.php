@@ -575,9 +575,12 @@ class AdminController
     public function createAuthConfig(): void
     {
         AuthGuard::isAdmin();
+        $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
+
         View::render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
+            'supportedProviders' => $supportedProviders,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -619,11 +622,13 @@ class AdminController
             echo "Конфігурацію аутентифікації не знайдено";
             return;
         }
+        $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
         View::render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
+            'supportedProviders' => $supportedProviders,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
