@@ -50,7 +50,7 @@
                 {% for patient in patients %}
                     <tr>
                         <td>{{ patient.id }}</td>
-                        <td>{{ patient.name }}</td>
+                        <td>{{ patient.last_name }} {{ patient.first_name }}</td>
                         <td>{{ patient.birth_date }}</td>
                         <td>{{ patient.phone }}</td>
                         <td>
