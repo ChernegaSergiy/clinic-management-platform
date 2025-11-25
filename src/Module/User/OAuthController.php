@@ -27,7 +27,7 @@ class OAuthController
 
         if (!$providerConfig || !$providerConfig['is_active']) {
             // Or handle this error more gracefully
-            die("Provider not supported or inactive.");
+            die("Провайдер не підтримується або вимкнений.");
         }
 
         $providerObj = $this->getProvider($provider, $providerConfig);
@@ -44,14 +44,14 @@ class OAuthController
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
         if (!$providerConfig || !$providerConfig['is_active']) {
-            die("Provider not supported or inactive.");
+            die("Провайдер не підтримується або вимкнений.");
         }
 
         $providerObj = $this->getProvider($provider, $providerConfig);
 
         if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
             unset($_SESSION['oauth2state']);
-            die('Invalid state.');
+            die('Некоректний стан запиту.');
         }
 
         try {
@@ -76,7 +76,7 @@ class OAuthController
                 ]);
 
                 // Redirect to a profile/settings page with a success message
-                $_SESSION['success_message'] = 'Your ' . ucfirst($provider) . ' account has been successfully linked.';
+                $_SESSION['success_message'] = sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider));
                 header('Location: /user/profile'); // Assuming a /user/profile route exists
                 exit();
             }
@@ -99,7 +99,7 @@ class OAuthController
                 exit();
             } else {
                 // No user found, redirect back to login with an error
-                $_SESSION['errors'] = ['login' => 'No account is associated with this ' . ucfirst($provider) . ' account. Please register first.'];
+                $_SESSION['errors'] = ['login' => sprintf('Жодного користувача, пов\'язаного з цим акаунтом %s, не знайдено. Спершу зареєструйтеся.', ucfirst($provider))];
                 header('Location: /login');
                 exit();
             }
@@ -107,7 +107,7 @@ class OAuthController
         } catch (IdentityProviderException $e) {
             // Failed to get the access token or user details.
             // You should handle this more gracefully.
-            die('Something went wrong: ' . $e->getMessage());
+            die('Сталася помилка: ' . $e->getMessage());
         }
     }
 
@@ -134,7 +134,7 @@ class OAuthController
                     'redirectUri'  => $_ENV['APP_BASE_URL'] . '/oauth/callback/github',
                 ]);
             default:
-                throw new \Exception("Provider not supported: $provider");
+                throw new \Exception("Провайдер не підтримується: $provider");
         }
     }
 
