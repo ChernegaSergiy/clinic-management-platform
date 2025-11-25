@@ -20,7 +20,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                {% if errors.provider %}<div class="ui basic red pointing prompt label">{{ errors.provider }}</div>{% endif %}
+                {% if errors.provider %}<div class="ui basic red pointing prompt label">{{ errors.provider[0] }}</div>{% endif %}
             </div>
             {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? config.client_id, 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}
             {{ forms.input('client_secret', 'Client Secret (необов\'язково)', old.client_secret ?? config.client_secret, 'text', 'Client Secret для OAuth2', errors.client_secret ?? null) }}
