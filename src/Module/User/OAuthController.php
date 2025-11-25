@@ -7,6 +7,7 @@ use App\Module\User\Repository\UserRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use League\OAuth2\Client\Provider\Google;
 use League\OAuth2\Client\Provider\Facebook;
+use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 class OAuthController
@@ -126,6 +127,12 @@ class OAuthController
                     'redirectUri'       => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/facebook',
                     'graphApiVersion'   => 'v2.10',
                 ]);
+            case 'github':
+                return new Github([
+                    'clientId'     => $config['client_id'],
+                    'clientSecret' => $config['client_secret'],
+                    'redirectUri'  => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/github',
+                ]);
             // Add other providers here
             default:
                 throw new \Exception("Provider not supported: $provider");
@@ -137,6 +144,7 @@ class OAuthController
         return [
             'google',
             'facebook',
+            'github',
         ];
     }
 }
