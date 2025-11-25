@@ -118,20 +118,20 @@ class OAuthController
                 return new Google([
                     'clientId'     => $config['client_id'],
                     'clientSecret' => $config['client_secret'],
-                    'redirectUri'  => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/google',
+                    'redirectUri'  => $_ENV['APP_BASE_URL'] . '/oauth/callback/google',
                 ]);
             case 'facebook':
                 return new Facebook([
                     'clientId'          => $config['client_id'],
                     'clientSecret'      => $config['client_secret'],
-                    'redirectUri'       => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/facebook',
+                    'redirectUri'       => $_ENV['APP_BASE_URL'] . '/oauth/callback/facebook',
                     'graphApiVersion'   => 'v2.10',
                 ]);
             case 'github':
                 return new Github([
                     'clientId'     => $config['client_id'],
                     'clientSecret' => $config['client_secret'],
-                    'redirectUri'  => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/github',
+                    'redirectUri'  => $_ENV['APP_BASE_URL'] . '/oauth/callback/github',
                 ]);
             default:
                 throw new \Exception("Provider not supported: $provider");

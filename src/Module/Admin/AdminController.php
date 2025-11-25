@@ -691,7 +691,7 @@ class AdminController
             return;
         }
 
-        $redirectUri = 'http://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/oauth/callback/' . $config['provider'];
+        $redirectUri = $_ENV['APP_BASE_URL'] . '/oauth/callback/' . $config['provider'];
 
         View::render('@modules/Admin/templates/auth_configs/show.html.twig', [
             'config' => $config,

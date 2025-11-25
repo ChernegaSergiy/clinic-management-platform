@@ -117,7 +117,7 @@ class LabOrderController
             return;
         }
 
-        $qrCodeData = $_SERVER['HTTP_HOST'] . '/lab-orders/show?id=' . $id; // URL to the order details
+        $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id; // URL to the order details
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
         View::render('@modules/LabOrder/templates/show.html.twig', [
