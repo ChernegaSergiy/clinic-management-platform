@@ -38,12 +38,12 @@
                 {% for config in authConfigs %}
                     <div class="item">
                         <div class="right floated content">
-                            {% if user.provider == config.provider %}
-                                <form action="/user/profile/unlink-provider" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
+                            {% if config.provider in linkedProviders %}
+                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
                                     <button type="submit" class="ui small red button">Відв'язати</button>
                                 </form>
                             {% else %}
-                                <a href="/login/{{ config.provider }}" class="ui button {{ config.provider }}">
+                                <a href="/oauth/redirect/{{ config.provider }}" class="ui button {{ config.provider }}">
                                     <i class="{{ config.provider }} icon"></i>
                                     Прив'язати {{ config.provider|capitalize }}
                                 </a>
@@ -53,7 +53,7 @@
                         <div class="content">
                             <div class="header">{{ config.provider|capitalize }}</div>
                             <div class="description">
-                                {% if user.provider == config.provider %}
+                                {% if config.provider in linkedProviders %}
                                     Акаунт прив'язано
                                 {% else %}
                                     Не прив'язано
