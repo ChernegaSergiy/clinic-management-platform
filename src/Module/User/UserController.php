@@ -36,4 +36,15 @@ class UserController
             'successMessage' => $successMessage
         ]);
     }
+
+    public function unlinkProvider(): void
+    {
+        AuthGuard::check();
+
+        $this->userRepository->unlinkProvider($_SESSION['user']['id']);
+
+        $_SESSION['success_message'] = 'Ваш акаунт було успішно відв\'язано.';
+        header('Location: /user/profile');
+        exit();
+    }
 }
