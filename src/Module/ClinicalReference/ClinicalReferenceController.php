@@ -63,7 +63,7 @@ class ClinicalReferenceController
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        header('Location: /admin/clinical/icd-import');
+        header('Location: /admin/clinical');
         exit();
     }
 
@@ -111,7 +111,7 @@ class ClinicalReferenceController
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        header('Location: /admin/clinical/intervention-import');
+        header('Location: /admin/clinical');
         exit();
     }
 
