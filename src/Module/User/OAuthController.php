@@ -133,7 +133,6 @@ class OAuthController
                     'clientSecret' => $config['client_secret'],
                     'redirectUri'  => 'http://' . $_SERVER['HTTP_HOST'] . '/oauth/callback/github',
                 ]);
-            // Add other providers here
             default:
                 throw new \Exception("Provider not supported: $provider");
         }
