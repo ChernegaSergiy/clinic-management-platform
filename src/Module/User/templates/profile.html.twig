@@ -35,35 +35,35 @@
 
             <h2 class="ui header">Зв'язані акаунти</h2>
             <div class="ui relaxed divided list">
-                {% if user.provider == 'google' %}
+                {% for config in authConfigs %}
                     <div class="item">
                         <div class="right floated content">
-                            <form action="/user/profile/unlink-provider" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій Google-акаунт?');">
-                                <button type="submit" class="ui small red button">Відв'язати</button>
-                            </form>
+                            {% if user.provider == config.provider %}
+                                <form action="/user/profile/unlink-provider" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
+                                    <button type="submit" class="ui small red button">Відв'язати</button>
+                                </form>
+                            {% else %}
+                                <a href="/login/{{ config.provider }}" class="ui button {{ config.provider }}">
+                                    <i class="{{ config.provider }} icon"></i>
+                                    Прив'язати {{ config.provider|capitalize }}
+                                </a>
+                            {% endif %}
                         </div>
-                        <i class="large google middle aligned icon"></i>
+                        <i class="large {{ config.provider }} middle aligned icon"></i>
                         <div class="content">
-                            <div class="header">Google</div>
-                            <div class="description">Акаунт прив'язано</div>
+                            <div class="header">{{ config.provider|capitalize }}</div>
+                            <div class="description">
+                                {% if user.provider == config.provider %}
+                                    Акаунт прив'язано
+                                {% else %}
+                                    Не прив'язано
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="item">
-                        <div class="right floated content">
-                             <a href="/login/google" class="ui google plus button">
-                                <i class="google icon"></i>
-                                Прив'язати Google
-                            </a>
-                        </div>
-                         <i class="large google middle aligned icon"></i>
-                        <div class="content">
-                            <div class="header">Google</div>
-                            <div class="description">Не прив'язано</div>
-                        </div>
-                    </div>
-                {% endif %}
-                {# Add other providers here in the future #}
+                    <p>Немає доступних провайдерів для прив'язки.</p>
+                {% endfor %}
             </div>
         </div>
     </div>
