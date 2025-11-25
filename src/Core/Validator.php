@@ -83,16 +83,24 @@ class Validator
                 }
 
                 if (is_string($rule) && str_starts_with($rule, 'unique:')) {
-                    [$ruleName, $table, $column, $ignoreId] = array_pad(explode(':', $rule), 4, null);
-                    if (!empty($value)) {
-                        $sql = "SELECT COUNT(*) FROM {$table} WHERE {$column} = :value";
-                        $params = [':value' => $value];
+                    $paramsStr = substr($rule, 7); // Get "table,column,ignoreId"
+                    $params = explode(',', $paramsStr);
+
+                    $table = $params[0] ?? null;
+                    $column = $params[1] ?? $field;
+                    $ignoreId = $params[2] ?? null;
+
+                    if ($table && $column && !empty($value)) {
+                        $sql = "SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` = :value";
+                        $queryParams = [':value' => $value];
+                        
                         if ($ignoreId !== null) {
-                            $sql .= " AND id != :ignore_id";
-                            $params[':ignore_id'] = $ignoreId;
+                            $sql .= " AND `id` != :ignore_id";
+                            $queryParams[':ignore_id'] = $ignoreId;
                         }
+
                         $stmt = $this->pdo->prepare($sql);
-                        $stmt->execute($params);
+                        $stmt->execute($queryParams);
                         if ($stmt->fetchColumn() > 0) {
                             $this->errors[$field][] = "Значення поля '{$field}' вже існує.";
                         }

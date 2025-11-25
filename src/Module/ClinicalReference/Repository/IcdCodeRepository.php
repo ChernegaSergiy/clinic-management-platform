@@ -59,7 +59,9 @@ class IcdCodeRepository
 
     public function searchByCodeOrDescription(string $searchTerm): array
     {
-        $sql = "SELECT id, code, description FROM icd_codes WHERE code LIKE :term OR description LIKE :term ORDER BY code ASC LIMIT 20";
+        $sql = "SELECT id, code, description FROM icd_codes 
+                WHERE code LIKE :term OR description LIKE :term 
+                ORDER BY code ASC LIMIT 20";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':term' => '%' . $searchTerm . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

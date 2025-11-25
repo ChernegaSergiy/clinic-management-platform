@@ -64,7 +64,8 @@ class KpiController
     {
         AuthGuard::check();
         $results = [];
-        if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) { // Перевірка, чи користувач є адміністратором
+        if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) {
+            // Перевірка, чи користувач є адміністратором
             $results = $this->kpiRepository->findAllKpiResults();
         } else {
             $userId = $_SESSION['user']['id'];

@@ -30,7 +30,8 @@ class InterventionCodeRepository
         $this->pdo->beginTransaction();
         try {
             $this->pdo->exec("DELETE FROM intervention_codes");
-            $stmt = $this->pdo->prepare("INSERT INTO intervention_codes (code, description) VALUES (:code, :description)");
+            $stmt = $this->pdo->prepare("INSERT INTO intervention_codes (code, description) 
+                                        VALUES (:code, :description)");
             $count = 0;
             $seen = [];
             foreach ($rows as $row) {
@@ -59,7 +60,9 @@ class InterventionCodeRepository
 
     public function searchByCodeOrDescription(string $searchTerm): array
     {
-        $sql = "SELECT id, code, description FROM intervention_codes WHERE code LIKE :term OR description LIKE :term ORDER BY code ASC LIMIT 20";
+        $sql = "SELECT id, code, description FROM intervention_codes 
+                WHERE code LIKE :term OR description LIKE :term 
+                ORDER BY code ASC LIMIT 20";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':term' => '%' . $searchTerm . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

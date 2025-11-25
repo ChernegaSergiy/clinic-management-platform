@@ -10,7 +10,7 @@
                 <h2 class="ui header">Керування конфігураціями аутентифікації</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/auth-configs/new" class="ui primary button">
+                <a href="/admin/auth_configs/new" class="ui primary button">
                     <i class="plus icon"></i> Додати конфігурацію
                 </a>
             </div>
@@ -45,10 +45,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/admin/auth-configs/edit?id={{ config.id }}" class="ui icon button">
+                                <a href="/admin/auth_configs/edit?id={{ config.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/auth-configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?');">
+                                <form action="/admin/auth_configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?');">
                                     <input type="hidden" name="id" value="{{ config.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

@@ -105,7 +105,8 @@ class ClinicalReferenceController
             }
 
             $inserted = $this->interventionCodeRepository->replaceAll($rows);
-            $_SESSION['success_message'] = sprintf('Імпортовано %d записів НК 026:2021 (Класифікатор медичних інтервенцій).', $inserted);
+            $_SESSION['success_message'] = sprintf('Імпортовано %d записів НК 026:2021 '
+                                                    . '(Класифікатор медичних інтервенцій).', $inserted);
         } catch (\Throwable $e) {
             $_SESSION['errors']['import'] = $e->getMessage();
         }

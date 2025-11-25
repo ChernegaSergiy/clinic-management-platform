@@ -55,8 +55,10 @@ class PatientRepository implements PatientRepositoryInterface
             return false;
         }
 
-        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, phone, email, address, tax_id, document_id, marital_status, status) 
-                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, :phone, :email, :address, :tax_id, :document_id, :marital_status, :status)";
+        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, 
+                                    phone, email, address, tax_id, document_id, marital_status, status) 
+                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, 
+                        :phone, :email, :address, :tax_id, :document_id, :marital_status, :status)";
 
         $stmt = $this->pdo->prepare($sql);
 

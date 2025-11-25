@@ -188,8 +188,12 @@ class InstallController
         $last = $input['admin_last_name'];
         $passwordHash = password_hash($input['admin_password'], PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("INSERT INTO users (username, password_hash, email, first_name, last_name, role_id) VALUES (:username, :password_hash, :email, :first_name, :last_name, :role_id)
-            ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), first_name = VALUES(first_name), last_name = VALUES(last_name)");
+        $stmt = $pdo->prepare(
+            "INSERT INTO users (username, password_hash, email, first_name, last_name, role_id) 
+            VALUES (:username, :password_hash, :email, :first_name, :last_name, :role_id)
+            ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), 
+            first_name = VALUES(first_name), last_name = VALUES(last_name)"
+        );
         $stmt->execute([
             ':username' => $email,
             ':password_hash' => $passwordHash,

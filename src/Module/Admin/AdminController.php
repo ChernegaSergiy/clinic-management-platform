@@ -589,8 +589,6 @@ class AdminController
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'provider' => ['required', 'unique:auth_configs,provider'],
-            // 'client_id' => ['required'],
-            // 'client_secret' => ['required'],
         ]);
 
         if ($validator->hasErrors()) {
@@ -600,7 +598,10 @@ class AdminController
             exit();
         }
 
-        $this->authConfigRepository->save($_POST);
+        $data = $_POST;
+        $data['is_active'] = isset($_POST['is_active']) ? 1 : 0;
+
+        $this->authConfigRepository->save($data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно створено.";
         header('Location: /admin/auth_configs');
         exit();
@@ -643,8 +644,6 @@ class AdminController
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'provider' => ['required', 'unique:auth_configs,provider,' . $id],
-            // 'client_id' => ['required'],
-            // 'client_secret' => ['required'],
         ]);
 
         if ($validator->hasErrors()) {
@@ -654,7 +653,10 @@ class AdminController
             exit();
         }
 
-        $this->authConfigRepository->update($id, $_POST);
+        $data = $_POST;
+        $data['is_active'] = isset($_POST['is_active']) ? 1 : 0;
+
+        $this->authConfigRepository->update($id, $data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно оновлено.";
         header('Location: /admin/auth_configs');
         exit();

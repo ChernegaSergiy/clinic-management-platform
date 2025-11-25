@@ -28,8 +28,10 @@ class LabOrderRepository implements LabOrderRepositoryInterface
 
     public function save(array $data): int|false
     {
-        $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, order_code, qr_code_hash, results, status) 
-                VALUES (:patient_id, :doctor_id, :medical_record_id, :order_code, :qr_code_hash, :results, :status)";
+        $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, 
+                                        order_code, qr_code_hash, results, status) 
+                VALUES (:patient_id, :doctor_id, :medical_record_id, 
+                        :order_code, :qr_code_hash, :results, :status)";
 
         $stmt = $this->pdo->prepare($sql);
 

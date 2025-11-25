@@ -230,7 +230,8 @@ class LabOrderController
             $parsedData = $this->labImportService->validateStructural($tempPath, $file['type']);
             $_SESSION['hl7_dicom_parsed_data'] = $parsedData;
             $_SESSION['hl7_dicom_temp_path'] = $tempPath;
-            $_SESSION['success_message'] = 'Файл успішно завантажено та пройшов структурну валідацію. Будь ласка, перегляньте дані перед імпортом.';
+            $_SESSION['success_message'] = 'Файл успішно завантажено та пройшов структурну валідацію. '
+                                           . 'Будь ласка, перегляньте дані перед імпортом.';
             header('Location: /lab-orders/import/confirm');
             exit();
         } catch (\Exception $e) {

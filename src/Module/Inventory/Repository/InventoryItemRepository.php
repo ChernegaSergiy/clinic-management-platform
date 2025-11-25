@@ -60,8 +60,12 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
     {
         $this->pdo->beginTransaction();
         try {
-            $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, supplier, cost, quantity, min_stock_level, max_stock_level, location) 
-                    VALUES (:name, :description, :inn, :batch_number, :expiry_date, :supplier, :cost, :quantity, :min_stock_level, :max_stock_level, :location)";
+            $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, 
+                                                supplier, cost, quantity, min_stock_level, 
+                                                max_stock_level, location) 
+                    VALUES (:name, :description, :inn, :batch_number, :expiry_date, 
+                            :supplier, :cost, :quantity, :min_stock_level, 
+                            :max_stock_level, :location)";
 
             $stmt = $this->pdo->prepare($sql);
             $success = $stmt->execute([
@@ -81,7 +85,15 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             if ($success) {
                 $itemId = (int)$this->pdo->lastInsertId();
                 if (($data['quantity'] ?? 0) > 0) {
-                    $this->logMovement($itemId, $_SESSION['user']['id'] ?? null, 'in', $data['quantity'], $data['quantity'], 'Початковий запас', $data['cost'] ?? 0.00);
+                    $this->logMovement(
+                        $itemId,
+                        $_SESSION['user']['id'] ?? null,
+                        'in',
+                        $data['quantity'],
+                        $data['quantity'],
+                        'Початковий запас',
+                        $data['cost'] ?? 0.00
+                    );
                 }
                 $this->pdo->commit();
                 return true;
@@ -154,7 +166,15 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                     $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
                     $quantityChange = abs($newQuantity - $oldQuantity);
                     $reason = $data['movement_reason'] ?? 'Оновлення позиції';
-                    $this->logMovement($id, $_SESSION['user']['id'] ?? null, $movementType, $quantityChange, $newQuantity, $reason, $newCost);
+                    $this->logMovement(
+                        $id,
+                        $_SESSION['user']['id'] ?? null,
+                        $movementType,
+                        $quantityChange,
+                        $newQuantity,
+                        $reason,
+                        $newCost
+                    );
                 }
             }
             $this->pdo->commit();
@@ -166,10 +186,19 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         }
     }
 
-    private function logMovement(int $itemId, ?int $userId, string $movementType, int $quantityChange, int $newQuantity, string $reason, float $itemCost): bool
-    {
-        $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, quantity_change, new_quantity, reason) 
-                VALUES (:inventory_item_id, :user_id, :movement_type, :quantity_change, :new_quantity, :reason)";
+    private function logMovement(
+        int $itemId,
+        ?int $userId,
+        string $movementType,
+        int $quantityChange,
+        int $newQuantity,
+        string $reason,
+        float $itemCost
+    ): bool {
+        $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, 
+                                                quantity_change, new_quantity, reason) 
+                VALUES (:inventory_item_id, :user_id, :movement_type, 
+                        :quantity_change, :new_quantity, :reason)";
         $stmt = $this->pdo->prepare($sql);
         $success = $stmt->execute([
             ':inventory_item_id' => $itemId,
@@ -182,7 +211,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
 
         if ($success) {
             $amount = $quantityChange * $itemCost;
-            $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue'; // Assuming 'revenue' for 'out'
+            $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue';
             if ($movementType === 'out') {
                 $amount = -$amount; // Negative for cost deduction
             }
@@ -194,11 +223,17 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             }
 
             $this->invoiceRepository->logFinancialTransaction(
-                $patientId, // Need a patient ID, might be a system patient or context specific
+                $patientId,
                 $amount,
                 $transactionType,
-                sprintf("Рух складу: %s %d одиниць '%s'. Причина: %s", $movementType === 'in' ? 'Прихід' : 'Вибуття', $quantityChange, $itemDetails['name'], $reason),
-                $itemId // Linked entity ID
+                sprintf(
+                    "Рух складу: %s %d одиниць '%s'. Причина: %s",
+                    $movementType === 'in' ? 'Прихід' : 'Вибуття',
+                    $quantityChange,
+                    $itemDetails['name'],
+                    $reason
+                ),
+                $itemId
             );
         }
         return $success;

@@ -18,7 +18,8 @@ class PrescriptionRepository
     {
         $this->pdo->beginTransaction();
         try {
-            $sql = "INSERT INTO prescriptions (patient_id, doctor_id, medical_record_id, issue_date, expiry_date, notes) 
+            $sql = "INSERT INTO prescriptions (patient_id, doctor_id, medical_record_id, 
+                                            issue_date, expiry_date, notes) 
                     VALUES (
                         :patient_id, 
                         :doctor_id, 

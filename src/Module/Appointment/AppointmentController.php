@@ -513,11 +513,11 @@ class AppointmentController
             }
 
             View::render('@modules/Appointment/templates/waitlist.html.twig', [
-                'errors' => $validator->getErrors(),
-                'old' => $_POST,
-                'waitlistEntries' => $waitlistEntries,
-                'patients' => $patientOptions,
-                'doctors' => $doctorOptions,
+            'errors' => $validator->getErrors(),
+            'old' => $_POST,
+            'waitlistEntries' => $waitlistEntries,
+            'patients' => $patientOptions,
+            'doctors' => $doctorOptions,
             ]);
             return;
         }

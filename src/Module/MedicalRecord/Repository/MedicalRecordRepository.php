@@ -46,8 +46,10 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 
     public function save(array $data): int|false
     {
-        $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, diagnosis_code, diagnosis_text, treatment, notes) 
-                VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, :diagnosis_code, :diagnosis_text, :treatment, :notes)";
+        $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, 
+                                            diagnosis_code, diagnosis_text, treatment, notes) 
+                VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, 
+                        :diagnosis_code, :diagnosis_text, :treatment, :notes)";
 
         $stmt = $this->pdo->prepare($sql);
 

@@ -166,8 +166,12 @@ class AppointmentRepository implements AppointmentRepositoryInterface
     public function addToWaitlist(array $data): bool
     {
         $ticket = $data['ticket_number'] ?? $this->generateWaitlistTicket();
-        $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, desired_start_time, desired_end_time, notes, contact_phone, contact_email) 
-                VALUES (:ticket_number, :patient_id, :desired_doctor_id, :desired_start_time, :desired_end_time, :notes, :contact_phone, :contact_email)";
+        $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, 
+                                    desired_start_time, desired_end_time, notes, 
+                                    contact_phone, contact_email) 
+                VALUES (:ticket_number, :patient_id, :desired_doctor_id, 
+                        :desired_start_time, :desired_end_time, :notes, 
+                        :contact_phone, :contact_email)";
 
         $stmt = $this->pdo->prepare($sql);
 

@@ -62,7 +62,9 @@ class DictionaryRepository
     // --- Dictionary Values ---
     public function findValuesByDictionaryId(int $dictionaryId): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM dictionary_values WHERE dictionary_id = :dictionary_id ORDER BY order_num ASC, label ASC");
+        $stmt = $this->pdo->prepare("SELECT * FROM dictionary_values 
+                                    WHERE dictionary_id = :dictionary_id 
+                                    ORDER BY order_num ASC, label ASC");
         $stmt->execute([':dictionary_id' => $dictionaryId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

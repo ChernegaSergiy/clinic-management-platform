@@ -20,10 +20,15 @@ class Router
         $path = parse_url($uri, PHP_URL_PATH);
 
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $path) {
+            // Convert route path to a regex
+            $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_]+)', $route['path']);
+            $pattern = '#^' . $pattern . '$#';
+
+            if ($route['method'] === $method && preg_match($pattern, $path, $matches)) {
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                
                 $handler = $route['handler'];
 
-                // Якщо передано [ClassName, method], створюємо екземпляр контролера
                 if (is_array($handler) && is_string($handler[0])) {
                     $controller = new $handler[0]();
                     $callback = [$controller, $handler[1]];
@@ -31,13 +36,13 @@ class Router
                     $callback = $handler;
                 }
 
-                call_user_func($callback);
+                call_user_func_array($callback, $params);
                 return;
             }
         }
 
         // Handle 404
         http_response_code(404);
-        echo "404 Not Found"; // Поки що просто текст
+        View::render('errors/error.html.twig', ['message' => '404 Not Found']);
     }
 }

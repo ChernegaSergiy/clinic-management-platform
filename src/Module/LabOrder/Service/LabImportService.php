@@ -33,7 +33,11 @@ class LabImportService
         }
 
         // Basic check for file type based on mime type or extension
-        if (str_contains($mimeType, 'application/hl7') || str_ends_with($filePath, '.hl7') || str_ends_with($filePath, '.txt')) {
+        if (
+            str_contains($mimeType, 'application/hl7')
+            || str_ends_with($filePath, '.hl7')
+            || str_ends_with($filePath, '.txt')
+        ) {
             // Assume it's HL7-like for now. Minimal structural check.
             if (empty($fileContent)) {
                 throw new Exception("HL7/текстовий файл порожній.");
@@ -41,7 +45,10 @@ class LabImportService
             // Further HL7 parsing would go here, e.g., using a dedicated library.
             // For now, we return content as a simplified "parsed" structure.
             return ['type' => 'HL7', 'content' => $fileContent, 'parsed_data' => ['order_code' => 'HL7_TEST_' . uniqid()]];
-        } elseif (str_contains($mimeType, 'application/dicom') || str_ends_with($filePath, '.dcm')) {
+        } elseif (
+            str_contains($mimeType, 'application/dicom')
+                || str_ends_with($filePath, '.dcm')
+        ) {
             // Assume it's DICOM-like. Minimal structural check.
             if (empty($fileContent)) {
                 throw new Exception("DICOM файл порожній.");

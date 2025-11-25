@@ -9,7 +9,7 @@
         <h2 class="ui header">Додати нову конфігурацію аутентифікації</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/auth-configs/new">
+        <form class="ui form" method="POST" action="/admin/auth_configs/new">
             {{ forms.input('provider', 'Провайдер', old.provider ?? '', 'text', 'Наприклад, google, mfa_totp', errors.provider ?? null, {'required': 'required'}) }}
             {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? '', 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}
             {{ forms.input('client_secret', 'Client Secret (необов\'язково)', old.client_secret ?? '', 'text', 'Client Secret для OAuth2', errors.client_secret ?? null) }}
@@ -23,7 +23,7 @@
             </div>
 
             {{ ui.button('Зберегти конфігурацію', 'primary', 'large', 'save') }}
-            <a href="/admin/auth-configs" class="ui button">Скасувати</a>
+            <a href="/admin/auth_configs" class="ui button">Скасувати</a>
         </form>
     </div>
 {% endblock %}
