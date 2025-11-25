@@ -73,6 +73,7 @@ $router->add('GET', '/logout', [AuthController::class, 'logout']);
 
 // User Profile
 $router->add('GET', '/user/profile', [UserController::class, 'profile']);
+$router->add('POST', '/user/profile/unlink-provider', [UserController::class, 'unlinkProvider']);
 
 // OAuth routes
 $router->add('GET', '/login/{provider}', [AuthController::class, 'redirectToProvider']);
