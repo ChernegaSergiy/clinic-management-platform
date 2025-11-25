@@ -5,6 +5,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Core\Router;
 use App\Controller\PageController;
 use App\Module\User\AuthController;
+use App\Module\User\OAuthController;
+use App\Module\User\UserController;
 use App\Module\Patient\PatientController;
 use App\Module\Appointment\AppointmentController;
 use App\Module\MedicalRecord\MedicalRecordController;
@@ -69,6 +71,13 @@ $router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
 $router->add('POST', '/login', [AuthController::class, 'login']);
 $router->add('GET', '/logout', [AuthController::class, 'logout']);
 
+// User Profile
+$router->add('GET', '/user/profile', [UserController::class, 'profile']);
+
+// OAuth routes
+$router->add('GET', '/login/{provider}', [AuthController::class, 'redirectToProvider']);
+$router->add('GET', '/oauth/callback/{provider}', [OAuthController::class, 'callback']);
+
 // Patient routes
 $router->add('GET', '/patients', [PatientController::class, 'index']);
 $router->add('GET', '/patients/new', [PatientController::class, 'create']);
@@ -112,10 +121,18 @@ $router->add(
 );
 
 // Clinical reference routes
-$router->add('GET', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportForm']);
-$router->add('POST', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportRun']);
-$router->add('GET', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportForm']);
-$router->add('POST', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportRun']);
+$router->add('GET', '/admin/clinical/icd-import', [
+    ClinicalReferenceController::class, 'icdImportForm'
+]);
+$router->add('POST', '/admin/clinical/icd-import', [
+    ClinicalReferenceController::class, 'icdImportRun'
+]);
+$router->add('GET', '/admin/clinical/intervention-import', [
+    ClinicalReferenceController::class, 'interventionImportForm'
+]);
+$router->add('POST', '/admin/clinical/intervention-import', [
+    ClinicalReferenceController::class, 'interventionImportRun'
+]);
 
 // Lab Order routes
 $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);

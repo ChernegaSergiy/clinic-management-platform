@@ -52,7 +52,7 @@ class AuthController
 
         $user = $this->userRepository->findByEmail($email);
 
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password_hash'])) { // Corrected column name
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'first_name' => $user['first_name'],
@@ -70,6 +70,17 @@ class AuthController
             header('Location: /login');
             exit();
         }
+    }
+
+    /**
+     * Redirects to the specified OAuth provider for authentication.
+     *
+     * @param string $providerName
+     * @return void
+     */
+    public function redirectToProvider(string $provider): void
+    {
+        (new OAuthController())->redirect($provider);
     }
 
     public function logout(): void
