@@ -1,0 +1,51 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Мій профіль{% endblock %}
+
+{% block body %}
+    <div class="ui segments">
+        <div class="ui segment">
+            <h1 class="ui header">Мій профіль</h1>
+        </div>
+        <div class="ui secondary segment">
+            {% if successMessage %}
+                <div class="ui success message">
+                    <i class="close icon"></i>
+                    <div class="header">Успіх!</div>
+                    <p>{{ successMessage }}</p>
+                </div>
+            {% endif %}
+
+            <div class="ui list">
+                <div class="item">
+                    <i class="user icon"></i>
+                    <div class="content">
+                        <strong>Ім'я:</strong> {{ user.first_name }} {{ user.last_name }}
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="envelope icon"></i>
+                    <div class="content">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h2 class="ui header">Зв'язані акаунти</h2>
+            {% if user.provider == 'google' %}
+                <div class="ui green label">
+                    <i class="google icon"></i>
+                    Google-акаунт прив'язано
+                </div>
+            {% else %}
+                <p>Ви можете прив'язати свій Google-акаунт для швидкого входу.</p>
+                <a href="/login/google" class="ui google plus button">
+                    <i class="google icon"></i>
+                    Прив'язати Google
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

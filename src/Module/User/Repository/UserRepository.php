@@ -16,10 +16,45 @@ class UserRepository implements UserRepositoryInterface
 
     public function findByEmail(string $email): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT *, password_hash AS password FROM users WHERE email = :email");
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
         $stmt->execute([':email' => $email]);
         $result = $stmt->fetch();
         return $result === false ? null : $result;
+    }
+
+    /**
+     * Finds a user by OAuth provider and ID, or links an existing user by email.
+     * Does NOT create a new user if no match is found.
+     *
+     * @param string $provider
+     * @param \League\OAuth2\Client\Provider\ResourceOwnerInterface $owner
+     * @return array|null
+     */
+    public function findOrLinkFromOAuth(string $provider, \League\OAuth2\Client\Provider\ResourceOwnerInterface $owner): ?array
+    {
+        // 1. Check if user with provider ID already exists
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE provider = :provider AND provider_id = :provider_id");
+        $stmt->execute([':provider' => $provider, ':provider_id' => $owner->getId()]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            return $user;
+        }
+
+        // 2. Check if user with email exists to link account
+        $user = $this->findByEmail($owner->getEmail());
+        if ($user) {
+            $stmt = $this->pdo->prepare("UPDATE users SET provider = :provider, provider_id = :provider_id WHERE id = :id");
+            $stmt->execute([
+                ':provider' => $provider,
+                ':provider_id' => $owner->getId(),
+                ':id' => $user['id']
+            ]);
+            return $this->findById($user['id']);
+        }
+
+        // No matching user found, and we don't create new ones automatically via this method
+        return null;
     }
 
     public function findAll(string $searchTerm = ''): array
@@ -73,7 +108,9 @@ class UserRepository implements UserRepositoryInterface
                 email, 
                 role_id, 
                 created_at, 
-                updated_at 
+                updated_at,
+                provider,
+                provider_id
             FROM users 
             WHERE id = :id
         ");
@@ -111,12 +148,14 @@ class UserRepository implements UserRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
+        $passwordHash = !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
+
         return $stmt->execute([
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
             ':email' => $data['email'],
             ':username' => $username,
-            ':password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
+            ':password_hash' => $passwordHash,
             ':role_id' => $data['role_id'],
         ]);
     }
@@ -137,7 +176,7 @@ class UserRepository implements UserRepositoryInterface
             ':role_id' => $data['role_id'],
         ];
 
-        if (!empty($data['password'])) {
+        if (isset($data['password']) && !empty($data['password'])) { // Only update password if provided
             $sql .= ", password_hash = :password_hash";
             $params[':password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
@@ -166,16 +205,16 @@ class UserRepository implements UserRepositoryInterface
             return;
         }
 
-        $email = $_ENV['ADMIN_EMAIL'] ?? 'admin@clinic.ua';
-        $password = $_ENV['ADMIN_PASSWORD'] ?? 'password';
+        $email = getenv('ADMIN_EMAIL') ?: 'admin@clinic.ua';
+        $password = getenv('ADMIN_PASSWORD') ?: 'password';
 
         $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
                 VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':first_name' => 'Адмін',
-            ':last_name' => 'Адміненко',
+            ':first_name' => getenv('ADMIN_FIRST_NAME') ?: 'Адмін',
+            ':last_name' => getenv('ADMIN_LAST_NAME') ?: 'Адміненко',
             ':email' => $email,
             ':username' => 'admin',
             ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
