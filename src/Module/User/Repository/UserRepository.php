@@ -221,4 +221,10 @@ class UserRepository implements UserRepositoryInterface
             ':role_id' => 1,
         ]);
     }
+
+    public function unlinkProvider(int $userId): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE users SET provider = NULL, provider_id = NULL WHERE id = :id");
+        return $stmt->execute([':id' => $userId]);
+    }
 }
