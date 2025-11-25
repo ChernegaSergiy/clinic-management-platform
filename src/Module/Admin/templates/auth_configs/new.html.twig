@@ -10,7 +10,18 @@
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/auth_configs/new">
-            {{ forms.input('provider', 'Провайдер', old.provider ?? '', 'text', 'Наприклад, google, mfa_totp', errors.provider ?? null, {'required': 'required'}) }}
+            <div class="field {% if errors.provider %}error{% endif %}">
+                <label>Провайдер</label>
+                <select name="provider" class="ui fluid dropdown" required>
+                    <option value="">Оберіть провайдера</option>
+                    {% for providerOption in supportedProviders %}
+                        <option value="{{ providerOption }}" {% if old.provider == providerOption %}selected{% endif %}>
+                            {{ providerOption|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if errors.provider %}<div class="ui basic red pointing prompt label">{{ errors.provider }}</div>{% endif %}
+            </div>
             {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? '', 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}
             {{ forms.input('client_secret', 'Client Secret (необов\'язково)', old.client_secret ?? '', 'text', 'Client Secret для OAuth2', errors.client_secret ?? null) }}
             {{ forms.textarea('config', 'Додаткова конфігурація (JSON, необов\'язково)', old.config ?? '', '{\"key\": \"value\"}', errors.config ?? null) }}
