@@ -19,7 +19,9 @@
         "phpoffice/phpspreadsheet": "^5.2",
         "chernegasergiy/nk-025-2021-parser": "^0.1.0",
         "chernegasergiy/nk-026-2021-parser": "^0.1.0",
-        "robmorgan/phinx": "^0.16.10"
+        "robmorgan/phinx": "^0.16.10",
+        "league/oauth2-client": "^2.8",
+        "league/oauth2-google": "^4.0"
     },
     "autoload": {
         "psr-4": {
