@@ -144,6 +144,10 @@
             $('#notificationDropdown').dropdown();
             $('#notificationDropdownMobile').dropdown();
 
+            let notificationPage = 1;
+            const pageSize = 10;
+            let hasMore = false;
+
             function updateBadge(count) {
                 $('.notification-badge').each(function() {
                     if (count > 0) {
@@ -154,16 +158,26 @@
                 });
             }
 
-            function fetchNotifications() {
-                fetch('/api/notifications')
+            function fetchNotifications(reset = true) {
+                if (reset) {
+                    notificationPage = 1;
+                }
+                const params = new URLSearchParams({
+                    page: notificationPage,
+                    limit: pageSize
+                });
+
+                fetch('/api/notifications?' + params.toString())
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
                         }
                         return response.json();
                     })
-                    .then(notifications => {
-                        updateNotificationDropdown(notifications);
+                    .then(data => {
+                        hasMore = !!data.has_more;
+                        updateBadge(data.unread_count ?? 0);
+                        updateNotificationDropdown(data.notifications ?? [], reset);
                     })
                     .catch(error => {
                         console.error('Error fetching notifications:', error);
@@ -179,21 +193,19 @@
                 }
             }
 
-            function updateNotificationDropdown(notifications) {
+            function updateNotificationDropdown(notifications, reset) {
                 const menu = $('#notificationMenu');
                 const mobileMenu = $('#notificationMenuMobile');
-                const notificationCount = notifications.length;
+                if (reset) {
+                    menu.find('.item:not(.header):not(.divider):not(.notification-mark-all)').remove();
+                    mobileMenu.find('.item:not(.header):not(.divider):not(.notification-mark-all)').remove();
+                }
 
-                // Clear previous items (except header and divider)
-                menu.find('.item:not(.header):not(.divider)').remove();
-                mobileMenu.find('.item:not(.header):not(.divider)').remove();
-
-                updateBadge(notificationCount);
-
-                if (notificationCount > 0) {
+                if (notifications.length > 0) {
                     notifications.forEach(notification => {
+                        const unreadClass = notification.is_read ? '' : 'unread';
                         const notificationItem = `
-                            <div class="item notification-item unread">
+                            <div class="item notification-item ${unreadClass}">
                                 <i class="bell outline icon"></i>
                                 <div class="content">
                                     <div class="header">${notification.message}</div>
@@ -204,17 +216,28 @@
                         menu.append(notificationItem);
                         mobileMenu.append(notificationItem);
                     });
-                    // Optionally update a badge with the count
-                } else {
+                }
+
+                // Empty state if nothing at all
+                if (menu.find('.notification-item').length === 0) {
                     const noNotificationItem = `
                         <div class="item">
                             <div class="content">
-                                <div class="description">Немає нових сповіщень</div>
+                                <div class="description">Немає сповіщень</div>
                             </div>
                         </div>
                     `;
                     menu.append(noNotificationItem);
                     mobileMenu.append(noNotificationItem);
+                }
+
+                // Manage "load more"
+                menu.find('.notification-load-more').remove();
+                mobileMenu.find('.notification-load-more').remove();
+                if (hasMore) {
+                    const loadMore = `<div class="item notification-load-more"><i class="angle down icon"></i> Показати ще</div>`;
+                    menu.append(loadMore);
+                    mobileMenu.append(loadMore);
                 }
             }
 
@@ -249,6 +272,11 @@
 
             $('#notificationMarkAll, #notificationMarkAllMobile').on('click', function() {
                 markNotificationsAsRead();
+            });
+
+            $(document).on('click', '.notification-load-more', function() {
+                notificationPage += 1;
+                fetchNotifications(false);
             });
 
             // Fetch notifications on page load
