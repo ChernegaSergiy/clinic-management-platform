@@ -151,6 +151,10 @@ class AppointmentController
         AuthGuard::check();
 
         $rawInput = $_POST;
+        $waitlistId = (int)($rawInput['waitlist_id'] ?? 0); // Extract waitlist_id
+        if ($waitlistId) {
+            unset($_POST['waitlist_id']); // Remove it from $_POST so it's not validated against general rules
+        }
 
         // Normalize HTML datetime-local (or localized input) to DB format before validation
         foreach (['start_time', 'end_time'] as $field) {
@@ -201,17 +205,25 @@ class AppointmentController
 
             View::render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
-                'old' => array_merge($rawInput, [
+                'old' => array_merge($rawInput, [ // Merge rawInput back for prefilling
                     'start_time' => $_POST['start_time_input'] ?? $rawInput['start_time'] ?? null,
                     'end_time' => $_POST['end_time_input'] ?? $rawInput['end_time'] ?? null,
                 ]),
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
+                'waitlist_id' => $waitlistId, // Ensure waitlist_id is passed back if validation fails
             ]);
             return;
         }
 
-        $this->appointmentRepository->save($_POST);
+        $dataToSave = $_POST;
+        $dataToSave['waitlist_id'] = ($waitlistId > 0) ? $waitlistId : null; // Add waitlist_id for repository
+
+        $this->appointmentRepository->save($dataToSave);
+
+        if ($waitlistId > 0) {
+            $this->appointmentRepository->updateWaitlistStatus($waitlistId, 'booked');
+        }
 
         $patient = $this->patientRepository->findById($_POST['patient_id']);
         $doctor = $this->userRepository->findById($_POST['doctor_id']);
