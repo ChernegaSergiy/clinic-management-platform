@@ -331,7 +331,6 @@ class BillingController
         // TODO: Add validation
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
-            'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'in:pending,paid,cancelled'],
         ]);
