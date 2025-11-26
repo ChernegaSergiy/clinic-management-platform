@@ -179,6 +179,7 @@ $router->add('POST', '/billing/new', [BillingController::class, 'store']);
 $router->add('GET', '/billing/show', [BillingController::class, 'show']);
 $router->add('GET', '/billing/edit', [BillingController::class, 'edit']);
 $router->add('POST', '/billing/edit', [BillingController::class, 'update']);
+$router->add('POST', '/billing/add-payment', [BillingController::class, 'addPayment']);
 $router->add('GET', '/billing/export-pdf', [BillingController::class, 'exportInvoicesToPdf']);
 $router->add('GET', '/billing/export-excel', [BillingController::class, 'exportInvoicesToExcel']);
 $router->add('GET', '/billing/export-csv', [BillingController::class, 'exportInvoicesToCsv']);
