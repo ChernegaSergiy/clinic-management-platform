@@ -29,9 +29,9 @@ class LabOrderRepository implements LabOrderRepositoryInterface
     public function save(array $data): int|false
     {
         $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, 
-                                        order_code, qr_code_hash, results, status) 
+                                        order_code, results, status) 
                 VALUES (:patient_id, :doctor_id, :medical_record_id, 
-                        :order_code, :qr_code_hash, :results, :status)";
+                        :order_code, :results, :status)";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -40,7 +40,6 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             ':doctor_id' => $data['doctor_id'],
             ':medical_record_id' => $data['medical_record_id'],
             ':order_code' => $data['order_code'],
-            ':qr_code_hash' => $data['qr_code_hash'],
             ':results' => $data['results'] ?? null,
             ':status' => $data['status'] ?? 'ordered',
         ]);
@@ -85,6 +84,16 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             ':status' => $data['status'],
             ':results' => $data['results'] ?? null,
             ':notes' => $data['notes'] ?? null,
+        ]);
+    }
+
+    public function updateQrCodeHash(int $id, string $qrCodeHash): bool
+    {
+        $sql = "UPDATE lab_orders SET qr_code_hash = :qr_code_hash WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':qr_code_hash' => $qrCodeHash,
+            ':id' => $id,
         ]);
     }
 }
