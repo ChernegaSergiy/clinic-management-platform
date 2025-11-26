@@ -5,6 +5,7 @@ namespace App\Module\Dashboard\Service;
 use App\Module\Admin\Repository\KpiRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\User\Repository\UserRepository; // Import UserRepository
 use DateTime;
 
 class KpiCalculatorService
@@ -12,12 +13,14 @@ class KpiCalculatorService
     private KpiRepository $kpiRepository;
     private AppointmentRepository $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
+    private UserRepository $userRepository; // Add UserRepository
 
     public function __construct()
     {
         $this->kpiRepository = new KpiRepository();
         $this->appointmentRepository = new AppointmentRepository();
         $this->invoiceRepository = new InvoiceRepository();
+        $this->userRepository = new UserRepository(); // Instantiate UserRepository
     }
 
     public function calculateAndStoreAll(): void
@@ -42,6 +45,9 @@ class KpiCalculatorService
                     // TODO: Implement actual patient satisfaction calculation when feedback mechanism is added
                     $value = 4.5; // Placeholder value
                     break;
+                case 'doctor_utilization':
+                    $value = $this->calculateDoctorUtilization($today);
+                    break;
             }
 
             $this->kpiRepository->saveKpiResult([
@@ -57,15 +63,33 @@ class KpiCalculatorService
 
     private function calculateAppointmentsCount(string $date): int
     {
-        // This is a guess. The actual repository method might be different.
-        // I will need to check the AppointmentRepository to be sure.
         return $this->appointmentRepository->countAppointmentsByDate($date);
     }
 
     private function calculateRevenueGenerated(string $date): float
     {
-        // This is a guess. The actual repository method might be different.
-        // I will need to check the InvoiceRepository to be sure.
         return $this->invoiceRepository->sumTotalAmountByDate($date);
+    }
+
+    private function calculateDoctorUtilization(string $date): float
+    {
+        $doctors = $this->userRepository->findAllDoctors();
+        $doctorCount = count($doctors);
+        if ($doctorCount === 0) {
+            return 0.0;
+        }
+
+        $bookedDurations = $this->appointmentRepository->getSumOfCompletedAppointmentDurationsForDate($date); // keyed by doctor_id
+
+        $totalUtilization = 0;
+        $workdaySeconds = 8 * 3600; // Assuming 8-hour workday
+
+        foreach ($doctors as $doctor) {
+            $bookedSeconds = $bookedDurations[$doctor['id']] ?? 0;
+            $doctorUtilization = ($bookedSeconds / $workdaySeconds) * 100;
+            $totalUtilization += $doctorUtilization;
+        }
+
+        return $totalUtilization / $doctorCount; // Average utilization
     }
 }
