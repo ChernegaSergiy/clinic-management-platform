@@ -294,4 +294,26 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt->execute([':date' => $date]);
         return (int)$stmt->fetchColumn();
     }
+
+    /**
+     * Retrieves the sum of durations of completed appointments for each doctor on a given date.
+     *
+     * @param string $date The date in 'YYYY-MM-DD' format.
+     * @return array An associative array with doctor_id as key and total duration in seconds as value.
+     */
+    public function getSumOfCompletedAppointmentDurationsForDate(string $date): array
+    {
+        $sql = "
+            SELECT
+                doctor_id,
+                SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) as total_duration_seconds
+            FROM appointments
+            WHERE DATE(start_time) = :date AND status = 'completed'
+            GROUP BY doctor_id
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date' => $date]);
+        $results = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Fetches as [doctor_id => total_duration_seconds]
+        return array_map('intval', $results); // Ensure values are integers
+    }
 }
