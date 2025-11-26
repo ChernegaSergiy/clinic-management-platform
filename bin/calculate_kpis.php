@@ -2,6 +2,10 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// Load .env file
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->safeLoad();
+
 use App\Module\Dashboard\Service\KpiCalculatorService;
 
 // Minimal setup to allow KpiCalculatorService to run
