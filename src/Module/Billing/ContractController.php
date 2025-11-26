@@ -44,6 +44,15 @@ class ContractController
             'status' => ['required', 'in:active,expired,terminated'],
         ]);
 
+        if (isset($_POST['end_date']) && $_POST['end_date'] === '') {
+            unset($_POST['end_date']);
+        }
+
+        // Normalize optional end_date: store null instead of empty string
+        if (isset($_POST['end_date']) && $_POST['end_date'] === '') {
+            unset($_POST['end_date']);
+        }
+
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
