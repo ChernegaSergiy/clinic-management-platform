@@ -38,7 +38,7 @@ class KpiRepository
             ':name' => $data['name'],
             ':description' => $data['description'] ?? null,
             ':kpi_type' => $data['kpi_type'],
-            ':target_value' => $data['target_value'] ?? null,
+            ':target_value' => empty($data['target_value']) ? null : $data['target_value'],
             ':unit' => $data['unit'] ?? null,
             ':is_active' => $data['is_active'] ?? true,
         ]);
@@ -61,7 +61,7 @@ class KpiRepository
             ':name' => $data['name'],
             ':description' => $data['description'] ?? null,
             ':kpi_type' => $data['kpi_type'],
-            ':target_value' => $data['target_value'] ?? null,
+            ':target_value' => empty($data['target_value']) ? null : $data['target_value'],
             ':unit' => $data['unit'] ?? null,
             ':is_active' => $data['is_active'] ?? true,
         ]);
