@@ -250,6 +250,8 @@ $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, '
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
+$router->add('GET', '/dashboard/export-csv', [DashboardController::class, 'exportCsv']);
+$router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
 
 // KPI routes (legacy)
 $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
