@@ -14,61 +14,37 @@
                 <a href="/dashboard/export-excel" class="ui green button">Експорт в Excel</a>
             </div>
         </div>
-        <div class="center aligned row">
-            {# Dynamically generate cards for key KPIs #}
-            {% set kpi_card_mapping = {
-                'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue'},
-                'revenue_generated': {label: 'Дохід', icon: 'dollar sign', color: 'green'},
-                'doctor_utilization': {label: 'Завантаженість', icon: 'user md', color: 'teal'},
-                'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'orange'},
-                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
-            } %}
+        <div class="row">
+            <div class="sixteen wide column">
+                <div class="ui five statistics">
+                        {% set kpi_card_mapping = {
+                            'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue'},
+                            'revenue_generated': {label: 'Дохід', icon: 'dollar sign', color: 'green'},
+                            'doctor_utilization': {label: 'Завантаженість', icon: 'user md', color: 'teal'},
+                            'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'red'},
+                            'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
+                        } %}
 
-            {% for kpi_type, kpi_info in kpi_card_mapping %}
-                {% set kpi_data = dashboardData.kpis[kpi_type] %}
-                <div class="eight wide mobile four wide tablet three wide computer column">
-                    <div class="ui card">
-                        <div class="ui top attached {{ kpi_info.color }} label">{{ kpi_info.label }}</div>
-                        <div class="content">
-                            {% if kpi_data %}
-                                <div class="ui huge statistic">
-                                    <div class="value">
+                        {% for kpi_type, kpi_info in kpi_card_mapping %}
+                            {% set kpi_data = dashboardData.kpis[kpi_type] %}
+                            <div class="ui statistic">
+                                <div class="value">
+                                    <i class="{{ kpi_info.icon }} icon"></i>
+                                    {% if kpi_data %}
                                         {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : (kpi_data.definition.unit == '%' ? 1 : 0), '.', ',') }}
-                                        {% if kpi_data.definition.unit == '₴' %}
-                                            <span style="font-size: 0.5em; color: #888;">₴</span>
-                                        {% elseif kpi_data.definition.unit == '%' %}
-                                            <span style="font-size: 0.5em; color: #888;">%</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="meta" style="margin-top: 1em;">
-                                    {% if kpi_data.trend %}
-                                        {% if kpi_data.trend starts with '+' %}
-                                            <i class="icon arrow up green"></i>
-                                        {% elseif kpi_data.trend starts with '-' %}
-                                            <i class="icon arrow down red"></i>
-                                        {% else %}
-                                            <i class="icon minus grey"></i>
-                                        {% endif %}
-                                        <span>{{ kpi_data.trend }} vs. попередній період</span>
+                                        {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
+                                        {% if kpi_data.definition.unit == '%' %}<small>%</small>{% endif %}
                                     {% else %}
-                                        <span>Немає даних для порівняння</span>
+                                        N/A
                                     {% endif %}
                                 </div>
-                            {% else %}
-                                <div class="ui huge statistic">
-                                    <div class="value" style="color: #ccc;">
-                                        N/A
-                                    </div>
+                                <div class="label">
+                                    {{ kpi_info.label }}
                                 </div>
-                                 <div class="meta" style="margin-top: 1em;">
-                                    <span>Дані ще не розраховані</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                            </div>
+                        {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
         <div class="ui hidden section divider"></div>
         <div class="row">
