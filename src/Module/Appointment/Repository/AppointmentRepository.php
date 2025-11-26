@@ -286,4 +286,12 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function countAppointmentsByDate(string $date): int
+    {
+        $sql = "SELECT COUNT(*) FROM appointments WHERE DATE(start_time) = :date";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date' => $date]);
+        return (int)$stmt->fetchColumn();
+    }
 }
