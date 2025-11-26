@@ -28,6 +28,15 @@ class PrescriptionController
         $this->inventoryItemRepository = new InventoryItemRepository();
     }
 
+    public function index(): void
+    {
+        AuthGuard::check();
+        $prescriptions = $this->prescriptionRepository->findAll();
+        View::render('@modules/Prescription/templates/index.html.twig', [
+            'prescriptions' => $prescriptions,
+        ]);
+    }
+
     public function create(): void
     {
         AuthGuard::check();
