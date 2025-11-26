@@ -22,7 +22,7 @@
             <div class="field">
                 <label>ICD-10 Коди</label>
                 <div class="ui fluid search multiple selection dropdown" id="icd-codes-dropdown">
-                    <input type="hidden" name="icd_codes" value="{{ record.icd_codes|map(c => c.id)|join(',') }}">
+                    <input type="hidden" name="icd_codes[]" value="{{ record.icd_codes|map(c => c.id)|join(',') }}">
                     <i class="dropdown icon"></i>
                     <div class="default text">Виберіть ICD-10 коди</div>
                     <div class="menu">
@@ -35,7 +35,7 @@
             <div class="field">
                 <label>Коди медичних інтервенцій (НК 026:2021)</label>
                 <div class="ui fluid search multiple selection dropdown" id="intervention-codes-dropdown">
-                    <input type="hidden" name="intervention_codes" value="{{ record.intervention_codes|map(c => c.id)|join(',') }}">
+                    <input type="hidden" name="intervention_codes[]" value="{{ record.intervention_codes|map(c => c.id)|join(',') }}">
                     <i class="dropdown icon"></i>
                     <div class="default text">Виберіть коди інтервенцій</div>
                     <div class="menu">
