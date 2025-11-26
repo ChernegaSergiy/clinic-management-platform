@@ -19,42 +19,52 @@
             {% set kpi_card_mapping = {
                 'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue'},
                 'revenue_generated': {label: 'Дохід', icon: 'dollar sign', color: 'green'},
-                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'},
-                'doctor_utilization': {label: 'Завантаженість лікарів', icon: 'user md', color: 'teal'},
-                'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'red'}
+                'doctor_utilization': {label: 'Завантаженість', icon: 'user md', color: 'teal'},
+                'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'orange'},
+                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
             } %}
 
             {% for kpi_type, kpi_info in kpi_card_mapping %}
                 {% set kpi_data = dashboardData.kpis[kpi_type] %}
-                <div class="eight wide mobile four wide tablet four wide computer column">
-                    <div class="ui centered card {{ kpi_info.color }}">
+                <div class="eight wide mobile four wide tablet three wide computer column">
+                    <div class="ui card">
+                        <div class="ui top attached {{ kpi_info.color }} label">{{ kpi_info.label }}</div>
                         <div class="content">
-                            <div class="header">{{ kpi_info.label }}</div>
-                            <div class="meta">За останній період</div>
-                            <div class="description">
-                                {% if kpi_data %}
-                                    <h2 class="ui header">
-                                        {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : 0, '.', ',') }}
-                                        {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
-                                        {% if kpi_data.trend %}
-                                            <div class="sub header">
-                                                {% if kpi_data.trend starts with '+' %}
-                                                    <i class="icon arrow up green"></i>
-                                                {% elseif kpi_data.trend starts with '-' %}
-                                                    <i class="icon arrow down red"></i>
-                                                {% else %}
-                                                    <i class="icon minus grey"></i>
-                                                {% endif %}
-                                                {{ kpi_data.trend }}
-                                            </div>
+                            {% if kpi_data %}
+                                <div class="ui huge statistic">
+                                    <div class="value">
+                                        {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : (kpi_data.definition.unit == '%' ? 1 : 0), '.', ',') }}
+                                        {% if kpi_data.definition.unit == '₴' %}
+                                            <span style="font-size: 0.5em; color: #888;">₴</span>
+                                        {% elseif kpi_data.definition.unit == '%' %}
+                                            <span style="font-size: 0.5em; color: #888;">%</span>
                                         {% endif %}
-                                    </h2>
-                                    <p>Оновлено: {{ kpi_data.period_end }}</p>
-                                {% else %}
-                                    <h2 class="ui grey header">N/A</h2>
-                                    <p>Дані відсутні</p>
-                                {% endif %}
-                            </div>
+                                    </div>
+                                </div>
+                                <div class="meta" style="margin-top: 1em;">
+                                    {% if kpi_data.trend %}
+                                        {% if kpi_data.trend starts with '+' %}
+                                            <i class="icon arrow up green"></i>
+                                        {% elseif kpi_data.trend starts with '-' %}
+                                            <i class="icon arrow down red"></i>
+                                        {% else %}
+                                            <i class="icon minus grey"></i>
+                                        {% endif %}
+                                        <span>{{ kpi_data.trend }} vs. попередній період</span>
+                                    {% else %}
+                                        <span>Немає даних для порівняння</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="ui huge statistic">
+                                    <div class="value" style="color: #ccc;">
+                                        N/A
+                                    </div>
+                                </div>
+                                 <div class="meta" style="margin-top: 1em;">
+                                    <span>Дані ще не розраховані</span>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
