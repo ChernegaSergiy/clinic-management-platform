@@ -19,6 +19,7 @@ use App\Module\Dashboard\DashboardController;
 use App\Controller\InstallController;
 use App\Module\Admin\KpiController;
 use App\Module\ClinicalReference\ClinicalReferenceController;
+use App\Module\Notification\NotificationController;
 use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
@@ -254,6 +255,10 @@ $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
 $router->add('GET', '/dashboard/export-csv', [DashboardController::class, 'exportCsv']);
 $router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
 $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exportExcel']);
+
+// API routes - Notifications
+$router->add('GET', '/api/notifications', [NotificationController::class, 'getUnread']);
+$router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
 
 // KPI routes (legacy)
 $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
