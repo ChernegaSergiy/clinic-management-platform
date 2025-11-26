@@ -14,6 +14,23 @@ class PrescriptionRepository
         $this->pdo = Database::getInstance();
     }
 
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT
+                p.id,
+                CONCAT(pat.last_name, ' ', pat.first_name) as patient_name,
+                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name,
+                p.issue_date,
+                p.expiry_date
+            FROM prescriptions p
+            JOIN patients pat ON p.patient_id = pat.id
+            JOIN users doc ON p.doctor_id = doc.id
+            ORDER BY p.issue_date DESC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function save(array $data): ?int
     {
         $this->pdo->beginTransaction();
