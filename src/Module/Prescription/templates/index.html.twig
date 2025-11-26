@@ -1,0 +1,55 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Рецепти - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Список рецептів</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/prescriptions/new" class="ui primary button">
+                    <i class="plus icon"></i> Створити рецепт
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пацієнт</th>
+                    <th>Лікар</th>
+                    <th>Дата виписки</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.id }}</td>
+                        <td>{{ prescription.patient_name }}</td>
+                        <td>{{ prescription.doctor_name }}</td>
+                        <td>{{ prescription.issue_date|date('Y-m-d') }}</td>
+                        <td>
+                            <a href="/prescriptions/show?id={{ prescription.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="/prescriptions/edit?id={{ prescription.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="center aligned">Немає рецептів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
