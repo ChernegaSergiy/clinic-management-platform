@@ -182,4 +182,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // No-op stub to avoid runtime errors from inventory module.
         return true;
     }
+
+    public function sumTotalAmountByDate(string $date): float
+    {
+        $sql = "SELECT SUM(amount) FROM invoices WHERE DATE(issued_date) = :date AND status = 'paid'";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date' => $date]);
+        $sum = $stmt->fetchColumn();
+        return (float)($sum ?? 0.0);
+    }
 }
