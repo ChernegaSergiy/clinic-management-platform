@@ -5,7 +5,8 @@ namespace App\Module\Dashboard\Service;
 use App\Module\Admin\Repository\KpiRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\User\Repository\UserRepository; // Import UserRepository
+use App\Module\User\Repository\UserRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository; // Import MedicalRecordRepository
 use DateTime;
 
 class KpiCalculatorService
@@ -13,14 +14,16 @@ class KpiCalculatorService
     private KpiRepository $kpiRepository;
     private AppointmentRepository $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
-    private UserRepository $userRepository; // Add UserRepository
+    private UserRepository $userRepository;
+    private MedicalRecordRepository $medicalRecordRepository; // Add MedicalRecordRepository
 
     public function __construct()
     {
         $this->kpiRepository = new KpiRepository();
         $this->appointmentRepository = new AppointmentRepository();
         $this->invoiceRepository = new InvoiceRepository();
-        $this->userRepository = new UserRepository(); // Instantiate UserRepository
+        $this->userRepository = new UserRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository(); // Instantiate MedicalRecordRepository
     }
 
     public function calculateAndStoreAll(): void
@@ -47,6 +50,9 @@ class KpiCalculatorService
                     break;
                 case 'doctor_utilization':
                     $value = $this->calculateDoctorUtilization($today);
+                    break;
+                case 'readmission_rate':
+                    $value = $this->calculateReadmissionRate($today);
                     break;
             }
 
@@ -91,5 +97,54 @@ class KpiCalculatorService
         }
 
         return $totalUtilization / $doctorCount; // Average utilization
+    }
+
+    private function calculateReadmissionRate(string $date): float
+    {
+        $dischargeEvents = $this->appointmentRepository->getCompletedAppointmentsWithIcdCodes($date);
+
+        $totalDischarges = count($dischargeEvents);
+        if ($totalDischarges === 0) {
+            return 0.0;
+        }
+
+        $readmissions = 0;
+        $readmissionTimeframeDays = 30; // Define readmission timeframe
+
+        foreach ($dischargeEvents as $event) {
+            $patientId = $event['patient_id'];
+            $dischargeDate = (new DateTime($date))->format('Y-m-d H:i:s'); // Use end of day for search
+            $originalIcdCodeIds = explode(',', $event['icd_code_ids']);
+            $originalIcdCodeIds = array_filter($originalIcdCodeIds); // Remove empty values
+
+            if (empty($originalIcdCodeIds)) {
+                continue; // Cannot track readmission without an original diagnosis
+            }
+
+            // Find subsequent appointments for the same patient within the timeframe
+            $subsequentAppointments = $this->appointmentRepository->findPatientSubsequentAppointments(
+                $patientId,
+                $dischargeDate,
+                $readmissionTimeframeDays
+            );
+
+            foreach ($subsequentAppointments as $subsequentAppt) {
+                // Get ICD codes for the subsequent appointment
+                $subsequentMedicalRecordId = $subsequentAppt['medical_record_id'];
+                if (!$subsequentMedicalRecordId) {
+                    continue; // Subsequent appointment has no medical record, can't check ICDs
+                }
+                $subsequentIcdCodes = $this->medicalRecordRepository->getIcdCodesForMedicalRecord($subsequentMedicalRecordId);
+                $subsequentIcdCodeIds = array_column($subsequentIcdCodes, 'id');
+
+                // Check for overlapping ICD codes
+                if (array_intersect($originalIcdCodeIds, $subsequentIcdCodeIds)) {
+                    $readmissions++;
+                    break; // Count only one readmission per discharge event
+                }
+            }
+        }
+
+        return ($readmissions / $totalDischarges) * 100;
     }
 }
