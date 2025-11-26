@@ -154,13 +154,13 @@ class BillingController
         $appointmentOptions = [];
         foreach ($appointments as $appointment) {
             $appointmentOptions[$appointment['id']] = 'Запис #' . $appointment['id']
-                . ' - ' . $appointment['patient_name'] . ' (' . $appointment['start_time'] . ')';
+                . ' - ' . ($appointment['patient_name'] ?? 'Невідомий пацієнт') . ' (' . $appointment['start_time'] . ')';
         }
 
         $medicalRecordOptions = [];
         foreach ($medicalRecords as $record) {
             $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id']
-                . ' - ' . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
+                . ' - ' . ($record['patient_name'] ?? 'Невідомий пацієнт') . ' (' . $record['visit_date'] . ')';
         }
 
         $old = $_SESSION['old'] ?? [];
@@ -291,13 +291,13 @@ class BillingController
         $appointmentOptions = [];
         foreach ($appointments as $appointment) {
             $appointmentOptions[$appointment['id']] = 'Запис #' . $appointment['id'] . ' - '
-                . $appointment['patient_name'] . ' (' . $appointment['start_time'] . ')';
+                . ($appointment['patient_name'] ?? 'Невідомий пацієнт') . ' (' . $appointment['start_time'] . ')';
         }
 
         $medicalRecordOptions = [];
         foreach ($medicalRecords as $record) {
             $medicalRecordOptions[$record['id']] = 'Запис #' . $record['id'] . ' - '
-                . $record['patient_name'] . ' (' . $record['visit_date'] . ')';
+                . ($record['patient_name'] ?? 'Невідомий пацієнт') . ' (' . $record['visit_date'] . ')';
         }
 
         $old = $_SESSION['old'] ?? [];
