@@ -15,7 +15,8 @@ class NotificationController
     }
 
     /**
-     * API endpoint to get unread notifications for the logged-in user.
+     * API endpoint to get notifications (read + unread) with pagination.
+     * Query params: page (1-based), limit.
      */
     public function getUnread(): void
     {
@@ -28,10 +29,25 @@ class NotificationController
             return;
         }
 
-        $notifications = $this->notificationRepository->findUnreadByUserId($userId);
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
+        $offset = ($page - 1) * $limit;
+
+        // Fetch one extra to know if more pages exist
+        $notifications = $this->notificationRepository->findByUserId($userId, $limit + 1, $offset);
+        $hasMore = count($notifications) > $limit;
+        if ($hasMore) {
+            array_pop($notifications);
+        }
+
+        $unreadCount = $this->notificationRepository->countUnreadByUserId($userId);
 
         header('Content-Type: application/json');
-        echo json_encode($notifications);
+        echo json_encode([
+            'notifications' => $notifications,
+            'has_more' => $hasMore,
+            'unread_count' => $unreadCount,
+        ]);
     }
 
     /**

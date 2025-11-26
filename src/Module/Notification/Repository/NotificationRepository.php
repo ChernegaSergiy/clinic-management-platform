@@ -36,6 +36,31 @@ class NotificationRepository
         return $stmt->fetchAll();
     }
 
+    public function findByUserId(int $userId, int $limit = 10, int $offset = 0): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT id, message, created_at, is_read
+            FROM notifications
+            WHERE user_id = :user_id
+            ORDER BY created_at DESC
+            LIMIT :limit OFFSET :offset
+        ");
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function countUnreadByUserId(int $userId): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = false
+        ");
+        $stmt->execute([':user_id' => $userId]);
+        return (int)$stmt->fetchColumn();
+    }
+
     /**
      * Marks all unread notifications for a specific user as read.
      *
