@@ -191,4 +191,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $sum = $stmt->fetchColumn();
         return (float)($sum ?? 0.0);
     }
+
+    public function getDailyRevenueForPeriod(string $startDate, string $endDate): array
+    {
+        $sql = "
+            SELECT 
+                DATE(issued_date) as date,
+                SUM(amount) as total_revenue
+            FROM invoices
+            WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
+            GROUP BY DATE(issued_date)
+            ORDER BY DATE(issued_date) ASC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':start_date' => $startDate,
+            ':end_date' => $endDate,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
