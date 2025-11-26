@@ -77,7 +77,9 @@ class NotificationController
     {
         AuthGuard::check();
         $userId = $_SESSION['user']['id'] ?? 0;
-        $id = (int)($_POST['id'] ?? 0);
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw, true) ?: [];
+        $id = (int)($input['id'] ?? ($_POST['id'] ?? 0));
 
         if (!$userId || $id === 0) {
             http_response_code(400);
