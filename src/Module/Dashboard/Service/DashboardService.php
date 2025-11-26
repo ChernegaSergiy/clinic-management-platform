@@ -3,21 +3,24 @@
 namespace App\Module\Dashboard\Service;
 
 use App\Module\Admin\Repository\KpiRepository;
+use App\Module\Billing\Repository\InvoiceRepository;
 use DateTime;
 
 class DashboardService
 {
     private KpiRepository $kpiRepository;
+    private InvoiceRepository $invoiceRepository;
 
     public function __construct()
     {
         $this->kpiRepository = new KpiRepository();
+        $this->invoiceRepository = new InvoiceRepository();
     }
 
     /**
-     * Fetches the latest KPI results for display on the dashboard.
+     * Fetches the latest KPI results and chart data for the dashboard.
      *
-     * @return array An associative array of KPI results, keyed by kpi_type.
+     * @return array An associative array containing kpi_results and chart_data.
      */
     public function getDashboardData(): array
     {
@@ -43,7 +46,33 @@ class DashboardService
                 ];
             }
         }
-        return $dashboardKpis;
+
+        // Prepare data for the revenue chart
+        $endDate = new DateTime();
+        $startDate = (new DateTime())->modify('-6 days');
+        $rawChartData = $this->invoiceRepository->getDailyRevenueForPeriod($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+
+        // Format data for Chart.js
+        $chartData = [
+            'labels' => [],
+            'data' => [],
+        ];
+        $revenueByDate = array_column($rawChartData, 'total_revenue', 'date');
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = (new DateTime())->modify("-$i days")->format('Y-m-d');
+            $chartData['labels'][] = $date;
+            $chartData['data'][] = (float)($revenueByDate[$date] ?? 0.0);
+        }
+        // Reverse to show oldest date first
+        $chartData['labels'] = array_reverse($chartData['labels']);
+        $chartData['data'] = array_reverse($chartData['data']);
+
+
+        return [
+            'kpis' => $dashboardKpis,
+            'revenueChart' => $chartData,
+        ];
     }
 
     private function calculateTrend(float $currentValue, ?float $previousValue): ?string
