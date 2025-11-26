@@ -62,4 +62,25 @@ class DashboardController
         $exporter->render();
         $exporter->download('dashboard_report.pdf');
     }
+
+    public function exportExcel(): void
+    {
+        AuthGuard::check();
+        $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
+
+        $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
+        $data = [];
+
+        foreach ($dashboardData as $kpi) {
+            $data[] = [
+                $kpi['definition']['name'],
+                $kpi['latest_value'],
+                $kpi['trend'] ?? 'N/A',
+                $kpi['definition']['description'] ?? '',
+            ];
+        }
+
+        $exporter = new \App\Core\ExcelExporter();
+        $exporter->export($headers, $data, 'dashboard_report.xlsx');
+    }
 }
