@@ -28,9 +28,29 @@
         <form class="ui form" action="/lab-orders/import/process" method="POST" enctype="multipart/form-data">
             <div class="field">
                 <label>Виберіть HL7/DICOM файл</label>
-                <input type="file" name="hl7_dicom_file" accept=".hl7,.dcm,.txt,.xml">
+                <div class="ui action input">
+                    <input type="text" id="hl7-file-display" readonly placeholder="Файл не обрано">
+                    <label for="hl7-file-input" class="ui button">Обрати файл</label>
+                </div>
+                <input type="file" id="hl7-file-input" name="hl7_dicom_file" accept=".hl7,.dcm,.txt,.xml" style="display: none;">
             </div>
             <button class="ui primary button" type="submit">Завантажити та обробити</button>
         </form>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('hl7-file-input');
+            const display = document.getElementById('hl7-file-display');
+
+            if (fileInput && display) {
+                fileInput.addEventListener('change', function() {
+                    display.value = fileInput.files.length ? fileInput.files[0].name : 'Файл не обрано';
+                });
+            }
+        });
+    </script>
 {% endblock %}
