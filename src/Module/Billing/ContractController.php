@@ -195,11 +195,15 @@ class ContractController
         exit();
     }
 
-    public function downloadFile(): void
+    public function downloadFile(int $id = 0): void
     {
         AuthGuard::check();
 
-        $id = (int)($_GET['id'] ?? 0);
+        // Accept ID from route parameter or query string fallback
+        if ($id === 0) {
+            $id = (int)($_GET['id'] ?? 0);
+        }
+
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract || !$contract['file_path'] || !file_exists(__DIR__ . '/../../' . $contract['file_path'])) {

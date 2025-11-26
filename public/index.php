@@ -200,6 +200,7 @@ $router->add('GET', '/billing/contracts/show', [ContractController::class, 'show
 $router->add('GET', '/billing/contracts/edit', [ContractController::class, 'edit']);
 $router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
 $router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
+$router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
