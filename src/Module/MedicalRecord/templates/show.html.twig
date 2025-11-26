@@ -79,7 +79,11 @@
         <form class="ui form" action="/medical-records/attachments/upload?id={{ record.id }}" method="POST" enctype="multipart/form-data">
             <div class="field">
                 <label>Завантажити новий файл</label>
-                <input type="file" name="attachments[]" multiple>
+                <div class="ui action input">
+                    <input type="text" id="attachments-display" readonly placeholder="Файл не обрано">
+                    <label for="attachments-upload" class="ui button">Обрати файл</label>
+                </div>
+                <input type="file" id="attachments-upload" name="attachments[]" multiple style="display: none;">
             </div>
             <button class="ui primary button" type="submit">Завантажити</button>
         </form>
@@ -154,4 +158,25 @@
             </tbody>
         </table>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('attachments-upload');
+            const displayInput = document.getElementById('attachments-display');
+
+            if (fileInput && displayInput) {
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length === 0) {
+                        displayInput.value = 'Файл не обрано';
+                        return;
+                    }
+                    const names = Array.from(fileInput.files).map(f => f.name).join(', ');
+                    displayInput.value = names;
+                });
+            }
+        });
+    </script>
 {% endblock %}
