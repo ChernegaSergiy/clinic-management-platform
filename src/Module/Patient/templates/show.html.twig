@@ -68,23 +68,6 @@
 
         <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">Редагувати</a>
         <a href="/prescriptions/new?patient_id={{ patient.id }}" class="ui teal button">Створити рецепт</a>
-        {% if appointments is not empty %}
-            <div class="ui inline form" style="display: inline-block;">
-                <div class="field" style="margin-bottom: 0;">
-                    <select class="ui dropdown" onchange="if (this.value) { window.location = this.value; }">
-                        <option value="">Створити медичний запис для візиту…</option>
-                        {% for appointment in appointments %}
-                            <option value="/medical-records/new?appointment_id={{ appointment.id }}">
-                                {{ appointment.start_time|date('Y-m-d H:i') }}
-                                {% if appointment.doctor_name %} — {{ appointment.doctor_name }}{% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        {% else %}
-            <div class="ui disabled button">Немає візитів для медзапису</div>
-        {% endif %}
         {% if patient.status == 'active' %}
             <form action="/patients/toggle-status" method="POST" style="display: inline;">
                 <input type="hidden" name="id" value="{{ patient.id }}">
@@ -97,6 +80,38 @@
             </form>
         {% endif %}
         <a href="/patients" class="ui button">Повернутися до списку</a>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Записи на прийом</h3>
+        {% if appointments is not empty %}
+            <table class="ui celled unstackable table">
+                <thead>
+                    <tr>
+                        <th>Дата/час</th>
+                        <th>Лікар</th>
+                        <th>Статус</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
+                            <td>{{ appointment.doctor_name ?? 'Невідомий' }}</td>
+                            <td>{{ appointment.status }}</td>
+                            <td>
+                                <a class="ui icon button" href="/medical-records/new?appointment_id={{ appointment.id }}">
+                                    <i class="plus icon"></i> Створити медзапис
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="ui message">Немає запланованих візитів.</div>
+        {% endif %}
     </div>
 
     <div class="ui segment">
