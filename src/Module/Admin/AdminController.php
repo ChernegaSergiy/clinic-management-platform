@@ -836,6 +836,12 @@ class AdminController
             'kpi_type' => ['required'],
         ]);
 
+        // Normalize optional fields
+        if (isset($_POST['target_value']) && $_POST['target_value'] === '') {
+            unset($_POST['target_value']);
+        }
+        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
+
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
@@ -888,6 +894,12 @@ class AdminController
             'name' => ['required', 'unique:kpi_definitions,name,' . $id],
             'kpi_type' => ['required'],
         ]);
+
+        // Normalize optional fields
+        if (isset($_POST['target_value']) && $_POST['target_value'] === '') {
+            unset($_POST['target_value']);
+        }
+        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
 
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
