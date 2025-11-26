@@ -61,6 +61,18 @@ class NotificationRepository
         return (int)$stmt->fetchColumn();
     }
 
+    public function deleteByIdAndUser(int $id, int $userId): bool
+    {
+        $stmt = $this->pdo->prepare("
+            DELETE FROM notifications
+            WHERE id = :id AND user_id = :user_id
+        ");
+        return $stmt->execute([
+            ':id' => $id,
+            ':user_id' => $userId,
+        ]);
+    }
+
     /**
      * Marks all unread notifications for a specific user as read.
      *

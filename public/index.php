@@ -267,6 +267,7 @@ $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exp
 // API routes - Notifications
 $router->add('GET', '/api/notifications', [NotificationController::class, 'getUnread']);
 $router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
+$router->add('POST', '/api/notifications/delete', [NotificationController::class, 'delete']);
 
 // KPI routes (legacy)
 $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);

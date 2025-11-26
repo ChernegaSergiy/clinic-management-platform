@@ -69,4 +69,25 @@ class NotificationController
         header('Content-Type: application/json');
         echo json_encode(['success' => $success]);
     }
+
+    /**
+     * API endpoint to delete a notification for the logged-in user.
+     */
+    public function delete(): void
+    {
+        AuthGuard::check();
+        $userId = $_SESSION['user']['id'] ?? 0;
+        $id = (int)($_POST['id'] ?? 0);
+
+        if (!$userId || $id === 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
+    }
 }
