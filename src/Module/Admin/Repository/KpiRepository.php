@@ -77,7 +77,11 @@ class KpiRepository
     public function saveKpiResult(array $data): ?int
     {
         $sql = "INSERT INTO kpi_results (kpi_id, user_id, period_start, period_end, calculated_value, notes) 
-                VALUES (:kpi_id, :user_id, :period_start, :period_end, :calculated_value, :notes)";
+                VALUES (:kpi_id, :user_id, :period_start, :period_end, :calculated_value, :notes)
+                ON DUPLICATE KEY UPDATE 
+                    calculated_value = VALUES(calculated_value),
+                    notes = VALUES(notes)";
+
         $stmt = $this->pdo->prepare($sql);
         $success = $stmt->execute([
             ':kpi_id' => $data['kpi_id'],
@@ -87,7 +91,33 @@ class KpiRepository
             ':calculated_value' => $data['calculated_value'],
             ':notes' => $data['notes'] ?? null,
         ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+
+        if (!$success) {
+            return null;
+        }
+
+        // If a duplicate was updated, lastInsertId will be 0; fetch existing id for consistency
+        $lastId = (int)$this->pdo->lastInsertId();
+        if ($lastId > 0) {
+            return $lastId;
+        }
+
+        $stmt = $this->pdo->prepare("
+            SELECT id FROM kpi_results 
+            WHERE kpi_id = :kpi_id 
+              AND user_id = :user_id 
+              AND period_start = :period_start 
+              AND period_end = :period_end
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':kpi_id' => $data['kpi_id'],
+            ':user_id' => $data['user_id'],
+            ':period_start' => $data['period_start'],
+            ':period_end' => $data['period_end'],
+        ]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int)$row['id'] : null;
     }
 
     public function findKpiResultsForUser(int $userId, string $periodStart = null, string $periodEnd = null): array
