@@ -46,4 +46,20 @@ class DashboardController
         $exporter = new \App\Core\CsvExporter($headers, $data);
         $exporter->download('dashboard_report.csv');
     }
+
+    public function exportPdf(): void
+    {
+        AuthGuard::check();
+        $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
+
+        // Render the Twig template into an HTML string
+        $html = \App\Core\View::renderToString('dashboard/pdf_report.html.twig', [
+            'dashboardData' => $dashboardData,
+        ]);
+
+        $exporter = new \App\Core\PdfExporter();
+        $exporter->loadHtml($html);
+        $exporter->render();
+        $exporter->download('dashboard_report.pdf');
+    }
 }
