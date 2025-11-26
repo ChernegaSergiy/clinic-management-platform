@@ -127,6 +127,20 @@
         .notification-menu .notification-item i.bell.outline.icon {
             color: #f2711c;
         }
+        .notification-menu .notification-item .header {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .notification-menu .notification-item .notification-dismiss {
+            cursor: pointer;
+            color: #767676;
+            font-weight: 700;
+        }
+        .notification-menu .notification-item .notification-dismiss:hover {
+            color: #db2828;
+        }
         @media (max-width: 767px) {
             .notification-menu {
                 width: 100%;
@@ -205,10 +219,12 @@
                     notifications.forEach(notification => {
                         const unreadClass = notification.is_read ? '' : 'unread';
                         const notificationItem = `
-                            <div class="item notification-item ${unreadClass}">
-                                <i class="bell outline icon"></i>
+                            <div class="item notification-item ${unreadClass}" data-id="${notification.id}">
                                 <div class="content">
-                                    <div class="header">${notification.message}</div>
+                                    <div class="header">
+                                        ${notification.message}
+                                        <span class="notification-dismiss" title="Видалити">&times;</span>
+                                    </div>
                                     <div class="description">${formatDate(notification.created_at)}</div>
                                 </div>
                             </div>
@@ -277,6 +293,33 @@
             $(document).on('click', '.notification-load-more', function() {
                 notificationPage += 1;
                 fetchNotifications(false);
+            });
+
+            $(document).on('click', '.notification-dismiss', function(event) {
+                event.stopPropagation();
+                const item = $(this).closest('.notification-item');
+                const id = item.data('id');
+                if (!id) {
+                    item.remove();
+                    return;
+                }
+
+                fetch('/api/notifications/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        item.remove();
+                        // Recompute badge: if unread item removed, refetch count
+                        fetchNotifications(true);
+                    }
+                })
+                .catch(() => {
+                    item.remove(); // fallback to remove locally
+                });
             });
 
             // Fetch notifications on page load
