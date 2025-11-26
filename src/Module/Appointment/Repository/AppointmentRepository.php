@@ -316,4 +316,63 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         $results = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Fetches as [doctor_id => total_duration_seconds]
         return array_map('intval', $results); // Ensure values are integers
     }
+
+    /**
+     * Retrieves completed appointments for a given date, including associated medical record and ICD codes.
+     * These appointments serve as "discharge events" for readmission tracking.
+     *
+     * @param string $date The date in 'YYYY-MM-DD' format.
+     * @return array An array of associative arrays, each representing a completed appointment.
+     */
+    public function getCompletedAppointmentsWithIcdCodes(string $date): array
+    {
+        $sql = "
+            SELECT
+                a.id as appointment_id,
+                a.patient_id,
+                mr.id as medical_record_id,
+                GROUP_CONCAT(mri.icd_code_id) as icd_code_ids
+            FROM appointments a
+            JOIN medical_records mr ON a.id = mr.appointment_id
+            LEFT JOIN medical_record_icd mri ON mr.id = mri.medical_record_id
+            WHERE DATE(a.end_time) = :date AND a.status = 'completed'
+            GROUP BY a.id, a.patient_id, mr.id
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date' => $date]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Finds subsequent appointments for a specific patient after a given date and within a timeframe.
+     * Used to detect potential readmissions.
+     *
+     * @param int $patientId The ID of the patient.
+     * @param string $afterDate The date (YYYY-MM-DD) after which to search for appointments.
+     * @param int $timeframeDays The number of days after $afterDate to consider.
+     * @return array An array of subsequent appointments.
+     */
+    public function findPatientSubsequentAppointments(int $patientId, string $afterDate, int $timeframeDays): array
+    {
+        $sql = "
+            SELECT
+                a.id as appointment_id,
+                a.start_time,
+                a.status,
+                mr.id as medical_record_id
+            FROM appointments a
+            LEFT JOIN medical_records mr ON a.id = mr.appointment_id
+            WHERE a.patient_id = :patient_id
+              AND a.start_time > :after_date
+              AND a.start_time <= DATE_ADD(:after_date, INTERVAL :timeframe_days DAY)
+            ORDER BY a.start_time ASC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':patient_id' => $patientId,
+            ':after_date' => $afterDate,
+            ':timeframe_days' => $timeframeDays,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
