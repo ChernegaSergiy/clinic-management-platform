@@ -7,7 +7,7 @@
         <h2 class="ui header">Деталі рахунку #{{ invoice.id }}</h2>
         <div class="ui divider"></div>
 
-        <table class="ui stackable definition table">
+        <table class="ui unstackable definition table">
             <tbody>
                 <tr>
                     <td>ID</td>
@@ -78,7 +78,7 @@
         {% if invoice.payments is empty %}
             <p>Немає оплат для цього рахунку.</p>
         {% else %}
-            <table class="ui celled stackable table">
+            <table class="ui celled unstackable table">
                 <thead>
                     <tr>
                         <th>ID</th>

@@ -7,7 +7,7 @@
         <h2 class="ui header">Деталі рецепта #{{ prescription.id }}</h2>
         <div class="ui divider"></div>
 
-        <table class="ui stackable definition table">
+        <table class="ui unstackable definition table">
             <tbody>
                 <tr>
                     <td>Пацієнт</td>
@@ -48,7 +48,7 @@
         {% if prescription.items is empty %}
             <p>Немає пунктів у цьому рецепті.</p>
         {% else %}
-            <table class="ui celled stackable table">
+            <table class="ui celled unstackable table">
                 <thead>
                     <tr>
                         <th>Назва медикаменту</th>

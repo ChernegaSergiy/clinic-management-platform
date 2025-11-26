@@ -7,7 +7,7 @@
         <h2 class="ui header">Деталі медичного запису #{{ record.id }}</h2>
         <div class="ui divider"></div>
 
-        <table class="ui stackable definition table">
+        <table class="ui unstackable definition table">
             <tbody>
                 <tr>
                     <td>ID</td>
@@ -89,7 +89,7 @@
         {% if attachments is empty %}
             <p>Немає вкладень для цього медичного запису.</p>
         {% else %}
-            <table class="ui celled stackable table">
+            <table class="ui celled unstackable table">
                 <thead>
                     <tr>
                         <th>Назва файлу</th>
@@ -124,7 +124,7 @@
     <div class="ui segment">
         <h3 class="ui header">Лабораторні замовлення</h3>
         <a href="/lab-orders/new?record_id={{ record.id }}" class="ui green button">Створити лабораторне замовлення</a>
-        <table class="ui celled stackable table">
+        <table class="ui celled unstackable table">
             <thead>
                 <tr>
                     <th>Код замовлення</th>
