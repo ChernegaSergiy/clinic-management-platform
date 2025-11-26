@@ -65,7 +65,7 @@
         $(document).ready(function() {
             $('.ui.dropdown').dropdown();
 
-            var itemIndex = {{ old.items|length ?? 1 }};
+            var itemIndex = {{ (old.items|default([])|length > 0) ? (old.items|default([])|length) : 1 }};
 
             $('.add-item').on('click', function() {
                 var newItemHtml = `
