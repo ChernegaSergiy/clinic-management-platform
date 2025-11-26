@@ -5,6 +5,7 @@ namespace App\Module\Patient;
 use App\Core\Validator;
 use App\Core\View;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Patient\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;
@@ -14,11 +15,13 @@ class PatientController
 {
     private PatientRepository $patientRepository;
     private MedicalRecordRepository $medicalRecordRepository;
+    private AppointmentRepository $appointmentRepository;
 
     public function __construct()
     {
         $this->patientRepository = new PatientRepository();
         $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->appointmentRepository = new AppointmentRepository();
     }
 
     public function index(): void
@@ -94,10 +97,12 @@ class PatientController
         }
 
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
+        $appointments = $this->appointmentRepository->findByPatientId($id);
 
         View::render('@modules/Patient/templates/show.html.twig', [
             'patient' => $patient,
             'medical_records' => $medicalRecords,
+            'appointments' => $appointments,
         ]);
     }
 
