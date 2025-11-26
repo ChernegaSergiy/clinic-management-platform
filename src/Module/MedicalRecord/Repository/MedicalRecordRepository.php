@@ -18,7 +18,8 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
     {
         $stmt = $this->pdo->prepare("
             SELECT 
-                mr.*,
+                mr.id, mr.patient_id, mr.appointment_id, mr.doctor_id, mr.visit_date, 
+                mr.diagnosis_code, mr.diagnosis_text, mr.treatment, mr.notes,
                 CONCAT(u.last_name, ' ', u.first_name) as doctor_name
             FROM medical_records mr
             JOIN users u ON mr.doctor_id = u.id
