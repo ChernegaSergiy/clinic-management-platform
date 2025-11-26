@@ -26,10 +26,10 @@ class KpiCalculatorService
         $this->medicalRecordRepository = new MedicalRecordRepository(); // Instantiate MedicalRecordRepository
     }
 
-    public function calculateAndStoreAll(): void
+    public function calculateAndStoreAll(?string $forDate = null): void
     {
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        $today = (new DateTime())->format('Y-m-d');
+        $today = $forDate ?? (new DateTime())->format('Y-m-d');
 
         foreach ($definitions as $definition) {
             if (!$definition['is_active']) {
