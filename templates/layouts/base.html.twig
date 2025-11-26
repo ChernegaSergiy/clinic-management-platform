@@ -10,14 +10,12 @@
         <a class="item" href="/patients">Пацієнти</a>
         <a class="item" href="/appointments">Записи</a>
         <a class="item" href="/medical-records">Медичні записи</a>
+        <a class="item" href="/prescriptions">Рецепти</a>
         <a class="item" href="/inventory">Склад</a>
         <a class="item" href="/billing">Рахунки</a>
         <a class="item" href="/admin/users">Користувачі</a>
-        {% if session.user.role_id == 1 %}
-            <a class="item" href="/admin/clinical">Клінічні довідники</a>
-            <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
-        {% endif %}
-        {# Notification Dropdown #}
+        <a class="item" href="/admin/clinical">Клінічні довідники</a>
+        <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
             <div class="menu" id="notificationMenu">
@@ -39,13 +37,12 @@
         <a class="item" href="/patients">Пацієнти</a>
         <a class="item" href="/appointments">Записи</a>
         <a class="item" href="/medical-records">Медичні записи</a>
+        <a class="item" href="/prescriptions">Рецепти</a>
         <a class="item" href="/inventory">Склад</a>
         <a class="item" href="/billing">Рахунки</a>
         <a class="item" href="/admin/users">Користувачі</a>
-        {% if session.user.role_id == 1 %}
-            <a class="item" href="/admin/clinical">Клінічні довідники</a>
-            <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
-        {% endif %}
+        <a class="item" href="/admin/clinical">Клінічні довідники</a>
+        <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
         {# Notification Dropdown for Mobile #}
         <div class="ui dropdown item" id="notificationDropdownMobile">
             <i class="bell icon"></i> Сповіщення
@@ -69,13 +66,12 @@
         <a class="item" href="/patients">Пацієнти</a>
         <a class="item" href="/appointments">Записи</a>
         <a class="item" href="/medical-records">Медичні записи</a>
+        <a class="item" href="/prescriptions">Рецепти</a>
         <a class="item" href="/inventory">Склад</a>
         <a class="item" href="/billing">Рахунки</a>
         <a class="item" href="/admin/users">Користувачі</a>
-        {% if session.user.role_id == 1 %}
-            <a class="item" href="/admin/clinical">Клінічні довідники</a>
-            <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
-        {% endif %}
+        <a class="item" href="/admin/clinical">Клінічні довідники</a>
+        <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
         <div class="ui fitted divider"></div>
         <a class="item" href="/user/profile">Мій профіль</a>
         <a class="item" href="/logout">Вихід</a>
