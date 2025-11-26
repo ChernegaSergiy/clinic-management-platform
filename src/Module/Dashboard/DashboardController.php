@@ -25,4 +25,25 @@ class DashboardController
             'dashboardData' => $dashboardData,
         ]);
     }
+
+    public function exportCsv(): void
+    {
+        AuthGuard::check();
+        $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
+
+        $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
+        $data = [];
+
+        foreach ($dashboardData as $kpi) {
+            $data[] = [
+                $kpi['definition']['name'],
+                $kpi['latest_value'],
+                $kpi['trend'] ?? 'N/A',
+                $kpi['definition']['description'] ?? '',
+            ];
+        }
+
+        $exporter = new \App\Core\CsvExporter($headers, $data);
+        $exporter->download('dashboard_report.csv');
+    }
 }
