@@ -2,42 +2,27 @@
 
 namespace App\Module\Dashboard;
 
-use App\Core\View;
-use App\Module\Patient\Repository\PatientRepository;
-use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
+use App\Core\View;
+use App\Module\Dashboard\Service\DashboardService;
 
 class DashboardController
 {
-    private PatientRepository $patientRepository;
-    private AppointmentRepository $appointmentRepository;
-    private InventoryItemRepository $inventoryItemRepository;
+    private DashboardService $dashboardService;
 
     public function __construct()
     {
-        $this->patientRepository = new PatientRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->inventoryItemRepository = new InventoryItemRepository();
+        $this->dashboardService = new DashboardService();
     }
 
     public function index(): void
     {
-        AuthGuard::check();
+        AuthGuard::check(); // Ensure user is authenticated
 
-        // Fetch data for dashboard widgets
-        $patientCount = count($this->patientRepository->findAllActive());
-        $upcomingAppointments = $this->appointmentRepository->findUpcoming();
-        $upcomingAppointmentsCount = count($upcomingAppointments);
-        $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
-        $lowStockItemsCount = count($lowStockItems);
+        $dashboardData = $this->dashboardService->getDashboardData();
 
-        View::render('@modules/Dashboard/templates/index.html.twig', [
-            'patient_count' => $patientCount,
-            'upcoming_appointments' => $upcomingAppointments,
-            'upcoming_appointments_count' => $upcomingAppointmentsCount,
-            'low_stock_items' => $lowStockItems,
-            'low_stock_items_count' => $lowStockItemsCount,
+        View::render('dashboard/index.html.twig', [
+            'dashboardData' => $dashboardData,
         ]);
     }
 }
