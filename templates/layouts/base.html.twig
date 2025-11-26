@@ -16,6 +16,7 @@
         <a class="item" href="/admin/users">Користувачі</a>
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
+            <span class="ui red circular mini label notification-badge" style="display: none;"></span>
             <div class="menu" id="notificationMenu">
                 <div class="header">Сповіщення</div>
                 <div class="ui divider"></div>
@@ -46,6 +47,7 @@
         {# Notification Dropdown for Mobile #}
         <div class="ui dropdown item" id="notificationDropdownMobile">
             <i class="bell icon"></i> Сповіщення
+            <span class="ui red circular mini label notification-badge" style="display: none;"></span>
             <div class="menu" id="notificationMenuMobile">
                 <div class="header">Сповіщення</div>
                 <div class="ui divider"></div>
@@ -84,6 +86,11 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <style>
+        .notification-item.unread .header {
+            font-weight: 700;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             $('.message .close').on('click', function() {
@@ -101,6 +108,16 @@
                     markNotificationsAsRead();
                 }
             });
+
+            function updateBadge(count) {
+                $('.notification-badge').each(function() {
+                    if (count > 0) {
+                        $(this).text(count).show();
+                    } else {
+                        $(this).text('').hide();
+                    }
+                });
+            }
 
             function fetchNotifications() {
                 fetch('/api/notifications')
@@ -128,10 +145,12 @@
                 menu.find('.item:not(.header):not(.divider)').remove();
                 mobileMenu.find('.item:not(.header):not(.divider)').remove();
 
+                updateBadge(notificationCount);
+
                 if (notificationCount > 0) {
                     notifications.forEach(notification => {
                         const notificationItem = `
-                            <div class="item">
+                            <div class="item notification-item unread">
                                 <i class="bell outline icon"></i>
                                 <div class="content">
                                     <div class="header">${notification.message}</div>
@@ -172,9 +191,12 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        // Optionally update UI to show no unread count
-                        // Re-fetch to show updated status, or just clear badge
-                        // fetchNotifications(); // Re-fetch to update content
+                        updateBadge(0);
+                        // Mark current items as read visually
+                        $('#notificationMenu .notification-item').removeClass('unread');
+                        $('#notificationMenuMobile .notification-item').removeClass('unread');
+                        // Optionally show empty state when dropdown opens again
+                        // fetchNotifications();
                     }
                 })
                 .catch(error => {
