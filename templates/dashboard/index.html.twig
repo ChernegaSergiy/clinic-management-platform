@@ -19,7 +19,9 @@
             {% set kpi_card_mapping = {
                 'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue'},
                 'revenue_generated': {label: 'Дохід', icon: 'dollar sign', color: 'green'},
-                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
+                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'},
+                'doctor_utilization': {label: 'Завантаженість лікарів', icon: 'user md', color: 'teal'},
+                'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'red'}
             } %}
 
             {% for kpi_type, kpi_info in kpi_card_mapping %}
