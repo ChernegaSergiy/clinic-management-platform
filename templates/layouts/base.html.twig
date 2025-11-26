@@ -17,9 +17,9 @@
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
             <span class="ui red circular mini label notification-badge" style="display: none;"></span>
-            <div class="menu" id="notificationMenu">
+            <div class="menu notification-menu" id="notificationMenu">
                 <div class="header">Сповіщення</div>
-                <div class="item" id="notificationMarkAll"><i class="check icon"></i> Позначити всі як прочитані</div>
+                <div class="item notification-mark-all" id="notificationMarkAll"><i class="check icon"></i> Позначити всі як прочитані</div>
                 <div class="ui divider"></div>
                 <div class="item">Завантаження...</div>
             </div>
@@ -49,9 +49,9 @@
         <div class="ui dropdown item" id="notificationDropdownMobile">
             <i class="bell icon"></i> Сповіщення
             <span class="ui red circular mini label notification-badge" style="display: none;"></span>
-            <div class="menu" id="notificationMenuMobile">
+            <div class="menu notification-menu" id="notificationMenuMobile">
                 <div class="header">Сповіщення</div>
-                <div class="item" id="notificationMarkAllMobile"><i class="check icon"></i> Позначити всі як прочитані</div>
+                <div class="item notification-mark-all" id="notificationMarkAllMobile"><i class="check icon"></i> Позначити всі як прочитані</div>
                 <div class="ui divider"></div>
                 <div class="item">Завантаження...</div>
             </div>
@@ -92,6 +92,34 @@
         .notification-item.unread .header {
             font-weight: 700;
         }
+        .notification-menu {
+            min-width: 320px;
+            width: min(360px, 90vw);
+            max-width: 420px;
+            padding: 6px 0;
+        }
+        .notification-menu .item.notification-mark-all {
+            font-weight: 600;
+            color: #1b1c1d;
+        }
+        .notification-menu .notification-item .content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .notification-menu .notification-item .description {
+            font-size: 11px;
+            color: #767676;
+        }
+        .notification-menu .notification-item i.bell.outline.icon {
+            color: #f2711c;
+        }
+        @media (max-width: 767px) {
+            .notification-menu {
+                width: 100%;
+                min-width: 280px;
+            }
+        }
     </style>
     <script>
         $(document).ready(function() {
@@ -130,6 +158,14 @@
                     });
             }
 
+            function formatDate(value) {
+                try {
+                    return new Date(value + 'Z').toLocaleString();
+                } catch (e) {
+                    return value;
+                }
+            }
+
             function updateNotificationDropdown(notifications) {
                 const menu = $('#notificationMenu');
                 const mobileMenu = $('#notificationMenuMobile');
@@ -148,7 +184,7 @@
                                 <i class="bell outline icon"></i>
                                 <div class="content">
                                     <div class="header">${notification.message}</div>
-                                    <div class="description">${new Date(notification.created_at + 'Z').toLocaleString()}</div>
+                                    <div class="description">${formatDate(notification.created_at)}</div>
                                 </div>
                             </div>
                         `;
