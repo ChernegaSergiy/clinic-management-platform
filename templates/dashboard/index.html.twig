@@ -16,7 +16,7 @@
             } %}
 
             {% for kpi_type, kpi_info in kpi_card_mapping %}
-                {% set kpi_data = dashboardData[kpi_type] %}
+                {% set kpi_data = dashboardData.kpis[kpi_type] %}
                 <div class="eight wide mobile four wide tablet four wide computer column">
                     <div class="ui centered card {{ kpi_info.color }}">
                         <div class="content">
@@ -53,6 +53,13 @@
         </div>
         <div class="ui hidden section divider"></div>
         <div class="row">
+            <h1 class="ui huge dividing header">Щоденний дохід за 7 днів</h1>
+            <div class="sixteen wide column">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+        <div class="ui hidden section divider"></div>
+        <div class="row">
             <h1 class="ui huge dividing header">Зведена таблиця KPI</h1>
         </div>
         <div class="row">
@@ -66,7 +73,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for kpi_type, kpi_data in dashboardData %}
+                {% for kpi_type, kpi_data in dashboardData.kpis %}
                     <tr>
                         <td>{{ kpi_data.definition.name }}</td>
                         <td>
@@ -101,4 +108,55 @@
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const revenueChartData = {{ dashboardData.revenueChart|json_encode|raw }};
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: revenueChartData.labels,
+                    datasets: [{
+                        label: 'Щоденний дохід (₴)',
+                        data: revenueChartData.data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Щоденний дохід за останні 7 днів'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Дата'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Дохід (₴)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}
