@@ -35,11 +35,31 @@
         <form class="ui form" method="POST" action="/patients/import-json" enctype="multipart/form-data">
             <div class="field">
                 <label>Оберіть JSON файл</label>
-                <input type="file" name="json_file" accept=".json">
+                <div class="ui action input">
+                    <input type="text" id="json-file-display" readonly placeholder="Файл не обрано">
+                    <label for="json-file-input" class="ui button">Обрати файл</label>
+                </div>
+                <input type="file" id="json-file-input" name="json_file" accept=".json" style="display: none;">
             </div>
 
             {{ ui.button('Імпортувати', 'primary', 'large', 'upload') }}
             <a href="/patients" class="ui button">Скасувати</a>
         </form>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('json-file-input');
+            const display = document.getElementById('json-file-display');
+
+            if (fileInput && display) {
+                fileInput.addEventListener('change', function() {
+                    display.value = fileInput.files.length ? fileInput.files[0].name : 'Файл не обрано';
+                });
+            }
+        });
+    </script>
 {% endblock %}
