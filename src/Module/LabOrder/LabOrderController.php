@@ -87,7 +87,16 @@ class LabOrderController
         $data['doctor_id'] = $medicalRecord['doctor_id'];
         $data['medical_record_id'] = $recordId;
 
-        $this->labOrderRepository->save($data);
+        $labOrderId = $this->labOrderRepository->save($data);
+
+        if ($labOrderId) {
+            $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $labOrderId;
+            $qrCodeHash = hash('sha256', $qrCodeData); // Generate a hash of the QR code data
+            $updateSuccess = $this->labOrderRepository->updateQrCodeHash($labOrderId, $qrCodeHash);
+            if (!$updateSuccess) {
+                error_log("Failed to update QR code hash for lab order ID: " . $labOrderId);
+            }
+        }
 
         $doctor = $this->userRepository->findById($medicalRecord['doctor_id']);
         if ($doctor) {
