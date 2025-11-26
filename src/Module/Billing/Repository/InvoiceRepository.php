@@ -185,17 +185,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function sumTotalAmountByDate(string $date): float
     {
-        // Treat revenue as invoices marked paid on that date; fallback to issued_date if paid_date is null.
-        $sql = "
-            SELECT SUM(amount) 
-            FROM invoices 
-            WHERE status = 'paid'
-              AND DATE(COALESCE(paid_date, issued_date)) = :date
-        ";
-        $stmt = $this->pdo->prepare($sql);
+        // 1) Sum actual payments for the day (covers partial payments)
+        $paymentsSql = "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE DATE(payment_date) = :date";
+        $stmt = $this->pdo->prepare($paymentsSql);
         $stmt->execute([':date' => $date]);
-        $sum = $stmt->fetchColumn();
-        return (float)($sum ?? 0.0);
+        $paymentsSum = (float)$stmt->fetchColumn();
+
+        // 2) Include fully paid invoices that have no payment records (e.g., marked paid manually)
+        $invoicesSql = "
+            SELECT COALESCE(SUM(i.amount), 0)
+            FROM invoices i
+            WHERE i.status = 'paid'
+              AND DATE(COALESCE(i.paid_date, i.issued_date)) = :date
+              AND NOT EXISTS (
+                  SELECT 1 FROM payments p WHERE p.invoice_id = i.id
+              )
+        ";
+        $stmt = $this->pdo->prepare($invoicesSql);
+        $stmt->execute([':date' => $date]);
+        $invoicesSum = (float)$stmt->fetchColumn();
+
+        return $paymentsSum + $invoicesSum;
     }
 
     public function getDailyRevenueForPeriod(string $startDate, string $endDate): array
