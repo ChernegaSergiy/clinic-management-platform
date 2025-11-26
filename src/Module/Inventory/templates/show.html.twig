@@ -7,7 +7,7 @@
         <h2 class="ui header">Деталі позиції складу #{{ item.id }}</h2>
         <div class="ui divider"></div>
 
-        <table class="ui definition table">
+        <table class="ui stackable definition table">
             <tbody>
                 <tr>
                     <td>ID</td>
@@ -79,7 +79,7 @@
         {% if movementHistory is empty %}
             <p>Немає записів історії рухів для цієї позиції.</p>
         {% else %}
-            <table class="ui celled table">
+            <table class="ui celled stackable table">
                 <thead>
                     <tr>
                         <th>Тип руху</th>
