@@ -8,6 +8,7 @@ use App\Module\User\AuthController;
 use App\Module\User\OAuthController;
 use App\Module\User\UserController;
 use App\Module\Patient\PatientController;
+use App\Module\Prescription\PrescriptionController;
 use App\Module\Appointment\AppointmentController;
 use App\Module\MedicalRecord\MedicalRecordController;
 use App\Module\LabOrder\LabOrderController;
@@ -126,6 +127,12 @@ $router->add('POST', '/appointments/waitlist/reject', [AppointmentController::cl
 $router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
 $router->add('GET', '/book-appointment', [AppointmentController::class, 'publicForm']);
 $router->add('POST', '/book-appointment', [AppointmentController::class, 'submitPublicForm']);
+
+// Prescription routes
+$router->add('GET', '/prescriptions', [PrescriptionController::class, 'index']);
+$router->add('GET', '/prescriptions/new', [PrescriptionController::class, 'create']);
+$router->add('POST', '/prescriptions/new', [PrescriptionController::class, 'store']);
+$router->add('GET', '/prescriptions/show', [PrescriptionController::class, 'show']);
 
 // Medical Record routes
 $router->add('GET', '/medical-records', [MedicalRecordController::class, 'index']);
