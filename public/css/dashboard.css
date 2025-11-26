@@ -76,3 +76,10 @@ body {
     margin-bottom: 12px;
     display: inline-block;
 }
+
+/* Responsive improvements */
+td, th {
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+
