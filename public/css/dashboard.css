@@ -59,16 +59,6 @@ body {
     padding-right: 0;
 }
 
-.ui.tablet.computer.only .ui.top.fixed.menu {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-}
-
-.ui.tablet.computer.only .ui.top.fixed.menu .right.menu {
-    flex-wrap: nowrap;
-    gap: 8px;
-}
-
 .ui.mobile.only.grid .ui.menu .ui.vertical.menu {
     display: none;
 }
