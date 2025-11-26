@@ -185,7 +185,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function sumTotalAmountByDate(string $date): float
     {
-        $sql = "SELECT SUM(amount) FROM payments WHERE DATE(payment_date) = :date";
+        // Treat revenue as invoices marked paid on that date; fallback to issued_date if paid_date is null.
+        $sql = "
+            SELECT SUM(amount) 
+            FROM invoices 
+            WHERE status = 'paid'
+              AND DATE(COALESCE(paid_date, issued_date)) = :date
+        ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':date' => $date]);
         $sum = $stmt->fetchColumn();
