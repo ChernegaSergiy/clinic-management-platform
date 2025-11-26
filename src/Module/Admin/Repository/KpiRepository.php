@@ -134,4 +134,36 @@ class KpiRepository
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findLatestKpiResult(int $kpiId): ?array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT kr.*
+            FROM kpi_results kr
+            WHERE kr.kpi_id = :kpi_id
+            ORDER BY kr.period_start DESC, kr.created_at DESC
+            LIMIT 1
+        ");
+        $stmt->execute([':kpi_id' => $kpiId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result === false ? null : $result;
+    }
+
+    public function findKpiResultForPreviousPeriod(int $kpiId, string $currentPeriodEnd, string $periodType = 'day'): ?array
+    {
+        // Adjust currentPeriodEnd to exclude the current period
+        $stmt = $this->pdo->prepare("
+            SELECT kr.*
+            FROM kpi_results kr
+            WHERE kr.kpi_id = :kpi_id AND kr.period_end < :current_period_end
+            ORDER BY kr.period_end DESC
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':kpi_id' => $kpiId,
+            ':current_period_end' => $currentPeriodEnd
+        ]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result === false ? null : $result;
+    }
 }
