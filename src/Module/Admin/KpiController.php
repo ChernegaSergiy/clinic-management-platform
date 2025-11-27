@@ -6,6 +6,7 @@ use App\Core\View;
 use App\Core\Validator;
 use App\Module\Admin\Repository\KpiRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class KpiController
 {
@@ -20,6 +21,7 @@ class KpiController
     public function listDefinitions(): void
     {
         AuthGuard::check();
+        Gate::authorize('kpi.manage');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
         View::render('@modules/Admin/templates/kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
@@ -27,6 +29,7 @@ class KpiController
     public function createDefinition(): void
     {
         AuthGuard::check();
+        Gate::authorize('kpi.manage');
         View::render('@modules/Admin/templates/kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -37,6 +40,7 @@ class KpiController
     public function storeDefinition(): void
     {
         AuthGuard::check();
+        Gate::authorize('kpi.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -63,6 +67,7 @@ class KpiController
     public function listResults(): void
     {
         AuthGuard::check();
+        Gate::authorize('kpi.read');
         $results = [];
         if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) {
             // Перевірка, чи користувач є адміністратором
