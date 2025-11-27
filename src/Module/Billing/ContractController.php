@@ -6,6 +6,7 @@ use App\Core\View;
 use App\Core\Validator;
 use App\Module\Billing\Repository\ContractRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class ContractController
 {
@@ -19,6 +20,7 @@ class ContractController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         $contracts = $this->contractRepository->findAll();
         View::render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
     }
@@ -26,6 +28,7 @@ class ContractController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         View::render('@modules/Billing/templates/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -36,6 +39,7 @@ class ContractController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -86,6 +90,7 @@ class ContractController
     public function show(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -102,6 +107,7 @@ class ContractController
     public function edit(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -123,6 +129,7 @@ class ContractController
     public function update(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -174,6 +181,7 @@ class ContractController
     public function delete(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -198,6 +206,7 @@ class ContractController
     public function downloadFile(int $id = 0): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         // Accept ID from route parameter or query string fallback
         if ($id === 0) {
