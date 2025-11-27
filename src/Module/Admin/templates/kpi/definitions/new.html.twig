@@ -22,10 +22,18 @@
             {% set kpi_options = kpi_options|merge({ (selected_type): selected_type ~ ' (custom)' }) %}
         {% endif %}
 
+        {% set period_options = {
+            'day': 'Щодня',
+            'week': 'Щотижня',
+            'month': 'Щомісяця'
+        } %}
+        {% set selected_period = old.period ?? 'day' %}
+
         <form class="ui form" method="POST" action="/admin/kpi_definitions/new">
             {{ forms.input('name', 'Назва', old.name ?? '', 'text', 'Наприклад, Patient Wait Time', errors.name ?? null, {'required': 'required'}) }}
             {{ forms.textarea('description', 'Опис', old.description ?? '', 'Детальний опис KPI', errors.description ?? null) }}
             {{ forms.select('kpi_type', 'Тип KPI', kpi_options, selected_type, errors.kpi_type ?? null, {'required': 'required'}) }}
+            {{ forms.select('period', 'Період розрахунку', period_options, selected_period, errors.period ?? null, {'required': 'required'}) }}
             {{ forms.input('target_value', 'Цільове значення', old.target_value ?? '', 'text', 'Наприклад, 15, 95%, 100', errors.target_value ?? null) }}
             {{ forms.input('unit', 'Одиниця виміру', old.unit ?? '', 'text', 'Наприклад, minutes, %, patients', errors.unit ?? null) }}
 
