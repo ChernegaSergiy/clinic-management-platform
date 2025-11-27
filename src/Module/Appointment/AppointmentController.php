@@ -9,6 +9,7 @@ use App\Module\Patient\Repository\PatientRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class AppointmentController
 {
@@ -28,6 +29,7 @@ class AppointmentController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.read');
         $doctors = $this->userRepository->findAllDoctors();
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
         $appointments = $this->appointmentRepository->findAll();
@@ -91,6 +93,7 @@ class AppointmentController
     public function rejectWaitlist(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.write');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
@@ -106,6 +109,7 @@ class AppointmentController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.write');
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
@@ -149,6 +153,7 @@ class AppointmentController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.write');
 
         $rawInput = $_POST;
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0); // Extract waitlist_id
@@ -301,8 +306,9 @@ class AppointmentController
     public function show(): void
     {
         AuthGuard::check();
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('appointments.read', ['appointment_id' => $id]);
+
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
@@ -317,8 +323,9 @@ class AppointmentController
     public function edit(): void
     {
         AuthGuard::check();
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('appointments.write', ['appointment_id' => $id]);
+
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
@@ -350,6 +357,7 @@ class AppointmentController
     public function waitlist(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.read');
         $entries = $this->appointmentRepository->getWaitlistEntries();
         View::render('@modules/Appointment/templates/waitlist.html.twig', [
             'entries' => $entries,
@@ -359,6 +367,8 @@ class AppointmentController
     public function update(): void
     {
         AuthGuard::check();
+        $id = (int)($_POST['id'] ?? 0);
+        Gate::authorize('appointments.write', ['appointment_id' => $id]);
 
         $rawInput = $_POST;
 
@@ -437,8 +447,9 @@ class AppointmentController
     public function cancel(): void
     {
         AuthGuard::check();
-
         $id = (int)($_POST['id'] ?? 0);
+        Gate::authorize('appointments.write', ['appointment_id' => $id]);
+
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
@@ -476,6 +487,7 @@ class AppointmentController
     public function showWaitlist(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.read');
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -501,6 +513,7 @@ class AppointmentController
     public function addPatientToWaitlist(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.write');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
