@@ -329,6 +329,66 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return (int)$stmt->fetchColumn();
     }
 
+    public function sumBookedHoursByRange(string $from, string $to): float
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COALESCE(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600, 0) as hours
+            FROM appointments
+            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
+        ");
+        $stmt->execute([
+            ':from' => $from,
+            ':to' => $to,
+        ]);
+        return (float)$stmt->fetchColumn();
+    }
+
+    public function countDistinctDoctorsByRange(string $from, string $to): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(DISTINCT doctor_id)
+            FROM appointments
+            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
+        ");
+        $stmt->execute([
+            ':from' => $from,
+            ':to' => $to,
+        ]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function countDistinctPatientsByRange(string $from, string $to): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(DISTINCT patient_id)
+            FROM appointments
+            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
+        ");
+        $stmt->execute([
+            ':from' => $from,
+            ':to' => $to,
+        ]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function countReadmittedPatients(string $from, string $to): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM (
+                SELECT patient_id, COUNT(*) as cnt
+                FROM appointments
+                WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
+                GROUP BY patient_id
+                HAVING cnt > 1
+            ) t
+        ");
+        $stmt->execute([
+            ':from' => $from,
+            ':to' => $to,
+        ]);
+        return (int)$stmt->fetchColumn();
+    }
+
     public function getDoctorDailyLoad(string $date): array
     {
         $sql = "
