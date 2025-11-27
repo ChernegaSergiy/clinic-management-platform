@@ -4,17 +4,29 @@ namespace App\Module\Dashboard\Service;
 
 use App\Module\Admin\Repository\KpiRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\Patient\Repository\PatientRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\Inventory\Repository\InventoryItemRepository;
 use DateTime;
 
 class DashboardService
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
+    private PatientRepository $patientRepository;
+    private AppointmentRepository $appointmentRepository;
+    private LabOrderRepository $labOrderRepository;
+    private InventoryItemRepository $inventoryItemRepository;
 
     public function __construct()
     {
         $this->kpiRepository = new KpiRepository();
         $this->invoiceRepository = new InvoiceRepository();
+        $this->patientRepository = new PatientRepository();
+        $this->appointmentRepository = new AppointmentRepository();
+        $this->labOrderRepository = new LabOrderRepository();
+        $this->inventoryItemRepository = new InventoryItemRepository();
     }
 
     /**
@@ -68,10 +80,21 @@ class DashboardService
         $chartData['labels'] = array_reverse($chartData['labels']);
         $chartData['data'] = array_reverse($chartData['data']);
 
+        $startPeriod = (new DateTime())->modify('-6 days')->format('Y-m-d');
+        $endPeriod = (new DateTime())->format('Y-m-d');
+
+        $quickStats = [
+            'patients_total' => $this->patientRepository->countAll(),
+            'appointments_today' => $this->appointmentRepository->countScheduledByDate((new DateTime())->format('Y-m-d')),
+            'revenue_7d' => $this->invoiceRepository->sumRevenueForPeriod($startPeriod, $endPeriod),
+            'lab_pending' => $this->labOrderRepository->countByStatus(['ordered', 'in_progress']),
+            'low_stock' => $this->inventoryItemRepository->countItemsBelowMinStock(),
+        ];
 
         return [
             'kpis' => $dashboardKpis,
             'revenueChart' => $chartData,
+            'quickStats' => $quickStats,
         ];
     }
 
