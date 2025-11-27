@@ -226,4 +226,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function sumRevenueForPeriod(string $startDate, string $endDate): float
+    {
+        $sql = "
+            SELECT COALESCE(SUM(amount), 0) 
+            FROM invoices 
+            WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':start_date' => $startDate,
+            ':end_date' => $endDate,
+        ]);
+        return (float)$stmt->fetchColumn();
+    }
 }
