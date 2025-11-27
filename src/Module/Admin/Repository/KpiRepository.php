@@ -21,6 +21,12 @@ class KpiRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findActiveKpiDefinitions(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM kpi_definitions WHERE is_active = 1 ORDER BY name ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findKpiDefinitionById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM kpi_definitions WHERE id = :id");
