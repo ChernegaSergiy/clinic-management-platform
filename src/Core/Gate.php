@@ -10,6 +10,7 @@ class Gate
         'admin' => ['*'],
         'medical_manager' => [
             'dashboard.view',
+            'dashboard.export',
             'patients.read',
             'appointments.read',
             'medical.read',
@@ -25,6 +26,7 @@ class Gate
             'appointments.write',
             'billing.read',
             'notifications.read',
+            'dashboard.view',
         ],
         'doctor' => [
             'dashboard.view',
@@ -55,10 +57,13 @@ class Gate
             'patients.read',
             'appointments.read',
             'notifications.read',
+            'dashboard.view',
+            'dashboard.export',
         ],
         'inventory_manager' => [
             'inventory.manage',
             'notifications.read',
+            'dashboard.view',
         ],
     ];
 
@@ -124,5 +129,29 @@ class Gate
         http_response_code(403);
         echo "Доступ заборонено";
         exit();
+    }
+
+    public static function allows(string $ability, array $context = []): bool
+    {
+        $role = $_SESSION['user']['role_name'] ?? '';
+        if ($role === 'admin') {
+            return true;
+        }
+
+        $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
+        if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
+            return true;
+        }
+
+        $fallbacks = [
+            'patients.read' => 'patients.read_assigned',
+            'appointments.read' => 'appointments.read_assigned',
+            'medical.read' => 'medical.read_assigned',
+        ];
+        if (isset($fallbacks[$ability]) && in_array($fallbacks[$ability], $permissions, true)) {
+            return true;
+        }
+
+        return false;
     }
 }
