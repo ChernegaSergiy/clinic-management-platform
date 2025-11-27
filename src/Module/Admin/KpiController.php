@@ -7,14 +7,20 @@ use App\Core\Validator;
 use App\Module\Admin\Repository\KpiRepository;
 use App\Core\AuthGuard;
 use App\Core\Gate;
+use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\Appointment\Repository\AppointmentRepository;
 
 class KpiController
 {
     private KpiRepository $kpiRepository;
+    private InvoiceRepository $invoiceRepository;
+    private AppointmentRepository $appointmentRepository;
 
     public function __construct()
     {
         $this->kpiRepository = new KpiRepository();
+        $this->invoiceRepository = new InvoiceRepository();
+        $this->appointmentRepository = new AppointmentRepository();
     }
 
     // --- KPI Definitions ---
@@ -82,10 +88,40 @@ class KpiController
     // This would be called by a cron job or background process
     public function calculateResults(): void
     {
-        // TODO: Implement actual KPI calculation logic here
-        // This would involve fetching data from various repositories (appointments, invoices, etc.)
-        // and saving results using $this->kpiRepository->saveKpiResult();
-        echo "KPI results calculated (placeholder).";
+        $this->authorizeAdmin();
+        $definitions = $this->kpiRepository->findActiveKpiDefinitions();
+        $today = (new \DateTimeImmutable('today'));
+        $periodStart = $today->format('Y-m-d');
+        $periodEnd = $today->format('Y-m-d');
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        foreach ($definitions as $definition) {
+            $value = $this->calculateKpiValue($definition['kpi_type'], $today);
+            if ($value === null) {
+                continue;
+            }
+            $this->kpiRepository->saveKpiResult([
+                'kpi_id' => $definition['id'],
+                'user_id' => $userId,
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
+                'calculated_value' => $value,
+                'notes' => 'Auto-calculated for ' . $periodStart,
+            ]);
+        }
+
+        $_SESSION['success_message'] = "KPI перераховано за " . $periodStart;
+        header('Location: /dashboard');
         exit();
+    }
+
+    private function calculateKpiValue(string $type, \DateTimeImmutable $date): ?float
+    {
+        $day = $date->format('Y-m-d');
+        return match ($type) {
+            'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($day, $day),
+            'appointments_count' => (float)$this->appointmentRepository->countScheduledByDate($day),
+            default => null, // Інші KPI не підтримані наразі
+        };
     }
 }
