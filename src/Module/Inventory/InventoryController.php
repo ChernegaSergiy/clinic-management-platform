@@ -5,6 +5,7 @@ namespace App\Module\Inventory;
 use App\Core\View;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class InventoryController
 {
@@ -18,6 +19,7 @@ class InventoryController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
         $searchTerm = $_GET['search'] ?? '';
         $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
@@ -34,6 +36,7 @@ class InventoryController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
@@ -50,6 +53,7 @@ class InventoryController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -74,6 +78,7 @@ class InventoryController
     public function show(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -95,6 +100,7 @@ class InventoryController
     public function edit(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -122,6 +128,7 @@ class InventoryController
     public function update(): void
     {
         AuthGuard::check();
+        Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
