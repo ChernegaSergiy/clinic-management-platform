@@ -37,8 +37,8 @@ class KpiRepository
 
     public function saveKpiDefinition(array $data): ?int
     {
-        $sql = "INSERT INTO kpi_definitions (name, description, kpi_type, target_value, unit, is_active) 
-                VALUES (:name, :description, :kpi_type, :target_value, :unit, :is_active)";
+        $sql = "INSERT INTO kpi_definitions (name, description, kpi_type, target_value, unit, is_active, period) 
+                VALUES (:name, :description, :kpi_type, :target_value, :unit, :is_active, :period)";
         $stmt = $this->pdo->prepare($sql);
         $success = $stmt->execute([
             ':name' => $data['name'],
@@ -47,6 +47,7 @@ class KpiRepository
             ':target_value' => $data['target_value'] ?? null,
             ':unit' => $data['unit'] ?? null,
             ':is_active' => $data['is_active'] ?? true,
+            ':period' => $data['period'] ?? 'day',
         ]);
         return $success ? (int)$this->pdo->lastInsertId() : null;
     }
@@ -59,7 +60,8 @@ class KpiRepository
                     kpi_type = :kpi_type, 
                     target_value = :target_value, 
                     unit = :unit, 
-                    is_active = :is_active 
+                    is_active = :is_active,
+                    period = :period
                 WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
@@ -70,6 +72,7 @@ class KpiRepository
             ':target_value' => $data['target_value'] ?? null,
             ':unit' => $data['unit'] ?? null,
             ':is_active' => $data['is_active'] ?? true,
+            ':period' => $data['period'] ?? 'day',
         ]);
     }
 
