@@ -315,6 +315,20 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return (int)$stmt->fetchColumn();
     }
 
+    public function countScheduledByRange(string $from, string $to): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) 
+            FROM appointments 
+            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
+        ");
+        $stmt->execute([
+            ':from' => $from,
+            ':to' => $to,
+        ]);
+        return (int)$stmt->fetchColumn();
+    }
+
     public function getDoctorDailyLoad(string $date): array
     {
         $sql = "
