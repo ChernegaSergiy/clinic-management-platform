@@ -101,62 +101,67 @@
                 </div>
             </div>
         {% endif %}
-        <div class="ui hidden section divider"></div>
-        <div class="row">
-            <h1 class="ui huge dividing header">Щоденний дохід за 7 днів</h1>
-            <div class="sixteen wide column">
-                <canvas id="revenueChart"></canvas>
+        {% if canSeeFinance %}
+            <div class="ui hidden section divider"></div>
+            <div class="row">
+                <h1 class="ui huge dividing header">Щоденний дохід за 7 днів</h1>
+                <div class="sixteen wide column">
+                    <canvas id="revenueChart"></canvas>
+                </div>
             </div>
-        </div>
-        <div class="ui hidden section divider"></div>
-        <div class="row">
-            <h1 class="ui huge dividing header">Зведена таблиця KPI</h1>
-        </div>
-        <div class="row">
-            <table class="ui celled stackable table">
-                <thead>
-                <tr>
-                    <th>Показник</th>
-                    <th>Поточне значення</th>
-                    <th>Зміна</th>
-                    <th>Коментар</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for kpi_type, kpi_data in dashboardData.kpis %}
+        {% endif %}
+
+        {% if canSeeKpi %}
+            <div class="ui hidden section divider"></div>
+            <div class="row">
+                <h1 class="ui huge dividing header">Зведена таблиця KPI</h1>
+            </div>
+            <div class="row">
+                <table class="ui celled stackable table">
+                    <thead>
                     <tr>
-                        <td>{{ kpi_data.definition.name }}</td>
-                        <td>
-                            {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : 0, '.', ',') }}
-                            {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
-                            {% if kpi_data.definition.unit and kpi_data.definition.unit != '₴' %}
-                                <small>{{ kpi_data.definition.unit }}</small>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if kpi_data.trend %}
-                                {% if kpi_data.trend starts with '+' %}
-                                    <i class="icon arrow up green"></i>
-                                {% elseif kpi_data.trend starts with '-' %}
-                                    <i class="icon arrow down red"></i>
-                                {% else %}
-                                    <i class="icon minus grey"></i>
+                        <th>Показник</th>
+                        <th>Поточне значення</th>
+                        <th>Зміна</th>
+                        <th>Коментар</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for kpi_type, kpi_data in dashboardData.kpis %}
+                        <tr>
+                            <td>{{ kpi_data.definition.name }}</td>
+                            <td>
+                                {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : 0, '.', ',') }}
+                                {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
+                                {% if kpi_data.definition.unit and kpi_data.definition.unit != '₴' %}
+                                    <small>{{ kpi_data.definition.unit }}</small>
                                 {% endif %}
-                                {{ kpi_data.trend }}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td>{{ kpi_data.definition.description|default('Немає опису') }}</td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="4" class="center aligned">Немає доступних даних KPI.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                            <td>
+                                {% if kpi_data.trend %}
+                                    {% if kpi_data.trend starts with '+' %}
+                                        <i class="icon arrow up green"></i>
+                                    {% elseif kpi_data.trend starts with '-' %}
+                                        <i class="icon arrow down red"></i>
+                                    {% else %}
+                                        <i class="icon minus grey"></i>
+                                    {% endif %}
+                                    {{ kpi_data.trend }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ kpi_data.definition.description|default('Немає опису') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="center aligned">Немає доступних даних KPI.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 
