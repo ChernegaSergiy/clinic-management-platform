@@ -6,14 +6,17 @@ use App\Core\View;
 use App\Core\Validator;
 use App\Module\User\Repository\UserRepository;
 use App\Core\AuthGuard;
+use App\Module\Admin\Repository\AuthConfigRepository;
 
 class AuthController
 {
     private UserRepository $userRepository;
+    private AuthConfigRepository $authConfigRepository;
 
     public function __construct()
     {
         $this->userRepository = new UserRepository();
+        $this->authConfigRepository = new AuthConfigRepository();
     }
 
     public function showLoginForm(): void
@@ -26,6 +29,7 @@ class AuthController
         View::render('@modules/User/templates/login.html.twig', [
             'old' => $old,
             'errors' => $errors,
+            'authConfigs' => $this->authConfigRepository->findActive(),
         ]);
     }
 
