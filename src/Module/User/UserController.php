@@ -37,13 +37,12 @@ class UserController
         $successMessage = $_SESSION['success_message'] ?? null;
         unset($_SESSION['success_message']);
 
-        $authConfigs = $this->authConfigRepository->findAll();
         $linkedProviders = $this->userOAuthIdentityRepository->findAllByUserId($user['id']);
 
         View::render('@modules/User/templates/profile.html.twig', [
             'user' => $user,
             'successMessage' => $successMessage,
-            'authConfigs' => array_filter($authConfigs, fn($config) => $config['is_active']),
+            'authConfigs' => $this->authConfigRepository->findActive(),
             'linkedProviders' => array_column($linkedProviders, 'provider'),
         ]);
     }
