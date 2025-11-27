@@ -56,11 +56,7 @@ class AdminController
     {
         AuthGuard::isAdmin();
 
-        $roles = $this->roleRepository->findAll();
-        $roleOptions = [];
-        foreach ($roles as $role) {
-            $roleOptions[$role['id']] = $role['name'];
-        }
+        $roleOptions = $this->buildRoleOptionsByPriority();
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -136,11 +132,7 @@ class AdminController
             return;
         }
 
-        $roles = $this->roleRepository->findAll();
-        $roleOptions = [];
-        foreach ($roles as $role) {
-            $roleOptions[$role['id']] = $role['name'];
-        }
+        $roleOptions = $this->buildRoleOptionsByPriority();
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -153,6 +145,37 @@ class AdminController
             'old' => $old,
             'errors' => $errors,
         ]);
+    }
+
+    private function buildRoleOptionsByPriority(): array
+    {
+        $roles = $this->roleRepository->findAll();
+        $priority = [
+            'admin' => 1,
+            'medical_manager' => 2,
+            'doctor' => 3,
+            'registrar' => 4,
+            'nurse' => 5,
+            'lab_technician' => 6,
+            'billing' => 7,
+            'inventory_manager' => 8,
+        ];
+
+        usort($roles, function ($a, $b) use ($priority) {
+            $pa = $priority[$a['name']] ?? 999;
+            $pb = $priority[$b['name']] ?? 999;
+            if ($pa === $pb) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+            return $pa <=> $pb;
+        });
+
+        $roleOptions = [];
+        foreach ($roles as $role) {
+            $roleOptions[$role['id']] = $role['name'];
+        }
+
+        return $roleOptions;
     }
 
     public function updateUser(): void
