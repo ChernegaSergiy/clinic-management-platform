@@ -21,9 +21,8 @@ class DashboardController
         AuthGuard::check(); // Ensure user is authenticated
         Gate::authorize('dashboard.view');
 
-        $role = $_SESSION['user']['role_name'] ?? '';
-        $canSeeFinance = in_array($role, ['admin', 'billing', 'medical_manager'], true);
-        $canSeeKpi = in_array($role, ['admin', 'medical_manager'], true);
+        $canSeeFinance = Gate::allows('billing.read');
+        $canSeeKpi = Gate::allows('kpi.read');
         $canExport = Gate::allows('dashboard.export');
 
         $dashboardData = $this->dashboardService->getDashboardData();
