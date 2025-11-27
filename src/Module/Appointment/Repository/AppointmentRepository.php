@@ -237,6 +237,22 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return (bool)$stmt->fetchColumn();
     }
 
+    public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId): bool
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 1 
+            FROM appointments 
+            WHERE id = :appointment_id AND doctor_id = :doctor_id
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':appointment_id' => $appointmentId,
+            ':doctor_id' => $doctorId,
+        ]);
+
+        return (bool)$stmt->fetchColumn();
+    }
+
     public function findAppointmentsForReminder(int $minutesBefore): array
     {
         $sql = "
