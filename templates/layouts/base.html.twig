@@ -6,14 +6,23 @@
 
 {% block top_menu %}
     {% if session.user is defined %}
+        {% set role = session.user.role_name|default('') %}
+        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
+        {% set canPrescriptions = role in ['admin','doctor'] %}
+        {% set canInventory = role in ['admin','inventory_manager'] %}
+        {% set canBilling = role in ['admin','billing'] %}
+        {% set canAdminNav = role in ['admin'] %}
+
         <a class="item" href="/dashboard">Панель</a>
-        <a class="item" href="/patients">Пацієнти</a>
-        <a class="item" href="/appointments">Записи</a>
-        <a class="item" href="/medical-records">Медичні записи</a>
-        <a class="item" href="/prescriptions">Рецепти</a>
-        <a class="item" href="/inventory">Склад</a>
-        <a class="item" href="/billing">Рахунки</a>
-        <a class="item" href="/admin/users">Користувачі</a>
+        {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
+        {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
+        {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
+        {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
+        {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
+        {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
+        {% if canAdminNav %}<a class="item" href="/admin/users">Користувачі</a>{% endif %}
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
             <span class="ui red circular mini label notification-badge" style="display: none;"></span>
@@ -33,18 +42,29 @@
 
 {% block mobile_menu %}
     {% if session.user is defined %}
+        {% set role = session.user.role_name|default('') %}
+        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
+        {% set canPrescriptions = role in ['admin','doctor'] %}
+        {% set canInventory = role in ['admin','inventory_manager'] %}
+        {% set canBilling = role in ['admin','billing'] %}
+        {% set canAdminNav = role in ['admin'] %}
+
         <a class="item" href="/dashboard">Панель</a>
-        <a class="item" href="/patients">Пацієнти</a>
-        <a class="item" href="/appointments">Записи</a>
-        <a class="item" href="/medical-records">Медичні записи</a>
-        <a class="item" href="/prescriptions">Рецепти</a>
-        <a class="item" href="/inventory">Склад</a>
-        <a class="item" href="/billing">Рахунки</a>
-        <a class="item" href="/billing/contracts">Контракти</a>
-        <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
-        <a class="item" href="/admin/users">Користувачі</a>
-        <a class="item" href="/admin/clinical">Клінічні довідники</a>
-        <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+        {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
+        {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
+        {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
+        {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
+        {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
+        {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
+        {% if canBilling %}<a class="item" href="/billing/contracts">Контракти</a>{% endif %}
+        {% if canAdminNav %}
+            <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
+            <a class="item" href="/admin/users">Користувачі</a>
+            <a class="item" href="/admin/clinical">Клінічні довідники</a>
+            <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+        {% endif %}
         {# Notification Dropdown for Mobile #}
         <div class="ui dropdown item" id="notificationDropdownMobile">
             <i class="bell icon"></i> Сповіщення
@@ -66,18 +86,29 @@
 
 {% block sidebar %}
     {% if session.user is defined %}
+        {% set role = session.user.role_name|default('') %}
+        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
+        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
+        {% set canPrescriptions = role in ['admin','doctor'] %}
+        {% set canInventory = role in ['admin','inventory_manager'] %}
+        {% set canBilling = role in ['admin','billing'] %}
+        {% set canAdminNav = role in ['admin'] %}
+
         <a class="item" href="/dashboard">Панель</a>
-        <a class="item" href="/patients">Пацієнти</a>
-        <a class="item" href="/appointments">Записи</a>
-        <a class="item" href="/medical-records">Медичні записи</a>
-        <a class="item" href="/prescriptions">Рецепти</a>
-        <a class="item" href="/inventory">Склад</a>
-        <a class="item" href="/billing">Рахунки</a>
-        <a class="item" href="/billing/contracts">Контракти</a>
-        <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
-        <a class="item" href="/admin/users">Користувачі</a>
-        <a class="item" href="/admin/clinical">Клінічні довідники</a>
-        <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+        {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
+        {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
+        {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
+        {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
+        {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
+        {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
+        {% if canBilling %}<a class="item" href="/billing/contracts">Контракти</a>{% endif %}
+        {% if canAdminNav %}
+            <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
+            <a class="item" href="/admin/users">Користувачі</a>
+            <a class="item" href="/admin/clinical">Клінічні довідники</a>
+            <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+        {% endif %}
         <div class="ui fitted divider"></div>
         <a class="item" href="/user/profile">Мій профіль</a>
         <a class="item" href="/logout">Вихід</a>
