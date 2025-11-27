@@ -20,6 +20,12 @@ class AuthConfigRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findActive(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM auth_configs WHERE is_active = 1 ORDER BY provider ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM auth_configs WHERE id = :id");
