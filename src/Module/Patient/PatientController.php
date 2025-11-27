@@ -187,6 +187,9 @@ class PatientController
         exit();
     }
 
+    public function exportCsv(): void
+    {
+        AuthGuard::check();
         Gate::authorize('patients.read_all');
 
         $patients = $this->patientRepository->findAll();
