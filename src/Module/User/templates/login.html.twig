@@ -7,15 +7,15 @@
         <div class="auth__card">
             <p class="eyebrow">Вхід</p>
             <h1 class="auth__title">Увійдіть до облікового запису</h1>
-            <form method="POST" action="/login" class="auth__form">
+            <form method="POST" action="/login" class="auth__form" autocomplete="on">
                 <label class="auth__field">
                     <span class="auth__label">Email</span>
-                    <input class="auth__input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required>
+                    <input class="auth__input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required autocomplete="email">
                     {% if errors.email %}<div class="auth__error">{{ errors.email }}</div>{% endif %}
                 </label>
                 <label class="auth__field">
                     <span class="auth__label">Пароль</span>
-                    <input class="auth__input" type="password" name="password" placeholder="Ваш пароль" required>
+                    <input class="auth__input" type="password" name="password" placeholder="Ваш пароль" required autocomplete="current-password">
                     {% if errors.password %}<div class="auth__error">{{ errors.password }}</div>{% endif %}
                 </label>
                 {% if errors.login %}
