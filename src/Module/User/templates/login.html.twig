@@ -27,11 +27,16 @@
                 <button type="submit" class="button button--primary button--full">Увійти</button>
             </form>
 
-            <div class="auth__divider"><span>або</span></div>
-
-            <a href="/oauth/redirect/google" class="button button--secondary button--full auth__oauth-btn">
-                <i class="fab fa-google"></i> Увійти через Google
-            </a>
+            {% if authConfigs is defined and authConfigs|length %}
+                <div class="auth__divider"><span>або</span></div>
+                <div class="auth__providers">
+                    {% for config in authConfigs %}
+                        <a href="/oauth/redirect/{{ config.provider }}" class="button button--secondary button--full auth__oauth-btn">
+                            <i class="fab fa-{{ config.provider }}"></i> Увійти через {{ config.provider|capitalize }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <p class="auth__muted">Немає доступу? Зверніться до адміністратора клініки.</p>
         </div>
