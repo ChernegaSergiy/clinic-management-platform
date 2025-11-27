@@ -174,16 +174,37 @@ class KpiRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function findLatestKpiResult(int $kpiId): ?array
+    public function findLatestKpiResult(int $kpiId, string $periodType): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $sql = "
             SELECT kr.*
             FROM kpi_results kr
             WHERE kr.kpi_id = :kpi_id
-            ORDER BY kr.period_start DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
-            LIMIT 1
-        ");
-        $stmt->execute([':kpi_id' => $kpiId]);
+        ";
+        $params = [':kpi_id' => $kpiId];
+
+        switch ($periodType) {
+            case 'day':
+                $sql .= " AND kr.period_start = kr.period_end"; // For 'day' period, start and end dates are the same.
+                break;
+            case 'week':
+                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6"; // A week covers 7 days, so the difference is 6.
+                break;
+            case 'month':
+                // For month, we need to be more flexible as month length varies.
+                // A common approximation for 'month' is around 30 days, so DATEDIFF >= 28 AND DATEDIFF <= 31
+                // Given the resolvePeriodRange, it's 29 days diff.
+                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 29";
+                break;
+            default:
+                // If periodType is unknown or unsupported, do not add period filtering.
+                break;
+        }
+
+        $sql .= " ORDER BY kr.period_end DESC, kr.id DESC LIMIT 1";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result === false ? null : $result;
     }
