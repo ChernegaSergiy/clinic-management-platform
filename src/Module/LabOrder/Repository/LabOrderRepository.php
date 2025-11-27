@@ -96,4 +96,16 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             ':id' => $id,
         ]);
     }
+
+    public function countByStatus(array $statuses): int
+    {
+        if (empty($statuses)) {
+            return 0;
+        }
+        $placeholders = implode(',', array_fill(0, count($statuses), '?'));
+        $sql = "SELECT COUNT(*) FROM lab_orders WHERE status IN ($placeholders)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($statuses);
+        return (int)$stmt->fetchColumn();
+    }
 }
