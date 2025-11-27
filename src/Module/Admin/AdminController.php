@@ -10,6 +10,7 @@ use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\KpiRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class AdminController
 {
@@ -32,7 +33,7 @@ class AdminController
 
     public function users(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $searchTerm = $_GET['search'] ?? '';
         $users = $this->userRepository->findAll($searchTerm);
         $roles = $this->roleRepository->findAll();
@@ -54,7 +55,7 @@ class AdminController
 
     public function createUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $roleOptions = $this->buildRoleOptionsByPriority();
 
@@ -72,7 +73,7 @@ class AdminController
 
     public function storeUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -102,7 +103,7 @@ class AdminController
 
     public function showUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $user = $this->userRepository->findById($id);
@@ -121,7 +122,7 @@ class AdminController
 
     public function editUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $user = $this->userRepository->findById($id);
@@ -180,7 +181,7 @@ class AdminController
 
     public function updateUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $user = $this->userRepository->findById($id);
@@ -225,7 +226,7 @@ class AdminController
 
     public function deleteUser(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $user = $this->userRepository->findById($id);
@@ -252,14 +253,14 @@ class AdminController
     // --- Role Management ---
     public function listRoles(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $roles = $this->roleRepository->findAll();
         View::render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
     }
 
     public function createRole(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         View::render('@modules/Admin/templates/new_role.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -269,7 +270,7 @@ class AdminController
 
     public function storeRole(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -292,7 +293,7 @@ class AdminController
 
     public function editRole(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $role = $this->roleRepository->findById($id);
@@ -313,7 +314,7 @@ class AdminController
 
     public function updateRole(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $role = $this->roleRepository->findById($id);
@@ -345,7 +346,7 @@ class AdminController
 
     public function deleteRole(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $role = $this->roleRepository->findById($id);
@@ -365,14 +366,14 @@ class AdminController
     // --- Dictionary Management ---
     public function listDictionaries(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $dictionaries = $this->dictionaryRepository->findAll();
         View::render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
     public function showDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $id = (int)($_GET['id'] ?? 0);
         $dictionary = $this->dictionaryRepository->findById($id);
 
@@ -391,7 +392,7 @@ class AdminController
 
     public function createDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         View::render('@modules/Admin/templates/dictionaries/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -401,7 +402,7 @@ class AdminController
 
     public function storeDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -424,7 +425,7 @@ class AdminController
 
     public function editDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $dictionary = $this->dictionaryRepository->findById($id);
@@ -445,7 +446,7 @@ class AdminController
 
     public function updateDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $dictionary = $this->dictionaryRepository->findById($id);
@@ -477,7 +478,7 @@ class AdminController
 
     public function deleteDictionary(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->dictionaryRepository->delete($id);
@@ -489,7 +490,7 @@ class AdminController
     // --- Dictionary Value Management ---
     public function createDictionaryValue(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
         View::render('@modules/Admin/templates/dictionaries/values/new.html.twig', [
             'dictionary_id' => $dictionaryId,
@@ -501,7 +502,7 @@ class AdminController
 
     public function storeDictionaryValue(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $dictionaryId = (int)($_POST['dictionary_id'] ?? 0);
         $validator = new \App\Core\Validator(\App\Database::getInstance());
@@ -526,7 +527,7 @@ class AdminController
 
     public function editDictionaryValue(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $value = $this->dictionaryRepository->findValueById($id);
@@ -547,7 +548,7 @@ class AdminController
 
     public function updateDictionaryValue(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $value = $this->dictionaryRepository->findValueById($id);
@@ -575,7 +576,7 @@ class AdminController
 
     public function deleteDictionaryValue(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $value = $this->dictionaryRepository->findValueById($id);
@@ -590,14 +591,14 @@ class AdminController
     // --- Auth Configuration Management ---
     public function listAuthConfigs(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $configs = $this->authConfigRepository->findAll();
         View::render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
     public function createAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
         View::render('@modules/Admin/templates/auth_configs/new.html.twig', [
@@ -610,7 +611,7 @@ class AdminController
 
     public function storeAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -635,7 +636,7 @@ class AdminController
 
     public function editAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $config = $this->authConfigRepository->findById($id);
@@ -658,7 +659,7 @@ class AdminController
 
     public function updateAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $config = $this->authConfigRepository->findById($id);
@@ -692,7 +693,7 @@ class AdminController
 
     public function deleteAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->authConfigRepository->delete($id);
@@ -703,7 +704,7 @@ class AdminController
 
     public function showAuthConfig(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $config = $this->authConfigRepository->findById($id);
@@ -725,14 +726,14 @@ class AdminController
     // --- Backup Policy Management ---
     public function listBackupPolicies(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $policies = $this->backupPolicyRepository->findAll();
         View::render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
     public function createBackupPolicy(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         View::render('@modules/Admin/templates/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -742,7 +743,7 @@ class AdminController
 
     public function storeBackupPolicy(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -767,7 +768,7 @@ class AdminController
 
     public function editBackupPolicy(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $policy = $this->backupPolicyRepository->findById($id);
@@ -788,7 +789,7 @@ class AdminController
 
     public function updateBackupPolicy(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $policy = $this->backupPolicyRepository->findById($id);
@@ -822,7 +823,7 @@ class AdminController
 
     public function deleteBackupPolicy(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->backupPolicyRepository->delete($id);
@@ -834,14 +835,14 @@ class AdminController
     // --- KPI Definition Management ---
     public function listKpiDefinitions(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
         View::render('@modules/Admin/templates/kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createKpiDefinition(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
         View::render('@modules/Admin/templates/kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -851,7 +852,7 @@ class AdminController
 
     public function storeKpiDefinition(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -880,7 +881,7 @@ class AdminController
 
     public function editKpiDefinition(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -901,7 +902,7 @@ class AdminController
 
     public function updateKpiDefinition(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -939,12 +940,18 @@ class AdminController
 
     public function deleteKpiDefinition(): void
     {
-        AuthGuard::isAdmin();
+        $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
         header('Location: /admin/kpi_definitions');
         exit();
+    }
+
+    private function authorizeAdmin(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('admin.manage');
     }
 }
