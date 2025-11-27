@@ -9,16 +9,19 @@ use App\Module\Patient\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;
 use App\Core\AuthGuard;
+use App\Module\Appointment\Repository\AppointmentRepository;
 
 class PatientController
 {
     private PatientRepository $patientRepository;
     private MedicalRecordRepository $medicalRecordRepository;
+    private AppointmentRepository $appointmentRepository;
 
     public function __construct()
     {
         $this->patientRepository = new PatientRepository();
         $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->appointmentRepository = new AppointmentRepository();
     }
 
     public function index(): void
@@ -93,6 +96,8 @@ class PatientController
             return;
         }
 
+        $this->authorizePatientAccess($id);
+
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
 
         View::render('@modules/Patient/templates/show.html.twig', [
@@ -114,6 +119,8 @@ class PatientController
             return;
         }
 
+        $this->authorizePatientAccess($id);
+
         View::render('@modules/Patient/templates/edit.html.twig', ['patient' => $patient]);
     }
 
@@ -129,6 +136,8 @@ class PatientController
             echo "Пацієнта не знайдено";
             return;
         }
+
+        $this->authorizePatientAccess($id);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -312,5 +321,20 @@ class PatientController
 
         header('Location: /patients/show?id=' . $id);
         exit();
+    }
+
+    private function authorizePatientAccess(int $patientId): void
+    {
+        $role = $_SESSION['user']['role_name'] ?? null;
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if ($role === 'doctor' && $userId) {
+            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor($patientId, (int)$userId);
+            if (!$hasAccess) {
+                http_response_code(403);
+                echo "Доступ заборонено";
+                exit();
+            }
+        }
     }
 }
