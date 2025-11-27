@@ -10,6 +10,8 @@ use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
+use App\Core\Gate;
 
 class PrescriptionController
 {
@@ -31,6 +33,7 @@ class PrescriptionController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('prescriptions.write');
         $prescriptions = $this->prescriptionRepository->findAll();
         View::render('@modules/Prescription/templates/index.html.twig', [
             'prescriptions' => $prescriptions,
@@ -40,6 +43,7 @@ class PrescriptionController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('prescriptions.write');
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -69,6 +73,7 @@ class PrescriptionController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('prescriptions.write');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -133,6 +138,7 @@ class PrescriptionController
     public function show(): void
     {
         AuthGuard::check();
+        Gate::authorize('prescriptions.write');
 
         $id = (int)($_GET['id'] ?? 0);
         $prescription = $this->prescriptionRepository->findById($id);
