@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Core;
+
+use App\Module\Appointment\Repository\AppointmentRepository;
+
+class Gate
+{
+    private const ROLE_PERMISSIONS = [
+        'admin' => ['*'],
+        'medical_manager' => [
+            'dashboard.view',
+            'patients.read',
+            'appointments.read',
+            'medical.read',
+            'clinical.manage',
+            'kpi.read',
+            'lab.read',
+        ],
+        'registrar' => [
+            'patients.read',
+            'patients.write',
+            'appointments.read',
+            'appointments.write',
+            'billing.read',
+        ],
+        'doctor' => [
+            'dashboard.view',
+            'patients.read_assigned',
+            'appointments.read_assigned',
+            'appointments.write_assigned',
+            'medical.read_assigned',
+            'medical.write_assigned',
+            'prescriptions.write',
+            'lab.write_assigned',
+        ],
+        'nurse' => [
+            'dashboard.view',
+            'patients.read_assigned',
+            'appointments.read_assigned',
+            'medical.read_assigned',
+            'lab.write_assigned',
+        ],
+        'lab_technician' => [
+            'lab.manage',
+        ],
+        'billing' => [
+            'billing.manage',
+            'patients.read',
+            'appointments.read',
+        ],
+        'inventory_manager' => [
+            'inventory.manage',
+        ],
+    ];
+
+    private static ?AppointmentRepository $appointmentRepository = null;
+
+    private static function appointmentRepo(): AppointmentRepository
+    {
+        if (!self::$appointmentRepository) {
+            self::$appointmentRepository = new AppointmentRepository();
+        }
+        return self::$appointmentRepository;
+    }
+
+    public static function authorize(string $ability, array $context = []): void
+    {
+        AuthGuard::check(); // Also backfills role_name
+
+        $role = $_SESSION['user']['role_name'] ?? '';
+        if ($role === 'admin') {
+            return;
+        }
+
+        $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
+
+        if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
+            return;
+        }
+
+        if (isset($context['patient_id'])) {
+            if (in_array('patients.read_assigned', $permissions, true) && in_array($ability, ['patients.read', 'patients.write'], true)) {
+                $doctorId = $_SESSION['user']['id'] ?? null;
+                if ($doctorId && self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$doctorId)) {
+                    return;
+                }
+            }
+            if (in_array('medical.read_assigned', $permissions, true) && in_array($ability, ['medical.read', 'medical.write'], true)) {
+                $doctorId = $_SESSION['user']['id'] ?? null;
+                if ($doctorId && self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$doctorId)) {
+                    return;
+                }
+            }
+        }
+
+        if (isset($context['appointment_id'])) {
+            if (in_array('appointments.read_assigned', $permissions, true) && in_array($ability, ['appointments.read', 'appointments.write'], true)) {
+                $doctorId = $_SESSION['user']['id'] ?? null;
+                if ($doctorId && self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$doctorId)) {
+                    return;
+                }
+            }
+        }
+
+        http_response_code(403);
+        echo "Доступ заборонено";
+        exit();
+    }
+}
