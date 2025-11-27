@@ -21,17 +21,25 @@ class DashboardController
         AuthGuard::check(); // Ensure user is authenticated
         Gate::authorize('dashboard.view');
 
+        $role = $_SESSION['user']['role_name'] ?? '';
+        $canSeeFinance = in_array($role, ['admin', 'billing', 'medical_manager'], true);
+        $canSeeKpi = in_array($role, ['admin', 'medical_manager'], true);
+        $canExport = Gate::allows('dashboard.export');
+
         $dashboardData = $this->dashboardService->getDashboardData();
 
         View::render('dashboard/index.html.twig', [
             'dashboardData' => $dashboardData,
+            'canSeeFinance' => $canSeeFinance,
+            'canSeeKpi' => $canSeeKpi,
+            'canExport' => $canExport,
         ]);
     }
 
     public function exportCsv(): void
     {
         AuthGuard::check();
-        Gate::authorize('dashboard.view');
+        Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
@@ -53,7 +61,7 @@ class DashboardController
     public function exportPdf(): void
     {
         AuthGuard::check();
-        Gate::authorize('dashboard.view');
+        Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         // Render the Twig template into an HTML string
@@ -70,7 +78,7 @@ class DashboardController
     public function exportExcel(): void
     {
         AuthGuard::check();
-        Gate::authorize('dashboard.view');
+        Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
