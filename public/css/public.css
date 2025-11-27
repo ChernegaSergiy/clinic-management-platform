@@ -496,8 +496,14 @@ a { color: inherit; text-decoration: none; }
     border-top: 2px solid var(--ink);
     opacity: 0.4;
 }
+.auth__providers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
 .auth__oauth-btn {
-    margin-top: 14px;
+    margin-top: 0;
     background: var(--card);
     border-style: dashed;
 }
