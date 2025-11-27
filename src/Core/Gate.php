@@ -79,6 +79,16 @@ class Gate
             return;
         }
 
+        $fallbacks = [
+            'patients.read' => 'patients.read_assigned',
+            'appointments.read' => 'appointments.read_assigned',
+            'medical.read' => 'medical.read_assigned',
+        ];
+
+        if (isset($fallbacks[$ability]) && in_array($fallbacks[$ability], $permissions, true)) {
+            return;
+        }
+
         if (isset($context['patient_id'])) {
             if (in_array('patients.read_assigned', $permissions, true) && in_array($ability, ['patients.read', 'patients.write'], true)) {
                 $doctorId = $_SESSION['user']['id'] ?? null;
