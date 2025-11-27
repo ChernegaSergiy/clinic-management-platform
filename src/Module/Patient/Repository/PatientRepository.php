@@ -39,6 +39,28 @@ class PatientRepository implements PatientRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function findByIds(array $ids, string $searchTerm = ''): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "SELECT * FROM patients WHERE id IN ($placeholders)";
+        $params = $ids;
+
+        if (!empty($searchTerm)) {
+            $sql .= " AND MATCH(first_name, last_name, middle_name, address) AGAINST (? IN BOOLEAN MODE)";
+            $params[] = $searchTerm . '*';
+        }
+
+        $sql .= " ORDER BY last_name, first_name";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
     public function save(array $data): bool
     {
         $this->lastError = null;
