@@ -7,16 +7,19 @@ use App\Core\Validator;
 use App\Module\User\Repository\UserRepository;
 use App\Core\AuthGuard;
 use App\Module\Admin\Repository\AuthConfigRepository;
+use App\Module\User\Repository\RoleRepository;
 
 class AuthController
 {
     private UserRepository $userRepository;
     private AuthConfigRepository $authConfigRepository;
+    private RoleRepository $roleRepository;
 
     public function __construct()
     {
         $this->userRepository = new UserRepository();
         $this->authConfigRepository = new AuthConfigRepository();
+        $this->roleRepository = new RoleRepository();
     }
 
     public function showLoginForm(): void
@@ -55,6 +58,7 @@ class AuthController
         $password = $_POST['password'];
 
         $user = $this->userRepository->findByEmail($email);
+        $role = $user ? $this->roleRepository->findById((int)$user['role_id']) : null;
 
         if ($user && password_verify($password, $user['password_hash'])) { // Corrected column name
             $_SESSION['user'] = [
@@ -63,6 +67,7 @@ class AuthController
                 'last_name' => $user['last_name'],
                 'email' => $user['email'],
                 'role_id' => $user['role_id'],
+                'role_name' => $role['name'] ?? null,
             ];
             $redirect = $_SESSION['intended_url'] ?? '/dashboard';
             unset($_SESSION['intended_url']);
