@@ -4,6 +4,7 @@ namespace App\Module\Notification;
 
 use App\Core\AuthGuard;
 use App\Module\Notification\Repository\NotificationRepository;
+use App\Core\Gate;
 
 class NotificationController
 {
@@ -21,6 +22,7 @@ class NotificationController
     public function getUnread(): void
     {
         AuthGuard::check();
+        Gate::authorize('notifications.read');
         $userId = $_SESSION['user']['id'] ?? 0;
 
         if (!$userId) {
@@ -56,6 +58,7 @@ class NotificationController
     public function markAllRead(): void
     {
         AuthGuard::check();
+        Gate::authorize('notifications.read');
         $userId = $_SESSION['user']['id'] ?? 0;
 
         if (!$userId) {
@@ -76,6 +79,7 @@ class NotificationController
     public function delete(): void
     {
         AuthGuard::check();
+        Gate::authorize('notifications.read');
         $userId = $_SESSION['user']['id'] ?? 0;
         $raw = file_get_contents('php://input');
         $input = json_decode($raw, true) ?: [];
