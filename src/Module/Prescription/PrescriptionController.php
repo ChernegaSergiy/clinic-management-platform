@@ -11,7 +11,6 @@ use App\Module\User\Repository\UserRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
 use App\Core\AuthGuard;
 use App\Core\Gate;
-use App\Core\Gate;
 
 class PrescriptionController
 {
