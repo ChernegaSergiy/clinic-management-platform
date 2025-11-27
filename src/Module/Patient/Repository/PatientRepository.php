@@ -61,6 +61,12 @@ class PatientRepository implements PatientRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function countAll(): int
+    {
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM patients");
+        return (int)$stmt->fetchColumn();
+    }
+
     public function save(array $data): bool
     {
         $this->lastError = null;
