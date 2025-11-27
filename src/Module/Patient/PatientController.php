@@ -30,7 +30,14 @@ class PatientController
         AuthGuard::check();
         Gate::authorize('patients.read');
         $searchTerm = $_GET['search'] ?? '';
-        $patients = $this->patientRepository->findAll($searchTerm);
+        $role = $_SESSION['user']['role_name'] ?? '';
+        if (in_array($role, ['doctor', 'nurse'], true)) {
+            $doctorId = (int)($_SESSION['user']['id'] ?? 0);
+            $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($doctorId);
+            $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
+        } else {
+            $patients = $this->patientRepository->findAll($searchTerm);
+        }
         View::render('@modules/Patient/templates/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,

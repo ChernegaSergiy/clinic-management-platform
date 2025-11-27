@@ -31,12 +31,21 @@ class AppointmentController
         AuthGuard::check();
         Gate::authorize('appointments.read');
         $doctors = $this->userRepository->findAllDoctors();
+        $role = $_SESSION['user']['role_name'] ?? '';
+        $userId = (int)($_SESSION['user']['id'] ?? 0);
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
-        $appointments = $this->appointmentRepository->findAll();
+        if (in_array($role, ['doctor', 'nurse'], true)) {
+            $appointments = $this->appointmentRepository->findByDoctorId($userId);
+        } else {
+            $appointments = $this->appointmentRepository->findAll();
+        }
 
         $doctorOptions = [];
         foreach ($doctors as $doctor) {
             $doctorOptions[] = ['id' => $doctor['id'], 'title' => $doctor['full_name']];
+        }
+        if (in_array($role, ['doctor', 'nurse'], true)) {
+            $doctorOptions = array_values(array_filter($doctorOptions, fn($d) => (int)$d['id'] === $userId));
         }
 
         View::render('@modules/Appointment/templates/index.html.twig', [
