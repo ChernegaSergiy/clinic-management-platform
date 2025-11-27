@@ -221,6 +221,22 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return sprintf('WL-%s-%05d', $year, $count);
     }
 
+    public function isPatientAssignedToDoctor(int $patientId, int $doctorId): bool
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 1 
+            FROM appointments 
+            WHERE patient_id = :patient_id AND doctor_id = :doctor_id
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':patient_id' => $patientId,
+            ':doctor_id' => $doctorId,
+        ]);
+
+        return (bool)$stmt->fetchColumn();
+    }
+
     public function findAppointmentsForReminder(int $minutesBefore): array
     {
         $sql = "
