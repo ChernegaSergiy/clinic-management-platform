@@ -20,7 +20,9 @@ use App\Module\Dashboard\Service\KpiCalculatorService;
 $dateArg = $argv[1] ?? null;
 
 $service = new KpiCalculatorService();
+echo "Running KPI calculation for date: " . ($dateArg ?: 'today') . "\n";
 $service->calculateAndStoreAll($dateArg);
+echo "Done.\n";
 
 echo "KPI calculations completed.\n";
 

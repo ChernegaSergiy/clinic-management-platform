@@ -41,22 +41,23 @@ class DashboardService
 
         foreach ($kpiDefinitions as $definition) {
             $latestResult = $this->kpiRepository->findLatestKpiResult($definition['id']);
-            if ($latestResult) {
-                // Fetch previous period's result for comparison/trend
-                $previousResult = $this->kpiRepository->findKpiResultForPreviousPeriod(
-                    $definition['id'],
-                    $latestResult['period_end'],
-                    'day' // Assuming daily calculation for simplicity
-                );
-
-                $dashboardKpis[$definition['kpi_type']] = [
-                    'definition' => $definition,
-                    'latest_value' => (float)$latestResult['calculated_value'],
-                    'period_start' => $latestResult['period_start'],
-                    'period_end' => $latestResult['period_end'],
-                    'trend' => $this->calculateTrend($latestResult['calculated_value'], $previousResult['calculated_value'] ?? null)
-                ];
+            if (!$latestResult) {
+                continue;
             }
+
+            $previousResult = $this->kpiRepository->findKpiResultForPreviousPeriod(
+                $definition['id'],
+                $latestResult['period_end'],
+                'day'
+            );
+
+            $dashboardKpis[] = [
+                'definition' => $definition,
+                'latest_value' => (float)$latestResult['calculated_value'],
+                'period_start' => $latestResult['period_start'],
+                'period_end' => $latestResult['period_end'],
+                'trend' => $this->calculateTrend($latestResult['calculated_value'], $previousResult['calculated_value'] ?? null)
+            ];
         }
 
         // Prepare data for the revenue chart
