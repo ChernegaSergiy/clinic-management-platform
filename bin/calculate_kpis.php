@@ -11,6 +11,7 @@ $tz = $_ENV['APP_TIMEZONE'] ?? 'UTC';
 date_default_timezone_set($tz);
 
 use App\Module\Dashboard\Service\KpiCalculatorService;
+use App\Module\Admin\KpiController;
 
 // Minimal setup to allow KpiCalculatorService to run
 // This assumes Database::getInstance() is self-initializing or already configured.
@@ -19,8 +20,8 @@ use App\Module\Dashboard\Service\KpiCalculatorService;
 // Optional: pass date as first CLI argument (YYYY-MM-DD). Defaults to today.
 $dateArg = $argv[1] ?? null;
 
-$kpiCalculator = new KpiCalculatorService();
-$kpiCalculator->calculateAndStoreAll($dateArg);
+$controller = new KpiController();
+$controller->calculateResults();
 
 echo "KPI calculations completed.\n";
 
