@@ -45,7 +45,7 @@ class DashboardService
                 // Fetch previous period's result for comparison/trend
                 $previousResult = $this->kpiRepository->findKpiResultForPreviousPeriod(
                     $definition['id'],
-                    $latestResult['period_start'],
+                    $latestResult['period_end'],
                     'day' // Assuming daily calculation for simplicity
                 );
 

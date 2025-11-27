@@ -180,7 +180,7 @@ class KpiRepository
             SELECT kr.*
             FROM kpi_results kr
             WHERE kr.kpi_id = :kpi_id
-            ORDER BY kr.period_start DESC, kr.created_at DESC
+            ORDER BY kr.period_start DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
             LIMIT 1
         ");
         $stmt->execute([':kpi_id' => $kpiId]);
@@ -195,7 +195,7 @@ class KpiRepository
             SELECT kr.*
             FROM kpi_results kr
             WHERE kr.kpi_id = :kpi_id AND kr.period_end < :current_period_end
-            ORDER BY kr.period_end DESC
+            ORDER BY kr.period_end DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
             LIMIT 1
         ");
         $stmt->execute([
