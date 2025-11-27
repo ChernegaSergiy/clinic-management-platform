@@ -37,7 +37,7 @@ class DashboardService
     public function getDashboardData(): array
     {
         $dashboardKpis = [];
-        $kpiDefinitions = $this->kpiRepository->findAllKpiDefinitions();
+        $kpiDefinitions = $this->kpiRepository->findActiveKpiDefinitions();
 
         foreach ($kpiDefinitions as $definition) {
             $latestResult = $this->kpiRepository->findLatestKpiResult($definition['id']);
