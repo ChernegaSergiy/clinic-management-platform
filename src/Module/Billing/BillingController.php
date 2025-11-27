@@ -14,6 +14,7 @@ use App\Core\CsvExporter;
 use App\Core\PdfExporter;
 use App\Core\ExcelExporter;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class BillingController
 {
@@ -37,6 +38,7 @@ class BillingController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.read');
         $searchTerm = $_GET['search'] ?? '';
         $invoices = $this->invoiceRepository->findAll($searchTerm);
         View::render('@modules/Billing/templates/index.html.twig', [
@@ -49,6 +51,7 @@ class BillingController
     public function listServices(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
         View::render('@modules/Billing/templates/services/index.html.twig', ['services' => $services]);
     }
@@ -56,6 +59,7 @@ class BillingController
     public function createService(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         $categories = $this->serviceRepository->findCategories();
         View::render('@modules/Billing/templates/services/new.html.twig', [
             'categories' => $categories,
@@ -68,6 +72,7 @@ class BillingController
     public function storeService(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -92,6 +97,7 @@ class BillingController
     public function listServiceBundles(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         $bundles = $this->serviceBundleRepository->findAll();
         View::render('@modules/Billing/templates/bundles/index.html.twig', ['bundles' => $bundles]);
     }
@@ -99,6 +105,7 @@ class BillingController
     public function createServiceBundle(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
         View::render('@modules/Billing/templates/bundles/new.html.twig', [
             'services' => $services,
@@ -111,6 +118,7 @@ class BillingController
     public function storeServiceBundle(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -135,6 +143,7 @@ class BillingController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $patientId = $_GET['patient_id'] ?? null;
 
@@ -180,6 +189,7 @@ class BillingController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -204,6 +214,7 @@ class BillingController
     public function show(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.read');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -224,6 +235,7 @@ class BillingController
     public function addPayment(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $invoiceId = (int)($_POST['invoice_id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($invoiceId);
@@ -263,6 +275,7 @@ class BillingController
     public function edit(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -318,6 +331,7 @@ class BillingController
     public function update(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -353,6 +367,7 @@ class BillingController
     public function exportInvoicesToCsv(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.read');
 
         // Fetch all invoices
         $invoices = $this->invoiceRepository->findAll();
@@ -388,6 +403,7 @@ class BillingController
     public function exportInvoicesToPdf(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.read');
 
         $invoices = $this->invoiceRepository->findAll();
 
@@ -408,6 +424,7 @@ class BillingController
     public function exportInvoicesToExcel(): void
     {
         AuthGuard::check();
+        Gate::authorize('billing.read');
 
         $invoices = $this->invoiceRepository->findAll();
 
