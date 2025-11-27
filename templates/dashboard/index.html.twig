@@ -81,6 +81,9 @@
                                         {% endif %}
                                     </div>
                                     <div class="label">{{ kpi_data.definition.name }}</div>
+                                    {% if kpi_data.definition.target_value is not null %}
+                                        <div class="ui tiny grey sub header">Ціль: {{ kpi_data.definition.target_value }}{% if kpi_data.definition.unit %} {{ kpi_data.definition.unit }}{% endif %}</div>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>
