@@ -5,6 +5,7 @@ namespace App\Module\Dashboard;
 use App\Core\AuthGuard;
 use App\Core\View;
 use App\Module\Dashboard\Service\DashboardService;
+use App\Core\Gate;
 
 class DashboardController
 {
@@ -18,6 +19,7 @@ class DashboardController
     public function index(): void
     {
         AuthGuard::check(); // Ensure user is authenticated
+        Gate::authorize('dashboard.view');
 
         $dashboardData = $this->dashboardService->getDashboardData();
 
@@ -29,6 +31,7 @@ class DashboardController
     public function exportCsv(): void
     {
         AuthGuard::check();
+        Gate::authorize('dashboard.view');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
@@ -50,6 +53,7 @@ class DashboardController
     public function exportPdf(): void
     {
         AuthGuard::check();
+        Gate::authorize('dashboard.view');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         // Render the Twig template into an HTML string
@@ -66,6 +70,7 @@ class DashboardController
     public function exportExcel(): void
     {
         AuthGuard::check();
+        Gate::authorize('dashboard.view');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
