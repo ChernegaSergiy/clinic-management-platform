@@ -16,6 +16,7 @@ class Gate
             'clinical.manage',
             'kpi.read',
             'lab.read',
+            'notifications.read',
         ],
         'registrar' => [
             'patients.read',
@@ -23,6 +24,7 @@ class Gate
             'appointments.read',
             'appointments.write',
             'billing.read',
+            'notifications.read',
         ],
         'doctor' => [
             'dashboard.view',
@@ -33,6 +35,7 @@ class Gate
             'medical.write_assigned',
             'prescriptions.write',
             'lab.write_assigned',
+            'notifications.read',
         ],
         'nurse' => [
             'dashboard.view',
@@ -40,18 +43,22 @@ class Gate
             'appointments.read_assigned',
             'medical.read_assigned',
             'lab.write_assigned',
+            'notifications.read',
         ],
         'lab_technician' => [
             'lab.manage',
+            'notifications.read',
         ],
         'billing' => [
             'billing.read',
             'billing.manage',
             'patients.read',
             'appointments.read',
+            'notifications.read',
         ],
         'inventory_manager' => [
             'inventory.manage',
+            'notifications.read',
         ],
     ];
 
