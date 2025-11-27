@@ -90,13 +90,14 @@ class KpiController
     {
         $this->authorizeAdmin();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
-        $today = (new \DateTimeImmutable('today'));
-        $periodStart = $today->format('Y-m-d');
-        $periodEnd = $today->format('Y-m-d');
+        $today = new \DateTimeImmutable('today');
         $userId = $_SESSION['user']['id'] ?? null;
 
         foreach ($definitions as $definition) {
-            $value = $this->calculateKpiValue($definition['kpi_type'], $today);
+            $period = $definition['period'] ?? 'day';
+            [$periodStart, $periodEnd] = $this->resolvePeriodRange($today, $period);
+
+            $value = $this->calculateKpiValue($definition['kpi_type'], $periodStart, $periodEnd);
             if ($value === null) {
                 continue;
             }
@@ -106,22 +107,39 @@ class KpiController
                 'period_start' => $periodStart,
                 'period_end' => $periodEnd,
                 'calculated_value' => $value,
-                'notes' => 'Auto-calculated for ' . $periodStart,
+                'notes' => sprintf('Auto-calculated %s-%s', $periodStart, $periodEnd),
             ]);
         }
 
-        $_SESSION['success_message'] = "KPI перераховано за " . $periodStart;
+        $_SESSION['success_message'] = "KPI перераховано за " . $today->format('Y-m-d');
         header('Location: /dashboard');
         exit();
     }
 
-    private function calculateKpiValue(string $type, \DateTimeImmutable $date): ?float
+    private function calculateKpiValue(string $type, string $from, string $to): ?float
     {
-        $day = $date->format('Y-m-d');
         return match ($type) {
-            'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($day, $day),
-            'appointments_count' => (float)$this->appointmentRepository->countScheduledByDate($day),
+            'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($from, $to),
+            'appointments_count' => (float)$this->appointmentRepository->countScheduledByRange($from, $to),
             default => null, // Інші KPI не підтримані наразі
+        };
+    }
+
+    private function resolvePeriodRange(\DateTimeImmutable $today, string $period): array
+    {
+        return match ($period) {
+            'week' => [
+                $today->modify('-6 days')->format('Y-m-d'),
+                $today->format('Y-m-d'),
+            ],
+            'month' => [
+                $today->modify('-29 days')->format('Y-m-d'),
+                $today->format('Y-m-d'),
+            ],
+            default => [
+                $today->format('Y-m-d'),
+                $today->format('Y-m-d'),
+            ],
         };
     }
 }
