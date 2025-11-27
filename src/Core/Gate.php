@@ -45,6 +45,7 @@ class Gate
             'lab.manage',
         ],
         'billing' => [
+            'billing.read',
             'billing.manage',
             'patients.read',
             'appointments.read',
