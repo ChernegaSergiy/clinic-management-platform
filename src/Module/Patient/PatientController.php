@@ -28,16 +28,20 @@ class PatientController
     public function index(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.read');
         $searchTerm = $_GET['search'] ?? '';
-        $role = $_SESSION['user']['role_name'] ?? '';
-        if (in_array($role, ['doctor', 'nurse'], true)) {
-            $doctorId = (int)($_SESSION['user']['id'] ?? 0);
-            $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($doctorId);
-            $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
-        } else {
+        $currentUserId = $_SESSION['user']['id'] ?? 0;
+        $patients = [];
+
+        if (Gate::allows('patients.read_all')) {
             $patients = $this->patientRepository->findAll($searchTerm);
+        } elseif (Gate::allows('patients.read_assigned')) {
+            if ($currentUserId) {
+                $patientIds = $this->appointmentRepository->findPatientIdsByDoctor((int)$currentUserId);
+                $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
+            }
         }
+        // If neither permission is allowed, $patients remains an empty array.
+
         View::render('@modules/Patient/templates/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,
@@ -108,8 +112,6 @@ class PatientController
             return;
         }
 
-        $this->authorizePatientAccess($id);
-
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
 
         View::render('@modules/Patient/templates/show.html.twig', [
@@ -132,8 +134,6 @@ class PatientController
             return;
         }
 
-        $this->authorizePatientAccess($id);
-
         View::render('@modules/Patient/templates/edit.html.twig', ['patient' => $patient]);
     }
 
@@ -150,8 +150,6 @@ class PatientController
             echo "Пацієнта не знайдено";
             return;
         }
-
-        $this->authorizePatientAccess($id);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -341,18 +339,5 @@ class PatientController
         exit();
     }
 
-    private function authorizePatientAccess(int $patientId): void
-    {
-        $role = $_SESSION['user']['role_name'] ?? null;
-        $userId = $_SESSION['user']['id'] ?? null;
 
-        if ($role === 'doctor' && $userId) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor($patientId, (int)$userId);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                exit();
-            }
-        }
-    }
 }
