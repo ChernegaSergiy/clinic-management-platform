@@ -14,4 +14,5 @@ interface AppointmentRepositoryInterface
     public function findWaitlistById(int $id): ?array;
     public function updateWaitlistStatus(int $id, string $status): bool;
     public function generateWaitlistTicket(): string;
+    public function isPatientAssignedToDoctor(int $patientId, int $doctorId): bool;
 }
