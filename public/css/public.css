@@ -443,12 +443,13 @@ a { color: inherit; text-decoration: none; }
     border: 3px solid var(--ink);
     border-radius: 18px;
     background: var(--card);
-    padding: 22px;
-    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+    box-shadow: 10px 10px 0 var(--ink);
 }
 
-.auth__title { margin: 4px 0 14px; }
-.auth__form { display: flex; flex-direction: column; gap: 12px; }
+.auth__title { margin: 0 0 10px; }
+.auth__form { display: flex; flex-direction: column; gap: 16px; }
+.auth__form .button--full { margin-top: 12px; }
 .auth__field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
 .auth__label { font-size: 14px; letter-spacing: 0.2px; }
 .auth__input {
@@ -470,6 +471,36 @@ a { color: inherit; text-decoration: none; }
 
 .auth__error { color: #8b0000; font-size: 13px; }
 .auth__muted { margin-top: 12px; color: var(--muted); }
+.auth__muted--strong { font-weight: 700; color: #1b1b1b; }
+
+.auth__divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 18px;
+    width: 100%;
+}
+.auth__divider span {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    background: transparent;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+.auth__divider::before,
+.auth__divider::after {
+    content: "";
+    flex: 1;
+    border-top: 2px solid var(--ink);
+    opacity: 0.4;
+}
+.auth__oauth-btn {
+    margin-top: 14px;
+    background: var(--card);
+    border-style: dashed;
+}
 
 .content-card {
     background: var(--card);
