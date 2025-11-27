@@ -18,4 +18,5 @@ interface AppointmentRepositoryInterface
     public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId): bool;
     public function findPatientIdsByDoctor(int $doctorId): array;
     public function findByDoctorId(int $doctorId): array;
+    public function countScheduledByDate(string $date): int;
 }

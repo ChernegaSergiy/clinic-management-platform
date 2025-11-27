@@ -304,6 +304,17 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
 
+    public function countScheduledByDate(string $date): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) 
+            FROM appointments 
+            WHERE status = 'scheduled' AND DATE(start_time) = :date
+        ");
+        $stmt->execute([':date' => $date]);
+        return (int)$stmt->fetchColumn();
+    }
+
     public function getDoctorDailyLoad(string $date): array
     {
         $sql = "
