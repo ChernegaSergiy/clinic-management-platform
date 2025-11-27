@@ -12,6 +12,7 @@ use App\Core\QrCodeGenerator;
 use App\Module\LabOrder\Service\LabImportService;
 use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 
 class LabOrderController
 {
@@ -35,6 +36,7 @@ class LabOrderController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.write_assigned');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -60,6 +62,7 @@ class LabOrderController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.write_assigned');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -126,6 +129,8 @@ class LabOrderController
             return;
         }
 
+        $this->authorizeOrder($order);
+
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id; // URL to the order details
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
@@ -147,6 +152,8 @@ class LabOrderController
             echo "Лабораторне замовлення не знайдено";
             return;
         }
+
+        $this->authorizeOrder($order);
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -173,6 +180,8 @@ class LabOrderController
             return;
         }
 
+        $this->authorizeOrder($order);
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
@@ -195,6 +204,7 @@ class LabOrderController
     public function import(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.manage');
 
         View::render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -206,6 +216,7 @@ class LabOrderController
     public function processImport(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.manage');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -254,6 +265,7 @@ class LabOrderController
     public function confirmImport(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.manage');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -271,6 +283,7 @@ class LabOrderController
     public function finalizeImport(): void
     {
         AuthGuard::check();
+        Gate::authorize('lab.manage');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
@@ -298,5 +311,21 @@ class LabOrderController
             header('Location: /lab-orders/import/confirm');
             exit();
         }
+    }
+
+    private function authorizeOrder(array $order): void
+    {
+        $role = $_SESSION['user']['role_name'] ?? '';
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        if ($role === 'admin' || $role === 'lab_technician') {
+            return;
+        }
+
+        if ($role === 'doctor' && $userId && (int)$order['doctor_id'] === (int)$userId) {
+            return;
+        }
+
+        Gate::authorize('lab.manage');
     }
 }
