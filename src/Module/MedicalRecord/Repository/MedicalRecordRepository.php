@@ -47,6 +47,23 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function findByDoctorId(int $doctorId): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                mr.*,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name
+            FROM medical_records mr
+            JOIN users u ON mr.doctor_id = u.id
+            JOIN patients p ON mr.patient_id = p.id
+            WHERE mr.doctor_id = :doctor_id
+            ORDER BY mr.visit_date DESC
+        ");
+        $stmt->execute([':doctor_id' => $doctorId]);
+        return $stmt->fetchAll();
+    }
+
     public function save(array $data): int|false
     {
         $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, 
