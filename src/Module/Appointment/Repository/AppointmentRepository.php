@@ -276,6 +276,23 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findByDoctorId(int $doctorId): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                a.*, 
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.id
+            JOIN users u ON a.doctor_id = u.id
+            WHERE a.doctor_id = :doctor_id
+            ORDER BY a.start_time DESC
+        ");
+        $stmt->execute([':doctor_id' => $doctorId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getDoctorDailyLoad(string $date): array
     {
         $sql = "
