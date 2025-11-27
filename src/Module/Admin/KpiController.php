@@ -88,7 +88,7 @@ class KpiController
     // This would be called by a cron job or background process
     public function calculateResults(): void
     {
-        $this->authorizeAdmin();
+        $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
         $today = new \DateTimeImmutable('today');
         $userId = $_SESSION['user']['id'] ?? null;
@@ -174,5 +174,14 @@ class KpiController
         $readmitted = $this->appointmentRepository->countReadmittedPatients($from, $to);
 
         return round(($readmitted / $totalPatients) * 100, 1);
+    }
+
+    private function authorizeKpiAccess(): void
+    {
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+        AuthGuard::check();
+        Gate::authorize('admin.manage');
     }
 }
