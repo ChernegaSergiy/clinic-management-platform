@@ -91,7 +91,7 @@ class KpiController
         $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
         $today = new \DateTimeImmutable('today');
-        $userId = $_SESSION['user']['id'] ?? null;
+        $userId = $_SESSION['user']['id'] ?? 1;
 
         foreach ($definitions as $definition) {
             $period = $definition['period'] ?? 'day';
