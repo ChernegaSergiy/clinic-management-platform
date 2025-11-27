@@ -56,23 +56,18 @@ if (file_exists($envPath)) {
 if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
     $appUrlParts = parse_url($_ENV['APP_BASE_URL']);
     if (isset($appUrlParts['host'])) {
-        $cookieDomain = $appUrlParts['host'];
-        // Prepend a dot to the domain to make it valid for all subdomains
-        if (substr_count($cookieDomain, '.') > 1) {
-             $cookieDomain = '.' . $cookieDomain;
-        }
-
-        session_set_cookie_params([
+        $cookieParams = [
             'lifetime' => 0,
             'path' => '/',
-            'domain' => $cookieDomain,
-            'secure' => true,
+            'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on', // Set secure based on actual request protocol
             'httponly' => true,
             'samesite' => 'Lax'
-        ]);
+        ];
+        // Omit 'domain' to let PHP default to the current host, which is safest.
+        
+        session_set_cookie_params($cookieParams);
     }
 }
-
 session_start();
 
 $router = new Router();
