@@ -12,13 +12,15 @@
                     <div class="item"><i class="bell outline icon"></i>Сповіщення: {{ dashboardData.quickStats.lab_pending ?? 0 }} лаб, {{ dashboardData.quickStats.low_stock ?? 0 }} склад</div>
                 </div>
             </div>
-            <div class="six wide column right aligned">
-                <div class="ui mini basic buttons">
-                    <a href="/dashboard/export-csv" class="ui button">CSV</a>
-                    <a href="/dashboard/export-pdf" class="ui button">PDF</a>
-                    <a href="/dashboard/export-excel" class="ui button">Excel</a>
+            {% if canExport %}
+                <div class="six wide column right aligned">
+                    <div class="ui mini basic buttons">
+                        <a href="/dashboard/export-csv" class="ui button">CSV</a>
+                        <a href="/dashboard/export-pdf" class="ui button">PDF</a>
+                        <a href="/dashboard/export-excel" class="ui button">Excel</a>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
 
         <div class="row">
@@ -37,12 +39,14 @@
                             <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.appointments_today|default(0) }}</span></div>
                         </div>
                     </div>
-                    <div class="green card">
-                        <div class="content">
-                            <div class="header"><i class="dollar sign icon"></i> Дохід 7д</div>
-                            <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.revenue_7d|default(0)|number_format(0, '.', ',') }} ₴</span></div>
+                    {% if canSeeFinance %}
+                        <div class="green card">
+                            <div class="content">
+                                <div class="header"><i class="dollar sign icon"></i> Дохід 7д</div>
+                                <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.revenue_7d|default(0)|number_format(0, '.', ',') }} ₴</span></div>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                     <div class="orange card">
                         <div class="content">
                             <div class="header"><i class="flask icon"></i> Лаб. в роботі</div>
@@ -59,42 +63,44 @@
             </div>
         </div>
 
-        <div class="ui hidden divider"></div>
-        <div class="row">
-            <div class="sixteen wide column">
-                <h3 class="ui header">KPI / фінансові картки</h3>
-                <div class="ui five statistics">
-                        {% set kpi_card_mapping = {
-                            'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue', fallback: dashboardData.quickStats.appointments_today ?? null},
-                            'revenue_generated': {label: 'Дохід 7д', icon: 'dollar sign', color: 'green', fallback: dashboardData.quickStats.revenue_7d ?? null, unit: '₴'},
-                            'doctor_utilization': {label: 'Завантаженість', icon: 'user md', color: 'teal'},
-                            'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'red'},
-                            'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
-                        } %}
+        {% if canSeeKpi %}
+            <div class="ui hidden divider"></div>
+            <div class="row">
+                <div class="sixteen wide column">
+                    <h3 class="ui header">KPI / фінансові картки</h3>
+                    <div class="ui five statistics">
+                            {% set kpi_card_mapping = {
+                                'appointments_count': {label: 'Прийомів', icon: 'calendar check outline', color: 'blue', fallback: dashboardData.quickStats.appointments_today ?? null},
+                                'revenue_generated': {label: 'Дохід 7д', icon: 'dollar sign', color: 'green', fallback: dashboardData.quickStats.revenue_7d ?? null, unit: '₴'},
+                                'doctor_utilization': {label: 'Завантаженість', icon: 'user md', color: 'teal'},
+                                'readmission_rate': {label: 'Повторні звернення', icon: 'hospital', color: 'red'},
+                                'patient_satisfaction': {label: 'Задоволеність', icon: 'star outline', color: 'yellow'}
+                            } %}
 
-                        {% for kpi_type, kpi_info in kpi_card_mapping %}
-                            {% set kpi_data = dashboardData.kpis[kpi_type] ?? null %}
-                            <div class="ui statistic">
-                                <div class="value">
-                                    <i class="{{ kpi_info.icon }} icon"></i>
-                                    {% if kpi_data %}
-                                        {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : (kpi_data.definition.unit == '%' ? 1 : 0), '.', ',') }}
-                                        {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
-                                        {% if kpi_data.definition.unit == '%' %}<small>%</small>{% endif %}
-                                    {% elseif kpi_info.fallback is defined and kpi_info.fallback is not null %}
-                                        {{ kpi_info.fallback|number_format(kpi_info.unit == '₴' ? 0 : 0, '.', ',') }}{% if kpi_info.unit == '₴' %} ₴{% endif %}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
+                            {% for kpi_type, kpi_info in kpi_card_mapping %}
+                                {% set kpi_data = dashboardData.kpis[kpi_type] ?? null %}
+                                <div class="ui statistic">
+                                    <div class="value">
+                                        <i class="{{ kpi_info.icon }} icon"></i>
+                                        {% if kpi_data %}
+                                            {{ kpi_data.latest_value|number_format(kpi_data.definition.unit == '₴' ? 2 : (kpi_data.definition.unit == '%' ? 1 : 0), '.', ',') }}
+                                            {% if kpi_data.definition.unit == '₴' %}<small>₴</small>{% endif %}
+                                            {% if kpi_data.definition.unit == '%' %}<small>%</small>{% endif %}
+                                        {% elseif kpi_info.fallback is defined and kpi_info.fallback is not null %}
+                                            {{ kpi_info.fallback|number_format(kpi_info.unit == '₴' ? 0 : 0, '.', ',') }}{% if kpi_info.unit == '₴' %} ₴{% endif %}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </div>
+                                    <div class="label">
+                                        {{ kpi_info.label }}
+                                    </div>
                                 </div>
-                                <div class="label">
-                                    {{ kpi_info.label }}
-                                </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div class="ui hidden section divider"></div>
         <div class="row">
             <h1 class="ui huge dividing header">Щоденний дохід за 7 днів</h1>
