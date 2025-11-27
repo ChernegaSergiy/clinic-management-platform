@@ -20,4 +20,8 @@ interface AppointmentRepositoryInterface
     public function findByDoctorId(int $doctorId): array;
     public function countScheduledByDate(string $date): int;
     public function countScheduledByRange(string $from, string $to): int;
+    public function sumBookedHoursByRange(string $from, string $to): float;
+    public function countDistinctDoctorsByRange(string $from, string $to): int;
+    public function countReadmittedPatients(string $from, string $to): int;
+    public function countDistinctPatientsByRange(string $from, string $to): int;
 }
