@@ -45,6 +45,12 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function countItemsBelowMinStock(): int
+    {
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM inventory_items WHERE quantity < min_stock_level");
+        return (int)$stmt->fetchColumn();
+    }
+
     public function findItemsAboveMaxStock(): array
     {
         $stmt = $this->pdo->query("
