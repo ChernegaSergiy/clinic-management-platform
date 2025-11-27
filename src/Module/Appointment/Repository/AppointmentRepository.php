@@ -293,6 +293,17 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findPatientIdsByDoctor(int $doctorId): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT DISTINCT patient_id
+            FROM appointments
+            WHERE doctor_id = :doctor_id
+        ");
+        $stmt->execute([':doctor_id' => $doctorId]);
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
     public function getDoctorDailyLoad(string $date): array
     {
         $sql = "

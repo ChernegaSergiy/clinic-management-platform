@@ -16,4 +16,6 @@ interface AppointmentRepositoryInterface
     public function generateWaitlistTicket(): string;
     public function isPatientAssignedToDoctor(int $patientId, int $doctorId): bool;
     public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId): bool;
+    public function findPatientIdsByDoctor(int $doctorId): array;
+    public function findByDoctorId(int $doctorId): array;
 }
