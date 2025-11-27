@@ -121,6 +121,8 @@ class KpiController
         return match ($type) {
             'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($from, $to),
             'appointments_count' => (float)$this->appointmentRepository->countScheduledByRange($from, $to),
+            'doctor_utilization' => $this->calculateDoctorUtilization($from, $to),
+            'readmission_rate' => $this->calculateReadmissionRate($from, $to),
             default => null, // Інші KPI не підтримані наразі
         };
     }
@@ -141,5 +143,36 @@ class KpiController
                 $today->format('Y-m-d'),
             ],
         };
+    }
+
+    private function calculateDoctorUtilization(string $from, string $to): ?float
+    {
+        $bookedHours = $this->appointmentRepository->sumBookedHoursByRange($from, $to);
+        $doctorCount = $this->appointmentRepository->countDistinctDoctorsByRange($from, $to);
+
+        if ($doctorCount === 0) {
+            return null;
+        }
+
+        $days = (new \DateTimeImmutable($from))->diff(new \DateTimeImmutable($to))->days + 1;
+        $totalCapacity = $doctorCount * 8 * $days; // 8 робочих годин на лікаря
+
+        if ($totalCapacity <= 0) {
+            return null;
+        }
+
+        return round(($bookedHours / $totalCapacity) * 100, 1);
+    }
+
+    private function calculateReadmissionRate(string $from, string $to): ?float
+    {
+        $totalPatients = $this->appointmentRepository->countDistinctPatientsByRange($from, $to);
+        if ($totalPatients === 0) {
+            return null;
+        }
+
+        $readmitted = $this->appointmentRepository->countReadmittedPatients($from, $to);
+
+        return round(($readmitted / $totalPatients) * 100, 1);
     }
 }
