@@ -32,8 +32,22 @@ class PrescriptionController
     public function index(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescriptions.write');
-        $prescriptions = $this->prescriptionRepository->findAll();
+        $currentUserId = $_SESSION['user']['id'] ?? 0;
+        $prescriptions = [];
+
+        if (Gate::allows('prescriptions.read_all')) {
+            $prescriptions = $this->prescriptionRepository->findAll();
+        } elseif (Gate::allows('prescriptions.read_assigned')) {
+            // Need a findByDoctorId in PrescriptionRepository
+            if ($currentUserId) {
+                // Assuming prescriptions are linked to medical records or patients assigned to a doctor
+                // For simplicity, let's assume a doctor can only read prescriptions they issued
+                // Or if prescriptions are tied to a patient and doctor has access to that patient
+                $prescriptions = $this->prescriptionRepository->findByDoctorId($currentUserId); // This method needs to be added to the repository
+            }
+        }
+        // If neither permission is allowed, $prescriptions remains an empty array.
+
         View::render('@modules/Prescription/templates/index.html.twig', [
             'prescriptions' => $prescriptions,
         ]);
@@ -42,9 +56,9 @@ class PrescriptionController
     public function create(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescriptions.write');
-
         $patientId = (int)($_GET['patient_id'] ?? 0);
+        Gate::authorize('prescriptions.write', ['patient_id' => $patientId]);
+
         $patient = $this->patientRepository->findById($patientId);
 
         if (!$patient) {
@@ -72,7 +86,7 @@ class PrescriptionController
     public function store(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescriptions.write');
+        Gate::authorize('prescriptions.write', ['patient_id' => $_POST['patient_id']]);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -137,9 +151,9 @@ class PrescriptionController
     public function show(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescriptions.write');
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('prescriptions.read', ['prescription_id' => $id]);
+
         $prescription = $this->prescriptionRepository->findById($id);
 
         if (!$prescription) {

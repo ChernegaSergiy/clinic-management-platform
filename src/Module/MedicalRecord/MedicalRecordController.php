@@ -41,11 +41,6 @@ class MedicalRecordController
         $appointment = $this->appointmentRepository->findById($appointmentId);
         if ($appointment) {
             Gate::authorize('medical.write', ['patient_id' => $appointment['patient_id']]);
-            if (($appointment['doctor_id'] ?? null) && ($_SESSION['user']['role_name'] ?? '') === 'doctor' && (int)$appointment['doctor_id'] !== (int)$_SESSION['user']['id']) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
         }
 
         if (!$appointment) {
@@ -65,13 +60,17 @@ class MedicalRecordController
     public function index(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.read');
-        $role = $_SESSION['user']['role_name'] ?? '';
-        if (in_array($role, ['doctor', 'nurse'], true)) {
-            $records = $this->medicalRecordRepository->findByDoctorId((int)$_SESSION['user']['id']);
-        } else {
+        $currentUserId = $_SESSION['user']['id'] ?? 0;
+        $records = [];
+
+        if (Gate::allows('medical.read_all')) {
             $records = $this->medicalRecordRepository->findAll();
+        } elseif (Gate::allows('medical.read_assigned')) {
+            if ($currentUserId) {
+                $records = $this->medicalRecordRepository->findByDoctorId((int)$currentUserId);
+            }
         }
+        // If neither permission is allowed, $records remains an empty array.
 
         View::render('@modules/MedicalRecord/templates/index.html.twig', [
             'records' => $records,
@@ -85,11 +84,6 @@ class MedicalRecordController
         $appointment = $this->appointmentRepository->findById($appointmentId);
         if ($appointment) {
             Gate::authorize('medical.write', ['patient_id' => $appointment['patient_id']]);
-            if (($appointment['doctor_id'] ?? null) && ($_SESSION['user']['role_name'] ?? '') === 'doctor' && (int)$appointment['doctor_id'] !== (int)$_SESSION['user']['id']) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
         }
 
         if (!$appointment) {
@@ -158,25 +152,7 @@ class MedicalRecordController
     public function show(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.read');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $record = $this->medicalRecordRepository->findById($id);
-
-        if (!$record) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
-        }
-
-        if (in_array($_SESSION['user']['role_name'] ?? '', ['doctor', 'nurse'], true)) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor((int)$record['patient_id'], (int)$_SESSION['user']['id']);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
-        }
+        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
 
         // Log the view event
         $this->auditLogger->log(
@@ -201,6 +177,7 @@ class MedicalRecordController
     public function getIcdCodes(): void
     {
         AuthGuard::check();
+        Gate::authorize('clinical.read');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -212,6 +189,7 @@ class MedicalRecordController
     public function getInterventionCodes(): void
     {
         AuthGuard::check();
+        Gate::authorize('clinical.read');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -223,25 +201,7 @@ class MedicalRecordController
     public function edit(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.write');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $record = $this->medicalRecordRepository->findById($id);
-
-        if (!$record) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
-        }
-
-        if (in_array($_SESSION['user']['role_name'] ?? '', ['doctor', 'nurse'], true)) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor((int)$record['patient_id'], (int)$_SESSION['user']['id']);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
-        }
+        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         View::render('@modules/MedicalRecord/templates/edit.html.twig', [
             'record' => $record,
@@ -254,25 +214,7 @@ class MedicalRecordController
     public function update(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.write');
-
-        $id = (int)($_POST['id'] ?? 0);
-        $record = $this->medicalRecordRepository->findById($id);
-
-        if (!$record) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
-        }
-
-        if (in_array($_SESSION['user']['role_name'] ?? '', ['doctor', 'nurse'], true)) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor((int)$record['patient_id'], (int)$_SESSION['user']['id']);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
-        }
+        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         if (!empty($_POST['visit_date'])) {
             try {
@@ -318,25 +260,7 @@ class MedicalRecordController
     public function uploadAttachment(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.write');
-
-        $medicalRecordId = (int)($_GET['id'] ?? 0);
-        $record = $this->medicalRecordRepository->findById($medicalRecordId);
-
-        if (!$record) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
-        }
-
-        if (in_array($_SESSION['user']['role_name'] ?? '', ['doctor', 'nurse'], true)) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor((int)$record['patient_id'], (int)$_SESSION['user']['id']);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
-        }
+        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
@@ -365,26 +289,7 @@ class MedicalRecordController
     public function downloadAttachment(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.read');
-
-        $medicalRecordId = (int)($_GET['record_id'] ?? 0);
-        $attachmentId = (int)($_GET['attachment_id'] ?? 0);
-
-        $record = $this->medicalRecordRepository->findById($medicalRecordId);
-        if (!$record) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
-        }
-
-        if (in_array($_SESSION['user']['role_name'] ?? '', ['doctor', 'nurse'], true)) {
-            $hasAccess = $this->appointmentRepository->isPatientAssignedToDoctor((int)$record['patient_id'], (int)$_SESSION['user']['id']);
-            if (!$hasAccess) {
-                http_response_code(403);
-                echo "Доступ заборонено";
-                return;
-            }
-        }
+        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
 
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 

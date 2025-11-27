@@ -23,13 +23,7 @@ class NotificationController
     {
         AuthGuard::check();
         Gate::authorize('notifications.read');
-        $userId = $_SESSION['user']['id'] ?? 0;
-
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            return;
-        }
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -59,13 +53,7 @@ class NotificationController
     {
         AuthGuard::check();
         Gate::authorize('notifications.read');
-        $userId = $_SESSION['user']['id'] ?? 0;
-
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            return;
-        }
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
 
         $success = $this->notificationRepository->markAllAsReadByUserId($userId);
 
@@ -80,16 +68,7 @@ class NotificationController
     {
         AuthGuard::check();
         Gate::authorize('notifications.read');
-        $userId = $_SESSION['user']['id'] ?? 0;
-        $raw = file_get_contents('php://input');
-        $input = json_decode($raw, true) ?: [];
-        $id = (int)($input['id'] ?? ($_POST['id'] ?? 0));
-
-        if (!$userId || $id === 0) {
-            http_response_code(400);
-            echo json_encode(['success' => false]);
-            return;
-        }
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
 
         $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);
 

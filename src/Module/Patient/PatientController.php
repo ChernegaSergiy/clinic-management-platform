@@ -187,10 +187,7 @@ class PatientController
         exit();
     }
 
-    public function exportCsv(): void
-    {
-        AuthGuard::check();
-        Gate::authorize('patients.read');
+        Gate::authorize('patients.read_all');
 
         $patients = $this->patientRepository->findAll();
 
@@ -208,7 +205,7 @@ class PatientController
     public function exportPatientsToJson(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.read');
+        Gate::authorize('patients.read_all');
 
         $patients = $this->patientRepository->findAll();
 
@@ -225,9 +222,7 @@ class PatientController
     public function importPatientsFromJson(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write');
-
-        // Handle GET request (display import form)
+        Gate::authorize('patients.write_all');
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             View::render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
@@ -325,7 +320,7 @@ class PatientController
     public function toggleStatus(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write');
+        Gate::authorize('patients.write_all');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);

@@ -130,4 +130,21 @@ class PrescriptionRepository
         $stmt->execute([':patient_id' => $patientId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findByDoctorId(int $doctorId): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT "
+            . "p.id, p.issue_date, p.expiry_date, "
+            . "CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, "
+            . "CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name "
+            . "FROM prescriptions p "
+            . "JOIN patients pat ON p.patient_id = pat.id "
+            . "JOIN users doc ON p.doctor_id = doc.id "
+            . "WHERE p.doctor_id = :doctor_id "
+            . "ORDER BY p.issue_date DESC"
+        );
+        $stmt->execute([':doctor_id' => $doctorId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

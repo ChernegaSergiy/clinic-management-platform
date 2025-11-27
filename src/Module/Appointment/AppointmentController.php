@@ -29,22 +29,26 @@ class AppointmentController
     public function index(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.read');
         $doctors = $this->userRepository->findAllDoctors();
-        $role = $_SESSION['user']['role_name'] ?? '';
         $userId = (int)($_SESSION['user']['id'] ?? 0);
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
-        if (in_array($role, ['doctor', 'nurse'], true)) {
-            $appointments = $this->appointmentRepository->findByDoctorId($userId);
-        } else {
+        $appointments = [];
+
+        if (Gate::allows('appointments.read_all')) {
             $appointments = $this->appointmentRepository->findAll();
+        } elseif (Gate::allows('appointments.read_assigned')) {
+            if ($userId) {
+                $appointments = $this->appointmentRepository->findByDoctorId($userId);
+            }
         }
+        // If neither permission is allowed, $appointments remains an empty array.
 
         $doctorOptions = [];
         foreach ($doctors as $doctor) {
             $doctorOptions[] = ['id' => $doctor['id'], 'title' => $doctor['full_name']];
         }
-        if (in_array($role, ['doctor', 'nurse'], true)) {
+        // Filter doctor options for assigned view if not allowed to read all
+        if (!Gate::allows('appointments.read_all') && Gate::allows('appointments.read_assigned')) {
             $doctorOptions = array_values(array_filter($doctorOptions, fn($d) => (int)$d['id'] === $userId));
         }
 
@@ -278,15 +282,29 @@ class AppointmentController
 
     public function json(): void
     {
-        // Default to fetching all if no date range is provided (e.g., for initial load of a simple list)
+        AuthGuard::check(); // Ensure user is authenticated for API access
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
+        $userId = $_SESSION['user']['id'] ?? 0;
+        $appointments = [];
 
-        if ($start && $end) {
-            $appointments = $this->appointmentRepository->findByDateRange($start, $end);
-        } else {
-            $appointments = $this->appointmentRepository->findAll();
+        if (Gate::allows('appointments.read_all')) {
+            if ($start && $end) {
+                $appointments = $this->appointmentRepository->findByDateRange($start, $end);
+            } else {
+                $appointments = $this->appointmentRepository->findAll();
+            }
+        } elseif (Gate::allows('appointments.read_assigned')) {
+            if ($userId) {
+                if ($start && $end) {
+                    $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($userId, $start, $end); // Assuming this method exists or needs to be created
+                } else {
+                    $appointments = $this->appointmentRepository->findByDoctorId($userId);
+                }
+            }
         }
+        // If neither permission is allowed, $appointments remains an empty array.
+        // If only read_assigned is allowed, ensure results are filtered by doctor_id.
 
         $events = [];
 
@@ -564,6 +582,7 @@ class AppointmentController
     public function showLoadAnalytics(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointments.read_analytics'); // Or a more specific permission like 'dashboard.view_analytics'
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);

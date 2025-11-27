@@ -129,7 +129,7 @@ class LabOrderController
             return;
         }
 
-        $this->authorizeOrder($order);
+        Gate::authorize('lab.read', ['lab_order_id' => $id]);
 
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id; // URL to the order details
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
@@ -153,7 +153,7 @@ class LabOrderController
             return;
         }
 
-        $this->authorizeOrder($order);
+        Gate::authorize('lab.write', ['lab_order_id' => $id]);
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -180,7 +180,7 @@ class LabOrderController
             return;
         }
 
-        $this->authorizeOrder($order);
+        Gate::authorize('lab.write', ['lab_order_id' => $id]);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -313,19 +313,5 @@ class LabOrderController
         }
     }
 
-    private function authorizeOrder(array $order): void
-    {
-        $role = $_SESSION['user']['role_name'] ?? '';
-        $userId = $_SESSION['user']['id'] ?? null;
 
-        if ($role === 'admin' || $role === 'lab_technician') {
-            return;
-        }
-
-        if ($role === 'doctor' && $userId && (int)$order['doctor_id'] === (int)$userId) {
-            return;
-        }
-
-        Gate::authorize('lab.manage');
-    }
 }
