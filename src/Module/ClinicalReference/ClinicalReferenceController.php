@@ -8,6 +8,7 @@ use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use ChernegaSergiy\Nk0252021Parser\Parser;
 use ChernegaSergiy\Nk0262021Parser\Parser as Nk026Parser;
+use App\Core\Gate;
 
 class ClinicalReferenceController
 {
@@ -22,7 +23,8 @@ class ClinicalReferenceController
 
     public function icdImportForm(): void
     {
-        AuthGuard::isAdmin();
+        AuthGuard::check();
+        Gate::authorize('clinical.manage');
 
         $count = $this->icdCodeRepository->countAll();
         View::render('@modules/ClinicalReference/templates/icd_import.html.twig', [
@@ -35,7 +37,8 @@ class ClinicalReferenceController
 
     public function icdImportRun(): void
     {
-        AuthGuard::isAdmin();
+        AuthGuard::check();
+        Gate::authorize('clinical.manage');
 
         try {
             $parser = new Parser();
@@ -69,7 +72,8 @@ class ClinicalReferenceController
 
     public function interventionImportForm(): void
     {
-        AuthGuard::isAdmin();
+        AuthGuard::check();
+        Gate::authorize('clinical.manage');
 
         $count = $this->interventionCodeRepository->countAll();
         View::render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
@@ -82,7 +86,8 @@ class ClinicalReferenceController
 
     public function interventionImportRun(): void
     {
-        AuthGuard::isAdmin();
+        AuthGuard::check();
+        Gate::authorize('clinical.manage');
 
         try {
             $parser = new Nk026Parser();
@@ -117,7 +122,8 @@ class ClinicalReferenceController
 
     public function clinicalIndex(): void
     {
-        AuthGuard::isAdmin();
+        AuthGuard::check();
+        Gate::authorize('clinical.manage');
 
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();
