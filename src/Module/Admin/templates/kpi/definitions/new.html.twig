@@ -9,10 +9,23 @@
         <h2 class="ui header">Додати нове визначення KPI</h2>
         <div class="ui divider"></div>
 
+        {% set kpi_options = {
+            'revenue_generated': 'Дохід (revenue_generated)',
+            'appointments_count': 'Кількість прийомів (appointments_count)',
+            'doctor_utilization': 'Завантаженість лікарів (doctor_utilization)',
+            'readmission_rate': 'Повторні звернення (readmission_rate)',
+            'patient_satisfaction': 'Задоволеність пацієнтів (patient_satisfaction)',
+            'custom': 'Інше (manual)'
+        } %}
+        {% set selected_type = old.kpi_type ?? 'revenue_generated' %}
+        {% if selected_type is not empty and (selected_type not in kpi_options|keys) %}
+            {% set kpi_options = kpi_options|merge({ (selected_type): selected_type ~ ' (custom)' }) %}
+        {% endif %}
+
         <form class="ui form" method="POST" action="/admin/kpi_definitions/new">
             {{ forms.input('name', 'Назва', old.name ?? '', 'text', 'Наприклад, Patient Wait Time', errors.name ?? null, {'required': 'required'}) }}
             {{ forms.textarea('description', 'Опис', old.description ?? '', 'Детальний опис KPI', errors.description ?? null) }}
-            {{ forms.input('kpi_type', 'Тип KPI', old.kpi_type ?? '', 'text', 'Наприклад, average, percentage, count', errors.kpi_type ?? null, {'required': 'required'}) }}
+            {{ forms.select('kpi_type', 'Тип KPI', kpi_options, selected_type, errors.kpi_type ?? null, {'required': 'required'}) }}
             {{ forms.input('target_value', 'Цільове значення', old.target_value ?? '', 'text', 'Наприклад, 15, 95%, 100', errors.target_value ?? null) }}
             {{ forms.input('unit', 'Одиниця виміру', old.unit ?? '', 'text', 'Наприклад, minutes, %, patients', errors.unit ?? null) }}
 
