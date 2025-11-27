@@ -9,6 +9,7 @@ use App\Module\Patient\Repository\PatientRepository;
 use App\Core\CsvExporter;
 use App\Core\JsonExporter;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 use App\Module\Appointment\Repository\AppointmentRepository;
 
 class PatientController
@@ -27,6 +28,7 @@ class PatientController
     public function index(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.read');
         $searchTerm = $_GET['search'] ?? '';
         $patients = $this->patientRepository->findAll($searchTerm);
         View::render('@modules/Patient/templates/index.html.twig', [
@@ -38,12 +40,14 @@ class PatientController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.write');
         View::render('@modules/Patient/templates/new.html.twig');
     }
 
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.write');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -86,8 +90,9 @@ class PatientController
     public function show(): void
     {
         AuthGuard::check();
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('patients.read', ['patient_id' => $id]);
+
         $patient = $this->patientRepository->findById($id);
 
         if (!$patient) {
@@ -109,8 +114,9 @@ class PatientController
     public function edit(): void
     {
         AuthGuard::check();
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('patients.write', ['patient_id' => $id]);
+
         $patient = $this->patientRepository->findById($id);
 
         if (!$patient) {
@@ -127,8 +133,9 @@ class PatientController
     public function update(): void
     {
         AuthGuard::check();
-
         $id = (int)($_GET['id'] ?? 0);
+        Gate::authorize('patients.write', ['patient_id' => $id]);
+
         $patient = $this->patientRepository->findById($id);
 
         if (!$patient) {
@@ -178,6 +185,7 @@ class PatientController
     public function exportCsv(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.read');
 
         $patients = $this->patientRepository->findAll();
 
@@ -195,6 +203,7 @@ class PatientController
     public function exportPatientsToJson(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.read');
 
         $patients = $this->patientRepository->findAll();
 
@@ -211,6 +220,7 @@ class PatientController
     public function importPatientsFromJson(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.write');
 
         // Handle GET request (display import form)
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -310,6 +320,7 @@ class PatientController
     public function toggleStatus(): void
     {
         AuthGuard::check();
+        Gate::authorize('patients.write');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
