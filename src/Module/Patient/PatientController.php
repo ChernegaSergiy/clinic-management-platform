@@ -11,12 +11,18 @@ use App\Core\JsonExporter;
 use App\Core\AuthGuard;
 use App\Core\Gate;
 use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Insurance\Service\InsuranceService;
+use App\Module\Insurance\Repository\InsuranceCompanyRepository;
+use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 
 class PatientController
 {
     private PatientRepository $patientRepository;
     private MedicalRecordRepository $medicalRecordRepository;
     private AppointmentRepository $appointmentRepository;
+    private InsuranceService $insuranceService;
+    private InsuranceCompanyRepository $insuranceCompanyRepository;
+    private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
 
     public function __construct()
     {
