@@ -271,6 +271,9 @@ class MedicalRecordController
         }
 
         $data = $_POST;
+        $data['patient_id'] = $record['patient_id'];
+        $data['appointment_id'] = $record['appointment_id'];
+        $data['doctor_id'] = $record['doctor_id'];
 
         $this->medicalRecordRepository->update(
             $id,
