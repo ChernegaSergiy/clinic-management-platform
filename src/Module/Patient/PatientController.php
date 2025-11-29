@@ -353,5 +353,71 @@ class PatientController
         exit();
     }
 
+    public function addPolicy(int $patientId): void
+    {
+        AuthGuard::check();
+        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+
+        $patient = $this->patientRepository->findById($patientId);
+        if (!$patient) {
+            http_response_code(404);
+            echo "Пацієнта не знайдено";
+            return;
+        }
+
+        $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
+
+        View::render('@modules/Patient/templates/add_policy.html.twig', [
+            'patient' => $patient,
+            'insurance_companies' => $insuranceCompanies,
+        ]);
+    }
+
+    public function storePolicy(int $patientId): void
+    {
+        AuthGuard::check();
+        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+
+        $patient = $this->patientRepository->findById($patientId);
+        if (!$patient) {
+            http_response_code(404);
+            echo "Пацієнта не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $rules = [
+            'insurance_company_id' => ['required'],
+            'policy_number' => ['required'],
+            'valid_from' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
+            View::render('@modules/Patient/templates/add_policy.html.twig', [
+                'errors' => $validator->getErrors(),
+                'old' => $_POST,
+                'patient' => $patient,
+                'insurance_companies' => $insuranceCompanies,
+            ]);
+            return;
+        }
+
+        $isActive = isset($_POST['is_active']);
+
+        $this->insuranceService->addPolicyToPatient(
+            $patientId,
+            (int)$_POST['insurance_company_id'],
+            $_POST['policy_number'],
+            $_POST['group_number'],
+            $_POST['valid_from'],
+            $_POST['valid_to'],
+            $isActive
+        );
+
+        header('Location: /patients/show?id=' . $patientId);
+        exit();
+    }
+
 
 }
