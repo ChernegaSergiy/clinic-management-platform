@@ -113,4 +113,43 @@
             </tbody>
         </table>
     </div>
+
+    <div class="ui segment">
+        <div class="ui clearing">
+            <h3 class="ui header left floated">Страхові поліси</h3>
+            <a href="/patients/{{ patient.id }}/policies/add" class="ui primary button right floated">Додати поліс</a>
+        </div>
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>Номер полісу</th>
+                    <th>Компанія</th>
+                    <th>Дійсний з</th>
+                    <th>Дійсний до</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in patient_policies %}
+                    <tr>
+                        <td>{{ policy.policy_number }}</td>
+                        <td>{{ policy.insurance_company_id }}</td>
+                        <td>{{ policy.valid_from|date('Y-m-d') }}</td>
+                        <td>{{ policy.valid_to|date('Y-m-d') }}</td>
+                        <td>{{ policy.is_active ? 'Активний' : 'Неактивний' }}</td>
+                        <td>
+                            <a href="/patients/{{ patient.id }}/policies/edit?id={{ policy.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає страхових полісів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
