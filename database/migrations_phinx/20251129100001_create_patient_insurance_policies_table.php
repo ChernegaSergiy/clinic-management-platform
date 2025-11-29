@@ -8,10 +8,6 @@ final class CreatePatientInsurancePoliciesTable extends AbstractMigration
 {
     public function change(): void
     {
-        if ($this->hasTable('patient_insurance_policies')) {
-            $this->table('patient_insurance_policies')->drop()->save();
-        }
-
         $table = $this->table('patient_insurance_policies');
         $table->addColumn('patient_id', 'integer', ['signed' => false])
               ->addColumn('insurance_company_id', 'integer', ['signed' => false])
