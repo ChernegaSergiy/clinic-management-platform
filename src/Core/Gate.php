@@ -9,12 +9,13 @@ use App\Module\Prescription\Repository\PrescriptionRepository;
 class Gate
 {
     private const ROLE_PERMISSIONS = [
-        'admin' => ['*'],
+        'admin' => ['*', 'system.manage'],
         'medical_manager' => [
             'dashboard.view',
             'dashboard.export',
             'patients.read_all',
             'appointments.read_all',
+            'appointments.read_analytics',
             'medical.read_all',
             'clinical.manage',
             'kpi.read',
@@ -25,6 +26,7 @@ class Gate
         'registrar' => [
             'patients.read_all',
             'patients.write',
+            'patients.manage',
             'appointments.read_all',
             'appointments.write',
             'billing.read',
@@ -58,6 +60,7 @@ class Gate
         'lab_technician' => [
             'lab.read_all',
             'lab.write_all',
+            'lab.manage',
             'notifications.read',
         ],
         'billing' => [
@@ -129,7 +132,7 @@ class Gate
                 if (in_array('patients.read_all', $permissions, true) && $ability === 'patients.read') {
                     return;
                 }
-                if (in_array('patients.write_all', $permissions, true) && $ability === 'patients.write') { // Assuming patients.write_all might exist
+                if (in_array('patients.manage', $permissions, true) && $ability === 'patients.write') {
                     return;
                 }
                 if (in_array('patients.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
@@ -144,7 +147,7 @@ class Gate
                 if (in_array('appointments.read_all', $permissions, true) && $ability === 'appointments.read') {
                     return;
                 }
-                if (in_array('appointments.write_all', $permissions, true) && $ability === 'appointments.write') { // Assuming appointments.write_all might exist
+                if (in_array('appointments.write', $permissions, true) && $ability === 'appointments.write') {
                     return;
                 }
                 if (in_array('appointments.read_assigned', $permissions, true) && isset($context['appointment_id']) && $userId) {
@@ -159,7 +162,7 @@ class Gate
                 if (in_array('medical.read_all', $permissions, true) && $ability === 'medical.read') {
                     return;
                 }
-                if (in_array('medical.write_all', $permissions, true) && $ability === 'medical.write') { // Assuming medical.write_all might exist
+                if (in_array('medical.write_assigned', $permissions, true) && $ability === 'medical.write') {
                     return;
                 }
                 if (in_array('medical.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
@@ -174,7 +177,7 @@ class Gate
                 if (in_array('lab.read_all', $permissions, true) && $ability === 'lab.read') {
                     return;
                 }
-                if (in_array('lab.write_all', $permissions, true) && $ability === 'lab.write') { // Assuming lab.write_all might exist
+                if (in_array('lab.write_all', $permissions, true) && $ability === 'lab.write') {
                     return;
                 }
                 if (in_array('lab.read_assigned', $permissions, true) && isset($context['lab_order_id']) && $userId) {
@@ -190,8 +193,10 @@ class Gate
                 if (in_array('prescriptions.read_all', $permissions, true) && $ability === 'prescriptions.read') {
                     return;
                 }
-                if (in_array('prescriptions.write_all', $permissions, true) && $ability === 'prescriptions.write') { // Assuming prescriptions.write_all might exist
-                    return;
+                if (in_array('prescriptions.write_assigned', $permissions, true) && $ability === 'prescriptions.write' && isset($context['patient_id']) && $userId) {
+                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
+                        return;
+                    }
                 }
                 if (in_array('prescriptions.read_assigned', $permissions, true) && isset($context['prescription_id']) && $userId) {
                     $prescription = self::prescriptionRepo()->findById((int)$context['prescription_id']);

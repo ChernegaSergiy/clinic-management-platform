@@ -952,6 +952,6 @@ class AdminController
     private function authorizeAdmin(): void
     {
         AuthGuard::check();
-        Gate::authorize('admin.manage');
+        Gate::authorize('system.manage');
     }
 }

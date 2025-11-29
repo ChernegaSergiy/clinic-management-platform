@@ -225,7 +225,7 @@ class PatientController
     public function importPatientsFromJson(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write_all');
+        Gate::authorize('patients.manage');
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             View::render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
@@ -323,7 +323,7 @@ class PatientController
     public function toggleStatus(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write_all');
+        Gate::authorize('patients.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);

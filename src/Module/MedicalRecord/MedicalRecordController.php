@@ -152,6 +152,15 @@ class MedicalRecordController
     public function show(): void
     {
         AuthGuard::check();
+        $id = (int)($_GET['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
         Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
 
         // Log the view event
@@ -177,7 +186,7 @@ class MedicalRecordController
     public function getIcdCodes(): void
     {
         AuthGuard::check();
-        Gate::authorize('clinical.read');
+        Gate::authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -189,7 +198,7 @@ class MedicalRecordController
     public function getInterventionCodes(): void
     {
         AuthGuard::check();
-        Gate::authorize('clinical.read');
+        Gate::authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -201,6 +210,15 @@ class MedicalRecordController
     public function edit(): void
     {
         AuthGuard::check();
+        $id = (int)($_GET['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
         Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         View::render('@modules/MedicalRecord/templates/edit.html.twig', [
@@ -214,6 +232,15 @@ class MedicalRecordController
     public function update(): void
     {
         AuthGuard::check();
+        $id = (int)($_POST['id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($id);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
         Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         if (!empty($_POST['visit_date'])) {
@@ -244,9 +271,10 @@ class MedicalRecordController
         }
 
         $data = $_POST;
-        $data['patient_id'] = $record['patient_id'];
-        $data['appointment_id'] = $record['appointment_id'];
-        $data['doctor_id'] = $record['doctor_id'];
+        // These should not be changed on update from the form
+        // $data['patient_id'] = $record['patient_id'];
+        // $data['appointment_id'] = $record['appointment_id'];
+        // $data['doctor_id'] = $record['doctor_id'];
 
         $this->medicalRecordRepository->update(
             $id,
@@ -260,6 +288,15 @@ class MedicalRecordController
     public function uploadAttachment(): void
     {
         AuthGuard::check();
+        $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
+        $record = $this->medicalRecordRepository->findById($medicalRecordId);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис не знайдено";
+            return;
+        }
+
         Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
@@ -289,19 +326,25 @@ class MedicalRecordController
     public function downloadAttachment(): void
     {
         AuthGuard::check();
-        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
-
+        $attachmentId = (int)($_GET['attachment_id'] ?? 0);
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
-        if (
-            !$attachment ||
-            $attachment['entity_type'] !== 'medical_record' ||
-            $attachment['entity_id'] !== $medicalRecordId
-        ) {
+        if (!$attachment || $attachment['entity_type'] !== 'medical_record') {
             http_response_code(404);
-            echo "Вкладення не знайдено або доступ заборонено";
+            echo "Вкладення не знайдено";
             return;
         }
+
+        $medicalRecordId = (int)$attachment['entity_id'];
+        $record = $this->medicalRecordRepository->findById($medicalRecordId);
+
+        if (!$record) {
+            http_response_code(404);
+            echo "Медичний запис, пов'язаний із вкладенням, не знайдено";
+            return;
+        }
+
+        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
 
         // Check ACL (simplified for now, assuming only uploader can download or public)
         // More complex ACL check would go here, using AttachmentService::checkViewAccess

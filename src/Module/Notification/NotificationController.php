@@ -70,6 +70,7 @@ class NotificationController
         Gate::authorize('notifications.read');
         $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
 
+        $id = (int)($_POST['id'] ?? 0);
         $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);
 
         header('Content-Type: application/json');
