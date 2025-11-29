@@ -271,10 +271,6 @@ class MedicalRecordController
         }
 
         $data = $_POST;
-        // These should not be changed on update from the form
-        // $data['patient_id'] = $record['patient_id'];
-        // $data['appointment_id'] = $record['appointment_id'];
-        // $data['doctor_id'] = $record['doctor_id'];
 
         $this->medicalRecordRepository->update(
             $id,
