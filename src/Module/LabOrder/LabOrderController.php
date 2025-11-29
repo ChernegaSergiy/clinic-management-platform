@@ -233,7 +233,7 @@ class LabOrderController
         }
 
         // Save the file temporarily for processing
-        $tempDir = __DIR__ . '/../../uploads/temp/';
+        $tempDir = dirname(__DIR__, 3) . '/uploads/temp/';
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0775, true);
         }

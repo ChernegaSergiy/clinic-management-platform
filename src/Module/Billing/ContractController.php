@@ -67,7 +67,7 @@ class ContractController
         // Handle file upload for contract document
         $filePath = null;
         if (isset($_FILES['contract_file']) && $_FILES['contract_file']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../uploads/contracts/';
+            $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0775, true);
             }
@@ -157,7 +157,7 @@ class ContractController
         // Handle file upload for contract document (if new file is uploaded)
         $filePath = $contract['file_path']; // Keep existing path by default
         if (isset($_FILES['contract_file']) && $_FILES['contract_file']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../uploads/contracts/';
+            $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0775, true);
             }
@@ -193,8 +193,8 @@ class ContractController
         }
 
         // Optionally, delete the physical file
-        if ($contract['file_path'] && file_exists(__DIR__ . '/../../' . $contract['file_path'])) {
-            unlink(__DIR__ . '/../../' . $contract['file_path']);
+        if ($contract['file_path'] && file_exists(dirname(__DIR__, 3) . '/' . $contract['file_path'])) {
+            unlink(dirname(__DIR__, 3) . '/' . $contract['file_path']);
         }
 
         $this->contractRepository->delete($id);
@@ -215,13 +215,13 @@ class ContractController
 
         $contract = $this->contractRepository->findById($id);
 
-        if (!$contract || !$contract['file_path'] || !file_exists(__DIR__ . '/../../' . $contract['file_path'])) {
+        if (!$contract || !$contract['file_path'] || !file_exists(dirname(__DIR__, 3) . '/' . $contract['file_path'])) {
             http_response_code(404);
             echo "Файл контракту не знайдено";
             return;
         }
 
-        $filePath = __DIR__ . '/../../' . $contract['file_path'];
+        $filePath = dirname(__DIR__, 3) . '/' . $contract['file_path'];
         $filename = basename($contract['file_path']);
         $mimeType = mime_content_type($filePath);
 
