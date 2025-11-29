@@ -128,10 +128,12 @@ class PatientController
         }
 
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
+        $patientPolicies = $this->patientInsurancePolicyRepository->findByPatientId($id);
 
         View::render('@modules/Patient/templates/show.html.twig', [
             'patient' => $patient,
             'medical_records' => $medicalRecords,
+            'patient_policies' => $patientPolicies,
         ]);
     }
 
