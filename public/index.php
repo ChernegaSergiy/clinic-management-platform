@@ -108,6 +108,8 @@ $router->add('GET', '/patients/export-csv', [PatientController::class, 'exportCs
 $router->add('GET', '/patients/export-json', [PatientController::class, 'exportPatientsToJson']);
 $router->add('GET', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
 $router->add('POST', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
+$router->add('GET', '/patients/{patientId}/policies/add', [PatientController::class, 'addPolicy']);
+$router->add('POST', '/patients/{patientId}/policies/store', [PatientController::class, 'storePolicy']);
 
 // Appointment routes
 $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
