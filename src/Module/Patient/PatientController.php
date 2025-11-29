@@ -24,20 +24,11 @@ class PatientController
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
 
-    public function __construct(
-        PatientRepository $patientRepository,
-        MedicalRecordRepository $medicalRecordRepository,
-        AppointmentRepository $appointmentRepository,
-        InsuranceService $insuranceService,
-        InsuranceCompanyRepository $insuranceCompanyRepository,
-        PatientInsurancePolicyRepository $patientInsurancePolicyRepository
-    ) {
-        $this->patientRepository = $patientRepository;
-        $this->medicalRecordRepository = $medicalRecordRepository;
-        $this->appointmentRepository = $appointmentRepository;
-        $this->insuranceService = $insuranceService;
-        $this->insuranceCompanyRepository = $insuranceCompanyRepository;
-        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
+    public function __construct()
+    {
+        $this->patientRepository = new PatientRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->appointmentRepository = new AppointmentRepository();
     }
 
     public function index(): void
