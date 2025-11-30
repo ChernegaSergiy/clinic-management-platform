@@ -112,6 +112,7 @@ $router->add('GET', '/patients/{patientId}/policies/add', [PatientController::cl
 $router->add('POST', '/patients/{patientId}/policies/store', [PatientController::class, 'storePolicy']);
 $router->add('GET', '/patients/{patientId}/policies/edit', [PatientController::class, 'editPolicy']);
 $router->add('POST', '/patients/{patientId}/policies/update', [PatientController::class, 'updatePolicy']);
+$router->add('POST', '/patients/{patientId}/policies/delete', [PatientController::class, 'deletePolicy']);
 
 // Appointment routes
 $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
