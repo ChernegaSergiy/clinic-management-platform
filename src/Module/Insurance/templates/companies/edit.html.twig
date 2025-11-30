@@ -1,0 +1,43 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Редагувати страхову компанію - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати страхову компанію: {{ company.name }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" action="/insurance/companies/edit?id={{ company.id }}" method="POST">
+            <div class="field">
+                <label>Назва</label>
+                <input type="text" name="name" placeholder="Назва компанії" value="{{ company.name }}" required>
+            </div>
+            <div class="field">
+                <label>Контактна особа</label>
+                <input type="text" name="contact_person" placeholder="ПІБ контактної особи" value="{{ company.contact_person }}">
+            </div>
+            <div class="field">
+                <label>Телефон</label>
+                <input type="text" name="phone" placeholder="Телефон" value="{{ company.phone }}">
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Email" value="{{ company.email }}">
+            </div>
+            <div class="field">
+                <label>Нотатки</label>
+                <textarea name="notes" rows="3">{{ company.notes }}</textarea>
+            </div>
+
+            <button class="ui primary button" type="submit">Оновити</button>
+            <a href="/insurance/companies" class="ui button">Скасувати</a>
+        </form>
+
+        <div class="ui divider"></div>
+
+        <form action="/insurance/companies/delete" method="POST">
+            <input type="hidden" name="id" value="{{ company.id }}">
+            <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?');">Видалити</button>
+        </form>
+    </div>
+{% endblock %}
