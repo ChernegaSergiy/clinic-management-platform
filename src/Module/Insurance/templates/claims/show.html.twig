@@ -1,0 +1,89 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Страховий кейс #{{ claim.id }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Страховий кейс #{{ claim.id }}</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">Деталі кейсу</h3>
+                <table class="ui definition table">
+                    <tbody>
+                        <tr>
+                            <td>ID</td>
+                            <td>{{ claim.id }}</td>
+                        </tr>
+                        <tr>
+                            <td>Статус</td>
+                            <td>{{ claim.status }}</td>
+                        </tr>
+                        <tr>
+                            <td>Сума до відшкодування</td>
+                            <td>{{ claim.total_claimed|number_format(2, ',', ' ') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Відшкодовано</td>
+                            <td>{{ claim.total_paid|number_format(2, ',', ' ') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Дата подання</td>
+                            <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : 'Не подано' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="eight wide column">
+                <h3 class="ui header">Пов'язана інформація</h3>
+                <table class="ui definition table">
+                    <tbody>
+                        <tr>
+                            <td>Рахунок</td>
+                            <td><a href="/billing/show?id={{ claim.invoice_id }}">Рахунок #{{ claim.invoice_id }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Пацієнт</td>
+                            <td><a href="/patients/show?id={{ claim.patient_id }}">{{ claim.patient_name }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Страхова компанія</td>
+                            <td>{{ claim.insurance_company_name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Змінити статус</h3>
+        <form class="ui form" action="/insurance/claims/update-status" method="POST">
+            <input type="hidden" name="id" value="{{ claim.id }}">
+            <div class="two fields">
+                <div class="field">
+                    <label>Новий статус</label>
+                    <select name="status" class="ui dropdown">
+                        <option value="draft" {{ claim.status == 'draft' ? 'selected' : '' }}>Чернетка (Draft)</option>
+                        <option value="submitted" {{ claim.status == 'submitted' ? 'selected' : '' }}>Подано (Submitted)</option>
+                        <option value="paid" {{ claim.status == 'paid' ? 'selected' : '' }}>Сплачено (Paid)</option>
+                        <option value="partially_paid" {{ claim.status == 'partially_paid' ? 'selected' : '' }}>Частково сплачено (Partially Paid)</option>
+                        <option value="denied" {{ claim.status == 'denied' ? 'selected' : '' }}>Відмовлено (Denied)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Сплачена сума (якщо є)</label>
+                    <input type="number" step="0.01" name="total_paid" placeholder="0.00" value="{{ claim.total_paid }}">
+                </div>
+            </div>
+             <div class="field">
+                <label>Дата подання (якщо змінюється)</label>
+                <input type="date" name="submitted_at" value="{{ claim.submitted_at|date('Y-m-d') }}">
+            </div>
+            <button class="ui primary button" type="submit">Оновити статус</button>
+            <a href="/insurance/claims" class="ui button">Повернутися до списку</a>
+        </form>
+
+    </div>
+{% endblock %}

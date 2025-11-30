@@ -46,6 +46,7 @@ class ClaimRepository
         $sql = "
             SELECT 
                 c.*,
+                pip.patient_id,
                 p.first_name,
                 p.last_name,
                 CONCAT(p.first_name, ' ', p.last_name) as patient_name,
