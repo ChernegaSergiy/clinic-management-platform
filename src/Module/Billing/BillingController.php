@@ -15,6 +15,10 @@ use App\Core\PdfExporter;
 use App\Core\ExcelExporter;
 use App\Core\AuthGuard;
 use App\Core\Gate;
+use App\Module\Insurance\Repository\ClaimRepository;
+use App\Module\Insurance\Repository\InsuranceCompanyRepository;
+use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
+use App\Module\Insurance\Service\InsuranceService;
 
 class BillingController
 {
@@ -24,15 +28,26 @@ class BillingController
     private MedicalRecordRepository $medicalRecordRepository;
     private ServiceRepository $serviceRepository;
     private ServiceBundleRepository $serviceBundleRepository;
+    private InsuranceService $insuranceService;
 
     public function __construct()
     {
-        $this->invoiceRepository = new InvoiceRepository();
-        $this->patientRepository = new PatientRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->serviceRepository = new ServiceRepository();
-        $this->serviceBundleRepository = new ServiceBundleRepository();
+        $database = \App\Database::getInstance();
+        $this->invoiceRepository = new InvoiceRepository($database);
+        $this->patientRepository = new PatientRepository($database);
+        $this->appointmentRepository = new AppointmentRepository($database);
+        $this->medicalRecordRepository = new MedicalRecordRepository($database);
+        $this->serviceRepository = new ServiceRepository($database);
+        $this->serviceBundleRepository = new ServiceBundleRepository($database);
+        
+        $insuranceCompanyRepository = new InsuranceCompanyRepository($database);
+        $patientInsurancePolicyRepository = new PatientInsurancePolicyRepository($database);
+        $claimRepository = new ClaimRepository($database);
+        $this->insuranceService = new InsuranceService(
+            $insuranceCompanyRepository,
+            $patientInsurancePolicyRepository,
+            $claimRepository
+        );
     }
 
     public function index(): void
