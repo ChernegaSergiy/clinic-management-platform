@@ -34,4 +34,45 @@ class InsuranceController
             'companies' => $companies,
         ]);
     }
+
+    public function create(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        View::render('@modules/Insurance/templates/companies/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function store(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        $validator = new \App\Core\Validator();
+        $rules = [
+            'name' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /insurance/companies/new');
+            exit();
+        }
+
+        $this->insuranceService->addInsuranceCompany(
+            $_POST['name'],
+            $_POST['contact_person'] ?? null,
+            $_POST['phone'] ?? null,
+            $_POST['email'] ?? null,
+            $_POST['notes'] ?? null
+        );
+
+        header('Location: /insurance/companies');
+        exit();
+    }
 }
