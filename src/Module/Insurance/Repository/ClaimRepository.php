@@ -43,7 +43,20 @@ class ClaimRepository
 
     public function findAll(): array
     {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM claims ORDER BY submitted_at DESC");
+        $sql = "
+            SELECT 
+                c.*,
+                p.first_name,
+                p.last_name,
+                CONCAT(p.first_name, ' ', p.last_name) as patient_name,
+                ic.name as insurance_company_name
+            FROM claims c
+            JOIN patient_insurance_policies pip ON c.patient_policy_id = pip.id
+            JOIN patients p ON pip.patient_id = p.id
+            JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
+            ORDER BY c.created_at DESC
+        ";
+        $stmt = $this->database->getConnection()->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

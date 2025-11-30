@@ -1,0 +1,47 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Страхові кейси - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Страхові кейси (Claims)</h2>
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Рахунок ID</th>
+                    <th>Пацієнт</th>
+                    <th>Компанія</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th>Дата подання</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                    <tr>
+                        <td>{{ claim.id }}</td>
+                        <td><a href="/billing/show?id={{ claim.invoice_id }}">{{ claim.invoice_id }}</a></td>
+                        <td>{{ claim.patient_name }}</td>
+                        <td>{{ claim.insurance_company_name }}</td>
+                        <td>{{ claim.total_claimed|number_format(2, ',', ' ') }}</td>
+                        <td>{{ claim.status }}</td>
+                        <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : '' }}</td>
+                        <td>
+                            <a href="/insurance/claims/show?id={{ claim.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="center aligned">Немає страхових кейсів для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
