@@ -419,5 +419,80 @@ class PatientController
         exit();
     }
 
+    public function editPolicy(int $patientId): void
+    {
+        AuthGuard::check();
+        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+
+        $policyId = (int)($_GET['id'] ?? 0);
+        $patient = $this->patientRepository->findById($patientId);
+        $policy = $this->insuranceService->getPatientPolicy($policyId);
+
+        if (!$patient || !$policy || $policy['patient_id'] != $patientId) {
+            http_response_code(404);
+            echo "Ресурс не знайдено";
+            return;
+        }
+
+        $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
+
+        View::render('@modules/Patient/templates/edit_policy.html.twig', [
+            'patient' => $patient,
+            'policy' => $policy,
+            'insurance_companies' => $insuranceCompanies,
+        ]);
+    }
+
+    public function updatePolicy(int $patientId): void
+    {
+        AuthGuard::check();
+        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+
+        $policyId = (int)($_GET['id'] ?? 0);
+        $patient = $this->patientRepository->findById($patientId);
+        $policy = $this->insuranceService->getPatientPolicy($policyId);
+
+        if (!$patient || !$policy || $policy['patient_id'] != $patientId) {
+            http_response_code(404);
+            echo "Ресурс не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $rules = [
+            'insurance_company_id' => ['required'],
+            'policy_number' => ['required'],
+            'valid_from' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
+            View::render('@modules/Patient/templates/edit_policy.html.twig', [
+                'errors' => $validator->getErrors(),
+                'old' => $_POST,
+                'patient' => $patient,
+                'policy' => array_merge($policy, $_POST),
+                'insurance_companies' => $insuranceCompanies,
+            ]);
+            return;
+        }
+
+        $isActive = isset($_POST['is_active']);
+
+        $this->insuranceService->updatePatientPolicy(
+            $policyId,
+            $patientId,
+            (int)$_POST['insurance_company_id'],
+            $_POST['policy_number'],
+            $_POST['group_number'],
+            $_POST['valid_from'],
+            $_POST['valid_to'],
+            $isActive
+        );
+
+        header('Location: /patients/show?id=' . $patientId);
+        exit();
+    }
+
 
 }
