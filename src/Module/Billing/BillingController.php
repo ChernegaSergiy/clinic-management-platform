@@ -217,7 +217,34 @@ class BillingController
             exit();
         }
 
-        $this->invoiceRepository->save($_POST);
+        $invoiceId = $this->invoiceRepository->save($_POST);
+
+        if ($invoiceId) {
+            $patientId = (int)$_POST['patient_id'];
+            $policies = $this->insuranceService->getPatientPolicies($patientId);
+            $activePolicy = null;
+            foreach ($policies as $policy) {
+                if ($policy['is_active']) {
+                    $activePolicy = $policy;
+                    break;
+                }
+            }
+
+            if ($activePolicy) {
+                $amount = (float)$_POST['amount'];
+                // Create a claim for the full amount
+                $this->insuranceService->createClaim($invoiceId, $activePolicy['id'], $amount);
+
+                // Update invoice with insurance and patient due amounts
+                // For now, let's assume insurance covers 100%
+                $this->invoiceRepository->updateInsuranceDue($invoiceId, $amount, 0.00);
+            } else {
+                // If no active policy, patient owes the full amount
+                $amount = (float)$_POST['amount'];
+                $this->invoiceRepository->updateInsuranceDue($invoiceId, 0.00, $amount);
+            }
+        }
+        
         $_SESSION['success_message'] = "Рахунок успішно створено.";
         header('Location: /billing');
         exit();
