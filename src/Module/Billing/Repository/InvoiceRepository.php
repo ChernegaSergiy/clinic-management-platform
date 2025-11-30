@@ -46,14 +46,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int
     {
         $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
                 VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
 
         $stmt = $this->pdo->prepare($sql);
 
-        $success = $stmt->execute([
+        $stmt->execute([
             ':patient_id' => $data['patient_id'],
             ':appointment_id' => $data['appointment_id'] ?? null,
             ':medical_record_id' => $data['medical_record_id'] ?? null,
@@ -62,7 +62,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ':notes' => $data['notes'] ?? null,
             ':type' => $data['type'] ?? 'invoice',
         ]);
-        return $success; // Return true on success, false on failure
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue): bool
+    {
+        $sql = "UPDATE invoices SET insurance_due = :insurance_due, patient_due = :patient_due WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':id' => $invoiceId,
+            ':insurance_due' => $insuranceDue,
+            ':patient_due' => $patientDue,
+        ]);
     }
 
     public function findById(int $id): ?array
