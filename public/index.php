@@ -211,6 +211,8 @@ $router->add('GET', '/insurance/companies/edit', [InsuranceController::class, 'e
 $router->add('POST', '/insurance/companies/edit', [InsuranceController::class, 'update']);
 $router->add('POST', '/insurance/companies/delete', [InsuranceController::class, 'delete']);
 $router->add('GET', '/insurance/claims', [InsuranceController::class, 'listClaims']);
+$router->add('GET', '/insurance/claims/show', [InsuranceController::class, 'showClaim']);
+$router->add('POST', '/insurance/claims/update-status', [InsuranceController::class, 'updateClaimStatus']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
