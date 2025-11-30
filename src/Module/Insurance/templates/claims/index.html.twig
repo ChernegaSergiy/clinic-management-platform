@@ -1,10 +1,14 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Страхові кейси - Клініка{% endblock %}
+{% block title %}Страхові вимоги - Клініка{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Страхові кейси (Claims)</h2>
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h2 class="ui header">Страхові вимоги (Claims)</h2>
+            </div>
+        </div>
         <div class="ui divider"></div>
 
         <table class="ui celled unstackable table">
@@ -28,7 +32,21 @@
                         <td>{{ claim.patient_name }}</td>
                         <td>{{ claim.insurance_company_name }}</td>
                         <td>{{ claim.total_claimed|number_format(2, ',', ' ') }}</td>
-                        <td>{{ claim.status }}</td>
+                        <td>
+                            {% set status_color = 'grey' %}
+                            {% if claim.status in ['paid', 'approved'] %}
+                                {% set status_color = 'green' %}
+                            {% elseif claim.status in ['denied', 'rejected'] %}
+                                {% set status_color = 'red' %}
+                            {% elseif claim.status in ['submitted', 'pending'] %}
+                                {% set status_color = 'orange' %}
+                            {% elseif claim.status == 'draft' %}
+                                {% set status_color = 'blue' %}
+                            {% endif %}
+                            <div class="ui {{ status_color }} label">
+                                {{ claim.status|capitalize }}
+                            </div>
+                        </td>
                         <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : '' }}</td>
                         <td>
                             <a href="/insurance/claims/show?id={{ claim.id }}" class="ui icon button">
@@ -38,7 +56,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="8" class="center aligned">Немає страхових кейсів для відображення.</td>
+                        <td colspan="8" class="center aligned">Немає страхових вимог для відображення.</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -4,10 +4,17 @@
 
 {% block body %}
     <div class="ui segment">
-        <div class="ui clearing">
-            <h2 class="ui header left floated">Страхові компанії</h2>
-            <a href="/insurance/companies/new" class="ui primary button right floated">Додати компанію</a>
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Страхові компанії</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/insurance/companies/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати компанію
+                </a>
+            </div>
         </div>
+
         <div class="ui divider"></div>
 
         <table class="ui celled unstackable table">
@@ -30,6 +37,9 @@
                         <td>{{ company.phone }}</td>
                         <td>{{ company.email }}</td>
                         <td>
+                            <a href="/insurance/companies/show?id={{ company.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
                             <a href="/insurance/companies/edit?id={{ company.id }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
