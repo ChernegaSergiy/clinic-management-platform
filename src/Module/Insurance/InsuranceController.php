@@ -34,6 +34,25 @@ class InsuranceController
         ]);
     }
 
+    public function show(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.read'); // Reusing billing read permission
+
+        $id = (int)($_GET['id'] ?? 0);
+        $company = $this->insuranceService->getInsuranceCompany($id);
+
+        if (!$company) {
+            http_response_code(404);
+            View::render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.']);
+            return;
+        }
+
+        View::render('@modules/Insurance/templates/companies/show.html.twig', [
+            'company' => $company,
+        ]);
+    }
+
     public function create(): void
     {
         AuthGuard::check();
