@@ -22,6 +22,14 @@
                     <td>{{ invoice.amount }}</td>
                 </tr>
                 <tr>
+                    <td>Сплачує страхова</td>
+                    <td>{{ invoice.insurance_due | number_format(2) }}</td>
+                </tr>
+                <tr>
+                    <td>Сплачує пацієнт</td>
+                    <td>{{ invoice.patient_due | number_format(2) }}</td>
+                </tr>
+                <tr>
                     <td>Статус</td>
                     <td>{{ invoice.status }}</td>
                 </tr>
