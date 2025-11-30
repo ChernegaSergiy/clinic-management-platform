@@ -44,5 +44,10 @@
             <button class="ui primary button" type="submit">Оновити</button>
             <a href="/patients/show?id={{ patient.id }}" class="ui button">Скасувати</a>
         </form>
+
+        <form action="/patients/{{ patient.id }}/policies/delete" method="POST" style="margin-top: 1em;">
+            <input type="hidden" name="id" value="{{ policy.id }}">
+            <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цей поліс?');">Видалити</button>
+        </form>
     </div>
 {% endblock %}
