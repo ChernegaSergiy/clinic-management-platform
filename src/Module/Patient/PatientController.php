@@ -494,5 +494,21 @@ class PatientController
         exit();
     }
 
+    public function deletePolicy(int $patientId): void
+    {
+        AuthGuard::check();
+        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+
+        $policyId = (int)($_POST['id'] ?? 0);
+        $policy = $this->insuranceService->getPatientPolicy($policyId);
+
+        if ($policy && $policy['patient_id'] == $patientId) {
+            $this->insuranceService->deletePatientPolicy($policyId);
+        }
+
+        header('Location: /patients/show?id=' . $patientId);
+        exit();
+    }
+
 
 }
