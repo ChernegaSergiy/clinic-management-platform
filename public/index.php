@@ -205,6 +205,8 @@ $router->add('GET', '/billing/contracts/{id}/download', [ContractController::cla
 
 // Insurance routes
 $router->add('GET', '/insurance/companies', [InsuranceController::class, 'index']);
+$router->add('GET', '/insurance/companies/new', [InsuranceController::class, 'create']);
+$router->add('POST', '/insurance/companies/new', [InsuranceController::class, 'store']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
