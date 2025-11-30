@@ -159,4 +159,39 @@ class InsuranceController
             'claims' => $claims,
         ]);
     }
+
+    public function showClaim(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.read');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $claim = $this->insuranceService->getClaimWithDetails($id);
+
+        if (!$claim) {
+            http_response_code(404);
+            echo "Кейс не знайдено";
+            return;
+        }
+
+        View::render('@modules/Insurance/templates/claims/show.html.twig', [
+            'claim' => $claim,
+        ]);
+    }
+
+    public function updateClaimStatus(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $status = $_POST['status'] ?? 'draft';
+        $totalPaid = !empty($_POST['total_paid']) ? (float)$_POST['total_paid'] : null;
+        $submittedAt = !empty($_POST['submitted_at']) ? $_POST['submitted_at'] : null;
+
+        $this->insuranceService->updateClaimStatus($id, $status, $submittedAt, $totalPaid);
+
+        header('Location: /insurance/claims/show?id=' . $id);
+        exit();
+    }
 }

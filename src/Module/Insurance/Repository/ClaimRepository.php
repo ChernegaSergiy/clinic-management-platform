@@ -27,7 +27,27 @@ class ClaimRepository
     public function findByInvoiceId(int $invoiceId): ?array
     {
         $stmt = $this->database->getConnection()->prepare("SELECT * FROM claims WHERE invoice_id = :invoice_id");
-        $stmt->bindParam(':invoice_id', $invoiceId);
+        return $result ?: null;
+    }
+
+    public function findByIdWithDetails(int $id): ?array
+    {
+        $sql = "
+            SELECT 
+                c.*,
+                pip.patient_id,
+                p.first_name,
+                p.last_name,
+                CONCAT(p.first_name, ' ', p.last_name) as patient_name,
+                ic.name as insurance_company_name
+            FROM claims c
+            JOIN patient_insurance_policies pip ON c.patient_policy_id = pip.id
+            JOIN patients p ON pip.patient_id = p.id
+            JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
+            WHERE c.id = :id
+        ";
+        $stmt = $this->database->getConnection()->prepare($sql);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $result ?: null;

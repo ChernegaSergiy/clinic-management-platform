@@ -84,6 +84,11 @@ class InsuranceService
         return $this->claimRepository->findById($id);
     }
 
+    public function getClaimWithDetails(int $id): ?array
+    {
+        return $this->claimRepository->findByIdWithDetails($id);
+    }
+
     public function getClaimsForInvoice(int $invoiceId): ?array
     {
         return $this->claimRepository->findByInvoiceId($invoiceId);
