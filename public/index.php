@@ -210,6 +210,7 @@ $router->add('POST', '/insurance/companies/new', [InsuranceController::class, 's
 $router->add('GET', '/insurance/companies/edit', [InsuranceController::class, 'edit']);
 $router->add('POST', '/insurance/companies/edit', [InsuranceController::class, 'update']);
 $router->add('POST', '/insurance/companies/delete', [InsuranceController::class, 'delete']);
+$router->add('GET', '/insurance/claims', [InsuranceController::class, 'listClaims']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
