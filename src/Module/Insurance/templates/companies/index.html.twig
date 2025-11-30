@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Страхові компанії - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui clearing">
+            <h2 class="ui header left floated">Страхові компанії</h2>
+            <a href="/insurance/companies/new" class="ui primary button right floated">Додати компанію</a>
+        </div>
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Контактна особа</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                    <tr>
+                        <td>{{ company.id }}</td>
+                        <td>{{ company.name }}</td>
+                        <td>{{ company.contact_person }}</td>
+                        <td>{{ company.phone }}</td>
+                        <td>{{ company.email }}</td>
+                        <td>
+                            <a href="/insurance/companies/edit?id={{ company.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає страхових компаній для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
