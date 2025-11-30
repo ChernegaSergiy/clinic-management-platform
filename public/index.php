@@ -110,6 +110,8 @@ $router->add('GET', '/patients/import-json', [PatientController::class, 'importP
 $router->add('POST', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
 $router->add('GET', '/patients/{patientId}/policies/add', [PatientController::class, 'addPolicy']);
 $router->add('POST', '/patients/{patientId}/policies/store', [PatientController::class, 'storePolicy']);
+$router->add('GET', '/patients/{patientId}/policies/edit', [PatientController::class, 'editPolicy']);
+$router->add('POST', '/patients/{patientId}/policies/update', [PatientController::class, 'updatePolicy']);
 
 // Appointment routes
 $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
