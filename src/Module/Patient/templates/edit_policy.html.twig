@@ -1,0 +1,48 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Редагувати страховий поліс - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати страховий поліс для пацієнта: {{ patient.last_name }} {{ patient.first_name }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" action="/patients/{{ patient.id }}/policies/update?id={{ policy.id }}" method="POST">
+            <div class="field">
+                <label>Страхова компанія</label>
+                <select name="insurance_company_id" class="ui dropdown">
+                    {% for company in insurance_companies %}
+                        <option value="{{ company.id }}" {{ company.id == policy.insurance_company_id ? 'selected' : '' }}>{{ company.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Номер полісу</label>
+                <input type="text" name="policy_number" placeholder="Номер полісу" value="{{ policy.policy_number }}" required>
+            </div>
+            <div class="field">
+                <label>Номер групи</label>
+                <input type="text" name="group_number" placeholder="Номер групи" value="{{ policy.group_number }}">
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Дійсний з</label>
+                    <input type="date" name="valid_from" value="{{ policy.valid_from|date('Y-m-d') }}" required>
+                </div>
+                <div class="field">
+                    <label>Дійсний до</label>
+                    <input type="date" name="valid_to" value="{{ policy.valid_to|date('Y-m-d') }}">
+                </div>
+            </div>
+            <div class="inline field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="is_active" {{ policy.is_active ? 'checked' : '' }}>
+                    <label>Активний</label>
+                </div>
+            </div>
+
+            <button class="ui primary button" type="submit">Оновити</button>
+            <a href="/patients/show?id={{ patient.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
