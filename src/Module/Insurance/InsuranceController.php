@@ -75,4 +75,76 @@ class InsuranceController
         header('Location: /insurance/companies');
         exit();
     }
+
+    public function edit(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $company = $this->insuranceService->getInsuranceCompany($id);
+
+        if (!$company) {
+            http_response_code(404);
+            echo "Компанію не знайдено";
+            return;
+        }
+
+        View::render('@modules/Insurance/templates/companies/edit.html.twig', [
+            'company' => $company,
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['errors']);
+    }
+
+    public function update(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $company = $this->insuranceService->getInsuranceCompany($id);
+
+        if (!$company) {
+            http_response_code(404);
+            echo "Компанію не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator();
+        $rules = [
+            'name' => ['required'],
+        ];
+
+        if (!$validator->validate($_POST, $rules)) {
+            $_SESSION['errors'] = $validator->getErrors();
+            // Redirect back to edit form
+            header('Location: /insurance/companies/edit?id=' . $id);
+            exit();
+        }
+
+        $this->insuranceService->updateInsuranceCompany(
+            $id,
+            $_POST['name'],
+            $_POST['contact_person'] ?? null,
+            $_POST['phone'] ?? null,
+            $_POST['email'] ?? null,
+            $_POST['notes'] ?? null
+        );
+
+        header('Location: /insurance/companies');
+        exit();
+    }
+
+    public function delete(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.manage');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->insuranceService->deleteInsuranceCompany($id);
+
+        header('Location: /insurance/companies');
+        exit();
+    }
 }
