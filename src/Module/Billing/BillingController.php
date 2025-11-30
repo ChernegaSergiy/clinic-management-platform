@@ -15,6 +15,10 @@ use App\Core\PdfExporter;
 use App\Core\ExcelExporter;
 use App\Core\AuthGuard;
 use App\Core\Gate;
+use App\Module\Insurance\Repository\ClaimRepository;
+use App\Module\Insurance\Repository\InsuranceCompanyRepository;
+use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
+use App\Module\Insurance\Service\InsuranceService;
 
 class BillingController
 {
@@ -24,6 +28,7 @@ class BillingController
     private MedicalRecordRepository $medicalRecordRepository;
     private ServiceRepository $serviceRepository;
     private ServiceBundleRepository $serviceBundleRepository;
+    private InsuranceService $insuranceService;
 
     public function __construct()
     {
@@ -33,6 +38,13 @@ class BillingController
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->serviceRepository = new ServiceRepository();
         $this->serviceBundleRepository = new ServiceBundleRepository();
+        
+        $database = \App\Database::getInstance();
+        $this->insuranceService = new InsuranceService(
+            new InsuranceCompanyRepository($database),
+            new PatientInsurancePolicyRepository($database),
+            new ClaimRepository($database)
+        );
     }
 
     public function index(): void
