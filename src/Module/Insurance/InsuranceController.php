@@ -15,11 +15,10 @@ class InsuranceController
 
     public function __construct()
     {
-        $database = \App\Database::getInstance();
         $this->insuranceService = new InsuranceService(
-            new \App\Module\Insurance\Repository\InsuranceCompanyRepository($database),
-            new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository($database),
-            new \App\Module\Insurance\Repository\ClaimRepository($database)
+            new \App\Module\Insurance\Repository\InsuranceCompanyRepository(),
+            new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository(),
+            new \App\Module\Insurance\Repository\ClaimRepository()
         );
     }
 

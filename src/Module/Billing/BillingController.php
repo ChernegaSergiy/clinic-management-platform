@@ -39,11 +39,10 @@ class BillingController
         $this->serviceRepository = new ServiceRepository();
         $this->serviceBundleRepository = new ServiceBundleRepository();
         
-        $database = \App\Database::getInstance();
         $this->insuranceService = new InsuranceService(
-            new InsuranceCompanyRepository($database),
-            new PatientInsurancePolicyRepository($database),
-            new ClaimRepository($database)
+            new InsuranceCompanyRepository(),
+            new PatientInsurancePolicyRepository(),
+            new ClaimRepository()
         );
     }
 

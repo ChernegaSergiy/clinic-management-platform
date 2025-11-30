@@ -8,25 +8,19 @@ use App\Database;
 
 class ClaimRepository
 {
-    private Database $database;
+    private \PDO $pdo;
 
-    public function __construct(Database $database)
+    public function __construct()
     {
-        $this->database = $database;
+        $this->pdo = Database::getInstance();
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM claims WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT * FROM claims WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $result ?: null;
-    }
-
-    public function findByInvoiceId(int $invoiceId): ?array
-    {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM claims WHERE invoice_id = :invoice_id");
         return $result ?: null;
     }
 
@@ -46,8 +40,17 @@ class ClaimRepository
             JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
             WHERE c.id = :id
         ";
-        $stmt = $this->database->getConnection()->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+    public function findByInvoiceId(int $invoiceId): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM claims WHERE invoice_id = :invoice_id");
+        $stmt->bindParam(':invoice_id', $invoiceId);
         $stmt->execute();
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $result ?: null;
@@ -55,7 +58,7 @@ class ClaimRepository
 
     public function findByPatientPolicyId(int $patientPolicyId): array
     {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM claims WHERE patient_policy_id = :patient_policy_id");
+        $stmt = $this->pdo->prepare("SELECT * FROM claims WHERE patient_policy_id = :patient_policy_id");
         $stmt->bindParam(':patient_policy_id', $patientPolicyId);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -77,14 +80,14 @@ class ClaimRepository
             JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
             ORDER BY c.created_at DESC
         ";
-        $stmt = $this->database->getConnection()->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function create(int $invoiceId, int $patientPolicyId, string $status, float $totalClaimed, ?string $submittedAt = null): int
     {
-        $stmt = $this->database->getConnection()->prepare("
+        $stmt = $this->pdo->prepare("
             INSERT INTO claims (invoice_id, patient_policy_id, status, submitted_at, total_claimed, created_at, updated_at)
             VALUES (:invoice_id, :patient_policy_id, :status, :submitted_at, :total_claimed, NOW(), NOW())
         ");
@@ -94,12 +97,12 @@ class ClaimRepository
         $stmt->bindParam(':submitted_at', $submittedAt);
         $stmt->bindParam(':total_claimed', $totalClaimed);
         $stmt->execute();
-        return (int) $this->database->getConnection()->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function update(int $id, string $status, ?string $submittedAt = null, ?float $totalPaid = null): bool
     {
-        $stmt = $this->database->getConnection()->prepare("
+        $stmt = $this->pdo->prepare("
             UPDATE claims
             SET status = :status, submitted_at = :submitted_at, total_paid = :total_paid, updated_at = NOW()
             WHERE id = :id

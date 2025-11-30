@@ -8,16 +8,16 @@ use App\Database;
 
 class InsuranceCompanyRepository
 {
-    private Database $database;
+    private \PDO $pdo;
 
-    public function __construct(Database $database)
+    public function __construct()
     {
-        $this->database = $database;
+        $this->pdo = Database::getInstance();
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM insurance_companies WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT * FROM insurance_companies WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -26,14 +26,14 @@ class InsuranceCompanyRepository
 
     public function findAll(): array
     {
-        $stmt = $this->database->getConnection()->prepare("SELECT * FROM insurance_companies");
+        $stmt = $this->pdo->prepare("SELECT * FROM insurance_companies");
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function create(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): int
     {
-        $stmt = $this->database->getConnection()->prepare("
+        $stmt = $this->pdo->prepare("
             INSERT INTO insurance_companies (name, contact_person, phone, email, notes, created_at, updated_at)
             VALUES (:name, :contact_person, :phone, :email, :notes, NOW(), NOW())
         ");
@@ -43,12 +43,12 @@ class InsuranceCompanyRepository
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':notes', $notes);
         $stmt->execute();
-        return (int) $this->database->getConnection()->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function update(int $id, string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): bool
     {
-        $stmt = $this->database->getConnection()->prepare("
+        $stmt = $this->pdo->prepare("
             UPDATE insurance_companies
             SET name = :name, contact_person = :contact_person, phone = :phone, email = :email, notes = :notes, updated_at = NOW()
             WHERE id = :id
@@ -64,7 +64,7 @@ class InsuranceCompanyRepository
 
     public function delete(int $id): bool
     {
-        $stmt = $this->database->getConnection()->prepare("DELETE FROM insurance_companies WHERE id = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM insurance_companies WHERE id = :id");
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }

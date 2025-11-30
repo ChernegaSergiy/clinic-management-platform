@@ -26,16 +26,15 @@ class PatientController
 
     public function __construct()
     {
-        $database = \App\Database::getInstance();
-        $this->patientRepository = new PatientRepository($database);
-        $this->medicalRecordRepository = new MedicalRecordRepository($database);
-        $this->appointmentRepository = new AppointmentRepository($database);
-        $this->insuranceCompanyRepository = new \App\Module\Insurance\Repository\InsuranceCompanyRepository($database);
-        $this->patientInsurancePolicyRepository = new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository($database);
+        $this->patientRepository = new PatientRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->appointmentRepository = new AppointmentRepository();
+        $this->insuranceCompanyRepository = new \App\Module\Insurance\Repository\InsuranceCompanyRepository();
+        $this->patientInsurancePolicyRepository = new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository();
         $this->insuranceService = new \App\Module\Insurance\Service\InsuranceService(
             $this->insuranceCompanyRepository,
             $this->patientInsurancePolicyRepository,
-            new \App\Module\Insurance\Repository\ClaimRepository($database)
+            new \App\Module\Insurance\Repository\ClaimRepository()
         );
     }
 
