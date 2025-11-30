@@ -147,4 +147,16 @@ class InsuranceController
         header('Location: /insurance/companies');
         exit();
     }
+
+    public function listClaims(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('billing.read'); // Reuse billing permission
+
+        $claims = $this->insuranceService->getAllClaims();
+
+        View::render('@modules/Insurance/templates/claims/index.html.twig', [
+            'claims' => $claims,
+        ]);
+    }
 }
