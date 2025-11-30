@@ -21,6 +21,7 @@ use App\Controller\InstallController;
 use App\Module\Admin\KpiController;
 use App\Module\ClinicalReference\ClinicalReferenceController;
 use App\Module\Notification\NotificationController;
+use App\Module\Insurance\InsuranceController;
 use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
@@ -201,6 +202,9 @@ $router->add('GET', '/billing/contracts/edit', [ContractController::class, 'edit
 $router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
 $router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
 $router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
+
+// Insurance routes
+$router->add('GET', '/insurance/companies', [InsuranceController::class, 'index']);
 
 // Admin routes
 $router->add('GET', '/admin/users', [AdminController::class, 'users']);
