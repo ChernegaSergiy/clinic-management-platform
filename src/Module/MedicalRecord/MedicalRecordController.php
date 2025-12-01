@@ -60,20 +60,21 @@ class MedicalRecordController
     public function index(): void
     {
         AuthGuard::check();
+        $searchTerm = $_GET['search'] ?? '';
         $currentUserId = $_SESSION['user']['id'] ?? 0;
         $records = [];
 
         if (Gate::allows('medical.read_all')) {
-            $records = $this->medicalRecordRepository->findAll();
+            $records = $this->medicalRecordRepository->findAll($searchTerm);
         } elseif (Gate::allows('medical.read_assigned')) {
             if ($currentUserId) {
-                $records = $this->medicalRecordRepository->findByDoctorId((int)$currentUserId);
+                $records = $this->medicalRecordRepository->findByDoctorId((int)$currentUserId, $searchTerm);
             }
         }
-        // If neither permission is allowed, $records remains an empty array.
 
         View::render('@modules/MedicalRecord/templates/index.html.twig', [
             'records' => $records,
+            'searchTerm' => $searchTerm,
         ]);
     }
 
