@@ -6,7 +6,9 @@ namespace App\Module\Insurance;
 
 use App\Core\AuthGuard;
 use App\Core\Gate;
+use App\Core\Validator;
 use App\Core\View;
+use App\Database;
 use App\Module\Insurance\Service\InsuranceService;
 
 class InsuranceController
@@ -70,7 +72,7 @@ class InsuranceController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validator();
+        $validator = new Validator(\App\Database::getInstance());
         $rules = [
             'name' => ['required'],
         ];
@@ -129,7 +131,7 @@ class InsuranceController
             return;
         }
 
-        $validator = new \App\Core\Validator();
+        $validator = new Validator(\App\Database::getInstance());
         $rules = [
             'name' => ['required'],
         ];
