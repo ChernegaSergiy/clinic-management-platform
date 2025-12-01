@@ -32,9 +32,9 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("
+        $sql = "
             SELECT 
                 mr.*,
                 CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
@@ -42,14 +42,26 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             FROM medical_records mr
             JOIN users u ON mr.doctor_id = u.id
             JOIN patients p ON mr.patient_id = p.id
-            ORDER BY mr.visit_date DESC
-        ");
+        ";
+
+        $params = [];
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE CONCAT(p.last_name, ' ', p.first_name) LIKE :searchTerm 
+                      OR CONCAT(u.last_name, ' ', u.first_name) LIKE :searchTerm
+                      OR mr.diagnosis_code LIKE :searchTerm";
+            $params[':searchTerm'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY mr.visit_date DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
-    public function findByDoctorId(int $doctorId): array
+    public function findByDoctorId(int $doctorId, string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->prepare("
+        $sql = "
             SELECT 
                 mr.*,
                 CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
@@ -58,9 +70,19 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             JOIN users u ON mr.doctor_id = u.id
             JOIN patients p ON mr.patient_id = p.id
             WHERE mr.doctor_id = :doctor_id
-            ORDER BY mr.visit_date DESC
-        ");
-        $stmt->execute([':doctor_id' => $doctorId]);
+        ";
+
+        $params = [':doctor_id' => $doctorId];
+
+        if (!empty($searchTerm)) {
+            $sql .= " AND (CONCAT(p.last_name, ' ', p.first_name) LIKE :searchTerm OR mr.diagnosis_code LIKE :searchTerm)";
+            $params[':searchTerm'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY mr.visit_date DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
