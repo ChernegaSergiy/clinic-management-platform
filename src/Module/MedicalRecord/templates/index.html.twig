@@ -8,6 +8,15 @@
         <h2 class="ui header">Медичні записи</h2>
         <div class="ui divider"></div>
 
+        <form class="ui form" method="GET" action="/medical-records">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" name="search" placeholder="Пошук за пацієнтом, лікарем, діагнозом..." value="{{ searchTerm ?? '' }}">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
