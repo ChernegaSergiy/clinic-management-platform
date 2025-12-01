@@ -115,10 +115,17 @@
     </div>
 
     <div class="ui segment">
-        <div class="ui clearing">
-            <h3 class="ui header left floated">Страхові поліси</h3>
-            <a href="/patients/{{ patient.id }}/policies/add" class="ui primary button right floated">Додати поліс</a>
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">Страхові поліси</h3>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/patients/{{ patient.id }}/policies/add" class="ui primary button">
+                    <i class="plus icon"></i> Додати поліс
+                </a>
+            </div>
         </div>
+        <div class="ui divider"></div>
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
