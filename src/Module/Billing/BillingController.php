@@ -42,7 +42,8 @@ class BillingController
         $this->insuranceService = new InsuranceService(
             new InsuranceCompanyRepository(),
             new PatientInsurancePolicyRepository(),
-            new ClaimRepository()
+            new ClaimRepository(),
+            $this->invoiceRepository
         );
     }
 

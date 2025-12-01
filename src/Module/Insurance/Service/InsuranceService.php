@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance\Service;
 
+use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
@@ -13,15 +14,18 @@ class InsuranceService
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
     private ClaimRepository $claimRepository;
+    private InvoiceRepository $invoiceRepository;
 
     public function __construct(
         InsuranceCompanyRepository $insuranceCompanyRepository,
         PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
-        ClaimRepository $claimRepository
+        ClaimRepository $claimRepository,
+        InvoiceRepository $invoiceRepository
     ) {
         $this->insuranceCompanyRepository = $insuranceCompanyRepository;
         $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
         $this->claimRepository = $claimRepository;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function addInsuranceCompany(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): int
@@ -106,6 +110,20 @@ class InsuranceService
 
     public function updateClaimStatus(int $id, string $status, ?string $submittedAt = null, ?float $totalPaid = null): bool
     {
-        return $this->claimRepository->update($id, $status, $submittedAt, $totalPaid);
+        $success = $this->claimRepository->update($id, $status, $submittedAt, $totalPaid);
+
+        if ($success && $status === 'paid' && $totalPaid > 0) {
+            $claim = $this->claimRepository->findById($id);
+            if ($claim) {
+                $this->invoiceRepository->addPayment(
+                    (int)$claim['invoice_id'],
+                    $totalPaid,
+                    'insurance',
+                    'claim_id:' . $id
+                );
+            }
+        }
+
+        return $success;
     }
 }

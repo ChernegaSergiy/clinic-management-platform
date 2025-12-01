@@ -10,6 +10,7 @@ use App\Core\Validator;
 use App\Core\View;
 use App\Database;
 use App\Module\Insurance\Service\InsuranceService;
+use App\Module\Billing\Repository\InvoiceRepository;
 
 class InsuranceController
 {
@@ -20,7 +21,8 @@ class InsuranceController
         $this->insuranceService = new InsuranceService(
             new \App\Module\Insurance\Repository\InsuranceCompanyRepository(),
             new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository(),
-            new \App\Module\Insurance\Repository\ClaimRepository()
+            new \App\Module\Insurance\Repository\ClaimRepository(),
+            new InvoiceRepository()
         );
     }
 
