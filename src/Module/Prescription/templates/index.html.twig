@@ -13,6 +13,15 @@
 
         <div class="ui divider"></div>
 
+        <form class="ui form" method="GET" action="/prescriptions">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" name="search" placeholder="Пошук за пацієнтом чи лікарем..." value="{{ searchTerm ?? '' }}">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
