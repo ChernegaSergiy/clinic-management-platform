@@ -32,24 +32,21 @@ class PrescriptionController
     public function index(): void
     {
         AuthGuard::check();
+        $searchTerm = $_GET['search'] ?? '';
         $currentUserId = $_SESSION['user']['id'] ?? 0;
         $prescriptions = [];
 
         if (Gate::allows('prescriptions.read_all')) {
-            $prescriptions = $this->prescriptionRepository->findAll();
+            $prescriptions = $this->prescriptionRepository->findAll($searchTerm);
         } elseif (Gate::allows('prescriptions.read_assigned')) {
-            // Need a findByDoctorId in PrescriptionRepository
             if ($currentUserId) {
-                // Assuming prescriptions are linked to medical records or patients assigned to a doctor
-                // For simplicity, let's assume a doctor can only read prescriptions they issued
-                // Or if prescriptions are tied to a patient and doctor has access to that patient
-                $prescriptions = $this->prescriptionRepository->findByDoctorId($currentUserId); // This method needs to be added to the repository
+                $prescriptions = $this->prescriptionRepository->findByDoctorId($currentUserId, $searchTerm);
             }
         }
-        // If neither permission is allowed, $prescriptions remains an empty array.
 
         View::render('@modules/Prescription/templates/index.html.twig', [
             'prescriptions' => $prescriptions,
+            'searchTerm' => $searchTerm,
         ]);
     }
 
