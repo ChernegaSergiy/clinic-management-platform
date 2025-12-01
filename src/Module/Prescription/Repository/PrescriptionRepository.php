@@ -14,9 +14,9 @@ class PrescriptionRepository
         $this->pdo = Database::getInstance();
     }
 
-    public function findAll(): array
+    public function findAll(string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->query("
+        $sql = "
             SELECT
                 p.id,
                 CONCAT(pat.last_name, ' ', pat.first_name) as patient_name,
@@ -26,8 +26,19 @@ class PrescriptionRepository
             FROM prescriptions p
             JOIN patients pat ON p.patient_id = pat.id
             JOIN users doc ON p.doctor_id = doc.id
-            ORDER BY p.issue_date DESC
-        ");
+        ";
+
+        $params = [];
+        if (!empty($searchTerm)) {
+            $sql .= " WHERE CONCAT(pat.last_name, ' ', pat.first_name) LIKE :searchTerm 
+                      OR CONCAT(doc.last_name, ' ', doc.first_name) LIKE :searchTerm";
+            $params[':searchTerm'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY p.issue_date DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -131,20 +142,27 @@ class PrescriptionRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function findByDoctorId(int $doctorId): array
+    public function findByDoctorId(int $doctorId, string $searchTerm = ''): array
     {
-        $stmt = $this->pdo->prepare(
-            "SELECT "
-            . "p.id, p.issue_date, p.expiry_date, "
-            . "CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, "
-            . "CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name "
-            . "FROM prescriptions p "
-            . "JOIN patients pat ON p.patient_id = pat.id "
-            . "JOIN users doc ON p.doctor_id = doc.id "
-            . "WHERE p.doctor_id = :doctor_id "
-            . "ORDER BY p.issue_date DESC"
-        );
-        $stmt->execute([':doctor_id' => $doctorId]);
+        $sql = "SELECT p.id, p.issue_date, p.expiry_date, 
+                       CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, 
+                       CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name 
+                FROM prescriptions p 
+                JOIN patients pat ON p.patient_id = pat.id 
+                JOIN users doc ON p.doctor_id = doc.id 
+                WHERE p.doctor_id = :doctor_id";
+
+        $params = [':doctor_id' => $doctorId];
+
+        if (!empty($searchTerm)) {
+            $sql .= " AND (CONCAT(pat.last_name, ' ', pat.first_name) LIKE :searchTerm)";
+            $params[':searchTerm'] = '%' . $searchTerm . '%';
+        }
+
+        $sql .= " ORDER BY p.issue_date DESC";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
