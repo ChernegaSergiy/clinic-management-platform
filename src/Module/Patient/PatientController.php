@@ -11,6 +11,7 @@ use App\Core\JsonExporter;
 use App\Core\AuthGuard;
 use App\Core\Gate;
 use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
@@ -34,7 +35,8 @@ class PatientController
         $this->insuranceService = new \App\Module\Insurance\Service\InsuranceService(
             $this->insuranceCompanyRepository,
             $this->patientInsurancePolicyRepository,
-            new \App\Module\Insurance\Repository\ClaimRepository()
+            new \App\Module\Insurance\Repository\ClaimRepository(),
+            new InvoiceRepository()
         );
     }
 
