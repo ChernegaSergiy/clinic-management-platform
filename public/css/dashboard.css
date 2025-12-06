@@ -62,6 +62,9 @@ body {
 
 .ui.mobile.only.grid .ui.menu .ui.vertical.menu {
     display: none;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    width: 100%;
 }
 
 .dashboard-card__fa {
