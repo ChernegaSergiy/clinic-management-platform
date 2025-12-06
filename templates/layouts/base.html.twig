@@ -14,6 +14,7 @@
         {% set canInventory = role in ['admin','inventory_manager'] %}
         {% set canBilling = role in ['admin','billing'] %}
         {% set canAdminNav = role in ['admin'] %}
+        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
 
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
@@ -22,6 +23,7 @@
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
         {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
+        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}<a class="item" href="/admin/users">Користувачі</a>{% endif %}
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
@@ -50,6 +52,7 @@
         {% set canInventory = role in ['admin','inventory_manager'] %}
         {% set canBilling = role in ['admin','billing'] %}
         {% set canAdminNav = role in ['admin'] %}
+        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
 
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
@@ -63,6 +66,7 @@
             <a class="item" href="/insurance/companies">Страх. Компанії</a>
             <a class="item" href="/insurance/claims">Страх. Вимоги</a>
         {% endif %}
+        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}
             <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
             <a class="item" href="/admin/users">Користувачі</a>
@@ -98,6 +102,7 @@
         {% set canInventory = role in ['admin','inventory_manager'] %}
         {% set canBilling = role in ['admin','billing'] %}
         {% set canAdminNav = role in ['admin'] %}
+        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
 
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
@@ -111,6 +116,7 @@
             <a class="item" href="/insurance/companies">Страх. Компанії</a>
             <a class="item" href="/insurance/claims">Страх. Вимоги</a>
         {% endif %}
+        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}
             <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
             <a class="item" href="/admin/users">Користувачі</a>
