@@ -15,21 +15,82 @@
                     <p>{{ successMessage }}</p>
                 </div>
             {% endif %}
-
-            <div class="ui list">
-                <div class="item">
-                    <i class="user icon"></i>
-                    <div class="content">
-                        <strong>Ім'я:</strong> {{ user.first_name }} {{ user.last_name }}
-                    </div>
+             {% if session.error_message %}
+                <div class="ui error message">
+                    <i class="close icon"></i>
+                    <div class="header">Помилка!</div>
+                    <p>{{ session.error_message }}</p>
                 </div>
-                <div class="item">
-                    <i class="envelope icon"></i>
-                    <div class="content">
-                        <strong>Email:</strong> {{ user.email }}
+                 {% set _ = session.error_message is null %}
+            {% endif %}
+
+            <div class="ui grid">
+                <div class="four wide column">
+                    {% if user.profile_photo_path %}
+                        <img class="ui medium circular image" src="{{ user.profile_photo_path }}" style="object-fit: cover; aspect-ratio: 1 / 1;" alt="Профільне фото">
+                    {% else %}
+                        <img class="ui medium circular image" src="/assets/images/default_user.png" alt="Профільне фото">
+                    {% endif %}
+                    <form action="/user/profile/upload-photo" method="POST" enctype="multipart/form-data" class="ui form" style="margin-top: 15px;">
+                        <div class="field">
+                            <label>Змінити фото</label>
+                            <div class="ui action input">
+                                <input type="text" id="photo-display" readonly placeholder="Файл не обрано">
+                                <label for="photo-upload" class="ui icon button"><i class="upload icon"></i></label>
+                            </div>
+                            <input type="file" id="photo-upload" name="profile_photo" style="display: none;" accept="image/*">
+                        </div>
+                        <button type="submit" class="ui primary button">Завантажити</button>
+                    </form>
+                </div>
+                <div class="twelve wide column">
+                    <div class="ui list">
+                        <div class="item">
+                            <i class="user icon"></i>
+                            <div class="content">
+                                <strong>Ім'я:</strong> {{ user.first_name }} {{ user.last_name }}
+                            </div>
+                        </div>
+                        <div class="item">
+                            <i class="envelope icon"></i>
+                            <div class="content">
+                                <strong>Email:</strong> {{ user.email }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {% if employee %}
+                <div class="ui divider"></div>
+                <h2 class="ui header">Інформація про співробітника</h2>
+                <div class="ui list">
+                    <div class="item">
+                        <i class="briefcase icon"></i>
+                        <div class="content">
+                            <strong>Посада:</strong> {{ employee.position }}
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="building icon"></i>
+                        <div class="content">
+                            <strong>Департамент:</strong> {{ employee.department|default('N/A') }}
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="calendar alternate outline icon"></i>
+                        <div class="content">
+                            <strong>Дата найму:</strong> {{ employee.hire_date }}
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="info circle icon"></i>
+                        <div class="content">
+                            <strong>Статус:</strong> {{ employee.status }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
             <div class="ui divider"></div>
 
@@ -39,7 +100,7 @@
                     <div class="item">
                         <div class="right floated content">
                             {% if config.provider in linkedProviders %}
-                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
+                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\\'язати свій {{ config.provider|capitalize }} акаунт?');">
                                     <button type="submit" class="ui small red button">Відв'язати</button>
                                 </form>
                             {% else %}
@@ -67,4 +128,34 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Script for file upload button
+            const fileInput = document.getElementById('photo-upload');
+            const displayInput = document.getElementById('photo-display');
+
+            if (fileInput && displayInput) {
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length > 0) {
+                        displayInput.value = fileInput.files[0].name;
+                    } else {
+                        displayInput.value = 'Файл не обрано';
+                    }
+                });
+            }
+
+            // Script to dismiss messages
+            $('.message .close').on('click', function() {
+                $(this).closest('.message').transition('fade');
+            });
+        });
+    </script>
 {% endblock %}
