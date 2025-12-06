@@ -17,6 +17,7 @@ use App\Module\Billing\BillingController;
 use App\Module\Billing\ContractController;
 use App\Module\Admin\AdminController;
 use App\Module\Dashboard\DashboardController;
+use App\Module\HRM\HrmController;
 use App\Controller\InstallController;
 use App\Module\Admin\KpiController;
 use App\Module\ClinicalReference\ClinicalReferenceController;
@@ -92,6 +93,7 @@ $router->add('GET', '/logout', [AuthController::class, 'logout']);
 // User Profile
 $router->add('GET', '/user/profile', [UserController::class, 'profile']);
 $router->add('POST', '/user/profile/unlink-provider/{provider}', [UserController::class, 'unlinkProvider']);
+$router->add('POST', '/user/profile/upload-photo', [UserController::class, 'uploadPhoto']);
 
 // OAuth routes
 $router->add('GET', '/oauth/redirect/{provider}', [AuthController::class, 'redirectToProvider']);
@@ -273,6 +275,13 @@ $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, '
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
+$router->add('GET', '/dashboard/hrm', [HrmController::class, 'index']);
+$router->add('GET', '/dashboard/hrm/new', [HrmController::class, 'create']);
+$router->add('POST', '/dashboard/hrm/new', [HrmController::class, 'store']);
+$router->add('GET', '/dashboard/hrm/show', [HrmController::class, 'show']);
+$router->add('GET', '/dashboard/hrm/edit', [HrmController::class, 'edit']);
+$router->add('POST', '/dashboard/hrm/edit', [HrmController::class, 'update']);
+$router->add('POST', '/dashboard/hrm/toggle-status', [HrmController::class, 'toggleStatus']);
 $router->add('GET', '/dashboard/export-csv', [DashboardController::class, 'exportCsv']);
 $router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
 $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exportExcel']);
