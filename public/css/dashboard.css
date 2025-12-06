@@ -86,3 +86,9 @@ td, th {
     overflow-wrap: break-word;
     word-break: break-all;
 }
+
+/* Prevent top menu from wrapping and enable horizontal scroll */
+.ui.top.fixed.menu {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
