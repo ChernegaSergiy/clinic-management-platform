@@ -22,6 +22,7 @@ class Gate
             'lab.read_all',
             'prescriptions.read_all',
             'notifications.read',
+            'hrm.read',
         ],
         'registrar' => [
             'patients.read_all',
@@ -74,6 +75,13 @@ class Gate
         ],
         'inventory_manager' => [
             'inventory.manage',
+            'notifications.read',
+            'dashboard.view',
+        ],
+        'hr_manager' => [
+            'hrm.read',
+            'hrm.write',
+            'hrm.manage',
             'notifications.read',
             'dashboard.view',
         ],
