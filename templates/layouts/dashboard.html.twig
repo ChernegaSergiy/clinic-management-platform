@@ -33,6 +33,16 @@
         <div class="ui top fixed borderless fluid inverted menu">
             <a class="header item" href="#">{% block mobile_brand %}Clinic Admin{% endblock %}</a>
             <div class="right menu">
+                <div class="ui dropdown item" id="notificationDropdownMobile">
+                    <i class="bell icon"></i>
+                    <span class="ui red circular mini label notification-badge" style="display: none;"></span>
+                    <div class="menu notification-menu" id="notificationMenuMobile">
+                        <div class="header">Сповіщення</div>
+                        <div class="item notification-mark-all" id="notificationMarkAllMobile"><i class="check icon"></i> Позначити всі як прочитані</div>
+                        <div class="ui divider"></div>
+                        <div class="item">Завантаження...</div>
+                    </div>
+                </div>
                 <div class="item">
                     <button class="ui icon toggle basic inverted button">
                         <i class="content icon"></i>

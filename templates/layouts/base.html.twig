@@ -73,17 +73,6 @@
             <a class="item" href="/admin/clinical">Клінічні довідники</a>
             <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
         {% endif %}
-        {# Notification Dropdown for Mobile #}
-        <div class="ui dropdown item" id="notificationDropdownMobile">
-            <i class="bell icon"></i> Сповіщення
-            <span class="ui red circular mini label notification-badge" style="display: none;"></span>
-            <div class="menu notification-menu" id="notificationMenuMobile">
-                <div class="header">Сповіщення</div>
-                <div class="item notification-mark-all" id="notificationMarkAllMobile"><i class="check icon"></i> Позначити всі як прочитані</div>
-                <div class="ui divider"></div>
-                <div class="item">Завантаження...</div>
-            </div>
-        </div>
         <div class="ui fitted divider"></div>
         <a class="item" href="/user/profile">Мій профіль</a>
         <a class="item" href="/logout">Вихід</a>
@@ -187,9 +176,14 @@
             color: #db2828;
         }
         @media (max-width: 767px) {
-            .notification-menu {
-                width: 100%;
-                min-width: 280px;
+            #notificationMenuMobile {
+                position: fixed !important;
+                top: 50px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                right: auto !important;
+                width: 95vw !important;
+                min-width: 0 !important;
             }
         }
     </style>
