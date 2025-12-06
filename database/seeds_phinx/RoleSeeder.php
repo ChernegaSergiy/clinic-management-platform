@@ -6,7 +6,7 @@ class RoleSeeder extends AbstractSeed
 {
     public function run(): void
     {
-        $data = [
+        $roles_to_seed = [
             [
                 'name' => 'admin',
                 'description' => 'Адміністратор системи'
@@ -38,11 +38,27 @@ class RoleSeeder extends AbstractSeed
             [
                 'name' => 'inventory_manager',
                 'description' => 'Комірник / менеджер складу'
+            ],
+            [
+                'name' => 'hr_manager',
+                'description' => 'HR-менеджер / Менеджер з персоналу'
             ]
         ];
 
-        $roles = $this->table('roles');
-        $roles->insert($data)
-              ->saveData();
+        $rolesTable = $this->table('roles');
+        
+        $existingRoles = $this->fetchAll('SELECT name FROM roles');
+        $existingRoleNames = array_column($existingRoles, 'name');
+
+        $dataToInsert = [];
+        foreach ($roles_to_seed as $role) {
+            if (!in_array($role['name'], $existingRoleNames)) {
+                $dataToInsert[] = $role;
+            }
+        }
+
+        if (!empty($dataToInsert)) {
+            $rolesTable->insert($dataToInsert)->saveData();
+        }
     }
 }
