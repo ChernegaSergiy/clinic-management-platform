@@ -73,7 +73,8 @@ class UserRepository implements UserRepositoryInterface
                 email, 
                 role_id, 
                 created_at, 
-                updated_at
+                updated_at,
+                profile_photo_path
             FROM users 
             WHERE id = :id
         ");
@@ -182,6 +183,16 @@ class UserRepository implements UserRepositoryInterface
             ':username' => 'admin',
             ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
             ':role_id' => 1,
+        ]);
+    }
+
+    public function updateProfilePhotoPath(int $userId, ?string $path): bool
+    {
+        $sql = "UPDATE users SET profile_photo_path = :profile_photo_path WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':profile_photo_path' => $path,
+            ':id' => $userId,
         ]);
     }
 }
