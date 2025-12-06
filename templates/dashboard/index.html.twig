@@ -164,6 +164,19 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <style>
+        @media (max-width: 767px) {
+            .ui.mini.basic.buttons {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+            .ui.mini.basic.buttons .button {
+                width: 100%;
+            }
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const revenueChartData = {{ dashboardData.revenueChart|json_encode|raw }};
