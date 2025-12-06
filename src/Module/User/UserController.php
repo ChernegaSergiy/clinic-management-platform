@@ -70,7 +70,7 @@ class UserController
         AuthGuard::check();
 
         $userId = $_SESSION['user']['id'];
-        $uploadDir = __DIR__ . '/../../../public/uploads/avatars/'; // www/public/uploads/avatars/
+        $uploadDir = __DIR__ . '/../../../public/uploads/avatars/';
 
         // Create directory if it doesn't exist
         if (!is_dir($uploadDir)) {
