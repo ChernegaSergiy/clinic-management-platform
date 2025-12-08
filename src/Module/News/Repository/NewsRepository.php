@@ -11,7 +11,7 @@ class NewsRepository
 
     public function __construct()
     {
-        $this->pdo = Database::getInstance()->getConnection();
+        $this->pdo = Database::getInstance();
     }
 
     public function findAll(): array
