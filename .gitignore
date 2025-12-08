@@ -2,3 +2,4 @@
 /.env
 /var/
 uploads/
+node_modules/
