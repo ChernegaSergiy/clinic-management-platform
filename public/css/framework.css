@@ -847,6 +847,7 @@ section {
   border-radius: 0;
   appearance: none;
   margin-top: 0.3rem;
+  resize: vertical;
 }
 
 .booking-label {
