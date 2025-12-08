@@ -70,7 +70,7 @@ class NewsController
         View::render('@modules/News/templates/admin/create.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
-            'authors' => $this->userRepository->findAll(['role_name' => 'admin']), // Example: only admins can be authors
+            'authors' => $this->userRepository->findAllByRole('admin'), // Example: only admins can be authors
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -124,7 +124,7 @@ class NewsController
             'newsArticle' => $newsArticle,
             'old' => $_SESSION['old'] ?? $newsArticle,
             'errors' => $_SESSION['errors'] ?? [],
-            'authors' => $this->userRepository->findAll(['role_name' => 'admin']),
+            'authors' => $this->userRepository->findAllByRole('admin'),
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
