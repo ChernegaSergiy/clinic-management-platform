@@ -32,4 +32,19 @@ class PageController
     {
         View::render('privacy.html.twig');
     }
+
+    public function departments(): void
+    {
+        View::render('departments/index.html.twig');
+    }
+
+    public function doctors(): void
+    {
+        View::render('doctors/index.html.twig');
+    }
+
+    public function faq(): void
+    {
+        View::render('faq/index.html.twig');
+    }
 }
