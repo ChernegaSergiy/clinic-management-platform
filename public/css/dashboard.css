@@ -1,3 +1,7 @@
+:root {
+    --mobile-nav-offset: 56px;
+}
+
 body {
     -webkit-font-smoothing: antialiased;
     -moz-font-smoothing: grayscale;
@@ -58,13 +62,35 @@ body {
     border: none;
     padding-left: 0;
     padding-right: 0;
+    border-radius: 0;
 }
 
-.ui.mobile.only.grid .ui.menu .ui.vertical.menu {
+.ui.mobile.only.grid .ui.top.fixed.menu {
+    height: var(--mobile-nav-offset, 56px);
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    border-radius: 0;
+    z-index: 1200; /* тримаємо шапку та її дропдауни поверх мобільного меню */
+}
+
+.ui.mobile.only.grid .mobile-nav-menu {
     display: none;
-    max-height: calc(100vh - 60px);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--mobile-nav-offset, 56px);
+    max-height: calc(100vh - var(--mobile-nav-offset, 56px));
     overflow-y: auto;
     width: 100%;
+    z-index: 1100;
+    border-radius: 0;
+    margin-top: 0 !important;
+    border-top: none;
+}
+
+.ui.mobile.only.grid .notification-menu {
+    z-index: 1300; /* дропдауни сповіщень над мобільним меню */
 }
 
 .dashboard-card__fa {

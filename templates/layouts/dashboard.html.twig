@@ -49,7 +49,7 @@
                     </button>
                 </div>
             </div>
-            <div class="ui vertical borderless inverted fluid menu">
+            <div class="ui vertical borderless inverted fluid menu mobile-nav-menu">
                 {% block mobile_menu %}
                     <a class="item">Панель</a>
                     <a class="item">Налаштування</a>
@@ -103,7 +103,7 @@
         <script>
             $(document).ready(function() {
                 $('.ui.toggle.button').click(function() {
-                    $('.ui.mobile.only.grid .ui.vertical.menu').toggle(100);
+                    $('.ui.mobile.only.grid .mobile-nav-menu').toggle(100);
                 });
             });
         </script>
