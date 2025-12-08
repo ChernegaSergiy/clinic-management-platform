@@ -24,7 +24,7 @@ final class CreateNewsArticlesTable extends AbstractMigration
               ->addColumn('meta', 'string', ['limit' => 500, 'comment' => 'Short description or summary'])
               ->addColumn('content', 'text', ['comment' => 'Full article HTML content'])
               ->addColumn('published_at', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
-              ->addColumn('author_id', 'integer', ['null' => true, 'comment' => 'Foreign key to users table'])
+              ->addColumn('author_id', 'integer', ['null' => true, 'comment' => 'Foreign key to users table', 'signed' => false])
               ->addForeignKey('author_id', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
               ->addColumn('is_published', 'boolean', ['default' => true])
               ->addTimestamps() // Adds created_at and updated_at
