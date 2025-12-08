@@ -1,0 +1,28 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}{{ newsArticle.title }} — Новини — Міська клінічна лікарня №1{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container" style="max-width: 800px; padding: 2rem 0;">
+            <a href="/news" class="btn btn--ghost" style="margin-bottom: 1.5rem;">← НАЗАД ДО СПИСКУ НОВИН</a>
+
+            {% if newsArticle %}
+                <div class="news-detail" style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
+                    <div class="news-item__header">
+                        <span class="news-item__date">{{ newsArticle.published_at|date("d.m.Y H:i") }}</span>
+                        <h1 class="news-item__title" style="margin-top: 0.5rem;">{{ newsArticle.title }}</h1>
+                    </div>
+                    <div class="news-detail__content" style="margin-top: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
+                        {{ newsArticle.content|raw }} {# Using 'raw' filter because content is expected to be HTML #}
+                    </div>
+                </div>
+            {% else %}
+                <div class="news-detail" style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem; text-align: center;">
+                    <h1 class="news-item__title">Новина не знайдена.</h1>
+                    <p class="section__description">Можливо, ця новина була видалена або її не існує.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
