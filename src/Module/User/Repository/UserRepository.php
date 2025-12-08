@@ -24,7 +24,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function findAll(array $filters = [], string $searchTerm = ''): array
     {
-        $sql = "SELECT id, first_name, last_name, email, role_id FROM users";
+        $sql = "SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name FROM users";
         $params = [];
         $conditions = [];
 
