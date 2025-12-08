@@ -80,6 +80,9 @@ $router->add('GET', '/about', [PageController::class, 'about']);
 $router->add('GET', '/contact', [PageController::class, 'contact']);
 $router->add('GET', '/sitemap', [PageController::class, 'sitemap']);
 $router->add('GET', '/privacy', [PageController::class, 'privacy']);
+$router->add('GET', '/departments', [PageController::class, 'departments']);
+$router->add('GET', '/doctors', [PageController::class, 'doctors']);
+$router->add('GET', '/faq', [PageController::class, 'faq']);
 
 // Install routes
 $router->add('GET', '/install', [InstallController::class, 'form']);
