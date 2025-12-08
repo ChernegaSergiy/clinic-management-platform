@@ -3,53 +3,104 @@
 {% block title %}Контакти — Клініка{% endblock %}
 
 {% block body %}
-    <section class="section-block">
-        <div class="section-block__head">
-            <p class="eyebrow">Зв'язок</p>
-            <h1 class="section-block__title">Запишіться або поставте запитання</h1>
-            <p class="section-block__subtitle lede">Залиште контакти — адміністратор відповість протягом робочого дня та підбере зручний час.</p>
-        </div>
-        <form class="contact-form">
-            <label class="contact-form__field">
-                <span class="contact-form__label">Ваше ім'я</span>
-                <input class="contact-form__input" type="text" name="name" placeholder="Ім'я Прізвище" required>
-            </label>
-            <label class="contact-form__field">
-                <span class="contact-form__label">Ваш Email</span>
-                <input class="contact-form__input" type="email" name="email" placeholder="example@email.com" required>
-            </label>
-            <label class="contact-form__field">
-                <span class="contact-form__label">Номер телефону</span>
-                <input class="contact-form__input" type="tel" name="phone" placeholder="+380 XX XXX XX XX" required>
-            </label>
-            <label class="contact-form__field">
-                <span class="contact-form__label">Бажана дата</span>
-                <input class="contact-form__input" type="date" name="appointment_date">
-            </label>
-            <label class="contact-form__field contact-form__field--full">
-                <span class="contact-form__label">Ваше повідомлення</span>
-                <textarea class="contact-form__textarea" name="message" rows="4" placeholder="Опишіть питання чи симптоми"></textarea>
-            </label>
-            <div class="contact-form__actions">
-                <button type="submit" class="button button--primary">Надіслати запит</button>
-                <span class="contact-form__hint">Залишаючи контакти, ви погоджуєтесь на зворотній дзвінок.</span>
-            </div>
-        </form>
-    </section>
+        <section id="contacts" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Зв'язок</div>
+                    <h1 class="section__title">Основна інформація та координати</h1>
+                    <p class="section__description">Адреса, детальні телефони для різних служб, графік роботи та схема проїзду. Вся необхідна інформація на одній сторінці.</p>
+                </header>
 
-    <section class="section-block section-block--split">
-        <div>
-            <h2 class="section-block__title">Контакти</h2>
-            <p><strong>Адреса:</strong> м. Київ, вул. Хрещатик, 1</p>
-            <p><strong>Телефон:</strong> +380 (44) 123-45-67</p>
-            <p><strong>Email:</strong> info@clinic.ua</p>
-            <p><strong>Години:</strong> Пн-Пт 08:00 — 20:00, Сб 09:00 — 16:00</p>
-        </div>
-        <div class="map-card">
-            <div class="map-card__label">Локація</div>
-            <div class="map-card__placeholder">
-                <p>Тут буде інтерактивна карта</p>
+                <div class="contacts-grid">
+                    <article class="contact-block">
+                        <div class="contact-block__title">Адреса та режим роботи</div>
+
+                        <div class="contact-item">
+                            <span class="contact-item__label">Фактична адреса</span>
+                            <span class="contact-item__value">вул. Прикладна, 10, м. Прикладне, 00001</span>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-item__label">Графік роботи поліклініки</span>
+                            <ul class="time-table">
+                                <li><span class="time-table__day">Понеділок – П'ятниця</span><span class="time-table__hours">08:00 – 19:00</span></li>
+                                <li><span class="time-table__day">Субота</span><span class="time-table__hours">09:00 – 14:00 (черговий прийом)</span></li>
+                                <li><span class="time-table__day">Неділя</span><span class="time-table__hours">ВИХІДНИЙ</span></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-item__label">Стаціонар та Приймальне відділення</span>
+                            <span class="contact-item__value">ЦІЛОДОБОВО (24/7)</span>
+                        </div>
+                        
+                        <div class="contact-item" style="margin-top: 2rem;">
+                            <div class="contact-block__title" style="border-top: var(--border-thin); padding-top: 0.35rem; margin-bottom: 0.4rem;">Контактні телефони</div>
+                            <div class="table-wrapper" style="margin-bottom: 0;">
+                                <table class="contact-table">
+                                    <thead><tr><th>Служба</th><th>Телефон</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>Невідкладна допомога</td><td>103 (З МОБ.)</td></tr>
+                                    <tr><td>Приймальне відділення (черговий)</td><td><a href="tel:+380000000001">+380 (000) 000 00 01</a></td></tr>
+                                    <tr><td>Реєстратура поліклініки (запис)</td><td><a href="tel:+380000000002">+380 (000) 000 00 02</a></td></tr>
+                                    <tr><td>Довідкова служба</td><td><a href="tel:+380000000003">+380 (000) 000 00 03</a></td></tr>
+                                    <tr><td>Канцелярія / Загальні питання</td><td>+380 (000) 000 00 04</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </article>
+
+                    <article class="contact-block">
+                        <div class="contact-block__title">Карта та транспорт</div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-item__label">Громадський транспорт</span>
+                            <span class="contact-item__value">Автобуси №5, №12, Трамвай №3. Зупинка «Клінічна лікарня №1».</span>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-item__label">GPS координати</span>
+                            <span class="contact-item__value">49.849927, 24.029804 (для навігаторів)</span>
+                        </div>
+
+                        <div class="map-placeholder">
+                            [ОПЕРАТИВНА СХЕМА МІСЦЕЗНАХОДЖЕННЯ]<br>
+                            Тут може бути вбудований елемент карти (Google Maps або OpenStreetMap), стилізований у монохромній палітрі для дотримання естетики.
+                        </div>
+
+                    </article>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section id="feedback" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Зворотний зв'язок</div>
+                    <h2 class="section__title">Офіційне звернення</h2>
+                    <p class="section__description">Для письмових звернень, запитів або скарг просимо використовувати електронну пошту або поштову адресу.</p>
+                </header>
+                 <div class="contacts-grid" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem;">
+                    <article class="contact-block">
+                        <div class="contact-item">
+                            <span class="contact-item__label">Електронна пошта (для запитів)</span>
+                            <span class="contact-item__value"><a href="mailto:info@hospital1.example.ua">info@hospital1.example.ua</a></span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-item__label">Поштова адреса для кореспонденції</span>
+                            <span class="contact-item__value">00001, м. Прикладне, вул. Прикладна, 10, КНП «МКЛ №1»</span>
+                        </div>
+                    </article>
+                     <article class="contact-block">
+                        <div class="contact-item">
+                            <span class="contact-item__label">Телефон довіри (контроль якості)</span>
+                            <span class="contact-item__value"><a href="tel:+380000000005">+380 (000) 000 00 05</a></span>
+                            <p style="font-size: 0.75rem; opacity: 0.8; margin: 0.5rem 0 0;">(ПН–ПТ, 10:00–16:00. Прийом звернень щодо якості обслуговування.)</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
 {% endblock %}
