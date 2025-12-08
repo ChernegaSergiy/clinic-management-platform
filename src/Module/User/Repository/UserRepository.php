@@ -22,27 +22,15 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function findAll(array $filters = [], string $searchTerm = ''): array
+    public function findAll(string $searchTerm = ''): array
     {
         $sql = "SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name FROM users";
         $params = [];
-        $conditions = [];
 
         if (!empty($searchTerm)) {
-            $conditions[] = "(first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
-                . " OR CONCAT(first_name, ' ', last_name) LIKE :term)";
+            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
+                . " OR CONCAT(first_name, ' ', last_name) LIKE :term";
             $params[':term'] = '%' . $searchTerm . '%';
-        }
-
-        if (isset($filters['role_name']) && !empty($filters['role_name'])) {
-            $conditions[] = "role_id = (SELECT id FROM roles WHERE name = :role_name LIMIT 1)";
-            $params[':role_name'] = $filters['role_name'];
-        }
-        
-        // Add other filters as needed
-
-        if (!empty($conditions)) {
-            $sql .= " WHERE " . implode(" AND ", $conditions);
         }
 
         $sql .= " ORDER BY last_name, first_name";
@@ -50,6 +38,26 @@ class UserRepository implements UserRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    public function findAllByRole(string $roleName): array
+    {
+        $sql = "
+            SELECT 
+                u.id, 
+                u.first_name, 
+                u.last_name, 
+                u.email, 
+                u.role_id, 
+                CONCAT(u.first_name, ' ', u.last_name) AS full_name
+            FROM users AS u
+            JOIN roles AS r ON u.role_id = r.id
+            WHERE r.name = :role_name
+            ORDER BY u.last_name, u.first_name
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':role_name' => $roleName]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findAllActive(): array
