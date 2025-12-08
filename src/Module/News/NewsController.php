@@ -6,6 +6,7 @@ use App\Core\AuthGuard;
 use App\Core\Gate;
 use App\Core\View;
 use App\Core\Validator;
+use App\Core\Database;
 use App\Module\News\Repository\NewsRepository;
 use App\Module\User\Repository\UserRepository; // To get author info
 
@@ -80,7 +81,7 @@ class NewsController
         AuthGuard::check();
         Gate::authorize('news.manage');
 
-        $validator = new Validator(\App\Core\Database::getInstance());
+        $validator = new Validator(Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required', 'string', 'max:255'],
             'meta' => ['required', 'string', 'max:500'],
@@ -145,7 +146,7 @@ class NewsController
             return;
         }
 
-        $validator = new Validator(\App\Core\Database::getInstance());
+        $validator = new Validator(Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required', 'string', 'max:255'],
             'meta' => ['required', 'string', 'max:500'],
