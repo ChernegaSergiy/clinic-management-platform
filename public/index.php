@@ -83,6 +83,7 @@ $router->add('GET', '/privacy', [PageController::class, 'privacy']);
 $router->add('GET', '/departments', [PageController::class, 'departments']);
 $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 $router->add('GET', '/faq', [PageController::class, 'faq']);
+$router->add('GET', '/news', [PageController::class, 'news']);
 
 // Install routes
 $router->add('GET', '/install', [InstallController::class, 'form']);
