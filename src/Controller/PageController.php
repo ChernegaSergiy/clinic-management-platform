@@ -47,4 +47,9 @@ class PageController
     {
         View::render('faq/index.html.twig');
     }
+
+    public function news(): void
+    {
+        View::render('news/index.html.twig');
+    }
 }
