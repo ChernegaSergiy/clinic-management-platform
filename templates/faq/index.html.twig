@@ -1,0 +1,29 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}Часті питання — Міська клінічна лікарня №1{% endblock %}
+
+{% block body %}
+    <section id="faq" class="section">
+        <div class="container">
+            <header class="section__header">
+                 <div class="section__eyebrow">Часті питання</div>
+                <h1 class="section__title section__title--compact">Простий текст замість складних діалогових вікон</h1>
+                <p class="section__description">Замість чат-ботів та спливаючих вікон — лаконічні відповіді на базові питання. Користувач бачить усе на одній сторінці.</p>
+            </header>
+            <div id="faqList">
+                <article class="faq-item">
+                    <button class="faq-question"><span>Чи потрібне направлення сімейного лікаря?</span><span>+</span></button>
+                    <div class="faq-answer">Для планової госпіталізації зазвичай потрібне направлення. Для ургентних станів (невідкладних випадків) приймальне відділення працює без направлення — важливий стан пацієнта.</div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question"><span>Чи є платні послуги?</span><span>+</span></button>
+                    <div class="faq-answer">Перелік платних послуг затверджується наказом по лікарні. Він може бути представлений окремим txt / pdf-файлом або таблицею без декоративних елементів.</div>
+                </article>
+                <article class="faq-item">
+                    <button class="faq-question"><span>Як дізнатися, чи відкрите потрібне відділення?</span><span>+</span></button>
+                    <div class="faq-answer">Оперативний статус відділень можна розміщувати у верхній частині сторінки як текстовий рядок (без анімацій), або в окремому розділі «Статус відділень». На цій сторінці він позначений бейджами «ВІДКРИТО / ЗАЧИНЕНО».</div>
+                </article>
+            </div>
+        </div>
+    </section>
+{% endblock %}
