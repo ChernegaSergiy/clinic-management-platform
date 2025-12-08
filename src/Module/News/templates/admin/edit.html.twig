@@ -1,9 +1,9 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Редагувати Новину — Адмінпанель{% endblock %}
+{% block title %}Редагувати новину — Адмінпанель{% endblock %}
 
 {% block body %}
-    <h1 class="ui header">Редагувати Новину: {{ newsArticle.title }}</h1>
+    <h1 class="ui header">Редагувати новину: {{ newsArticle.title }}</h1>
 
     {% if errors %}
         <div class="ui negative message">
@@ -51,7 +51,7 @@
                 <label>Опубліковано</label>
             </div>
         </div>
-        <button class="ui primary button" type="submit">Оновити Новину</button>
+        <button class="ui primary button" type="submit">Оновити новину</button>
         <a href="/admin/news" class="ui button">Відмінити</a>
     </form>
 {% endblock %}
