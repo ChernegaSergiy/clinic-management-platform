@@ -1,0 +1,47 @@
+{% extends "layouts/dashboard.html.twig" %}
+
+{% block title %}Управління Новинами — Адмінпанель{% endblock %}
+
+{% block content %}
+    <h1 class="ui header">Управління Новинами</h1>
+
+    <div class="ui segment">
+        <a href="/admin/news/new" class="ui primary button">Додати Нову Новину</a>
+    </div>
+
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Заголовок</th>
+                <th>Мета-опис</th>
+                <th>Опубліковано</th>
+                <th>Автор</th>
+                <th>Статус</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for newsItem in newsArticles %}
+                <tr>
+                    <td>{{ newsItem.id }}</td>
+                    <td>{{ newsItem.title }}</td>
+                    <td>{{ newsItem.meta }}</td>
+                    <td>{{ newsItem.published_at|date("d.m.Y H:i") }}</td>
+                    <td>{{ newsItem.author_id }}</td> {# Placeholder for author name #}
+                    <td>{{ newsItem.is_published ? 'Опубліковано' : 'Чернетка' }}</td>
+                    <td class="collapsing">
+                        <a href="/admin/news/edit/{{ newsItem.id }}" class="ui basic button">Редагувати</a>
+                        <form action="/admin/news/delete/{{ newsItem.id }}" method="POST" style="display:inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю новину?');">
+                            <button type="submit" class="ui negative button">Видалити</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">Новини відсутні.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
