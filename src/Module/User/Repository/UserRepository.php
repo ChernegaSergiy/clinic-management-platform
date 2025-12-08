@@ -22,15 +22,27 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(array $filters = [], string $searchTerm = ''): array
     {
         $sql = "SELECT id, first_name, last_name, email, role_id FROM users";
         $params = [];
+        $conditions = [];
 
         if (!empty($searchTerm)) {
-            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
-                . " OR CONCAT(first_name, ' ', last_name) LIKE :term";
+            $conditions[] = "(first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
+                . " OR CONCAT(first_name, ' ', last_name) LIKE :term)";
             $params[':term'] = '%' . $searchTerm . '%';
+        }
+
+        if (isset($filters['role_name']) && !empty($filters['role_name'])) {
+            $conditions[] = "role_id = (SELECT id FROM roles WHERE name = :role_name LIMIT 1)";
+            $params[':role_name'] = $filters['role_name'];
+        }
+        
+        // Add other filters as needed
+
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(" AND ", $conditions);
         }
 
         $sql .= " ORDER BY last_name, first_name";
