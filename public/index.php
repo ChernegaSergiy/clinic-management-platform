@@ -98,8 +98,7 @@ $router->add('POST', '/admin/news/edit/{id}', [NewsController::class, 'update'])
 $router->add('POST', '/admin/news/delete/{id}', [NewsController::class, 'delete']);
 
 // Install routes
-$router->add('GET', '/install', [InstallController::class, 'form']);
-$router->add('POST', '/install', [InstallController::class, 'install']);
+$router->add('GET', '/install', [InstallController::class, 'check']);
 
 // Auth routes
 $router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
