@@ -1,0 +1,25 @@
+.btn {
+    border: var(--border-thick);
+    background: var(--color-bg-alt);
+    padding: 0.55rem 0.9rem;
+    font-family: inherit;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-align: center;
+    width: 100%;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+@media (min-width: 480px) { .btn { width: auto; } }
+
+.btn--primary { background: var(--color-accent); color: #fff; }
+.btn--ghost { background: transparent; }
+
+.btn:active { transform: translate(2px, 2px); box-shadow: -2px -2px 0 #000; }

@@ -1,0 +1,22 @@
+/* Clinic Manager SCSS framework built from existing utility.css */
+
+@import "settings/variables";
+
+@import "tools/base";
+@import "tools/layout";
+
+@import "components/top-strip";
+@import "components/header";
+@import "components/sections";
+@import "components/hero";
+@import "components/buttons";
+@import "components/grids";
+@import "components/forms";
+@import "components/faq";
+@import "components/footer";
+@import "components/news";
+@import "components/values";
+
+@import "utilities/helpers";
+
+@import "components/responsive";

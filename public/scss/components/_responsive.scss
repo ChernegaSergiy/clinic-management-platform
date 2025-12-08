@@ -1,0 +1,29 @@
+@media (min-width: 720px) {
+    .hero-inner { grid-template-columns: minmax(0, 3fr) minmax(260px, 2.3fr); align-items: stretch; }
+    .about-grid { grid-template-columns: 2fr 1.5fr; }
+    .about-grid-extended { grid-template-columns: 2fr 1fr; }
+    .departments-grid { grid-template-columns: 2fr 2fr; }
+    .doctors-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .booking-layout { grid-template-columns: minmax(0, 2.3fr) minmax(260px, 1.7fr); }
+    .contacts-grid { grid-template-columns: minmax(0, 1.6fr) minmax(260px, 2fr); }
+    .btn { width: auto; }
+    .news-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .time-table__hours { float: right; }
+}
+
+@media (min-width: 850px) {
+    .departments-grid { grid-template-columns: 2fr 3fr; }
+}
+
+@media (min-width: 992px) {
+    .departments-list { grid-template-columns: 1fr 1fr; }
+    .doctors-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1200px) {
+    .hero-inner { grid-template-columns: minmax(0, 4fr) minmax(320px, 2fr); gap: 2.5rem; }
+    .doctors-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .news-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

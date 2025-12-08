@@ -1,0 +1,18 @@
+.top-strip {
+    border-bottom: var(--border-medium);
+    padding: 0.4rem var(--page-gutter);
+    background: var(--color-bg-alt);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.top-strip__emergency { font-weight: 900; }
+
+.badge { display: inline-block; padding: 0.1rem 0.4rem; border: var(--border-thin); font-size: 0.65rem; }
+.badge--ok { border-color: var(--color-ok); color: inherit; font-weight: normal; }
+.badge--alert { border-color: var(--color-alert); color: var(--color-alert); font-weight: normal; }

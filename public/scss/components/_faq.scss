@@ -1,0 +1,9 @@
+.faq-item { border-bottom: var(--border-thin); }
+
+.faq-item:last-child { border-bottom: none; }
+
+.faq-question { width: 100%; text-align: left; background: transparent; border: none; padding: 0.6rem 0.7rem; font-family: inherit; font-size: 0.8rem; text-transform: uppercase; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+
+.faq-answer { font-size: 0.8rem; padding: 0 0.7rem; display: block; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding-bottom 0.3s ease-out; }
+
+.faq-answer.open { max-height: 500px; padding-bottom: 0.6rem; }

@@ -1,0 +1,19 @@
+:root {
+    --color-bg: #f5f5f5;
+    --color-bg-alt: #ffffff;
+    --color-text: #000000;
+    --color-accent: #000000;
+    --color-ok: #0a7f2e;
+    --color-alert: #b00020;
+
+    --border-thick: 4px solid #000;
+    --border-medium: 2px solid #000;
+    --border-thin: 1px solid #000;
+
+    --page-gutter: 1rem;
+    --max-width: 1120px;
+}
+
+@media (max-width: 360px) { :root { --page-gutter: 0.75rem; } }
+@media (min-width: 768px) { :root { --page-gutter: 1.5rem; } }
+@media (min-width: 1200px) { :root { --page-gutter: 2rem; } }
