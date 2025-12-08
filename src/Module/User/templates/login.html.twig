@@ -1,44 +1,60 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Вхід — Клініка{% endblock %}
+{% block title %}Вхід — Міська клінічна лікарня №1{% endblock %}
 
 {% block body %}
-    <section class="auth">
-        <div class="auth__card">
-            <p class="eyebrow">Вхід</p>
-            <h1 class="auth__title">Увійдіть до облікового запису</h1>
-            <p class="auth__muted auth__muted--strong">Доступ лише для співробітників клініки.</p>
-            <form method="POST" action="/login" class="auth__form" autocomplete="on">
-                <label class="auth__field">
-                    <span class="auth__label">Email</span>
-                    <input class="auth__input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required autocomplete="email">
-                    {% if errors.email %}<div class="auth__error">{{ errors.email }}</div>{% endif %}
-                </label>
-                <label class="auth__field">
-                    <span class="auth__label">Пароль</span>
-                    <input class="auth__input" type="password" name="password" placeholder="Ваш пароль" required autocomplete="current-password">
-                    {% if errors.password %}<div class="auth__error">{{ errors.password }}</div>{% endif %}
-                </label>
+    <section class="section">
+        <div class="container" style="max-width: 400px; padding: 2rem 0;">
+            <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
+                <header class="section__header" style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="section__eyebrow">Вхід</div>
+                    <h1 class="section__title section__title--compact" style="margin-bottom: 0.5rem;">Увійдіть до облікового запису</h1>
+                    <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Доступ лише для співробітників клініки.</p>
+                </header>
+
                 {% if errors.login %}
-                    <div class="auth__error-box">
+                    <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem; text-align: center;">
                         <strong>Помилка входу:</strong> {{ errors.login }}
                     </div>
                 {% endif %}
-                <button type="submit" class="button button--primary button--full">Увійти</button>
-            </form>
+                {% if errors.email or errors.password %}
+                    <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem;">
+                        <ul style="list-style: none; margin: 0; padding: 0;">
+                            {% if errors.email %}<li style="margin-bottom: 0.2rem;">{{ errors.email }}</li>{% endif %}
+                            {% if errors.password %}<li>{{ errors.password }}</li>{% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
 
-            {% if authConfigs is defined and authConfigs|length %}
-                <div class="auth__divider"><span>або</span></div>
-                <div class="auth__providers">
-                    {% for config in authConfigs %}
-                        <a href="/oauth/redirect/{{ config.provider }}" class="button button--secondary button--full auth__oauth-btn">
-                            <i class="fab fa-{{ config.provider }}"></i> Увійти через {{ config.provider|capitalize }}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+                <form method="POST" action="/login" style="display: grid; gap: 1rem;" autocomplete="on">
+                    <div>
+                        <label class="booking-label">Email</label>
+                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+                    <div>
+                        <label class="booking-label">Пароль</label>
+                        <input class="booking-input" type="password" name="password" placeholder="Ваш пароль" required autocomplete="current-password">
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button type="submit" class="btn btn--primary" style="width: 100%;">Увійти</button>
+                    </div>
+                </form>
 
-            <p class="auth__muted">Немає доступу? Зверніться до адміністратора клініки.</p>
+                {% if authConfigs is defined and authConfigs|length %}
+                    <div style="text-align: center; margin: 1.5rem 0; font-size: 0.75rem; text-transform: uppercase; border-top: var(--border-thin); padding-top: 1.5rem; position: relative;">
+                        <span style="background: var(--color-bg-alt); padding: 0 0.5rem; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);">або</span>
+                    </div>
+                    <div style="display: grid; gap: 0.8rem;">
+                        {% for config in authConfigs %}
+                            <a href="/oauth/redirect/{{ config.provider }}" class="btn btn--ghost" style="width: 100%;">
+                                {# <i class="fab fa-{{ config.provider }}"></i> #} Увійти через {{ config.provider|capitalize }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <p style="text-align: center; font-size: 0.75rem; opacity: 0.8; margin-top: 1.5rem;">Немає доступу? Зверніться до адміністратора клініки.</p>
+            </div>
         </div>
     </section>
 {% endblock %}
