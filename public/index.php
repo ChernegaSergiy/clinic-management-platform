@@ -74,7 +74,9 @@ session_start();
 
 $router = new Router();
 
-// Page routes
+use App\Module\News\NewsController; // Add this line at the top
+
+// Page routes (existing)
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
 $router->add('GET', '/contact', [PageController::class, 'contact']);
@@ -83,7 +85,17 @@ $router->add('GET', '/privacy', [PageController::class, 'privacy']);
 $router->add('GET', '/departments', [PageController::class, 'departments']);
 $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 $router->add('GET', '/faq', [PageController::class, 'faq']);
-$router->add('GET', '/news', [PageController::class, 'news']);
+// News module public routes
+$router->add('GET', '/news', [NewsController::class, 'index']);
+$router->add('GET', '/news/{id}', [NewsController::class, 'show']);
+
+// Admin News routes
+$router->add('GET', '/admin/news', [NewsController::class, 'adminIndex']);
+$router->add('GET', '/admin/news/new', [NewsController::class, 'create']);
+$router->add('POST', '/admin/news/new', [NewsController::class, 'store']);
+$router->add('GET', '/admin/news/edit/{id}', [NewsController::class, 'edit']);
+$router->add('POST', '/admin/news/edit/{id}', [NewsController::class, 'update']);
+$router->add('POST', '/admin/news/delete/{id}', [NewsController::class, 'delete']);
 
 // Install routes
 $router->add('GET', '/install', [InstallController::class, 'form']);
