@@ -1,18 +1,26 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Записатися на прийом — Клініка{% endblock %}
+{% block title %}Записатися на прийом — Міська клінічна лікарня №1{% endblock %}
 
 {% block body %}
-    <section class="section-block">
-        <div class="section-block__head">
-            <p class="eyebrow">Онлайн-запис</p>
-            <h1 class="section-block__title">Запишіться на прийом</h1>
-            <p class="section-block__subtitle lede">Оберіть лікаря, бажану дату та залиште контакти — ми підтвердимо запис.</p>
-        </div>
-        <div class="content-card">
+    <section class="section">
+        <div class="container" style="max-width: 700px; padding: 2rem 0;">
+            <header class="section__header" style="text-align: center;">
+                <div class="section__eyebrow">Онлайн-запис</div>
+                <h1 class="section__title section__title--large" style="margin-bottom: 0.75rem;">Запишіться на прийом</h1>
+                <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">Оберіть лікаря, бажану дату та залиште контакти — ми підтвердимо запис.</p>
+            </header>
+
+            {# Display success/error messages #}
+            {% if success_message %}
+                <div style="border: var(--border-medium); background: #e6ffe6; padding: 0.8rem; margin-bottom: 1.5rem; text-align: center; color: var(--color-ok); font-weight: 700; font-size: 0.85rem;">
+                    {{ success_message }}
+                </div>
+            {% endif %}
+
             {% if errors is defined and errors %}
-                <div class="alert alert--error">
-                    <ul>
+                <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem;">
+                    <ul style="list-style: none; margin: 0; padding: 0;">
                         {% for field, messages in errors %}
                             {% for msg in messages %}
                                 <li>{{ msg }}</li>
@@ -21,45 +29,44 @@
                     </ul>
                 </div>
             {% endif %}
-            {% if success_message %}
-                <div class="alert alert--success">{{ success_message }}</div>
-            {% endif %}
 
-            <form class="form-grid" method="POST" action="/book-appointment">
-                <div class="form-grid__row">
-                    <label>Ваше ім'я</label>
-                    <input type="text" name="name" value="{{ old.name ?? '' }}" required>
-                </div>
-                <div class="form-grid__row">
-                    <label>Телефон</label>
-                    <input type="tel" name="phone" value="{{ old.phone ?? '' }}" required>
-                </div>
-                <div class="form-grid__row">
-                    <label>Email (необов'язково)</label>
-                    <input type="email" name="email" value="{{ old.email ?? '' }}">
-                </div>
-                <div class="form-grid__row">
-                    <label>Лікар</label>
-                    <select name="doctor_id">
-                        <option value="">Будь-який доступний</option>
-                        {% for doctor in doctors %}
-                            <option value="{{ doctor.id }}" {% if old.doctor_id is defined and old.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-grid__row">
-                    <label>Бажана дата</label>
-                    <input type="date" name="desired_date" value="{{ old.desired_date ?? '' }}" required>
-                </div>
-                <div class="form-grid__row">
-                    <label>Коментар</label>
-                    <textarea name="notes" rows="3" placeholder="Симптоми чи побажання">{{ old.notes ?? '' }}</textarea>
-                </div>
-                <div class="form-grid__actions">
-                    <button type="submit" class="button button--primary">Надіслати запит</button>
-                    <a href="/" class="button button--ghost">На головну</a>
-                </div>
-            </form>
+            <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
+                <form method="POST" action="/book-appointment" style="display: grid; gap: 1rem;">
+                    <div>
+                        <label class="booking-label">Ваше ім'я</label>
+                        <input class="booking-input" type="text" name="name" value="{{ old.name ?? '' }}" required>
+                    </div>
+                    <div>
+                        <label class="booking-label">Телефон</label>
+                        <input class="booking-input" type="tel" name="phone" value="{{ old.phone ?? '' }}" required>
+                    </div>
+                    <div>
+                        <label class="booking-label">Email (необов'язково)</label>
+                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}">
+                    </div>
+                    <div>
+                        <label class="booking-label">Лікар</label>
+                        <select class="booking-select" name="doctor_id">
+                            <option value="">Будь-який доступний</option>
+                            {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}" {% if old.doctor_id is defined and old.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="booking-label">Бажана дата</label>
+                        <input class="booking-input" type="date" name="desired_date" value="{{ old.desired_date ?? '' }}" required>
+                    </div>
+                    <div>
+                        <label class="booking-label">Коментар</label>
+                        <textarea class="booking-textarea" name="notes" rows="3" placeholder="Симптоми чи побажання">{{ old.notes ?? '' }}</textarea>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
+                        <button type="submit" class="btn btn--primary">Надіслати запит</button>
+                        <a href="/" class="btn btn--ghost">На головну</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </section>
 {% endblock %}
