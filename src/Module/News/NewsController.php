@@ -67,10 +67,16 @@ class NewsController
         AuthGuard::check();
         Gate::authorize('news.manage');
 
-        View::render('@modules/News/templates/admin/create.html.twig', [
+        $authorsRaw = $this->userRepository->findAllByRole('admin');
+        $authors = array_reduce($authorsRaw, function ($acc, $author) {
+            $acc[$author['id']] = $author['full_name'];
+            return $acc;
+        }, []);
+
+        View::render('@modules/News/templates/admin/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
-            'authors' => $this->userRepository->findAllByRole('admin'), // Example: only admins can be authors
+            'authors' => $authors,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
@@ -120,11 +126,17 @@ class NewsController
             return;
         }
 
+        $authorsRaw = $this->userRepository->findAllByRole('admin');
+        $authors = array_reduce($authorsRaw, function ($acc, $author) {
+            $acc[$author['id']] = $author['full_name'];
+            return $acc;
+        }, []);
+
         View::render('@modules/News/templates/admin/edit.html.twig', [
             'newsArticle' => $newsArticle,
             'old' => $_SESSION['old'] ?? $newsArticle,
             'errors' => $_SESSION['errors'] ?? [],
-            'authors' => $this->userRepository->findAllByRole('admin'),
+            'authors' => $authors,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
     }
