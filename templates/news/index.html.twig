@@ -3,110 +3,52 @@
 {% block title %}Новини та Оголошення — Міська клінічна лікарня №1{% endblock %}
 
 {% block body %}
-        <section id="news" class="section">
-            <div class="container">
-                <header class="section__header">
-                    <div class="section__eyebrow">Оперативна інформація</div>
-                    <h1 class="section__title">Новини та Офіційні Оголошення</h1>
-                    <p class="section__description">Важливі повідомлення про графік роботи, зміни в прийомі, державні програми, закупівлі та внутрішні зміни в роботі відділень. Хронологічна стрічка без зображень.</p>
-                </header>
+    <section id="news" class="section">
+        <div class="container">
+            <header class="section__header">
+                <div class="section__eyebrow">Оперативна інформація</div>
+                <h1 class="section__title">Новини та Офіційні Оголошення</h1>
+                <p class="section__description">Важливі повідомлення про графік роботи, зміни в прийомі, державні програми, закупівлі та внутрішні зміни в роботі відділень. Хронологічна стрічка без зображень.</p>
+            </header>
 
-                <div id="news-container">
-                    <ul class="news-list" id="main-news-list">
-                        <li class="news-item" data-id="1">
+            <div id="news-container">
+                <ul class="news-list" id="main-news-list">
+                    {% for newsItem in newsArticles %}
+                        <li class="news-item" data-id="{{ newsItem.id }}">
                             <div class="news-item__header">
-                                <span class="news-item__date">23.11.2025</span>
-                                <div class="news-item__title">Оновлення графіка прийому сімейних лікарів</div>
+                                <span class="news-item__date">{{ newsItem.published_at|date("d.m.Y") }}</span>
+                                <div class="news-item__title">{{ newsItem.title }}</div>
                             </div>
-                            <div class="news-item__meta">Кабінети №101–105. Діє з 01.12.2025.</div>
+                            <div class="news-item__meta">{{ newsItem.meta }}</div>
                         </li>
-                        <li class="news-item" data-id="2">
+                    {% else %}
+                        <li class="news-item">
                             <div class="news-item__header">
-                                <span class="news-item__date">10.11.2025</span>
-                                <div class="news-item__title">Звіт про впровадження системи електронного документообігу (eHealth)</div>
+                                <div class="news-item__title">Наразі новин немає.</div>
                             </div>
-                            <div class="news-item__meta">Підвищено прозорість та швидкість обробки даних.</div>
                         </li>
-                         <li class="news-item" data-id="3">
-                            <div class="news-item__header">
-                                <span class="news-item__date">28.10.2025</span>
-                                <div class="news-item__title">Закінчення планової дезінфекції хірургічного корпусу</div>
-                            </div>
-                            <div class="news-item__meta">Корпус працює в штатному режимі з 29.10.</div>
-                        </li>
-                         <li class="news-item" data-id="4">
-                            <div class="news-item__header">
-                                <span class="news-item__date">01.10.2025</span>
-                                <div class="news-item__title">Публічний звіт за третій квартал 2025 року</div>
-                            </div>
-                            <div class="news-item__meta">Переглянути фінансові та медичні показники.</div>
-                        </li>
-                    </ul>
+                    {% endfor %}
+                </ul>
 
-                    <div id="news-detail-view" style="display:none;">
-                        <button class="btn btn--ghost" id="back-to-list-btn" style="margin-bottom: 1rem;">← НАЗАД ДО СПИСКУ</button>
-                        <div class="news-detail">
-                            <div class="news-item__header">
-                                <span class="news-item__date" id="detail-date"></span>
-                                <h3 class="news-item__title" id="detail-title"></h3>
-                            </div>
-                            <div class="news-detail__content" id="detail-content"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </section>
+        </div>
+    </section>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }} {# Include parent javascripts from public.html.twig #}
     <script>
-        // === JS ДЛЯ СТОРІНКИ НОВИН ===
-        const newsData = [
-            { id: 1, date: '23.11.2025', title: 'Оновлення графіка прийому сімейних лікарів', meta: 'Кабінети №101–105. Діє з 01.12.2025.', content: '<p>З 1 грудня 2025 року вводиться новий графік роботи сімейних лікарів поліклінічного відділення. Зміни спрямовані на оптимізацію черг та підвищення доступності послуг у вечірній час. Просимо пацієнтів <strong>перевіряти час запису</strong> через реєстратуру або електронну систему перед візитом.</p><p>Новий графік роботи реєстратури: ПН–ПТ, 07:45–19:30.</p>' },
-            { id: 2, date: '10.11.2025', title: 'Звіт про впровадження системи електронного документообігу (eHealth)', meta: 'Підвищено прозорість та швидкість обробки даних.', content: '<p>Лікарня №1 повністю завершила перехід на електронну систему ведення медичної документації. Це значно скоротило час на оформлення пацієнтів та підвищило <strong>безпеку зберігання даних</strong>. Всі дані захищені відповідно до вимог МОЗ.</p>' },
-            { id: 3, date: '28.10.2025', title: 'Закінчення планової дезінфекції хірургічного корпусу', meta: 'Корпус працює в штатному режимі з 29.10.', content: '<p>Планова дезінфекція Хірургічного відділення успішно завершена. Відділення відновлює планові госпіталізації та ургентний прийом <strong>з 08:00 29 жовтня</strong>. Дякуємо за розуміння.</p>' },
-            { id: 4, date: '01.10.2025', title: 'Публічний звіт за третій квартал 2025 року', meta: 'Переглянути фінансові та медичні показники.', content: '<p>Опубліковано детальний публічний звіт про фінансову діяльність та ключові медичні показники за 3-й квартал 2025 року. Документ доступний у розділі <a href="documents.html"><strong>«Ліцензії та Документи»</strong></a>.</p>' },
-        ];
-
-        const newsList = document.getElementById('main-news-list');
-        const newsDetailView = document.getElementById('news-detail-view');
-        const backToListBtn = document.getElementById('back-to-list-btn');
-
-        const detailDate = document.getElementById('detail-date');
-        const detailTitle = document.getElementById('detail-title');
-        const detailContent = document.getElementById('detail-content');
-        
-        // Функція відображення детальної новини
-        function showNewsDetail(newsItem) {
-            detailDate.textContent = newsItem.date;
-            detailTitle.textContent = newsItem.title;
-            detailContent.innerHTML = newsItem.content; // Вставляємо HTML
-
-            newsList.style.display = 'none';
-            newsDetailView.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Функція повернення до списку
-        function showNewsList() {
-            newsList.style.display = 'grid';
-            newsDetailView.style.display = 'none';
-        }
-
-        // Обробник кліку на елемент списку
-        newsList.addEventListener('click', (e) => {
-            const item = e.target.closest('.news-item');
-            if (item) {
-                const itemId = parseInt(item.dataset.id);
-                const selectedNews = newsData.find(n => n.id === itemId);
-                if (selectedNews) {
-                    showNewsDetail(selectedNews);
+        const mainNewsList = document.getElementById('main-news-list');
+        if (mainNewsList) {
+            mainNewsList.addEventListener('click', (e) => {
+                const item = e.target.closest('.news-item');
+                if (item) {
+                    const newsId = item.dataset.id;
+                    if (newsId) {
+                        window.location.href = `/news/${newsId}`; // Navigate to the detail page
+                    }
                 }
-            }
-        });
-
-        // Обробник кліку на кнопку "Назад"
-        backToListBtn.addEventListener('click', showNewsList);
+            });
+        }
     </script>
 {% endblock %}
