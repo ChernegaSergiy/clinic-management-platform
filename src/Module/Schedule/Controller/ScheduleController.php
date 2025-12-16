@@ -42,7 +42,7 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        $this->view->render('dashboard/schedule/index', [
+        View::render('@modules/Schedule/templates/index.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
         ]);
