@@ -23,9 +23,9 @@
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
         {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
-        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
-        {% if canAdminNav %}<a class="item" href="/admin/users">Користувачі</a>{% endif %}
-        <div class="ui dropdown item" id="notificationDropdown">
+                {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
+                {% if canAdminNav %}<a class="item" href="/admin/users">Користувачі</a>{% endif %}
+                <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
             <span class="ui red circular mini label notification-badge" style="display: none;"></span>
             <div class="menu notification-menu" id="notificationMenu">
@@ -72,6 +72,7 @@
             <a class="item" href="/admin/users">Користувачі</a>
             <a class="item" href="/admin/clinical">Клінічні довідники</a>
             <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+            <a class="item" href="/admin/services">Управління послугами</a>
         {% endif %}
         <div class="ui fitted divider"></div>
         <a class="item" href="/user/profile">Мій профіль</a>
@@ -111,6 +112,7 @@
             <a class="item" href="/admin/users">Користувачі</a>
             <a class="item" href="/admin/clinical">Клінічні довідники</a>
             <a class="item" href="/admin/auth_configs">Налаштування авторизації</a>
+            <a class="item" href="/admin/services">Управління послугами</a>
         {% endif %}
         <div class="ui fitted divider"></div>
         <a class="item" href="/user/profile">Мій профіль</a>
