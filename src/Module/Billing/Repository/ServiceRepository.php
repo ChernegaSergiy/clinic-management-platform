@@ -17,7 +17,7 @@ class ServiceRepository
     public function findAll(): array
     {
         $stmt = $this->pdo->query("
-            SELECT s.*, sc.name as category_name 
+            SELECT s.*, sc.name as category_name, s.duration_minutes
             FROM services s
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             ORDER BY s.name ASC
@@ -28,7 +28,7 @@ class ServiceRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-            SELECT s.*, sc.name as category_name 
+            SELECT s.*, sc.name as category_name, s.duration_minutes
             FROM services s
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             WHERE s.id = :id
