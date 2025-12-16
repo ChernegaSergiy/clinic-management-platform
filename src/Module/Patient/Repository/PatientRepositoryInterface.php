@@ -5,7 +5,7 @@ namespace App\Module\Patient\Repository;
 interface PatientRepositoryInterface
 {
     public function findAll(string $searchTerm = ''): array;
-    public function save(array $data): bool;
+    public function save(array $data): int|false;
     public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array;
     public function findByTaxId(string $taxId, ?int $excludeId = null): ?array;
     public function findById(int $id): ?array;
