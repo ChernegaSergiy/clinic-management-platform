@@ -1,27 +1,64 @@
-{% extends "layouts/base.html.twig" %}
+{% extends "layouts/dashboard.html.twig" %}
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Створити запис на прийом - Клініка{% endblock %}
+{% block title %}Create Appointment{% endblock %}
 
-{% block body %}
+{% block content %}
     <div class="ui segment">
-        <h2 class="ui header">Створити новий запис на прийом</h2>
+        <h2 class="ui header">Create New Appointment</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/appointments/new">
-            <div class="two fields">
-                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
-                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, {'required': 'required'}) }}
+        {# Step 1: Select Doctor, Service, and Date to find slots #}
+        <form class="ui form" id="find-slots-form">
+            <h4 class="ui dividing header">Step 1: Find Available Slots</h4>
+            <div class="three fields">
+                {{ forms.select('doctor_id', 'Doctor', doctors, old.doctor_id ?? null, null, {'id': 'doctor_selector'}) }}
+                {{ forms.select('service_id', 'Service', services|map(s => { id: s.id, name: s.name ~ ' (' ~ s.duration_minutes ~ ' min)' }), old.service_id ?? null, null, {'id': 'service_selector'}) }}
+                {{ forms.input('date', 'Date', selectedDate, 'date', '', null, {'id': 'date_selector'}) }}
             </div>
-            <div class="two fields">
-                {{ forms.input('start_time', 'Час початку', old.start_time ?? null, 'datetime-local', '', errors.start_time ?? null, {'required': 'required'}) }}
-                {{ forms.input('end_time', 'Час закінчення', old.end_time ?? null, 'datetime-local', '', errors.end_time ?? null, {'required': 'required'}) }}
-            </div>
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до запису') }}
+            <button class="ui secondary button" type="submit">Find Slots</button>
+        </form>
 
-            {{ ui.button('Зберегти запис', 'primary', 'large', 'save') }}
-            <a href="/appointments" class="ui button">Скасувати</a>
+        <div class="ui divider"></div>
+        
+        {# Step 2: Select a slot and patient #}
+        <form class="ui form" method="POST" action="/appointments/new">
+            <h4 class="ui dividing header">Step 2: Select Slot and Patient</h4>
+
+            <input type="hidden" name="doctor_id" value="{{ old.doctor_id ?? '' }}">
+            <input type="hidden" name="service_id" value="{{ old.service_id ?? '' }}">
+            <input type="hidden" name="start_time" id="start_time_hidden">
+            <input type="hidden" name="end_time" id="end_time_hidden">
+             {% if old.waitlist_id %}
+                <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id }}">
+            {% endif %}
+
+            <div class="field {% if availableSlots is empty %}disabled{% endif %}">
+                <label>Available Time Slots for {{ selectedDate|date("F d, Y") }}</label>
+                <div class="ui five column grid">
+                    {% for slot in availableSlots %}
+                        <div class="column">
+                            <button class="ui basic button slot-button" data-slot-time="{{ slot|date('Y-m-d H:i:s') }}">{{ slot|date("H:i") }}</button>
+                        </div>
+                    {% else %}
+                        <p>No available slots for this day, doctor, or service duration. Please try another selection.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="two fields">
+                 {{ forms.select('patient_id', 'Patient', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                 <div class="field">
+                    <label>Selected Slot</label>
+                    <input type="text" id="selected_slot_display" readonly placeholder="Please select a slot from above">
+                 </div>
+            </div>
+
+            {{ forms.textarea('notes', 'Notes', old.notes ?? null, 'Additional notes for the appointment') }}
+
+            {{ ui.button('Save Appointment', 'primary', 'large', 'save', { 'type': 'submit', 'class': 'disabled', 'id': 'save-button' }) }}
+            <a href="/appointments" class="ui button">Cancel</a>
         </form>
     </div>
 {% endblock %}
@@ -30,7 +67,63 @@
     {{ parent() }}
     <script>
         $(document).ready(function() {
-            $('.ui.dropdown').dropdown();
+            // Handle form submission for finding slots
+            $('#find-slots-form').submit(function(e) {
+                e.preventDefault();
+                const doctorId = $('#doctor_selector').val();
+                const serviceId = $('#service_selector').val();
+                const date = $('#date_selector').val();
+
+                if (doctorId && date) {
+                    let url = '/appointments/new?doctor_id=' + doctorId + '&date=' + date + '&service_id=' + serviceId;
+                    // Preserve patient_id if it was pre-selected (e.g. from waitlist)
+                     {% if old.patient_id %}
+                        url += '&patient_id={{ old.patient_id }}';
+                    {% endif %}
+                    {% if old.waitlist_id %}
+                        url += '&waitlist_id={{ old.waitlist_id }}';
+                    {% endif %}
+                    window.location.href = url;
+                }
+            });
+
+            // Handle slot selection
+            const serviceDuration = {{ (services|filter(s => s.id == (old.service_id ?? 0))|first).duration_minutes ?? 30 }};
+            
+            $('.slot-button').click(function(e) {
+                e.preventDefault();
+                const startTimeStr = $(this).data('slot-time');
+                const startTime = new Date(startTimeStr.replace(/-/g, "/")); // JS Date parsing can be tricky with hyphens
+                
+                // Calculate end time
+                let endTime = new Date(startTime.getTime() + serviceDuration * 60000);
+
+                // Format for hidden inputs (YYYY-MM-DD HH:mm:ss)
+                const formatForHidden = (date) => {
+                    const pad = (num) => num.toString().padStart(2, '0');
+                    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' +
+                           pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+                };
+                
+                $('#start_time_hidden').val(formatForHidden(startTime));
+                $('#end_time_hidden').val(formatForHidden(endTime));
+
+                // Update display
+                const displayTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                $('#selected_slot_display').val(displayTime);
+
+                // Highlight selected button
+                $('.slot-button').removeClass('primary');
+                $(this).addClass('primary');
+
+                // Enable save button
+                $('#save-button').removeClass('disabled');
+            });
+
+            // Pre-select patient if in query params
+            {% if old.patient_id %}
+                $('#patient_id').dropdown('set selected', '{{ old.patient_id }}');
+            {% endif %}
         });
     </script>
 {% endblock %}
