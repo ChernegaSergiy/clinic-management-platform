@@ -25,7 +25,7 @@ class ScheduleController
     {
         // For now, only for the logged-in doctor.
         // Later, could be extended for admins to manage any doctor.
-        $doctorId = (int)$_SESSION['user_id'];
+        $doctorId = (int)$_SESSION['user']['id'];
 
         $schedule = $this->doctorScheduleRepository->findByDoctor($doctorId);
         
@@ -51,7 +51,7 @@ class ScheduleController
     // update(), addException(), deleteException() methods will be added later.
     public function update(): void
     {
-        $doctorId = (int)$_SESSION['user_id'];
+        $doctorId = (int)$_SESSION['user']['id'];
         $scheduleData = $_POST['schedule'] ?? [];
 
         foreach ($scheduleData as $dayOfWeek => $data) {
@@ -79,7 +79,7 @@ class ScheduleController
 
     public function addException(): void
     {
-        $doctorId = (int)$_SESSION['user_id'];
+        $doctorId = (int)$_SESSION['user']['id'];
         $exceptionData = [
             'doctor_id' => $doctorId,
             'exception_date' => $_POST['exception_date'],
@@ -98,7 +98,7 @@ class ScheduleController
 
     public function deleteException(): void
     {
-        $doctorId = (int)$_SESSION['user_id'];
+        $doctorId = (int)$_SESSION['user']['id'];
         $exceptionId = (int)$_POST['exception_id'];
 
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
