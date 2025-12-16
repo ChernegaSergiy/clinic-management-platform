@@ -15,7 +15,7 @@ class ScheduleController
 
     public function __construct()
     {
-        AuthGuard::protect(); // Protect all actions in this controller
+        AuthGuard::check(); // Protect all actions in this controller
         $this->doctorScheduleRepository = new DoctorScheduleRepository();
         $this->scheduleExceptionRepository = new ScheduleExceptionRepository();
         $this->view = new View();
