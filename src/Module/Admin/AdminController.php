@@ -998,6 +998,9 @@ class AdminController
             exit();
         }
 
+        // Normalize is_active checkbox value
+        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
+
         $this->serviceRepository->save($_POST);
         $_SESSION['success_message'] = "Послугу успішно створено.";
         header('Location: /admin/services');
@@ -1060,6 +1063,9 @@ class AdminController
             header('Location: /admin/services/edit?id=' . $id);
             exit();
         }
+
+        // Normalize is_active checkbox value
+        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
 
         $this->serviceRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Послугу успішно оновлено.";
