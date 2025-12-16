@@ -22,7 +22,7 @@ use App\Module\News\NewsController;
 use App\Module\Notification\NotificationController;
 use App\Module\Patient\PatientController;
 use App\Module\Prescription\PrescriptionController;
-use App\Module\Schedule\Controller\ScheduleController;
+use App\Module\Schedule\ScheduleController;
 use App\Module\User\AuthController;
 use App\Module\User\OAuthController;
 use App\Module\User\UserController;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\Schedule\Controller;
+namespace App\Module\Schedule;
 
 use App\Core\AuthGuard;
 use App\Core\View;
