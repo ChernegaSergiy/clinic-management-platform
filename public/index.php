@@ -74,6 +74,9 @@ session_start();
 
 $router = new Router();
 
+$telegramBotController = new App\Module\Telegram\TelegramBotController($telegramService, $userRepository, $notificationService);
+$scheduleController = new App\Module\Schedule\Controller\ScheduleController();
+
 use App\Module\News\NewsController; // Add this line at the top
 
 // Page routes (existing)
@@ -287,6 +290,12 @@ $router->add('POST', '/admin/kpi_definitions/new', [AdminController::class, 'sto
 $router->add('GET', '/admin/kpi_definitions/edit', [AdminController::class, 'editKpiDefinition']);
 $router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'updateKpiDefinition']);
 $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
+
+// Schedule routes
+$router->add('GET', '/doctor/schedule', [$scheduleController, 'index']);
+$router->add('POST', '/doctor/schedule/update', [$scheduleController, 'update']);
+$router->add('POST', '/doctor/schedule/exceptions/add', [$scheduleController, 'addException']);
+$router->add('POST', '/doctor/schedule/exceptions/delete', [$scheduleController, 'deleteException']);
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
