@@ -297,6 +297,14 @@ $router->add('GET', '/admin/services/edit', [AdminController::class, 'editServic
 $router->add('POST', '/admin/services/edit', [AdminController::class, 'updateService']);
 $router->add('POST', '/admin/services/delete', [AdminController::class, 'deleteService']);
 
+// Admin Service Category routes
+$router->add('GET', '/admin/service-categories', [AdminController::class, 'listServiceCategories']);
+$router->add('GET', '/admin/service-categories/new', [AdminController::class, 'createServiceCategory']);
+$router->add('POST', '/admin/service-categories/new', [AdminController::class, 'storeServiceCategory']);
+$router->add('GET', '/admin/service-categories/edit', [AdminController::class, 'editServiceCategory']);
+$router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
+$router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
+
 // Schedule routes
 $router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
 $router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
