@@ -1085,6 +1085,117 @@ class AdminController
         exit();
     }
 
+    // --- Service Category Management ---
+    public function listServiceCategories(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+        $categories = $this->serviceRepository->findCategories();
+        View::render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
+    }
+
+    public function createServiceCategory(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+        View::render('@modules/Admin/templates/service_categories/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeServiceCategory(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:service_categories,name'],
+            'description' => [], // Optional
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/service-categories/new');
+            exit();
+        }
+
+        $this->serviceRepository->saveCategory($_POST);
+        $_SESSION['success_message'] = "Категорію послуг успішно створено.";
+        header('Location: /admin/service-categories');
+        exit();
+    }
+
+    public function editServiceCategory(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $category = $this->serviceRepository->findCategoryById($id);
+
+        if (!$category) {
+            http_response_code(404);
+            echo "Категорію послуг не знайдено";
+            return;
+        }
+
+        View::render('@modules/Admin/templates/service_categories/edit.html.twig', [
+            'category' => $category,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateServiceCategory(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $category = $this->serviceRepository->findCategoryById($id);
+
+        if (!$category) {
+            http_response_code(404);
+            echo "Категорію послуг не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:service_categories,name,' . $id],
+            'description' => [], // Optional
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/service-categories/edit?id=' . $id);
+            exit();
+        }
+
+        $this->serviceRepository->updateCategory($id, $_POST);
+        $_SESSION['success_message'] = "Категорію послуг успішно оновлено.";
+        header('Location: /admin/service-categories');
+        exit();
+    }
+
+    public function deleteServiceCategory(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_service_categories');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->serviceRepository->deleteCategory($id);
+        $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
+        header('Location: /admin/service-categories');
+        exit();
+    }
+
     private function authorizeAdmin(): void
     {
         AuthGuard::check();
