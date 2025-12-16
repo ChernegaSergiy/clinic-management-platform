@@ -1,0 +1,40 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Додати нову послугу - Адмін-панель{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Додати нову послугу</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/services/new">
+            {{ forms.input('name', 'Назва послуги', old.name ?? null, 'text', 'Назва послуги', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'Опис', old.description ?? null, 'Опис послуги', errors.description ?? null) }}
+            <div class="two fields">
+                {{ forms.input('price', 'Ціна', old.price ?? null, 'number', 'Ціна послуги', errors.price ?? null, {'required': 'required', 'step': '0.01'}) }}
+                {{ forms.input('duration_minutes', 'Тривалість (хв)', old.duration_minutes ?? null, 'number', 'Тривалість у хвилинах', errors.duration_minutes ?? null, {'required': 'required', 'min': '1'}) }}
+            </div>
+            {{ forms.select('category_id', 'Категорія', categories, old.category_id ?? null, errors.category_id ?? null, {'empty_option': 'Оберіть категорію'}) }}
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" name="is_active" {{ old.is_active is defined and old.is_active == 0 ? '' : 'checked' }}>
+                    <label>Активна послуга</label>
+                </div>
+            </div>
+
+            {{ ui.button('Зберегти послугу', 'primary', 'large', 'save') }}
+            <a href="/admin/services" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}

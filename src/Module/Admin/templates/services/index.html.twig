@@ -1,0 +1,68 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Послуги - Адмін-панель{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Список послуг</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/services/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати послугу
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Ціна</th>
+                    <th>Тривалість (хв)</th>
+                    <th>Категорія</th>
+                    <th>Активна</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                    <tr>
+                        <td>{{ service.id }}</td>
+                        <td>{{ service.name }}</td>
+                        <td>{{ service.price }}</td>
+                        <td>{{ service.duration_minutes }}</td>
+                        <td>{{ service.category_name ?? '-' }}</td>
+                        <td>
+                            {% if service.is_active %}
+                                <i class="check icon green"></i> Так
+                            {% else %}
+                                <i class="times icon red"></i> Ні
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/admin/services/edit?id={{ service.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                            <form action="/admin/services/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю послугу?');">
+                                <input type="hidden" name="id" value="{{ service.id }}">
+                                <button type="submit" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">Немає послуг для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
