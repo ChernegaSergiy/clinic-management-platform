@@ -74,7 +74,6 @@ session_start();
 
 $router = new Router();
 
-$telegramBotController = new App\Module\Telegram\TelegramBotController($telegramService, $userRepository, $notificationService);
 $scheduleController = new App\Module\Schedule\Controller\ScheduleController();
 
 use App\Module\News\NewsController; // Add this line at the top
