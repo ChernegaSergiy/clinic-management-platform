@@ -1,0 +1,113 @@
+{% extends "layouts/dashboard.html.twig" %}
+
+{% block title %}Manage Schedule{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="sixteen wide column">
+        <h1 class="ui header">Manage Your Schedule</h1>
+
+        <div class="ui segment">
+            <h2 class="ui header">Weekly Schedule</h2>
+            <p>Set your standard working hours for each day of the week.</p>
+            
+            <form class="ui form" method="POST" action="/doctor/schedule/update">
+                <div class="ui divided list">
+                    {% for day_num, day_name in {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 0: 'Sunday'} %}
+                        {% set schedule_entry = scheduleByDay[day_num] ?? null %}
+                        <div class="item">
+                            <div class="content">
+                                <div class="header">{{ day_name }}</div>
+                                <div class="description">
+                                    <div class="three fields">
+                                        <div class="field">
+                                            <label>Available</label>
+                                            <div class="ui toggle checkbox">
+                                                <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                                <label></label>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label>Start Time</label>
+                                            <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
+                                        </div>
+                                        <div class="field">
+                                            <label>End Time</label>
+                                            <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="ui primary button" type="submit">Save Weekly Schedule</button>
+            </form>
+        </div>
+
+        <div class="ui segment">
+            <h2 class="ui header">Schedule Exceptions</h2>
+            <p>Add or remove unavailable time, like holidays or special events.</p>
+            
+            <h3 class="ui header">Add New Exception</h3>
+            <form class="ui form" method="POST" action="/doctor/schedule/exceptions/add">
+                <div class="four fields">
+                    <div class="field">
+                        <label>Date</label>
+                        <input type="date" name="exception_date" required>
+                    </div>
+                    <div class="field">
+                        <label>Start Time</label>
+                        <input type="time" name="start_time" required>
+                    </div>
+                    <div class="field">
+                        <label>End Time</label>
+                        <input type="time" name="end_time" required>
+                    </div>
+                    <div class="field">
+                        <label>Type</label>
+                         <select name="is_available" class="ui dropdown">
+                            <option value="0">Unavailable</option>
+                            <option value="1">Available</option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="field">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2"></textarea>
+                </div>
+                <button class="ui primary button" type="submit">Add Exception</button>
+            </form>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Upcoming Exceptions</h3>
+            <div class="ui divided list">
+                {% for exception in exceptions %}
+                    <div class="item">
+                        <div class="right floated content">
+                            <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
+                                <input type="hidden" name="exception_id" value="{{ exception.id }}">
+                                <button class="ui mini red button" type="submit">Delete</button>
+                            </form>
+                        </div>
+                        <div class="content">
+                            <div class="header">{{ exception.exception_date|date("F d, Y") }}</div>
+                            <div class="description">
+                                {{ exception.start_time|date("H:i") }} - {{ exception.end_time|date("H:i") }}
+                                <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">{{ exception.is_available ? 'Available' : 'Unavailable' }}</span>
+                                {% if exception.notes %}<br>{{ exception.notes }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="item">
+                        <p>No upcoming exceptions found.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
