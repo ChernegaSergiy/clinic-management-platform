@@ -88,30 +88,43 @@
             <div class="ui divider"></div>
 
             <h4 class="ui header">Майбутні винятки</h4>
-            <div class="ui divided list">
-                {% for exception in exceptions %}
-                    <div class="item">
-                        <div class="right floated content">
-                            <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
-                                <input type="hidden" name="exception_id" value="{{ exception.id }}">
-                                <button class="ui mini red button" type="submit">Видалити</button>
-                            </form>
-                        </div>
-                        <div class="content">
-                            <div class="header">{{ exception.exception_date|date("F d, Y") }}</div>
-                            <div class="description">
-                                {{ exception.start_time|date("H:i") }} - {{ exception.end_time|date("H:i") }}
-                                <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">{{ exception.is_available ? 'Доступно' : 'Недоступно' }}</span>
-                                {% if exception.notes %}<br>{{ exception.notes }}{% endif %}
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="item">
-                        <p>Майбутніх винятків не знайдено.</p>
-                    </div>
-                {% endfor %}
-            </div>
+            <table class="ui celled unstackable table">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Час початку</th>
+                        <th>Час закінчення</th>
+                        <th>Тип</th>
+                        <th>Примітки</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exception in exceptions %}
+                        <tr>
+                            <td>{{ exception.exception_date|date("F d, Y") }}</td>
+                            <td>{{ exception.start_time|date("H:i") }}</td>
+                            <td>{{ exception.end_time|date("H:i") }}</td>
+                            <td>
+                                <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">
+                                    {{ exception.is_available ? 'Доступно' : 'Недоступно' }}
+                                </span>
+                            </td>
+                            <td>{{ exception.notes ?? '-' }}</td>
+                            <td>
+                                <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
+                                    <input type="hidden" name="exception_id" value="{{ exception.id }}">
+                                    <button class="ui mini red button" type="submit">Видалити</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="center aligned">Майбутніх винятків не знайдено.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}
