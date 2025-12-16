@@ -89,4 +89,29 @@ class ServiceRepository
         ]);
         return $success ? (int)$this->pdo->lastInsertId() : null;
     }
+
+    public function findCategoryById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM service_categories WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result === false ? null : $result;
+    }
+
+    public function updateCategory(int $id, array $data): bool
+    {
+        $sql = "UPDATE service_categories SET name = :name, description = :description WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':id' => $id,
+            ':name' => $data['name'],
+            ':description' => $data['description'] ?? null,
+        ]);
+    }
+
+    public function deleteCategory(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM service_categories WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }
