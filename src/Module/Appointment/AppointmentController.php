@@ -9,7 +9,10 @@ use App\Module\Patient\Repository\PatientRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\AuthGuard;
-use App\Core\Gate;
+use App\Module\Billing\Repository\ServiceRepository;
+use App\Module\Schedule\Repository\DoctorScheduleRepository;
+use App\Module\Schedule\Repository\ScheduleExceptionRepository;
+use App\Module\Schedule\Service\SchedulingService;
 
 class AppointmentController
 {
@@ -17,6 +20,8 @@ class AppointmentController
     private PatientRepository $patientRepository;
     private UserRepository $userRepository;
     private NotificationService $notificationService;
+    private SchedulingService $schedulingService;
+    private ServiceRepository $serviceRepository;
 
     public function __construct()
     {
@@ -24,6 +29,18 @@ class AppointmentController
         $this->patientRepository = new PatientRepository();
         $this->userRepository = new UserRepository();
         $this->notificationService = new NotificationService();
+
+        // Dependencies for SchedulingService
+        $this->serviceRepository = new ServiceRepository();
+        $doctorScheduleRepository = new DoctorScheduleRepository();
+        $scheduleExceptionRepository = new ScheduleExceptionRepository();
+
+        $this->schedulingService = new SchedulingService(
+            $doctorScheduleRepository,
+            $scheduleExceptionRepository,
+            $this->appointmentRepository,
+            $this->serviceRepository
+        );
     }
 
     public function index(): void
@@ -126,7 +143,23 @@ class AppointmentController
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
+        $services = $this->serviceRepository->findAll(); // Get all services
         $waitlistId = (int)($_GET['waitlist_id'] ?? 0);
+        
+        $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
+        $selectedDateStr = $_GET['date'] ?? date('Y-m-d');
+        $selectedServiceId = (int)($_GET['service_id'] ?? $services[0]['id'] ?? 0);
+
+        $availableSlots = [];
+        if ($selectedDoctorId && $selectedDateStr) {
+            try {
+                $selectedDate = new \DateTime($selectedDateStr);
+                $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+            } catch (\Exception $e) {
+                // Invalid date format, handle error or ignore
+            }
+        }
+        
         $prefill = [];
         if ($waitlistId) {
             $entry = $this->appointmentRepository->findWaitlistById($waitlistId);
@@ -159,7 +192,10 @@ class AppointmentController
         View::render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
-            'old' => $prefill,
+            'services' => $services,
+            'old' => array_merge($prefill, $_GET),
+            'availableSlots' => $availableSlots,
+            'selectedDate' => $selectedDateStr,
         ]);
     }
 
@@ -169,49 +205,49 @@ class AppointmentController
         Gate::authorize('appointments.write');
 
         $rawInput = $_POST;
-        $waitlistId = (int)($rawInput['waitlist_id'] ?? 0); // Extract waitlist_id
-        if ($waitlistId) {
-            unset($_POST['waitlist_id']); // Remove it from $_POST so it's not validated against general rules
-        }
-
-        // Normalize HTML datetime-local (or localized input) to DB format before validation
-        foreach (['start_time', 'end_time'] as $field) {
-            if (!empty($_POST[$field])) {
-                try {
-                    $dt = $this->normalizeDateTime($_POST[$field]);
-                    $_POST[$field] = $dt->format('Y-m-d H:i:s');
-                    // Save back a value suitable for datetime-local input
-                    $_POST[$field . '_input'] = $dt->format('Y-m-d\TH:i');
-                } catch (\Exception $e) {
-                    // leave as is; validator will catch format issues
-                }
-            }
-        }
-
+        $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
+        
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
+            'service_id' => ['required', 'numeric'],
             'start_time' => ['required', 'datetime'],
             'end_time' => ['required', 'datetime'],
         ];
 
-        // Validate end after start
-        if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
-            if (strtotime($_POST['end_time']) <= strtotime($_POST['start_time'])) {
-                $validator->addError('end_time', 'Час закінчення має бути пізніше за час початку.');
+        if (!$validator->validate($rawInput, $rules)) {
+            // This is a basic failure, redirect back with a generic error
+            // A more robust solution would re-render the form, which is complex.
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $rawInput;
+            header('Location: /appointments/new?' . http_build_query($rawInput));
+            exit();
+        }
+
+        // Advanced validation: Check if the slot is still available
+        $selectedDoctorId = (int)$rawInput['doctor_id'];
+        $selectedServiceId = (int)$rawInput['service_id'];
+        $startTime = new \DateTime($rawInput['start_time']);
+
+        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+        
+        $isSlotAvailable = false;
+        foreach ($availableSlots as $slot) {
+            if ($slot->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s')) {
+                $isSlotAvailable = true;
+                break;
             }
         }
 
-        if (!$validator->validate($_POST, $rules)) {
-            $errors = [];
-            foreach ($validator->getErrors() as $key => $messages) {
-                $errors[$key] = is_array($messages) ? reset($messages) : $messages;
-            }
+        if (!$isSlotAvailable) {
+             $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
 
-            // Повторне завантаження даних для форми у випадку помилки
+            // Re-render the form with all the necessary data
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
+            $services = $this->serviceRepository->findAll();
+
             $patientOptions = [];
             foreach ($patients as $patient) {
                 $patientOptions[$patient['id']] = $patient['full_name'];
@@ -220,22 +256,25 @@ class AppointmentController
             foreach ($doctors as $doctor) {
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
+            
+            $selectedDateStr = $startTime->format('Y-m-d');
+            $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
 
             View::render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
-                'old' => array_merge($rawInput, [ // Merge rawInput back for prefilling
-                    'start_time' => $_POST['start_time_input'] ?? $rawInput['start_time'] ?? null,
-                    'end_time' => $_POST['end_time_input'] ?? $rawInput['end_time'] ?? null,
-                ]),
+                'old' => $rawInput,
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
-                'waitlist_id' => $waitlistId, // Ensure waitlist_id is passed back if validation fails
+                'services' => $services,
+                'availableSlots' => $availableSlots,
+                'selectedDate' => $selectedDateStr,
             ]);
             return;
         }
 
-        $dataToSave = $_POST;
-        $dataToSave['waitlist_id'] = ($waitlistId > 0) ? $waitlistId : null; // Add waitlist_id for repository
+
+        $dataToSave = $rawInput;
+        $dataToSave['waitlist_id'] = ($waitlistId > 0) ? $waitlistId : null;
 
         $this->appointmentRepository->save($dataToSave);
 
@@ -243,14 +282,15 @@ class AppointmentController
             $this->appointmentRepository->updateWaitlistStatus($waitlistId, 'booked');
         }
 
-        $patient = $this->patientRepository->findById($_POST['patient_id']);
-        $doctor = $this->userRepository->findById($_POST['doctor_id']);
+        // Send notifications
+        $patient = $this->patientRepository->findById((int)$rawInput['patient_id']);
+        $doctor = $this->userRepository->findById($selectedDoctorId);
         if ($patient && $doctor) {
             $message = sprintf(
-                'Новий запис: Пацієнт %s до лікаря %s на %s.',
+                'New appointment: Patient %s with Dr. %s at %s.',
                 $patient['first_name'] . ' ' . $patient['last_name'],
                 $doctor['first_name'] . ' ' . $doctor['last_name'],
-                $_POST['start_time']
+                $startTime->format('Y-m-d H:i')
             );
             $this->notificationService->createNotification($doctor['id'], $message);
         }
