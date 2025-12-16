@@ -3,70 +3,194 @@
 {% block title %}Записатися на прийом — Міська клінічна лікарня №1{% endblock %}
 
 {% block body %}
-    <section class="section">
-        <div class="container" style="max-width: 700px; padding: 2rem 0;">
-            <header class="section__header" style="text-align: center;">
-                <div class="section__eyebrow">Онлайн-запис</div>
-                <h1 class="section__title section__title--large" style="margin-bottom: 0.75rem;">Запишіться на прийом</h1>
-                <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">Оберіть лікаря, бажану дату та залиште контакти — ми підтвердимо запис.</p>
-            </header>
+<section class="section">
+    <div class="container" style="max-width: 700px; padding: 2rem 0;">
+        <header class="section__header" style="text-align: center;">
+            <div class="section__eyebrow">Онлайн-запис</div>
+            <h1 class="section__title section__title--large" style="margin-bottom: 0.75rem;">Запишіться на прийом</h1>
+            <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">Оберіть лікаря, послугу, дату та час, щоб миттєво забронювати ваш візит.</p>
+        </header>
 
-            {# Display success/error messages #}
-            {% if success_message %}
-                <div style="border: var(--border-medium); background: #e6ffe6; padding: 0.8rem; margin-bottom: 1.5rem; text-align: center; color: var(--color-ok); font-weight: 700; font-size: 0.85rem;">
-                    {{ success_message }}
-                </div>
-            {% endif %}
+        {% if success_message %}
+            <div style="border: 1px solid #1c7c2f; background: #e6f7eb; padding: 0.8rem; margin-bottom: 1.5rem; text-align: center; color: #0f3d1a; font-weight: 700; font-size: 0.85rem;">
+                {{ success_message }}
+            </div>
+        {% endif %}
 
-            {% if errors is defined and errors %}
-                <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem;">
-                    <ul style="list-style: none; margin: 0; padding: 0;">
-                        {% for field, messages in errors %}
-                            {% for msg in messages %}
-                                <li>{{ msg }}</li>
-                            {% endfor %}
+        {% if errors is defined and errors %}
+            <div style="border: 1px solid #b00020; background: #ffecec; padding: 0.8rem; margin-bottom: 1.5rem; color: #2d0000; font-weight: 700; font-size: 0.85rem;">
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    {% for field, messages in errors %}
+                        {% for msg in messages %}
+                            <li>{{ msg }}</li>
                         {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-            <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
-                <form method="POST" action="/book-appointment" style="display: grid; gap: 1rem;">
+        <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
+            <form method="POST" action="/book-appointment" style="display: grid; gap: 1rem;">
+                <input type="hidden" name="start_time" id="start_time_hidden">
+                <input type="hidden" name="end_time" id="end_time_hidden">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
                         <label class="booking-label">Ваше ім'я</label>
-                        <input class="booking-input" type="text" name="name" value="{{ old.name ?? '' }}" required>
+                        <input class="booking-input" type="text" name="first_name" value="{{ old.first_name ?? '' }}" required>
                     </div>
+                    <div>
+                        <label class="booking-label">Ваше прізвище</label>
+                        <input class="booking-input" type="text" name="last_name" value="{{ old.last_name ?? '' }}" required>
+                    </div>
+                </div>
+                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
                         <label class="booking-label">Телефон</label>
-                        <input class="booking-input" type="tel" name="phone" value="{{ old.phone ?? '' }}" required>
+                        <input class="booking-input" type="tel" name="phone_number" value="{{ old.phone_number ?? '' }}" required>
                     </div>
                     <div>
-                        <label class="booking-label">Email (необов'язково)</label>
-                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}">
+                        <label class="booking-label">Email</label>
+                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}" required>
                     </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 12px 0;">
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                     <div>
                         <label class="booking-label">Лікар</label>
-                        <select class="booking-select" name="doctor_id">
-                            <option value="">Будь-який доступний</option>
+                        <select class="booking-select" name="doctor_id" id="doctor_selector">
+                            <option value="">Оберіть лікаря</option>
                             {% for doctor in doctors %}
                                 <option value="{{ doctor.id }}" {% if old.doctor_id is defined and old.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label class="booking-label">Бажана дата</label>
-                        <input class="booking-input" type="date" name="desired_date" value="{{ old.desired_date ?? '' }}" required>
+                        <label class="booking-label">Послуга</label>
+                         <select class="booking-select" name="service_id" id="service_selector">
+                            <option value="">Оберіть послугу</option>
+                            {% for service in services %}
+                                <option value="{{ service.id }}" data-duration="{{ service.duration_minutes }}" {% if old.service_id is defined and old.service_id == service.id %}selected{% endif %}>{{ service.name }} ({{ service.duration_minutes }} хв)</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div>
-                        <label class="booking-label">Коментар</label>
-                        <textarea class="booking-textarea" name="notes" rows="3" placeholder="Симптоми чи побажання">{{ old.notes ?? '' }}</textarea>
+                        <label class="booking-label">Дата</label>
+                        <input class="booking-input" type="date" name="date" id="date_selector" value="{{ old.date ?? '' | date('Y-m-d') }}" required>
                     </div>
-                    <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
-                        <button type="submit" class="btn btn--primary">Надіслати запит</button>
-                        <a href="/" class="btn btn--ghost">На головну</a>
+                </div>
+
+                <div>
+                    <label class="booking-label">Вільні години</label>
+                    <div id="slots_container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 4px;">
+                         <p style="grid-column: 1 / -1; color: var(--muted); margin: 0; padding: 10px 0; text-align: center;">Будь ласка, оберіть лікаря, послугу та дату.</p>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div>
+                    <label class="booking-label">Коментар</label>
+                    <textarea class="booking-textarea" name="notes" rows="3" placeholder="Симптоми чи побажання">{{ old.notes ?? '' }}</textarea>
+                </div>
+                
+                <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
+                    <button type="submit" id="save-button" class="btn btn--primary" disabled>Підтвердити запис</button>
+                    <a href="/" class="btn btn--ghost">На головну</a>
+                </div>
+            </form>
         </div>
-    </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const doctorSelect = document.getElementById('doctor_selector');
+    const serviceSelect = document.getElementById('service_selector');
+    const dateInput = document.getElementById('date_selector');
+    const slotsContainer = document.getElementById('slots_container');
+    const saveButton = document.getElementById('save-button');
+    let serviceDuration = 30;
+
+    function fetchSlots() {
+        const doctorId = doctorSelect.value;
+        const serviceId = serviceSelect.value;
+        const date = dateInput.value;
+
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.duration) {
+            serviceDuration = selectedOption.dataset.duration;
+        }
+
+        if (!doctorId || !serviceId || !date) {
+            slotsContainer.innerHTML = '<p style="grid-column: 1 / -1; color: var(--muted); margin: 0; padding: 10px 0; text-align: center;">Будь ласка, оберіть лікаря, послугу та дату.</p>';
+            saveButton.disabled = true;
+            return;
+        }
+
+        slotsContainer.innerHTML = '<p style="grid-column: 1 / -1; color: var(--muted); margin: 0; padding: 10px 0; text-align: center;">Завантаження...</p>';
+        saveButton.disabled = true;
+        
+        fetch(`/api/appointments/available-slots?doctor_id=${doctorId}&service_id=${serviceId}&date=${date}`)
+            .then(response => response.json())
+            .then(slots => {
+                slotsContainer.innerHTML = '';
+                if (slots.error) {
+                    slotsContainer.innerHTML = `<p style="grid-column: 1 / -1; color: var(--muted); margin: 0; padding: 10px 0; text-align: center;">${slots.error}</p>`;
+                    return;
+                }
+                if (slots.length > 0) {
+                    slots.forEach(slot => {
+                        const button = document.createElement('button');
+                        button.className = 'btn slot-button';
+                        button.dataset.slotTime = slot.value;
+                        button.innerText = slot.label;
+                        button.style.width = '100%';
+                        button.addEventListener('click', handleSlotClick);
+                        slotsContainer.appendChild(button);
+                    });
+                } else {
+                    slotsContainer.innerHTML = '<p style="grid-column: 1 / -1; color: var(--muted); margin: 0; padding: 10px 0; text-align: center;">На цей день вільних годин немає.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching slots:', error);
+                slotsContainer.innerHTML = '<p style="grid-column: 1 / -1; color: red; margin: 0; padding: 10px 0; text-align: center;">Помилка завантаження. Спробуйте пізніше.</p>';
+            });
+    }
+
+    function handleSlotClick(e) {
+        e.preventDefault();
+        
+        const startTimeStr = this.dataset.slotTime;
+        const startTime = new Date(startTimeStr.replace(/-/g, "/"));
+        const endTime = new Date(startTime.getTime() + parseInt(serviceDuration, 10) * 60000);
+
+        const formatForHidden = (date) => {
+            const pad = (num) => num.toString().padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        };
+
+        document.getElementById('start_time_hidden').value = formatForHidden(startTime);
+        document.getElementById('end_time_hidden').value = formatForHidden(endTime);
+
+        document.querySelectorAll('.slot-button').forEach(btn => {
+            btn.classList.remove('btn--primary');
+        });
+        this.classList.add('btn--primary');
+        
+        saveButton.disabled = false;
+    }
+
+    doctorSelect.addEventListener('change', fetchSlots);
+    serviceSelect.addEventListener('change', fetchSlots);
+    dateInput.addEventListener('change', fetchSlots);
+
+    if (doctorSelect.value && serviceSelect.value && dateInput.value) {
+        fetchSlots();
+    }
+});
+</script>
 {% endblock %}
