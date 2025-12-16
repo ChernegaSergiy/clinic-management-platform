@@ -67,15 +67,17 @@ class PatientRepository implements PatientRepositoryInterface
         return (int)$stmt->fetchColumn();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|false
     {
         $this->lastError = null;
 
-        // Check for duplicate patient before saving
-        if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
-            // Patient with same first name, last name, and birth date already exists
-            $this->lastError = 'patient_exists';
-            return false;
+        // Check for duplicate patient before saving, but only if it's not a placeholder date
+        if (isset($data['birth_date']) && $data['birth_date'] !== '1900-01-01') {
+            if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
+                // Patient with same first name, last name, and birth date already exists
+                $this->lastError = 'patient_exists';
+                return false;
+            }
         }
 
         if (!empty($data['tax_id']) && $this->findByTaxId($data['tax_id'])) {
@@ -91,7 +93,7 @@ class PatientRepository implements PatientRepositoryInterface
         $stmt = $this->pdo->prepare($sql);
 
         try {
-            return $stmt->execute(
+            $success = $stmt->execute(
                 [
                     ':first_name' => $data['first_name'],
                     ':last_name' => $data['last_name'],
@@ -107,6 +109,12 @@ class PatientRepository implements PatientRepositoryInterface
                     ':status' => $data['status'] ?? 'active',
                 ]
             );
+            
+            if ($success) {
+                return (int)$this->pdo->lastInsertId();
+            }
+            return false;
+
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000') {
                 $this->lastError = 'duplicate_key';
@@ -148,6 +156,14 @@ class PatientRepository implements PatientRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+
+    public function findByEmail(string $email): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE email = :email");
+        $stmt->execute([':email' => $email]);
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
