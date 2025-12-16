@@ -46,6 +46,21 @@ class ScheduleExceptionRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function findByDoctorAndDateRange(int $doctorId, string $startDate, string $endDate): array
+    {
+        $sql = "SELECT * FROM schedule_exceptions 
+                WHERE doctor_id = :doctor_id 
+                AND exception_date BETWEEN :start_date AND :end_date 
+                ORDER BY exception_date ASC, start_time ASC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':doctor_id' => $doctorId,
+            ':start_date' => $startDate,
+            ':end_date' => $endDate,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function update(int $id, array $data): bool
     {
         $sql = "UPDATE schedule_exceptions SET
