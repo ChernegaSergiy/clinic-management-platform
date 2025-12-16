@@ -289,6 +289,14 @@ $router->add('GET', '/admin/kpi_definitions/edit', [AdminController::class, 'edi
 $router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'updateKpiDefinition']);
 $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
 
+// Admin Service routes
+$router->add('GET', '/admin/services', [AdminController::class, 'listServices']);
+$router->add('GET', '/admin/services/new', [AdminController::class, 'createService']);
+$router->add('POST', '/admin/services/new', [AdminController::class, 'storeService']);
+$router->add('GET', '/admin/services/edit', [AdminController::class, 'editService']);
+$router->add('POST', '/admin/services/edit', [AdminController::class, 'updateService']);
+$router->add('POST', '/admin/services/delete', [AdminController::class, 'deleteService']);
+
 // Schedule routes
 $router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
 $router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
