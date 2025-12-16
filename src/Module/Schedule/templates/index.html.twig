@@ -3,38 +3,44 @@
 {% block title %}Управління розкладом{% endblock %}
 
 {% block body %}
-<div class="ui grid">
-    <div class="sixteen wide column">
-        <h1 class="ui header">Управління вашим розкладом</h1>
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Управління вашим розкладом</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                {# Future action buttons like "Generate Report" or "Settings" could go here #}
+            </div>
+        </div>
 
-        <div class="ui segment">
-            <h2 class="ui header">Тижневий розклад</h2>
-            <p>Встановіть стандартні робочі години для кожного дня тижня.</p>
-            
-            <form class="ui form" method="POST" action="/doctor/schedule/update">
-                <div class="ui divided list">
-                    {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
-                        {% set schedule_entry = scheduleByDay[day_num] ?? null %}
-                        <div class="item">
-                            <div class="content">
-                                <div class="header">{{ day_name }}</div>
-                                <div class="description">
-                                    <div class="three fields">
-                                        <div class="field">
-                                            <label>Доступно</label>
-                                            <div class="ui toggle checkbox">
-                                                <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
-                                                <label></label>
-                                            </div>
+        <div class="ui divider"></div>
+
+        <h3 class="ui header">Тижневий розклад</h3>
+        <p>Встановіть стандартні робочі години для кожного дня тижня.</p>
+        
+        <form class="ui form" method="POST" action="/doctor/schedule/update">
+            <div class="ui divided list">
+                {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                    {% set schedule_entry = scheduleByDay[day_num] ?? null %}
+                    <div class="item">
+                        <div class="content">
+                            <div class="header">{{ day_name }}</div>
+                            <div class="description">
+                                <div class="three fields">
+                                    <div class="field">
+                                        <label>Доступно</label>
+                                        <div class="ui toggle checkbox">
+                                            <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                            <label></label>
                                         </div>
-                                        <div class="field">
-                                            <label>Час початку</label>
-                                            <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
-                                        </div>
-                                        <div class="field">
-                                            <label>Час закінчення</label>
-                                            <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
-                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label>Час початку</label>
+                                        <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
+                                    </div>
+                                    <div class="field">
+                                        <label>Час закінчення</label>
+                                        <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
                                     </div>
                                 </div>
                             </div>
@@ -45,11 +51,11 @@
             </form>
         </div>
 
-        <div class="ui segment">
-            <h2 class="ui header">Винятки з розкладу</h2>
+        <div class="ui segment" style="margin-top: 2rem;"> {# This segment is for Schedule Exceptions #}
+            <h3 class="ui header">Винятки з розкладу</h3>
             <p>Додайте або видаліть недоступний час, наприклад, відпустки або особливі події.</p>
             
-            <h3 class="ui header">Додати новий виняток</h3>
+            <h4 class="ui header">Додати новий виняток</h4>
             <form class="ui form" method="POST" action="/doctor/schedule/exceptions/add">
                 <div class="four fields">
                     <div class="field">
@@ -81,7 +87,7 @@
 
             <div class="ui divider"></div>
 
-            <h3 class="ui header">Майбутні винятки</h3>
+            <h4 class="ui header">Майбутні винятки</h4>
             <div class="ui divided list">
                 {% for exception in exceptions %}
                     <div class="item">
@@ -107,7 +113,5 @@
                 {% endfor %}
             </div>
         </div>
-
     </div>
-</div>
 {% endblock %}
