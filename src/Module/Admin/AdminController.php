@@ -9,6 +9,7 @@ use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\KpiRepository;
+use App\Module\Billing\Repository\ServiceRepository; // Added
 use App\Core\AuthGuard;
 use App\Core\Gate;
 
@@ -20,6 +21,7 @@ class AdminController
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
     private KpiRepository $kpiRepository;
+    private ServiceRepository $serviceRepository; // Added
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class AdminController
         $this->authConfigRepository = new AuthConfigRepository();
         $this->backupPolicyRepository = new BackupPolicyRepository();
         $this->kpiRepository = new KpiRepository();
+        $this->serviceRepository = new ServiceRepository(); // Added
     }
 
     public function users(): void
@@ -946,6 +949,133 @@ class AdminController
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
         header('Location: /admin/kpi_definitions');
+        exit();
+    }
+
+    // --- Service Management ---
+    public function listServices(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services'); // Specific permission for service management
+        $services = $this->serviceRepository->findAll();
+        View::render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
+    }
+
+    public function createService(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services');
+        $categories = $this->serviceRepository->findCategories();
+        $categoryOptions = [];
+        foreach ($categories as $category) {
+            $categoryOptions[$category['id']] = $category['name'];
+        }
+
+        View::render('@modules/Admin/templates/services/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+            'categories' => $categoryOptions,
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function storeService(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services');
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:services,name'],
+            'price' => ['required', 'numeric'],
+            'duration_minutes' => ['required', 'numeric', 'min:1'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/services/new');
+            exit();
+        }
+
+        $this->serviceRepository->save($_POST);
+        $_SESSION['success_message'] = "Послугу успішно створено.";
+        header('Location: /admin/services');
+        exit();
+    }
+
+    public function editService(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $service = $this->serviceRepository->findById($id);
+
+        if (!$service) {
+            http_response_code(404);
+            echo "Послугу не знайдено";
+            return;
+        }
+
+        $categories = $this->serviceRepository->findCategories();
+        $categoryOptions = [];
+        foreach ($categories as $category) {
+            $categoryOptions[$category['id']] = $category['name'];
+        }
+
+        View::render('@modules/Admin/templates/services/edit.html.twig', [
+            'service' => $service,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+            'categories' => $categoryOptions,
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateService(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $service = $this->serviceRepository->findById($id);
+
+        if (!$service) {
+            http_response_code(404);
+            echo "Послугу не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:services,name,' . $id],
+            'price' => ['required', 'numeric'],
+            'duration_minutes' => ['required', 'numeric', 'min:1'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /admin/services/edit?id=' . $id);
+            exit();
+        }
+
+        $this->serviceRepository->update($id, $_POST);
+        $_SESSION['success_message'] = "Послугу успішно оновлено.";
+        header('Location: /admin/services');
+        exit();
+    }
+
+    public function deleteService(): void
+    {
+        $this->authorizeAdmin();
+        Gate::authorize('admin.manage_services');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->serviceRepository->delete($id);
+        $_SESSION['success_message'] = "Послугу успішно видалено.";
+        header('Location: /admin/services');
         exit();
     }
 
