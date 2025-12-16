@@ -215,4 +215,12 @@ class UserRepository implements UserRepositoryInterface
             ':id' => $userId,
         ]);
     }
+
+    public function findRoleIdByName(string $roleName): ?int
+    {
+        $stmt = $this->pdo->prepare("SELECT id FROM roles WHERE name = :role_name LIMIT 1");
+        $stmt->execute([':role_name' => $roleName]);
+        $result = $stmt->fetchColumn();
+        return $result === false ? null : (int)$result;
+    }
 }

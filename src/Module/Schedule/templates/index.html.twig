@@ -6,7 +6,20 @@
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Управління вашим розкладом</h2>
+                <h2 class="ui header">
+                    Управління розкладом 
+                    {% if selectedDoctorId %}
+                        {% set doctorName = '' %}
+                        {% for doc in allDoctors %}
+                            {% if doc.id == selectedDoctorId %}
+                                {% set doctorName = doc.full_name %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if doctorName %}: {{ doctorName }}{% else %}(Невідомий лікар){% endif %}
+                    {% else %}
+                        (Ваш розклад)
+                    {% endif %}
+                </h2>
             </div>
             <div class="eight wide column right aligned">
                 {# Future action buttons like "Generate Report" or "Settings" could go here #}
@@ -15,10 +28,27 @@
 
         <div class="ui divider"></div>
 
+        {% if canManageAllSchedules %}
+            <form class="ui form" method="GET" action="/doctor/schedule">
+                <div class="field">
+                    <label>Оберіть лікаря для управління розкладом</label>
+                    <select class="ui dropdown" name="doctor_id" onchange="this.form.submit()">
+                        {% for doctor in allDoctors %}
+                            <option value="{{ doctor.id }}" {% if doctor.id == selectedDoctorId %}selected{% endif %}>{{ doctor.full_name }}</option>
+                        {% else %}
+                            <option value="">Немає доступних лікарів</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+            <div class="ui divider"></div>
+        {% endif %}
+
         <h3 class="ui header">Тижневий розклад</h3>
         <p>Встановіть стандартні робочі години для кожного дня тижня.</p>
         
         <form class="ui form" method="POST" action="/doctor/schedule/update">
+            <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}">
             <div class="ui divided list">
                 {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
                     {% set schedule_entry = scheduleByDay[day_num] ?? null %}
@@ -45,11 +75,11 @@
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
-                <button class="ui primary button" type="submit">Зберегти тижневий розклад</button>
-            </form>
-        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="ui primary button" type="submit">Зберегти тижневий розклад</button>
+        </form>
 
         <div class="ui segment" style="margin-top: 2rem;"> {# This segment is for Schedule Exceptions #}
             <h3 class="ui header">Винятки з розкладу</h3>
@@ -57,6 +87,7 @@
             
             <h4 class="ui header">Додати новий виняток</h4>
             <form class="ui form" method="POST" action="/doctor/schedule/exceptions/add">
+                <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}">
                 <div class="four fields">
                     <div class="field">
                         <label>Дата</label>
@@ -114,6 +145,7 @@
                             <td>
                                 <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
                                     <input type="hidden" name="exception_id" value="{{ exception.id }}">
+                                    <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}"> {# Pass selectedDoctorId for delete action #}
                                     <button class="ui mini red button" type="submit">Видалити</button>
                                 </form>
                             </td>
