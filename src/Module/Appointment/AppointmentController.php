@@ -9,6 +9,7 @@ use App\Module\Patient\Repository\PatientRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Core\NotificationService;
 use App\Core\AuthGuard;
+use App\Core\Gate;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
