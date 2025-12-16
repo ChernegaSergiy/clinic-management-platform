@@ -2,28 +2,30 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Core\Router;
+use App\Controller\InstallController;
 use App\Controller\PageController;
+use App\Core\Router;
+use App\Core\View;
+use App\Module\Admin\AdminController;
+use App\Module\Admin\KpiController;
+use App\Module\Appointment\AppointmentController;
+use App\Module\Billing\BillingController;
+use App\Module\Billing\ContractController;
+use App\Module\ClinicalReference\ClinicalReferenceController;
+use App\Module\Dashboard\DashboardController;
+use App\Module\HRM\HrmController;
+use App\Module\Insurance\InsuranceController;
+use App\Module\Inventory\InventoryController;
+use App\Module\LabOrder\LabOrderController;
+use App\Module\MedicalRecord\MedicalRecordController;
+use App\Module\News\NewsController;
+use App\Module\Notification\NotificationController;
+use App\Module\Patient\PatientController;
+use App\Module\Prescription\PrescriptionController;
+use App\Module\Schedule\Controller\ScheduleController;
 use App\Module\User\AuthController;
 use App\Module\User\OAuthController;
 use App\Module\User\UserController;
-use App\Module\Patient\PatientController;
-use App\Module\Prescription\PrescriptionController;
-use App\Module\Appointment\AppointmentController;
-use App\Module\MedicalRecord\MedicalRecordController;
-use App\Module\LabOrder\LabOrderController;
-use App\Module\Inventory\InventoryController;
-use App\Module\Billing\BillingController;
-use App\Module\Billing\ContractController;
-use App\Module\Admin\AdminController;
-use App\Module\Dashboard\DashboardController;
-use App\Module\HRM\HrmController;
-use App\Controller\InstallController;
-use App\Module\Admin\KpiController;
-use App\Module\ClinicalReference\ClinicalReferenceController;
-use App\Module\Notification\NotificationController;
-use App\Module\Insurance\InsuranceController;
-use App\Core\View;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
 $requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -74,10 +76,6 @@ session_start();
 
 $router = new Router();
 
-$scheduleController = new App\Module\Schedule\Controller\ScheduleController();
-
-use App\Module\News\NewsController; // Add this line at the top
-
 // Page routes (existing)
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
@@ -87,6 +85,7 @@ $router->add('GET', '/privacy', [PageController::class, 'privacy']);
 $router->add('GET', '/departments', [PageController::class, 'departments']);
 $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 $router->add('GET', '/faq', [PageController::class, 'faq']);
+
 // News module public routes
 $router->add('GET', '/news', [NewsController::class, 'index']);
 $router->add('GET', '/news/{id}', [NewsController::class, 'show']);
@@ -291,10 +290,10 @@ $router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'up
 $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
 
 // Schedule routes
-$router->add('GET', '/doctor/schedule', [$scheduleController, 'index']);
-$router->add('POST', '/doctor/schedule/update', [$scheduleController, 'update']);
-$router->add('POST', '/doctor/schedule/exceptions/add', [$scheduleController, 'addException']);
-$router->add('POST', '/doctor/schedule/exceptions/delete', [$scheduleController, 'deleteException']);
+$router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
+$router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
+$router->add('POST', '/doctor/schedule/exceptions/add', [ScheduleController::class, 'addException']);
+$router->add('POST', '/doctor/schedule/exceptions/delete', [ScheduleController::class, 'deleteException']);
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
