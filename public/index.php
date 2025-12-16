@@ -312,6 +312,7 @@ $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exp
 $router->add('GET', '/api/notifications', [NotificationController::class, 'getUnread']);
 $router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
 $router->add('POST', '/api/notifications/delete', [NotificationController::class, 'delete']);
+$router->add('GET', '/api/appointments/available-slots', [AppointmentController::class, 'getAvailableSlotsApi']);
 
 // KPI routes (legacy)
 $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
