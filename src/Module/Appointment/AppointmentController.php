@@ -80,9 +80,28 @@ class AppointmentController
     public function publicForm(): void
     {
         $doctors = $this->userRepository->findAllDoctors();
+        $services = $this->serviceRepository->findAll();
+
+        $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
+        $selectedDateStr = $_GET['date'] ?? date('Y-m-d');
+        $selectedServiceId = (int)($_GET['service_id'] ?? $services[0]['id'] ?? 0);
+
+        $availableSlots = [];
+        if ($selectedDoctorId && $selectedDateStr && $selectedServiceId) {
+            try {
+                $selectedDate = new \DateTime($selectedDateStr);
+                $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+            } catch (\Exception $e) {
+                // Invalid date format, handle error or ignore
+            }
+        }
+
         View::render('@modules/Appointment/templates/public/book.html.twig', [
             'doctors' => $doctors,
-            'old' => $_SESSION['old'] ?? [],
+            'services' => $services,
+            'availableSlots' => $availableSlots,
+            'selectedDate' => $selectedDateStr,
+            'old' => array_merge($_SESSION['old'] ?? [], $_GET),
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['public_success_message'] ?? null,
         ]);
@@ -91,32 +110,82 @@ class AppointmentController
 
     public function submitPublicForm(): void
     {
+        $rawInput = $_POST;
+        
         $validator = new \App\Core\Validator(\App\Database::getInstance());
-        $validator->validate($_POST, [
-            'name' => ['required'],
-            'phone' => ['required'],
-            'desired_date' => ['required', 'date'],
-        ]);
+        $rules = [
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'phone_number' => ['required'],
+            'email' => ['required', 'email'],
+            'doctor_id' => ['required', 'numeric'],
+            'service_id' => ['required', 'numeric'],
+            'start_time' => ['required', 'datetime'],
+            'end_time' => ['required', 'datetime'],
+        ];
 
-        if ($validator->hasErrors()) {
+        if (!$validator->validate($rawInput, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            header('Location: /book-appointment');
+            $_SESSION['old'] = $rawInput;
+            header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'] ?? '', 'service_id' => $rawInput['service_id'] ?? '', 'date' => $rawInput['date'] ?? '']));
             exit();
         }
 
-        // For now, just enqueue to waitlist with minimal fields
-        $this->appointmentRepository->addToWaitlist([
-            'patient_id' => null,
-            'desired_doctor_id' => $_POST['doctor_id'] ?: null,
-            'desired_start_time' => $_POST['desired_date'],
-            'desired_end_time' => null,
-            'contact_phone' => $_POST['phone'] ?? null,
-            'contact_email' => $_POST['email'] ?? null,
-            'notes' => $_POST['notes'] ?? null,
+        // Advanced validation: Check if the slot is still available
+        $selectedDoctorId = (int)$rawInput['doctor_id'];
+        $selectedServiceId = (int)$rawInput['service_id'];
+        $startTime = new \DateTime($rawInput['start_time']);
+
+        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+        
+        $isSlotAvailable = false;
+        foreach ($availableSlots as $slot) {
+            if ($slot->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s')) {
+                $isSlotAvailable = true;
+                break;
+            }
+        }
+
+        if (!$isSlotAvailable) {
+            $_SESSION['errors'] = ['start_time' => ['The selected time slot is no longer available. Please choose another one.']];
+            $_SESSION['old'] = $rawInput;
+            header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
+            exit();
+        }
+
+        // Find or create patient
+        $patient = $this->patientRepository->findByEmail($rawInput['email']);
+        if (!$patient) {
+            $patientId = $this->patientRepository->save([
+                'first_name' => $rawInput['first_name'],
+                'last_name' => $rawInput['last_name'],
+                'phone' => $rawInput['phone_number'],
+                'email' => $rawInput['email'],
+                // These are required by DB but not on the form, so use placeholders
+                'birth_date' => '1900-01-01', 
+                'gender' => 'other',
+            ]);
+            if (!$patientId) {
+                 $_SESSION['errors'] = ['patient' => ['Could not create a new patient record.']];
+                 $_SESSION['old'] = $rawInput;
+                 header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
+                 exit();
+            }
+        } else {
+            $patientId = $patient['id'];
+        }
+
+        // Save the appointment
+        $this->appointmentRepository->save([
+            'patient_id' => $patientId,
+            'doctor_id' => $selectedDoctorId,
+            'start_time' => $rawInput['start_time'],
+            'end_time' => $rawInput['end_time'],
+            'notes' => $rawInput['notes'] ?? null,
+            'status' => 'scheduled',
         ]);
 
-        $_SESSION['public_success_message'] = 'Заявку на прийом надіслано. Ми зв\'яжемося для підтвердження.';
+        $_SESSION['public_success_message'] = 'Your appointment has been successfully booked!';
         header('Location: /book-appointment');
         exit();
     }
@@ -632,5 +701,38 @@ class AppointmentController
             'date' => $date,
             'doctorLoad' => $doctorLoad,
         ]);
+    }
+
+    public function getAvailableSlotsApi(): void
+    {
+        header('Content-Type: application/json');
+        
+        $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
+        $selectedDateStr = $_GET['date'] ?? null;
+        $selectedServiceId = (int)($_GET['service_id'] ?? 0);
+
+        if (!$selectedDoctorId || !$selectedDateStr || !$selectedServiceId) {
+            echo json_encode(['error' => 'Doctor, service, and date are required.']);
+            return;
+        }
+
+        try {
+            $selectedDate = new \DateTime($selectedDateStr);
+            $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+            
+            $formattedSlots = [];
+            foreach ($availableSlots as $slot) {
+                $formattedSlots[] = [
+                    'value' => $slot->format('Y-m-d H:i:s'),
+                    'label' => $slot->format('H:i'),
+                ];
+            }
+            
+            echo json_encode($formattedSlots);
+
+        } catch (\Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid date format.']);
+        }
     }
 }
