@@ -146,8 +146,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         const button = document.createElement('button');
                         button.className = 'btn slot-button';
                         button.dataset.slotTime = slot.value;
+                        button.dataset.available = slot.available;
                         button.innerText = slot.label;
                         button.style.width = '100%';
+                        
+                        if (!slot.available) {
+                            button.style.opacity = '0.6';
+                            button.style.textDecoration = 'line-through';
+                            button.style.cursor = 'not-allowed';
+                        }
+                        
                         button.addEventListener('click', handleSlotClick);
                         slotsContainer.appendChild(button);
                     });
@@ -163,6 +171,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleSlotClick(e) {
         e.preventDefault();
+        
+        const isAvailable = this.dataset.available;
+        if (isAvailable === false || isAvailable === 'false') {
+            return; // Don't allow selection of unavailable slots
+        }
         
         const startTimeStr = this.dataset.slotTime;
         const startTime = new Date(startTimeStr.replace(/-/g, "/"));
