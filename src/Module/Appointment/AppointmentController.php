@@ -61,24 +61,23 @@ class AppointmentController
             }
         }
         // If neither permission is allowed, $appointments remains an empty array.
-
-        $doctorOptions = [];
-        foreach ($doctors as $doctor) {
-            $doctorOptions[$doctor['id']] = $doctor['full_name'];
-        }
-        
-        // Create service options array for template
-        $serviceOptions = [];
-        foreach ($services as $service) {
-            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
-        }
         // Filter doctor options for assigned view if not allowed to read all
-        if (!Gate::allows('appointments.read_all') && Gate::allows('appointments.read_assigned')) {
-            $doctorOptions = array_values(array_filter($doctorOptions, fn($d) => (int)$d['id'] === $userId));
+
+
+        // Prepare doctors for calendar (need objects with id and title)
+        $calendarDoctors = [];
+        foreach ($doctors as $doctor) {
+            if (Gate::allows('appointments.read_all') || 
+                (Gate::allows('appointments.read_assigned') && (int)$doctor['id'] === $userId)) {
+                $calendarDoctors[] = [
+                    'id' => $doctor['id'],
+                    'title' => $doctor['full_name']
+                ];
+            }
         }
 
         View::render('@modules/Appointment/templates/index.html.twig', [
-            'doctors' => $doctorOptions,
+            'doctors' => $calendarDoctors,
             'waitlist' => $waitlist,
             'appointments' => $appointments,
         ]);
