@@ -10,6 +10,9 @@
                 <h2 class="ui header">Календар записів</h2>
             </div>
             <div class="eight wide column right aligned">
+                <a href="/appointments/waitlist" class="ui orange button" style="margin-right: 0.5rem;">
+                    <i class="list icon"></i> Заявки ({{ waitlist|length }})
+                </a>
                 <a href="/appointments/new" class="ui primary button">
                     <i class="plus icon"></i> Створити запис
                 </a>
@@ -30,53 +33,8 @@
             <a class="ui label grey">Інше</a>
         </div>
 
-        <div class="ui segments">
-            <div class="ui segment">
-                <h3 class="ui header">Заявки з публічної форми</h3>
-                <table class="ui celled unstackable table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Пацієнт</th>
-                            <th>Номер</th>
-                            <th>Бажаний лікар</th>
-                            <th>Дата</th>
-                            <th>Примітки</th>
-                            <th>Контакт</th>
-                            <th>Статус</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for entry in waitlist %}
-                            <tr>
-                                <td>{{ entry.id }}</td>
-                                <td>{{ entry.patient_name ?? 'Невідомо' }}</td>
-                                <td>{{ entry.ticket_number ?? '—' }}</td>
-                                <td>{{ entry.doctor_name ?? 'Будь-який' }}</td>
-                                <td>{{ entry.desired_start_time ?: '—' }}</td>
-                                <td>{{ entry.notes ?: '—' }}</td>
-                                <td>
-                                    {% if entry.contact_phone %}<div>{{ entry.contact_phone }}</div>{% endif %}
-                                    {% if entry.contact_email %}<div>{{ entry.contact_email }}</div>{% endif %}
-                                </td>
-                                <td>{{ entry.status }}</td>
-                                <td>
-                                    <a class="ui tiny primary button" href="/appointments/new?waitlist_id={{ entry.id }}">Створити запис</a>
-                                    <form action="/appointments/waitlist/reject" method="POST" style="display:inline;">
-                                        <input type="hidden" name="id" value="{{ entry.id }}">
-                                        <button type="submit" class="ui tiny negative button">Відхилити</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr><td colspan="8" class="center aligned">Немає заявок у списку очікування.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="ui segment">
-                <h3 class="ui header">Список записів</h3>
+        <div class="ui segment">
+            <h3 class="ui header">Список записів</h3>
                 <table class="ui celled unstackable table">
                     <thead>
                         <tr>
@@ -106,7 +64,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
         </div>
     </div>
 {% endblock %}

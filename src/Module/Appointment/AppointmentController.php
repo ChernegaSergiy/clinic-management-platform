@@ -509,10 +509,7 @@ public function create(): void
         ]);
     }
 
-    public function waitlist(): void
-    {
-        $this->showWaitlist();
-    }
+
 
     public function update(): void
     {
