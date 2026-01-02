@@ -18,6 +18,7 @@ class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH);
+        error_log("DEBUG: Router looking for $method $path");
 
         foreach ($this->routes as $route) {
             // Convert route path to a regex
@@ -25,17 +26,20 @@ class Router
             $pattern = '#^' . $pattern . '$#';
 
             if ($route['method'] === $method && preg_match($pattern, $path, $matches)) {
+                error_log("DEBUG: Found matching route: {$route['method']} {$route['path']}");
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
                 $handler = $route['handler'];
 
                 if (is_array($handler) && is_string($handler[0])) {
+                    error_log("DEBUG: Creating controller {$handler[0]}");
                     $controller = new $handler[0]();
                     $callback = [$controller, $handler[1]];
                 } else {
                     $callback = $handler;
                 }
 
+                error_log("DEBUG: Calling callback");
                 call_user_func_array($callback, $params);
                 return;
             }
