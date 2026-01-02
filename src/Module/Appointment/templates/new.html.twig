@@ -2,29 +2,29 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Create Appointment{% endblock %}
+{% block title %}Створити Запис{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Create New Appointment</h2>
+        <h2 class="ui header">Створити новий запис</h2>
         <div class="ui divider"></div>
 
         {# Step 1: Select Doctor, Service, and Date to find slots #}
         <form class="ui form" id="find-slots-form">
-            <h4 class="ui dividing header">Step 1: Find Available Slots</h4>
+            <h4 class="ui dividing header">Крок 1: Знайти вільні години</h4>
             <div class="three fields">
-                {{ forms.select('doctor_id', 'Doctor', doctors, old.doctor_id ?? null, null, {'id': 'doctor_selector'}) }}
-                {{ forms.select('service_id', 'Service', services|map(s => { id: s.id, name: s.name ~ ' (' ~ s.duration_minutes ~ ' min)' }), old.service_id ?? null, null, {'id': 'service_selector'}) }}
-                {{ forms.input('date', 'Date', selectedDate, 'date', '', null, {'id': 'date_selector'}) }}
+                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, null, {'id': 'doctor_selector'}) }}
+                {{ forms.select('service_id', 'Послуга', services|reduce((acc, s) => acc|merge({(s.id): s.name ~ ' (' ~ s.duration_minutes ~ ' хв)'}), {}), old.service_id ?? null, null, {'id': 'service_selector'}) }}
+                {{ forms.input('date', 'Дата', selectedDate, 'date', '', null, {'id': 'date_selector'}) }}
             </div>
-            <button class="ui secondary button" type="submit">Find Slots</button>
+            <button class="ui secondary button" type="submit">Знайти Години</button>
         </form>
 
         <div class="ui divider"></div>
         
         {# Step 2: Select a slot and patient #}
         <form class="ui form" method="POST" action="/appointments/new">
-            <h4 class="ui dividing header">Step 2: Select Slot and Patient</h4>
+            <h4 class="ui dividing header">Крок 2: Обрати час та пацієнта</h4>
 
             <input type="hidden" name="doctor_id" value="{{ old.doctor_id ?? '' }}">
             <input type="hidden" name="service_id" value="{{ old.service_id ?? '' }}">
@@ -35,30 +35,30 @@
             {% endif %}
 
             <div class="field {% if availableSlots is empty %}disabled{% endif %}">
-                <label>Available Time Slots for {{ selectedDate|date("F d, Y") }}</label>
+                <label>Доступні години на {{ selectedDate|date("d.m.Y") }}</label>
                 <div class="ui five column grid">
                     {% for slot in availableSlots %}
                         <div class="column">
                             <button class="ui basic button slot-button" data-slot-time="{{ slot|date('Y-m-d H:i:s') }}">{{ slot|date("H:i") }}</button>
                         </div>
                     {% else %}
-                        <p>No available slots for this day, doctor, or service duration. Please try another selection.</p>
+                        <p>Немає вільних годин на цей день, лікаря або тривалість послуги. Спробуйте інший вибір.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="two fields">
-                 {{ forms.select('patient_id', 'Patient', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                 {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
                  <div class="field">
-                    <label>Selected Slot</label>
-                    <input type="text" id="selected_slot_display" readonly placeholder="Please select a slot from above">
+                    <label>Обраний час</label>
+                    <input type="text" id="selected_slot_display" readonly placeholder="Оберіть час вище">
                  </div>
             </div>
 
-            {{ forms.textarea('notes', 'Notes', old.notes ?? null, 'Additional notes for the appointment') }}
+            {{ forms.textarea('notes', 'Нотатки', old.notes ?? null, 'Додаткові нотатки до запису') }}
 
-            {{ ui.button('Save Appointment', 'primary', 'large', 'save', { 'type': 'submit', 'class': 'disabled', 'id': 'save-button' }) }}
-            <a href="/appointments" class="ui button">Cancel</a>
+            {{ ui.button('Зберегти запис', 'primary', 'large', 'save', { 'type': 'submit', 'class': 'disabled', 'id': 'save-button' }) }}
+            <a href="/appointments" class="ui button">Скасувати</a>
         </form>
     </div>
 {% endblock %}
