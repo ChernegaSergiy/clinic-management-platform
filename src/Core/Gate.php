@@ -9,7 +9,7 @@ use App\Module\Prescription\Repository\PrescriptionRepository;
 class Gate
 {
     private const ROLE_PERMISSIONS = [
-        'admin' => ['*', 'system.manage'],
+        'admin' => ['*', 'system.manage', 'schedules.manage_all'],
         'medical_manager' => [
             'dashboard.view',
             'dashboard.export',
@@ -23,6 +23,7 @@ class Gate
             'prescriptions.read_all',
             'notifications.read',
             'hrm.read',
+            'schedules.manage_all',
         ],
         'registrar' => [
             'patients.read_all',
@@ -46,6 +47,7 @@ class Gate
             'lab.read_assigned',
             'lab.write_assigned',
             'notifications.read',
+            'schedules.manage_own',
         ],
         'nurse' => [
             'dashboard.view',
