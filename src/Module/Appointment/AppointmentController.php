@@ -117,6 +117,7 @@ class AppointmentController
 
     public function submitPublicForm(): void
     {
+        error_log('submitPublicForm called with data: ' . json_encode($_POST));
         $rawInput = $_POST;
         
         $validator = new \App\Core\Validator(\App\Database::getInstance());
