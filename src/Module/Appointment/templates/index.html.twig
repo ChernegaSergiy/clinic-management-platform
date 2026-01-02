@@ -74,7 +74,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            var resources = {{ doctors|map(d => {'id': d.id, 'title': d.name})|json_encode|raw }} || [];
+            var resources = {{ doctors|map(d => {'id': d.id, 'title': d.title})|json_encode|raw }} || [];
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                 initialView: 'resourceTimelineDay',
