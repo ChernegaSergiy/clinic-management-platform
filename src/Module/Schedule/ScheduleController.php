@@ -54,50 +54,34 @@ class ScheduleController
         // Admin schedule management for all doctors
         Gate::authorize('schedules.manage_all');
         
-        $selectedDoctorId = null;
-        $selectedDoctorName = null;
-        $selectedDoctorSchedule = [];
-        $mode = $_GET['mode'] ?? 'view';
-        
         $allDoctors = $this->userRepository->findAllDoctors();
-        $allSchedules = [];
-        
-        foreach ($allDoctors as $doctor) {
-            $schedules = $this->doctorScheduleRepository->findByDoctor($doctor['id']);
-            $scheduleByDay = [];
-            foreach ($schedules as $entry) {
-                $scheduleByDay[$entry['day_of_week']] = $entry;
-            }
-            
-            $doctorSchedule = [
-                'doctor' => $doctor,
-                'scheduleByDay' => $scheduleByDay
-            ];
-            
-            $allSchedules[] = $doctorSchedule;
-        }
-        
-        // If specific doctor is selected, prepare their schedule for editing
-        if (isset($_GET['doctor_id']) && (int)$_GET['doctor_id'] > 0) {
-            $selectedDoctorId = (int)$_GET['doctor_id'];
-            $selectedDoctor = $this->userRepository->findById($selectedDoctorId);
-            $selectedDoctorName = $selectedDoctor['full_name'] ?? null;
-            
-            if ($selectedDoctor) {
-                $schedules = $this->doctorScheduleRepository->findByDoctor($selectedDoctorId);
-                foreach ($schedules as $entry) {
-                    $selectedDoctorSchedule[$entry['day_of_week']] = $entry;
-                }
-            }
-        }
         
         View::render('@modules/Schedule/templates/admin.html.twig', [
-            'allSchedules' => $allSchedules,
             'allDoctors' => $allDoctors,
-            'selectedDoctorId' => $selectedDoctorId,
-            'selectedDoctorName' => $selectedDoctorName,
-            'selectedDoctorSchedule' => $selectedDoctorSchedule,
-            'mode' => $mode
+        ]);
+    }
+
+    public function adminShow($id): void
+    {
+        Gate::authorize('schedules.manage_all');
+        
+        $doctorId = (int)$id;
+        $doctor = $this->userRepository->findById($doctorId);
+        
+        if (!$doctor) {
+            header('Location: /admin/schedules');
+            exit;
+        }
+        
+        $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
+        $scheduleByDay = [];
+        foreach ($schedules as $entry) {
+            $scheduleByDay[$entry['day_of_week']] = $entry;
+        }
+        
+        View::render('@modules/Schedule/templates/show.html.twig', [
+            'doctor' => $doctor,
+            'scheduleByDay' => $scheduleByDay
         ]);
     }
 
