@@ -60,6 +60,7 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <link rel="stylesheet" href="/css/time-slots.css">
     <script>
         $(document).ready(function() {
             const doctorField = $('#doctor_id');
@@ -106,27 +107,50 @@
                     success: function(slots) {
                         slotLoader.hide();
                         if (slots.length > 0) {
-                            let content = '<label>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString() + '</label>';
-                            content += '<div class="ui five column grid">';
-                            slots.forEach(function(slot) {
-                                let buttonClass = 'ui basic button slot-button';
-                                if (!slot.available) {
-                                    buttonClass += ' disabled';
-                                }
-                                if (slot.is_in_past) {
-                                    buttonClass += ' grey';
-                                } else if (slot.is_booked) {
-                                    buttonClass += ' red';
-                                }
-                                content += '<div class="column"><button class="' + buttonClass + '" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button></div>';
-                            });
-                            content += '</div>';
-                             if (slots.length > 15) { // Add a tip for many slots
-                                content += '<div class="ui mini message" style="margin-top:1em;">Порада: доступно багато годин, скористайтесь прокруткою, щоб побачити всі.</div>';
+                            let content = '<div class="time-slots-container">';
+                            content += '<h4 class="ui header">Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h4>';
+                            
+                            // Group slots by time periods
+                            const morningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) < 12);
+                            const afternoonSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 12 && parseInt(s.label.split(':')[0]) < 17);
+                            const eveningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 17);
+                            
+                            function renderSlotGroup(title, slots, icon) {
+                                if (slots.length === 0) return '';
+                                
+                                let html = '<div class="slot-group">';
+                                html += '<div class="slot-group-header">';
+                                html += '<i class="' + icon + ' icon"></i>';
+                                html += '<span>' + title + '</span>';
+                                html += '<span class="available-count">' + slots.filter(s => s.available).length + '/' + slots.length + '</span>';
+                                html += '</div>';
+                                html += '<div class="slot-buttons">';
+                                
+                                slots.forEach(function(slot) {
+                                    let buttonClass = 'slot-button';
+                                    if (!slot.available) {
+                                        buttonClass += ' disabled';
+                                    }
+                                    if (slot.is_in_past) {
+                                        buttonClass += ' past';
+                                    } else if (slot.is_booked) {
+                                        buttonClass += ' booked';
+                                    }
+                                    html += '<button class="' + buttonClass + '" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button>';
+                                });
+                                
+                                html += '</div></div>';
+                                return html;
                             }
+                            
+                            content += renderSlotGroup('Ранок', morningSlots, 'sun outline');
+                            content += renderSlotGroup('День', afternoonSlots, 'sun');
+                            content += renderSlotGroup('Вечір', eveningSlots, 'moon outline');
+                            
+                            content += '</div>';
                             slotsContainer.html(content);
                         } else {
-                            slotsContainer.html('<div class="ui warning message"><p>На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</p></div>');
+                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i>На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</div>');
                         }
                     },
                     error: function() {
