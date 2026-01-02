@@ -183,21 +183,19 @@ class AppointmentController
             $patientId = $patient['id'];
         }
 
-        // Save the appointment
-        $result = $this->appointmentRepository->save([
+        // Add to waitlist
+        $waitlistData = [
             'patient_id' => $patientId,
-            'doctor_id' => $selectedDoctorId,
-            'start_time' => $rawInput['start_time'],
-            'end_time' => $rawInput['end_time'],
+            'desired_doctor_id' => (int)$rawInput['doctor_id'],
+            'desired_start_time' => $rawInput['start_time'],
+            'contact_phone' => $rawInput['phone_number'],
+            'contact_email' => $rawInput['email'],
             'notes' => $rawInput['notes'] ?? null,
-            'status' => 'scheduled',
-        ]);
-        
-        // Debug: Log the result
-        error_log('Public appointment save result: ' . ($result ? 'SUCCESS' : 'FAILED'));
-        error_log('Appointment data: patient_id=' . $patientId . ', doctor_id=' . $selectedDoctorId . ', start_time=' . $rawInput['start_time']);
+        ];
 
-        $_SESSION['public_success_message'] = 'Your appointment has been successfully booked!';
+        $result = $this->appointmentRepository->addToWaitlist($waitlistData);
+
+        $_SESSION['public_success_message'] = 'Вашу заявку успішно додано до списку очікування! Ми зв\'яжемося з вами найближчим часом для підтвердження запису.';
         header('Location: /book-appointment');
         exit();
     }
