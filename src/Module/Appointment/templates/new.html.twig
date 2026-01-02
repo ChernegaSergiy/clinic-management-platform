@@ -10,6 +10,13 @@
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/appointments/new">
+            <style>
+                @media only screen and (max-width: 480px) {
+                    .ui.mobile.two.column.grid > .column {
+                        width: 50% !important;
+                    }
+                }
+            </style>
             {% if old.waitlist_id %}
                 <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id }}">
             {% endif %}
@@ -126,7 +133,7 @@
                                 html += '</div>';
                                 html += '</div>';
                                 
-                                html += '<div class="ui ' + (slots.length > 8 ? 'four' : slots.length > 6 ? 'three' : slots.length > 4 ? 'two' : 'one') + ' column grid">';
+                                html += '<div class="ui stackable four column grid mobile two column">';
                                 
                                 slots.forEach(function(slot) {
                                     let buttonClass = 'ui basic button';
