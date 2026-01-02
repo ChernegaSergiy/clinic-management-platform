@@ -29,12 +29,12 @@ class SchedulingService
     }
 
     /**
-     * Generates available time slots for a given doctor on a specific date.
+     * Generates time slots for a given doctor on a specific date.
      *
      * @param int $doctorId
      * @param DateTime $date
      * @param int $serviceId Optional, to get specific duration. Default to 30 mins if not provided.
-     * @return array An array of available time slots (DateTime objects).
+     * @return array An array of time slots with availability info ['time' => DateTime, 'available' => bool, 'booked' => bool].
      */
     public function getAvailableTimeSlots(int $doctorId, DateTime $date, ?int $serviceId = null): array
     {
@@ -98,6 +98,7 @@ class SchedulingService
         }
 
         // 3. Generate slots from working periods
+        $allSlots = [];
         foreach ($workingPeriods as $period) {
             $currentSlotStart = $period[0];
             $periodEnd = $period[1];
@@ -107,22 +108,16 @@ class SchedulingService
                 $slotEnd->add($slotInterval);
 
                 if ($slotEnd <= $periodEnd) {
-                    $availableSlots[] = $currentSlotStart;
+                    $allSlots[] = $currentSlotStart;
                 }
                 $currentSlotStart = $slotEnd;
             }
         }
 
-        // 4. Remove slots that are in the past
+        // 4. Check if slots are in the past
         $now = new DateTime();
-        $currentAvailableSlots = [];
-        foreach ($availableSlots as $slot) {
-            if ($slot >= $now) {
-                $currentAvailableSlots[] = $slot;
-            }
-        }
-
-        // 5. Remove slots that conflict with existing appointments
+        
+        // 5. Check which slots conflict with existing appointments
         // This findByDoctorAndDate method might not exist in the AppointmentRepository yet.
         // I will assume it returns appointments for the given doctor and date.
         $bookedAppointments = $this->appointmentRepository->findByDoctorIdAndDateRange(
@@ -131,8 +126,10 @@ class SchedulingService
             $date->format('Y-m-d 23:59:59')
         );
 
-        $finalAvailableSlots = [];
-        foreach ($currentAvailableSlots as $slot) {
+        $finalSlots = [];
+        foreach ($allSlots as $slot) {
+            $isInPast = $slot < $now;
+            
             $isBooked = false;
             foreach ($bookedAppointments as $appointment) {
                 $appointmentStart = new DateTime($appointment['start_time']);
@@ -146,12 +143,18 @@ class SchedulingService
                     break;
                 }
             }
-            if (!$isBooked) {
-                $finalAvailableSlots[] = $slot;
-            }
+            
+            $isAvailable = !$isInPast && !$isBooked;
+            
+            $finalSlots[] = [
+                'time' => $slot,
+                'available' => $isAvailable,
+                'is_in_past' => $isInPast,
+                'is_booked' => $isBooked
+            ];
         }
 
-        return $finalAvailableSlots;
+        return $finalSlots;
     }
 
     // You might also add methods like:

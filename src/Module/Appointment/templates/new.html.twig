@@ -109,7 +109,16 @@
                             let content = '<label>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString() + '</label>';
                             content += '<div class="ui five column grid">';
                             slots.forEach(function(slot) {
-                                content += '<div class="column"><button class="ui basic button slot-button" data-slot-time="' + slot.value + '">' + slot.label + '</button></div>';
+                                let buttonClass = 'ui basic button slot-button';
+                                if (!slot.available) {
+                                    buttonClass += ' disabled';
+                                }
+                                if (slot.is_in_past) {
+                                    buttonClass += ' grey';
+                                } else if (slot.is_booked) {
+                                    buttonClass += ' red';
+                                }
+                                content += '<div class="column"><button class="' + buttonClass + '" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button></div>';
                             });
                             content += '</div>';
                              if (slots.length > 15) { // Add a tip for many slots
@@ -146,6 +155,11 @@
             // Event delegation for dynamically added slot buttons
             $(document).on('click', '.slot-button', function(e) {
                 e.preventDefault();
+                
+                const isAvailable = $(this).data('available');
+                if (isAvailable === false || isAvailable === 'false') {
+                    return; // Don't allow selection of unavailable slots
+                }
                 
                 const startTimeStr = $(this).data('slot-time');
                 const serviceId = serviceField.val();

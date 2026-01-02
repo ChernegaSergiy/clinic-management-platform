@@ -48,6 +48,7 @@ class AppointmentController
     {
         AuthGuard::check();
         $doctors = $this->userRepository->findAllDoctors();
+        $services = $this->serviceRepository->findAll();
         $userId = (int)($_SESSION['user']['id'] ?? 0);
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
         $appointments = [];
@@ -61,7 +62,7 @@ class AppointmentController
         }
         // If neither permission is allowed, $appointments remains an empty array.
 
-$doctorOptions = [];
+        $doctorOptions = [];
         foreach ($doctors as $doctor) {
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
@@ -146,7 +147,7 @@ $doctorOptions = [];
         
         $isSlotAvailable = false;
         foreach ($availableSlots as $slot) {
-            if ($slot->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s')) {
+            if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
                 $isSlotAvailable = true;
                 break;
             }
@@ -318,7 +319,7 @@ public function create(): void
         
         $isSlotAvailable = false;
         foreach ($availableSlots as $slot) {
-            if ($slot->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s')) {
+            if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
                 $isSlotAvailable = true;
                 break;
             }
@@ -678,43 +679,22 @@ public function create(): void
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
 
-$patientOptions = [];
-        foreach ($patients as $patient) {
-            $patientOptions[$patient['id']] = $patient['full_name'];
-        }
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
 
-        $doctorOptions = [];
-        error_log("DEBUG: Processing doctors array: " . json_encode($doctors));
-        foreach ($doctors as $doctor) {
-            error_log("DEBUG: Processing doctor: " . json_encode($doctor));
-            $doctorOptions[$doctor['id']] = $doctor['full_name'];
-        }
-        error_log("DEBUG: Final doctor options: " . json_encode($doctorOptions));
-        
-        // Create service options array properly
-        $serviceOptions = [];
-        error_log("DEBUG: Creating service options from: " . json_encode($services));
-        foreach ($services as $service) {
-            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
-            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
-        }
-        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
-        
-        // Create service options array properly
-        $serviceOptions = [];
-        error_log("DEBUG: Creating service options from: " . json_encode($services));
-        foreach ($services as $service) {
-            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
-            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
-        }
-        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
 
             View::render('@modules/Appointment/templates/waitlist.html.twig', [
-            'errors' => $validator->getErrors(),
-            'old' => $_POST,
-            'waitlistEntries' => $waitlistEntries,
-            'patients' => $patientOptions,
-            'doctors' => $doctorOptions,
+                'errors' => $validator->getErrors(),
+                'old' => $_POST,
+                'waitlistEntries' => $waitlistEntries,
+                'patients' => $patientOptions,
+                'doctors' => $doctorOptions,
             ]);
             return;
         }
@@ -758,8 +738,11 @@ $patientOptions = [];
             $formattedSlots = [];
             foreach ($availableSlots as $slot) {
                 $formattedSlots[] = [
-                    'value' => $slot->format('Y-m-d H:i:s'),
-                    'label' => $slot->format('H:i'),
+                    'value' => $slot['time']->format('Y-m-d H:i:s'),
+                    'label' => $slot['time']->format('H:i'),
+                    'available' => $slot['available'],
+                    'is_in_past' => $slot['is_in_past'],
+                    'is_booked' => $slot['is_booked']
                 ];
             }
             
