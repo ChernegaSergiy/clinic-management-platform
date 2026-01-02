@@ -6,7 +6,7 @@
 {% block body %}
     <div class="ui segment">
         <h2 class="ui header">Графік роботи: {{ doctor.full_name }}</h2>
-        
+
         <a href="/admin/schedules/edit?id={{ doctor.id }}" class="ui primary button">
             <i class="edit icon"></i>
             Редагувати графік
@@ -18,26 +18,39 @@
 
         <div class="ui divider"></div>
         
-        <div class="ui grid">
-            <div class="sixteen wide column">
-                <div class="ui seven column grid">
-                    {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
-                        {% set schedule_entry = scheduleByDay[day_num] ?? null %}
-                        <div class="column">
-                            <div class="ui segment">
-                                <h4 class="ui header">{{ day_name }}</h4>
+        <div class="ui stackable seven column grid">
+            {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                {% set schedule_entry = scheduleByDay[day_num] ?? null %}
+                
+                {% set card_color = 'grey' %}
+                {% if schedule_entry and schedule_entry.is_available %}
+                    {% set card_color = 'green' %}
+                {% elseif schedule_entry %}
+                    {% set card_color = 'red' %}
+                {% endif %}
+
+                <div class="column">
+                    <div class="ui {{ card_color }} card">
+                        <div class="content">
+                            <div class="header">{{ day_name }}</div>
+                            <div class="meta">
                                 {% if schedule_entry and schedule_entry.is_available %}
-                                    <p><strong>Час роботи:</strong> {{ schedule_entry.start_time|slice(0, 5) }} - {{ schedule_entry.end_time|slice(0, 5) }}</p>
+                                    <i class="check circle icon"></i> Робочий день
                                 {% elseif schedule_entry %}
-                                    <p class="ui red text">Вихідний</p>
+                                    <i class="times circle icon"></i> Вихідний
                                 {% else %}
-                                    <p class="ui grey text">Не встановлено</p>
+                                    <i class="question circle outline icon"></i> Не встановлено
+                                {% endif %}
+                            </div>
+                            <div class="description">
+                                {% if schedule_entry and schedule_entry.is_available %}
+                                    <p><i class="clock outline icon"></i> {{ schedule_entry.start_time|slice(0, 5) }} - {{ schedule_entry.end_time|slice(0, 5) }}</p>
                                 {% endif %}
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}
