@@ -57,6 +57,7 @@ class ScheduleController
         $selectedDoctorId = null;
         $selectedDoctorName = null;
         $selectedDoctorSchedule = [];
+        $mode = $_GET['mode'] ?? 'view';
         
         $allDoctors = $this->userRepository->findAllDoctors();
         $allSchedules = [];
@@ -95,7 +96,8 @@ class ScheduleController
             'allDoctors' => $allDoctors,
             'selectedDoctorId' => $selectedDoctorId,
             'selectedDoctorName' => $selectedDoctorName,
-            'selectedDoctorSchedule' => $selectedDoctorSchedule
+            'selectedDoctorSchedule' => $selectedDoctorSchedule,
+            'mode' => $mode
         ]);
     }
 

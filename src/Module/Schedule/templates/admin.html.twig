@@ -35,59 +35,10 @@
 
             <div class="ui divider"></div>
 
-            <!-- Quick summary of all schedules -->
-            <h3 class="ui header">Загальний огляд графіків</h3>
-            <div class="ui stackable grid">
-                {% for doctorSchedule in allSchedules %}
-                    <div class="four wide tablet five wide computer column">
-                        <div class="ui card">
-                            <div class="content">
-                                <div class="header">{{ doctorSchedule.doctor.full_name }}</div>
-                                <div class="meta">
-                                    Графік роботи
-                                </div>
-                                <div class="description">
-                                    <div class="ui list">
-                                        {% for day_num, day_name in {1: 'Пн', 2: 'Вт', 3: 'Ср', 4: 'Чт', 5: 'Пт', 6: 'Сб', 0: 'Нд'} %}
-                                            {% set day_schedule = doctorSchedule.scheduleByDay[day_num] ?? null %}
-                                            <div class="item">
-                                                <div class="content">
-                                                    <div class="header">{{ day_name }}</div>
-                                                    {% if day_schedule %}
-                                                        {% if day_schedule.is_available %}
-                                                        <div class="ui green label">{{ day_schedule.start_time }} - {{ day_schedule.end_time }}</div>
-                                                        {% else %}
-                                                            <div class="ui red label">Вихідний</div>
-                                                        {% endif %}
-                                                    {% else %}
-                                                            <div class="ui grey label">Не встановлено</div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="extra content">
-                                <a href="/admin/schedules/edit/{{ doctorSchedule.doctor.id }}" class="ui primary fluid button">
-                                    <i class="edit icon"></i>
-                                    Редагувати графік
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="sixteen wide column">
-                        <div class="ui warning message">
-                            <div class="header">Немає лікарів</div>
-                            <p>Не знайдено жодного лікаря в системі.</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+
 
         {% else %}
-            <!-- Edit mode - show detailed form for selected doctor -->
+            <!-- View/Edit mode for a selected doctor -->
             <div class="ui grid">
                 <div class="sixteen wide column">
                     <div class="ui breadcrumb">
@@ -100,55 +51,96 @@
 
             <div class="ui divider"></div>
 
-            <div class="ui grid">
-                <div class="sixteen wide column">
-                    <h3 class="ui header">Редагування графіка: {{ selectedDoctorName }}</h3>
-                    
-                    <form class="ui form" method="POST" action="/admin/schedules/update">
-                        <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}">
+            {% if mode == 'edit' %}
+                <!-- Edit Mode -->
+                <div class="ui grid">
+                    <div class="sixteen wide column">
+                        <h3 class="ui header">Редагування графіка: {{ selectedDoctorName }}</h3>
                         
+                        <form class="ui form" method="POST" action="/admin/schedules/update">
+                            <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}">
+                            
+                            <div class="ui four column grid">
+                                {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                                    {% set schedule_entry = selectedDoctorSchedule[day_num] ?? null %}
+                                    <div class="column">
+                                        <div class="ui segment">
+                                            <h4 class="ui header">{{ day_name }}</h4>
+                                            
+                                            <div class="field">
+                                                <div class="ui toggle checkbox">
+                                                    <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                                    <label>Робочий день</label>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="two fields">
+                                                <div class="field">
+                                                    <label>Час початку</label>
+                                                    <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Час закінчення</label>
+                                                    <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="ui divider"></div>
+                            
+                            <div class="ui grid">
+                                <div class="eight wide column">
+                                    <button class="ui primary button" type="submit">Зберегти графік</button>
+                                    <a href="?doctor_id={{ selectedDoctorId }}" class="ui button">
+                                        Скасувати
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <!-- View Mode -->
+                <div class="ui grid">
+                    <div class="sixteen wide column">
+                        <h3 class="ui header">Графік роботи: {{ selectedDoctorName }}</h3>
+                        <a href="?doctor_id={{ selectedDoctorId }}&mode=edit" class="ui primary button">
+                            <i class="edit icon"></i>
+                            Редагувати графік
+                        </a>
+                        <a href="/admin/schedules" class="ui button">
+                            Повернутися до списку
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ui divider"></div>
+                
+                <div class="ui grid">
+                    <div class="sixteen wide column">
                         <div class="ui four column grid">
                             {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
                                 {% set schedule_entry = selectedDoctorSchedule[day_num] ?? null %}
                                 <div class="column">
                                     <div class="ui segment">
                                         <h4 class="ui header">{{ day_name }}</h4>
-                                        
-                                        <div class="field">
-                                            <div class="ui toggle checkbox">
-                                                <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
-                                                <label>Робочий день</label>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="two fields">
-                                            <div class="field">
-                                                <label>Час початку</label>
-                                                <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
-                                            </div>
-                                            <div class="field">
-                                                <label>Час закінчення</label>
-                                                <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
-                                            </div>
-                                        </div>
+                                        {% if schedule_entry and schedule_entry.is_available %}
+                                            <p><strong>Час роботи:</strong> {{ schedule_entry.start_time }} - {{ schedule_entry.end_time }}</p>
+                                        {% elseif schedule_entry %}
+                                            <p class="ui red text">Вихідний</p>
+                                        {% else %}
+                                            <p class="ui grey text">Не встановлено</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                        
-                        <div class="ui divider"></div>
-                        
-                        <div class="ui grid">
-                            <div class="eight wide column">
-                                <button class="ui primary button" type="submit">Зберегти графік</button>
-                                <a href="/admin/schedules" class="ui button">
-                                    Повернутися
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         {% endif %}
     </div>
 
