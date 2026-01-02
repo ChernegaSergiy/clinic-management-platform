@@ -55,7 +55,7 @@
                  </div>
             </div>
 
-            {{ forms.textarea('notes', 'Нотатки', old.notes ?? null, 'Додаткові нотатки до запису') }}
+            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до запису') }}
 
             {{ ui.button('Зберегти запис', 'primary', 'large', 'save', { 'type': 'submit', 'class': 'disabled', 'id': 'save-button' }) }}
             <a href="/appointments" class="ui button">Скасувати</a>
