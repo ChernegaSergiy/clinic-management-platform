@@ -183,7 +183,7 @@ class AppointmentController
         }
 
         // Save the appointment
-        $this->appointmentRepository->save([
+        $result = $this->appointmentRepository->save([
             'patient_id' => $patientId,
             'doctor_id' => $selectedDoctorId,
             'start_time' => $rawInput['start_time'],
@@ -191,6 +191,10 @@ class AppointmentController
             'notes' => $rawInput['notes'] ?? null,
             'status' => 'scheduled',
         ]);
+        
+        // Debug: Log the result
+        error_log('Public appointment save result: ' . ($result ? 'SUCCESS' : 'FAILED'));
+        error_log('Appointment data: patient_id=' . $patientId . ', doctor_id=' . $selectedDoctorId . ', start_time=' . $rawInput['start_time']);
 
         $_SESSION['public_success_message'] = 'Your appointment has been successfully booked!';
         header('Location: /book-appointment');
