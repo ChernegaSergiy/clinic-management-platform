@@ -18,7 +18,7 @@
             <h4 class="ui dividing header">1. Оберіть параметри для пошуку</h4>
             <div class="three fields">
                 {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, {'id': 'doctor_selector', 'required': 'required'}) }}
-                {{ forms.select('service_id', 'Послуга', services|reduce((acc, s) => acc|merge({(s.id): s.name ~ ' (' ~ s.duration_minutes ~ ' хв)'}), {}), old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
+                {{ forms.select('service_id', 'Послуга', services, old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
                 {{ forms.input('date', 'Дата', old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
             </div>
             
@@ -62,28 +62,49 @@
     {{ parent() }}
     <script>
         $(document).ready(function() {
-            const doctorField = $('#doctor_selector');
-            const serviceField = $('#service_selector');
-            const dateField = $('#date_selector');
+            console.log('Document ready, initializing dropdowns');
+            const doctorField = $('#doctor_id');
+            const serviceField = $('#service_id');
+            const dateField = $('#date');
             const slotsContainer = $('#slots-container');
             const slotLoader = $('#slot-loader');
             const saveButton = $('#save-button');
+            
+            console.log('Doctor field exists:', doctorField.length > 0);
+            console.log('Service field exists:', serviceField.length > 0);
+            console.log('Date field exists:', dateField.length > 0);
+            
+            // Check all select elements
+            console.log('All select elements:', $('select').length);
+            $('select').each(function() {
+                console.log('Select found:', $(this).attr('id'), $(this).attr('name'));
+            });
+            
+            // Check all input elements
+            console.log('All input elements:', $('input[type="date"]').length);
+            $('input[type="date"]').each(function() {
+                console.log('Date input found:', $(this).attr('id'), $(this).attr('name'));
+            });
             const selectedSlotDisplay = $('#selected_slot_display');
             const startTimeHidden = $('#start_time_hidden');
             const endTimeHidden = $('#end_time_hidden');
 
-            // Store services data to get duration on the fly
+// Store services data to get duration on the fly
             const servicesData = {
-                {% for service in services %}
+                {% for service in servicesForJs %}
                     "{{ service.id }}": { duration: {{ service.duration_minutes }} }
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
             };
 
             function fetchAvailableSlots() {
-                const doctorId = doctorField.val();
-                const serviceId = serviceField.val();
-                const date = dateField.val();
+                const doctorId = $('#doctor_id').dropdown('get value');
+                const serviceId = $('#service_id').dropdown('get value');
+                const date = $('#date').val();
+
+                console.log('fetchAvailableSlots called:', { doctorId, serviceId, date });
+
+                
 
                 if (!doctorId || !serviceId || !date) {
                     slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря, послугу та дату для пошуку вільних годин.</p></div>');
@@ -102,6 +123,7 @@
                         date: date
                     },
                     success: function(slots) {
+                        console.log('API response:', slots);
                         slotLoader.hide();
                         if (slots.length > 0) {
                             let content = '<label>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString() + '</label>';
@@ -132,7 +154,43 @@
                 saveButton.addClass('disabled');
             }
 
-            doctorField.add(serviceField).add(dateField).on('change', fetchAvailableSlots);
+            // Initialize dropdowns and bind events
+            console.log('Initializing doctor dropdown');
+            try {
+                $('#doctor_id').dropdown({
+                    onChange: function(value, text, $choice) {
+                        console.log('Doctor changed:', value, text);
+                        fetchAvailableSlots();
+                    }
+                });
+                console.log('Doctor dropdown initialized');
+            } catch (e) {
+                console.error('Error initializing doctor dropdown:', e);
+            }
+            
+            console.log('Initializing service dropdown');
+            console.log('Service dropdown options:', $('#service_id option').length);
+            $('#service_id option').each(function() {
+                console.log('Service option:', $(this).val(), $(this).text());
+            });
+            try {
+                $('#service_id').dropdown({
+                    onChange: function(value, text, $choice) {
+                        console.log('Service changed:', value, text);
+                        fetchAvailableSlots();
+                    }
+                });
+                // Set initial value to first option
+                $('#service_id').dropdown('set selected', $('#service_id option:first').val());
+                console.log('Service dropdown initialized with value:', $('#service_id').dropdown('get value'));
+            } catch (e) {
+                console.error('Error initializing service dropdown:', e);
+            }
+            
+            dateField.on('change', function() {
+                console.log('Date changed:', $(this).val());
+                fetchAvailableSlots();
+            });
 
             // Event delegation for dynamically added slot buttons
             $(document).on('click', '.slot-button', function(e) {
@@ -166,10 +224,10 @@
             });
             
             // Initial fetch if data is pre-filled
-            if (doctorField.val() && serviceField.val() && dateField.val()) {
+            if ($('#doctor_id').dropdown('get value') && $('#service_id').dropdown('get value') && dateField.val()) {
                 fetchAvailableSlots();
             } else {
-                slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря, послугу та дату для пошуку вільних годин.</p></div>');
+                slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря для пошуку вільних годин.</p></div>');
             }
         });
     </script>
