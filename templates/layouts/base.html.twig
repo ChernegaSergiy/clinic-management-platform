@@ -59,7 +59,8 @@
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
         {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
-        {% if canSchedule %}<a class="item" href="/doctor/schedule">Графік</a>{% endif %}
+        {% if canPersonalSchedule %}<a class="item" href="/doctor/schedule">Мій графік</a>{% endif %}
+        {% if canAdminSchedules %}<a class="item" href="/admin/schedules">Управління графіками</a>{% endif %}
         {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
@@ -102,7 +103,8 @@
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
         {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
-        {% if canSchedule %}<a class="item" href="/doctor/schedule">Графік</a>{% endif %}
+        {% if canPersonalSchedule %}<a class="item" href="/doctor/schedule">Мій графік</a>{% endif %}
+        {% if canAdminSchedules %}<a class="item" href="/admin/schedules">Управління графіками</a>{% endif %}
         {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
