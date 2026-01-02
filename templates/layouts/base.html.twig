@@ -55,6 +55,8 @@
         {% set canAdminNav = role in ['admin'] %}
         {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
         {% set canSchedule = role in ['admin', 'doctor'] %}
+        {% set canPersonalSchedule = role in ['doctor'] %}
+        {% set canAdminSchedules = role in ['admin'] %}
 
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
