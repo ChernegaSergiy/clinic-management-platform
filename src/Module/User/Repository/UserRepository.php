@@ -94,7 +94,8 @@ class UserRepository implements UserRepositoryInterface
                 role_id, 
                 created_at, 
                 updated_at,
-                profile_photo_path
+                profile_photo_path,
+                CONCAT(first_name, ' ', last_name) AS full_name
             FROM users 
             WHERE id = :id
         ");
