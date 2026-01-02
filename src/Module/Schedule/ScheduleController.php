@@ -4,16 +4,16 @@ namespace App\Module\Schedule;
 
 use App\Core\AuthGuard;
 use App\Core\View;
-use App\Core\Gate; // Added
+use App\Core\Gate;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
-use App\Module\User\Repository\UserRepository; // Added
+use App\Module\User\Repository\UserRepository;
 
 class ScheduleController
 {
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
-    private UserRepository $userRepository; // Added
+    private UserRepository $userRepository;
     private View $view;
 
     public function __construct()
@@ -21,43 +21,19 @@ class ScheduleController
         AuthGuard::check(); // Protect all actions in this controller
         $this->doctorScheduleRepository = new DoctorScheduleRepository();
         $this->scheduleExceptionRepository = new ScheduleExceptionRepository();
-        $this->userRepository = new UserRepository(); // Added
+        $this->userRepository = new UserRepository();
         $this->view = new View();
     }
 
     public function index(): void
     {
-        $sessionUserId = (int)$_SESSION['user']['id'];
-        $canManageAllSchedules = Gate::allows('admin.manage_schedules'); // Assuming this permission is defined
-
-        $targetDoctorId = $sessionUserId; // Default to own schedule
-        $allDoctors = [];
-
-        if ($canManageAllSchedules) {
-            $allDoctors = $this->userRepository->findAllDoctors();
-            if (isset($_GET['doctor_id']) && (int)$_GET['doctor_id'] > 0) {
-                // Validate if selected doctor is actually a doctor
-                $selectedDoctor = $this->userRepository->findById((int)$_GET['doctor_id']);
-                if ($selectedDoctor && $selectedDoctor['role_id'] == $this->userRepository->findRoleIdByName('doctor')) {
-                    $targetDoctorId = (int)$_GET['doctor_id'];
-                } else {
-                    // If selected user is not a doctor, default back to current user's schedule or the first doctor
-                    // For now, let's default to current user's schedule to prevent confusion
-                    $targetDoctorId = $sessionUserId;
-                }
-            }
-        } else {
-            // Non-admins can only view/manage their own schedule
-            $targetDoctorId = $sessionUserId;
-            // Still need to get all doctors for template to find current doctor's name
-            $allDoctors = $this->userRepository->findAllDoctors();
-        }
-
-
-        $schedule = $this->doctorScheduleRepository->findByDoctor($targetDoctorId);
+        // Personal schedule for doctors
+        Gate::authorize('schedules.manage_own');
         
+        $userId = (int)$_SESSION['user']['id'];
+        $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
         $exceptions = $this->scheduleExceptionRepository->findByDoctorAndDateRange(
-            $targetDoctorId,
+            $userId,
             date('Y-m-d'),
             date('Y-m-d', strtotime('+1 year'))
         );
@@ -66,15 +42,37 @@ class ScheduleController
         foreach ($schedule as $entry) {
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
-
-
         
-        View::render('@modules/Schedule/templates/index.html.twig', [
+        View::render('@modules/Schedule/templates/personal.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
-            'allDoctors' => $allDoctors, // Pass all doctors if admin
-            'selectedDoctorId' => $targetDoctorId,
-            'canManageAllSchedules' => $canManageAllSchedules,
+        ]);
+    }
+
+    public function adminIndex(): void
+    {
+        // Admin schedule management for all doctors
+        Gate::authorize('schedules.manage_all');
+        
+        $allDoctors = $this->userRepository->findAllDoctors();
+        $allSchedules = [];
+        
+        foreach ($allDoctors as $doctor) {
+            $schedules = $this->doctorScheduleRepository->findByDoctor($doctor['id']);
+            $scheduleByDay = [];
+            foreach ($schedules as $entry) {
+                $scheduleByDay[$entry['day_of_week']] = $entry;
+            }
+            
+            $allSchedules[] = [
+                'doctor' => $doctor,
+                'scheduleByDay' => $scheduleByDay
+            ];
+        }
+        
+        View::render('@modules/Schedule/templates/admin.html.twig', [
+            'allSchedules' => $allSchedules,
+            'allDoctors' => $allDoctors
         ]);
     }
 
@@ -83,13 +81,13 @@ class ScheduleController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if (Gate::allows('admin.manage_schedules') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if (Gate::allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('admin.manage_schedules');
+            Gate::authorize('schedules.manage_all');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -113,7 +111,8 @@ class ScheduleController
         }
         
         // TODO: Add flash message for success
-        header('Location: /doctor/schedule' . ($targetDoctorId !== $sessionUserId ? '?doctor_id=' . $targetDoctorId : ''));
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
+        header('Location: ' . $redirectUrl);
         exit;
     }
 
@@ -122,13 +121,13 @@ class ScheduleController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if (Gate::allows('admin.manage_schedules') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if (Gate::allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('admin.manage_schedules');
+            Gate::authorize('schedules.manage_all');
         }
 
         $exceptionData = [
@@ -143,7 +142,8 @@ class ScheduleController
         $this->scheduleExceptionRepository->create($exceptionData);
 
         // TODO: Add flash message
-        header('Location: /doctor/schedule' . ($targetDoctorId !== $sessionUserId ? '?doctor_id=' . $targetDoctorId : ''));
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
+        header('Location: ' . $redirectUrl);
         exit;
     }
 
@@ -156,7 +156,8 @@ class ScheduleController
 
         if (!$exception) {
             // TODO: Add error flash message (exception not found)
-            header('Location: /doctor/schedule'); // Redirect even if not found
+            $redirectUrl = '/doctor/schedule';
+            header('Location: ' . $redirectUrl);
             exit;
         }
 
@@ -164,18 +165,19 @@ class ScheduleController
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('admin.manage_schedules');
+            Gate::authorize('schedules.manage_all');
         }
         
-        // Final check that the exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === $sessionUserId || Gate::allows('admin.manage_schedules')) { // Double check for safety
+        // Final check that exception belongs to the intended targetDoctorId
+        if ($targetDoctorId === $sessionUserId || Gate::allows('schedules.manage_all')) { // Double check for safety
              $this->scheduleExceptionRepository->delete($exceptionId);
             // TODO: Add flash message
         } else {
             // TODO: Add error flash message (permission denied)
         }
 
-        header('Location: /doctor/schedule' . ($targetDoctorId !== $sessionUserId ? '?doctor_id=' . $targetDoctorId : ''));
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
+        header('Location: ' . $redirectUrl);
         exit;
     }
 }
