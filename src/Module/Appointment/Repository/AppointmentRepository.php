@@ -309,7 +309,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
             WHERE a.doctor_id = :doctor_id
-              AND a.start_time >= :start_time AND a.end_time <= :end_time
+              AND a.start_time >= :start_time AND a.start_time <= :end_time
             ORDER BY a.start_time ASC
         ");
         $stmt->execute([
