@@ -16,12 +16,10 @@
         {% set canAdminNav = role in ['admin'] %}
         {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
         {% set canSchedule = role in ['admin', 'doctor'] %}
-        {% set canSchedule = role in ['admin', 'doctor'] %}
 
         <a class="item" href="/dashboard">Панель</a>
         {% if canPatients %}<a class="item" href="/patients">Пацієнти</a>{% endif %}
         {% if canAppointments %}<a class="item" href="/appointments">Записи</a>{% endif %}
-        {% if canSchedule %}<a class="item" href="/doctor/schedule">Графік</a>{% endif %}
         {% if canMedical %}<a class="item" href="/medical-records">Медичні записи</a>{% endif %}
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
