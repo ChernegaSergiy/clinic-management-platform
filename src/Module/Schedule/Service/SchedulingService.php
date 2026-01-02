@@ -113,7 +113,16 @@ class SchedulingService
             }
         }
 
-        // 4. Remove slots that conflict with existing appointments
+        // 4. Remove slots that are in the past
+        $now = new DateTime();
+        $currentAvailableSlots = [];
+        foreach ($availableSlots as $slot) {
+            if ($slot >= $now) {
+                $currentAvailableSlots[] = $slot;
+            }
+        }
+
+        // 5. Remove slots that conflict with existing appointments
         // This findByDoctorAndDate method might not exist in the AppointmentRepository yet.
         // I will assume it returns appointments for the given doctor and date.
         $bookedAppointments = $this->appointmentRepository->findByDoctorIdAndDateRange(
@@ -123,7 +132,7 @@ class SchedulingService
         );
 
         $finalAvailableSlots = [];
-        foreach ($availableSlots as $slot) {
+        foreach ($currentAvailableSlots as $slot) {
             $isBooked = false;
             foreach ($bookedAppointments as $appointment) {
                 $appointmentStart = new DateTime($appointment['start_time']);
