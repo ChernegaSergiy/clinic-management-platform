@@ -61,11 +61,11 @@ class ScheduleController
         ]);
     }
 
-    public function adminShow($id): void
+    public function adminShow(): void
     {
         Gate::authorize('schedules.manage_all');
         
-        $doctorId = (int)$id;
+        $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
         
         if (!$doctor) {
@@ -281,11 +281,11 @@ class ScheduleController
         exit;
     }
 
-    public function adminEdit($id): void
+    public function adminEdit(): void
     {
         Gate::authorize('schedules.manage_all');
         
-        $doctorId = (int)$id;
+        $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
         
         if (!$doctor) {

@@ -35,7 +35,7 @@
             $('#doctor_select').on('change', function() {
                 var doctorId = $(this).val();
                 if (doctorId) {
-                    window.location.href = '/admin/schedules/show/' + doctorId;
+                    window.location.href = '/admin/schedules/show?id=' + doctorId;
                 }
             });
         });
