@@ -49,6 +49,8 @@ class ScheduleController
         } else {
             // Non-admins can only view/manage their own schedule
             $targetDoctorId = $sessionUserId;
+            // Still need to get all doctors for template to find current doctor's name
+            $allDoctors = $this->userRepository->findAllDoctors();
         }
 
 
@@ -65,8 +67,7 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        // Debug: Log the target doctor ID
-        error_log("Schedule Debug: sessionUserId=$sessionUserId, targetDoctorId=$targetDoctorId, canManageAllSchedules=" . ($canManageAllSchedules ? 'true' : 'false'));
+
         
         View::render('@modules/Schedule/templates/index.html.twig', [
             'scheduleByDay' => $scheduleByDay,

@@ -15,9 +15,9 @@
                         {% set doctorName = doc.full_name %}
                     {% endif %}
                 {% endfor %}
-                {% if doctorName %}: {{ doctorName }} (ID: {{ selectedDoctorId }}){% else %}(Невідомий лікар, ID: {{ selectedDoctorId }}){% endif %}
+                {% if doctorName %}: {{ doctorName }}{% else %}(Невідомий лікар){% endif %}
             {% else %}
-                (Ваш розклад, ID: {{ selectedDoctorId }})
+                (Ваш розклад)
             {% endif %}
         </h2>
             </div>
