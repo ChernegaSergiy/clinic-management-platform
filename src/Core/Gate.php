@@ -40,6 +40,7 @@ class Gate
             'patients.read_assigned',
             'appointments.read_assigned',
             'appointments.write_assigned',
+            'appointments.write',
             'medical.read_assigned',
             'medical.write_assigned',
             'prescriptions.read_assigned',
@@ -123,15 +124,19 @@ class Gate
 
         $role = $_SESSION['user']['role_name'] ?? '';
         $userId = $_SESSION['user']['id'] ?? null;
+        error_log("DEBUG: Gate authorize - role: $role, ability: $ability");
 
         if ($role === 'admin') {
+            error_log("DEBUG: Admin access granted");
             return;
         }
 
         $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
+        error_log("DEBUG: Role permissions: " . json_encode($permissions));
 
         // Explicit permission check
         if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
+            error_log("DEBUG: Permission granted via explicit check");
             return;
         }
 
@@ -225,6 +230,7 @@ class Gate
         }
 
         // If none of the above conditions returned, access is denied.
+        error_log("DEBUG: Access denied for $ability");
         http_response_code(403);
         echo "Доступ заборонено";
         exit();
