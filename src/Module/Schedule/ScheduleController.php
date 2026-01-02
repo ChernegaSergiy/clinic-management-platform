@@ -203,4 +203,95 @@ class ScheduleController
         header('Location: ' . $redirectUrl);
         exit;
     }
+
+    // Admin schedule management methods
+    public function adminUpdate(): void
+    {
+        Gate::authorize('schedules.manage_all');
+        
+        $targetDoctorId = (int)$_POST['doctor_id'];
+        
+        // Authorize if attempting to modify another user's schedule
+        if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
+            Gate::authorize('schedules.manage_all');
+        }
+
+        $scheduleData = $_POST['schedule'] ?? [];
+
+        foreach ($scheduleData as $dayOfWeek => $data) {
+            $existingSchedule = $this->doctorScheduleRepository->findByDoctorAndDay($targetDoctorId, (int)$dayOfWeek);
+
+            $scheduleEntry = [
+                'doctor_id' => $targetDoctorId,
+                'day_of_week' => (int)$dayOfWeek,
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
+                'is_available' => isset($data['is_available']) ? 1 : 0,
+            ];
+
+            if ($existingSchedule) {
+                $this->doctorScheduleRepository->update($existingSchedule['id'], $scheduleEntry);
+            } else {
+                $this->doctorScheduleRepository->create($scheduleEntry);
+            }
+        }
+        
+        header('Location: /admin/schedules');
+        exit;
+    }
+
+    public function adminAddException(): void
+    {
+        Gate::authorize('schedules.manage_all');
+        
+        $targetDoctorId = (int)$_POST['doctor_id'];
+        
+        // Authorize if attempting to modify another user's schedule
+        if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
+            Gate::authorize('schedules.manage_all');
+        }
+
+        $exceptionData = [
+            'doctor_id' => $targetDoctorId,
+            'exception_date' => $_POST['exception_date'],
+            'start_time' => $_POST['start_time'],
+            'end_time' => $_POST['end_time'],
+            'is_available' => (int)$_POST['is_available'],
+            'notes' => $_POST['notes'] ?? null,
+        ];
+
+        $this->scheduleExceptionRepository->create($exceptionData);
+
+        header('Location: /admin/schedules');
+        exit;
+    }
+
+    public function adminDeleteException(): void
+    {
+        Gate::authorize('schedules.manage_all');
+        
+        $exceptionId = (int)$_POST['exception_id'];
+
+        $exception = $this->scheduleExceptionRepository->findById($exceptionId);
+
+        if (!$exception) {
+            header('Location: /admin/schedules');
+            exit;
+        }
+
+        $targetDoctorId = (int)$exception['doctor_id'];
+
+        // Authorize if attempting to delete another user's exception
+        if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
+            Gate::authorize('schedules.manage_all');
+        }
+        
+        // Final check that exception belongs to the intended targetDoctorId
+        if ($targetDoctorId === (int)$_SESSION['user']['id'] || Gate::allows('schedules.manage_all')) { // Double check for safety
+             $this->scheduleExceptionRepository->delete($exceptionId);
+        }
+        
+        header('Location: /admin/schedules');
+        exit;
+    }
 }

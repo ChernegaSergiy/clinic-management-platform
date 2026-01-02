@@ -313,6 +313,9 @@ $router->add('POST', '/doctor/schedule/exceptions/delete', [ScheduleController::
 
 // Admin schedule management routes
 $router->add('GET', '/admin/schedules', [ScheduleController::class, 'adminIndex']);
+$router->add('POST', '/admin/schedules/update', [ScheduleController::class, 'adminUpdate']);
+$router->add('POST', '/admin/schedules/exceptions/add', [ScheduleController::class, 'adminAddException']);
+$router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
 
 // Dashboard route
 $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
