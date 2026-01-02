@@ -61,9 +61,15 @@ class AppointmentController
         }
         // If neither permission is allowed, $appointments remains an empty array.
 
-        $doctorOptions = [];
+$doctorOptions = [];
         foreach ($doctors as $doctor) {
-            $doctorOptions[] = ['id' => $doctor['id'], 'title' => $doctor['full_name']];
+            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        }
+        
+        // Create service options array for template
+        $serviceOptions = [];
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
         }
         // Filter doctor options for assigned view if not allowed to read all
         if (!Gate::allows('appointments.read_all') && Gate::allows('appointments.read_assigned')) {
@@ -209,23 +215,55 @@ class AppointmentController
     public function create(): void
     {
         AuthGuard::check();
+        error_log("DEBUG: AuthGuard passed");
         Gate::authorize('appointments.write');
+        error_log("DEBUG: Gate authorize passed");
 
         $patients = $this->patientRepository->findAllActive();
+        error_log("DEBUG: Patients loaded: " . count($patients));
+        
+        error_log("DEBUG: About to load doctors");
         $doctors = $this->userRepository->findAllDoctors();
+        error_log("DEBUG: Doctors loaded: " . count($doctors));
+        
+        error_log("DEBUG: About to load services");
         $services = $this->serviceRepository->findAll(); // Get all services
+        error_log("DEBUG: Services loaded: " . count($services));
+        foreach ($services as $service) {
+            error_log("DEBUG: Service: " . json_encode($service));
+        }
         $waitlistId = (int)($_GET['waitlist_id'] ?? 0);
         
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
+        error_log("DEBUG: Selected doctor ID: $selectedDoctorId");
         $selectedDateStr = $_GET['date'] ?? date('Y-m-d');
+        error_log("DEBUG: Selected date: $selectedDateStr");
         $selectedServiceId = (int)($_GET['service_id'] ?? $services[0]['id'] ?? 0);
+        error_log("DEBUG: Selected service ID: $selectedServiceId");
+        error_log("DEBUG: First service ID from array: " . ($services[0]['id'] ?? 'no service'));
+        error_log("DEBUG: Services array structure: " . json_encode($services));
+        
+        // Create service options array properly
+        $serviceOptions = [];
+        error_log("DEBUG: Creating service options from: " . json_encode($services));
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
+        }
+        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
+        error_log("DEBUG: Selected values - doctor: $selectedDoctorId, service: $selectedServiceId, date: $selectedDateStr");
 
         $availableSlots = [];
+        error_log("DEBUG: About to check slots");
         if ($selectedDoctorId && $selectedDateStr) {
             try {
+                error_log("DEBUG: Creating date object");
                 $selectedDate = new \DateTime($selectedDateStr);
+                error_log("DEBUG: Getting available slots");
                 $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+                error_log("DEBUG: Got slots: " . count($availableSlots));
             } catch (\Exception $e) {
+                error_log("DEBUG: Exception: " . $e->getMessage());
                 // Invalid date format, handle error or ignore
             }
         }
@@ -258,15 +296,28 @@ class AppointmentController
         foreach ($doctors as $doctor) {
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
+        
+        // Create service options array properly
+        $serviceOptions = [];
+        error_log("DEBUG: Creating service options from: " . json_encode($services));
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
+        }
+        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
 
+error_log("DEBUG: About to render template");
+        error_log("DEBUG: Rendering template with service options: " . json_encode($serviceOptions));
         View::render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
-            'services' => $services,
+            'services' => $serviceOptions,
+            'servicesForJs' => $services, // Pass original service objects for JavaScript
             'old' => array_merge($prefill, $_GET),
             'availableSlots' => $availableSlots,
             'selectedDate' => $selectedDateStr,
         ]);
+        error_log("DEBUG: Template rendered");
     }
 
     public function store(): void
@@ -664,15 +715,36 @@ class AppointmentController
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
 
-            $patientOptions = [];
-            foreach ($patients as $patient) {
-                $patientOptions[$patient['id']] = $patient['full_name'];
-            }
+$patientOptions = [];
+        foreach ($patients as $patient) {
+            $patientOptions[$patient['id']] = $patient['full_name'];
+        }
 
-            $doctorOptions = [];
-            foreach ($doctors as $doctor) {
-                $doctorOptions[$doctor['id']] = $doctor['full_name'];
-            }
+        $doctorOptions = [];
+        error_log("DEBUG: Processing doctors array: " . json_encode($doctors));
+        foreach ($doctors as $doctor) {
+            error_log("DEBUG: Processing doctor: " . json_encode($doctor));
+            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        }
+        error_log("DEBUG: Final doctor options: " . json_encode($doctorOptions));
+        
+        // Create service options array properly
+        $serviceOptions = [];
+        error_log("DEBUG: Creating service options from: " . json_encode($services));
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
+        }
+        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
+        
+        // Create service options array properly
+        $serviceOptions = [];
+        error_log("DEBUG: Creating service options from: " . json_encode($services));
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+            error_log("DEBUG: Service option created: " . $service['id'] . ' => ' . $serviceOptions[$service['id']]);
+        }
+        error_log("DEBUG: Final service options: " . json_encode($serviceOptions));
 
             View::render('@modules/Appointment/templates/waitlist.html.twig', [
             'errors' => $validator->getErrors(),
