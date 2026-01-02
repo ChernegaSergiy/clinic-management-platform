@@ -5,160 +5,200 @@
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Управління графіками лікарів</h2>
-        <div class="ui divider"></div>
+        <h2 class="ui header">
+            <i class="calendar alternate outline icon"></i>
+            Управління графіками лікарів
+        </h2>
         
-        <!-- Фільтр для вибору конкретного лікаря -->
-        <form class="ui form" method="GET" action="/admin/schedules">
-            <div class="field">
-                <label>Оберіть лікаря для перегляду/редагування</label>
-                <select class="ui dropdown" name="doctor_id" onchange="this.form.submit()">
-                    <option value="">Всі лікарі</option>
-                    {% for doctor in allDoctors %}
-                        <option value="{{ doctor.id }}" {% if selectedDoctorId == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </form>
-        
-        <div class="ui divider"></div>
-        
-        <!-- Таблиця всіх графіків -->
-        <table class="ui celled table">
-            <thead>
-                <tr>
-                    <th class="center aligned">
-                        <i class="user md icon"></i>
-                        Лікар
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Пн
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Вт
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Ср
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Чт
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Пт
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Сб
-                    </th>
-                    <th class="center aligned">
-                        <i class="calendar day icon"></i>
-                        Нд
-                    </th>
-                    <th class="center aligned">
-                        <i class="settings icon"></i>
-                        Дії
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for doctorSchedule in allSchedules %}
-                    <tr>
-                        <td><strong>{{ doctorSchedule.doctor.full_name }}</strong></td>
-                        {% for day_num in [1,2,3,4,5,6,0] %}
-                            {% set day_schedule = doctorSchedule.scheduleByDay[day_num] ?? null %}
-                            <td class="center aligned">
-                                {% if day_schedule %}
-                                    {% if day_schedule.is_available %}
-                                        <div class="ui green compact message">
-                                            <i class="clock icon"></i>
-                                            <div class="content">
-                                                <div class="header">Робочий день</div>
-                                                <p>{{ day_schedule.start_time }} - {{ day_schedule.end_time }}</p>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="ui red compact message">
-                                            <i class="close icon"></i>
-                                            <div class="content">
-                                                <div class="header">Вихідний</div>
-                                                <p>Недоступно</p>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% else %}
-                                    <div class="ui grey compact message">
-                                        <i class="question icon"></i>
-                                        <div class="content">
-                                            <div class="header">Не налаштовано</div>
-                                            <p>Встановити час</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </td>
-                        {% endfor %}
-                        <td>
-                            <a href="/admin/schedules/edit/{{ doctorSchedule.doctor.id }}" class="ui mini primary button">
-                                <i class="edit icon"></i>
-                                Редагувати
-                            </a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="10" class="center aligned">Немає лікарів з налаштованими графіками.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        {% if selectedDoctorId %}
-            <div class="ui divider"></div>
+        {% if not selectedDoctorId %}
+            <!-- Overview mode - show quick access cards -->
             <div class="ui grid">
-                <div class="eight wide column">
-                    <h3 class="ui header">Графік: {{ selectedDoctorName }}</h3>
+                <div class="sixteen wide column">
+                    <div class="ui info message">
+                        <i class="info circle icon"></i>
+                        <div class="content">
+                            <div class="header">Оберіть лікаря для редагування графіка</div>
+                            <p>Використовуйте форму нижче для вибору лікаря, щоб переглянути або відредагувати його робочий графік.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Керування графіками</h3>
+            <form class="ui form" method="GET" action="/admin/schedules">
+                <div class="field">
+                    <label>Оберіть лікаря для редагування графіка</label>
+                    <select class="ui fluid search dropdown" name="doctor_id" onchange="this.form.submit()">
+                        <option value="">Оберіть лікаря...</option>
+                        {% for doctor in allDoctors %}
+                            <option value="{{ doctor.id }}" {% if selectedDoctorId == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            <div class="ui divider"></div>
+
+            <!-- Quick summary of all schedules -->
+            <h3 class="ui header">Загальний огляд графіків</h3>
+            <div class="ui stackable grid">
+                {% for doctorSchedule in allSchedules %}
+                    <div class="four wide tablet five wide computer column">
+                        <div class="ui card">
+                            <div class="content">
+                                <div class="header">
+                                    <i class="user circle icon"></i>
+                                    {{ doctorSchedule.doctor.full_name }}
+                                </div>
+                                <div class="meta">
+                                    Графік роботи
+                                </div>
+                                <div class="description">
+                                    <div class="ui list">
+                                        {% for day_num, day_name in {1: 'Пн', 2: 'Вт', 3: 'Ср', 4: 'Чт', 5: 'Пт', 6: 'Сб', 0: 'Нд'} %}
+                                            {% set day_schedule = doctorSchedule.scheduleByDay[day_num] ?? null %}
+                                            <div class="item">
+                                                <div class="content">
+                                                    <div class="header">{{ day_name }}</div>
+                                                    {% if day_schedule %}
+                                                        {% if day_schedule.is_available %}
+                                                            <div class="ui green label">
+                                                                <i class="clock icon"></i>
+                                                                {{ day_schedule.start_time }} - {{ day_schedule.end_time }}
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="ui red label">
+                                                                <i class="close icon"></i>
+                                                                Вихідний
+                                                            </div>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <div class="ui grey label">
+                                                            <i class="question icon"></i>
+                                                            Не встановлено
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <a href="/admin/schedules/edit/{{ doctorSchedule.doctor.id }}" class="ui primary fluid button">
+                                    <i class="edit icon"></i>
+                                    Редагувати графік
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="sixteen wide column">
+                        <div class="ui warning message">
+                            <i class="exclamation triangle icon"></i>
+                            <div class="content">
+                                <div class="header">Немає лікарів</div>
+                                <p>Не знайдено жодного лікаря в системі.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Edit mode - show detailed form for selected doctor -->
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <div class="ui breadcrumb">
+                        <a href="/admin/schedules" class="section">Управління графіками</a>
+                        <i class="right angle icon divider"></i>
+                        <div class="active section">{{ selectedDoctorName }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div class="ui grid">
+                <div class="sixteen wide column">
+                    <h3 class="ui header">
+                        <i class="user circle icon"></i>
+                        Редагування графіка: {{ selectedDoctorName }}
+                    </h3>
+                    
                     <form class="ui form" method="POST" action="/admin/schedules/update">
                         <input type="hidden" name="doctor_id" value="{{ selectedDoctorId }}">
-                        <div class="ui divided list">
+                        
+                        <div class="ui four column grid">
                             {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
                                 {% set schedule_entry = selectedDoctorSchedule[day_num] ?? null %}
-                                <div class="item">
-                                    <div class="content">
-                                        <div class="header">{{ day_name }}</div>
-                                        <div class="description">
-                                            <div class="three fields">
-                                                <div class="field">
-                                                    <label>Доступно</label>
-                                                    <div class="ui toggle checkbox">
-                                                        <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
-                                                        <label></label>
-                                                    </div>
-                                                </div>
-                                                <div class="field">
-                                                    <label>Час початку</label>
-                                                    <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
-                                                </div>
-                                                <div class="field">
-                                                    <label>Час закінчення</label>
-                                                    <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
-                                                </div>
+                                <div class="column">
+                                    <div class="ui segment">
+                                        <h4 class="ui header">{{ day_name }}</h4>
+                                        
+                                        <div class="field">
+                                            <div class="ui toggle checkbox">
+                                                <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                                <label>Робочий день</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="two fields">
+                                            <div class="field">
+                                                <label>Час початку</label>
+                                                <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                            </div>
+                                            <div class="field">
+                                                <label>Час закінчення</label>
+                                                <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                        <div class="ui field">
-                            <button class="ui primary button" type="submit">Зберегти графік лікаря</button>
-                            <a href="/admin/schedules" class="ui button">Скасувати</a>
+                        
+                        <div class="ui divider"></div>
+                        
+                        <div class="ui grid">
+                            <div class="eight wide column">
+                                <button class="ui primary button" type="submit">
+                                    <i class="save icon"></i>
+                                    Зберегти графік
+                                </button>
+                                <a href="/admin/schedules" class="ui button">
+                                    <i class="arrow left icon"></i>
+                                    Повернутися
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         {% endif %}
     </div>
+
+    <script>
+        $(document).ready(function() {
+            // Enable/disable time inputs based on availability checkbox
+            $('.ui.toggle.checkbox').checkbox({
+                onChecked: function() {
+                    $(this).closest('.segment').find('input[type="time"]').prop('disabled', false);
+                },
+                onUnchecked: function() {
+                    $(this).closest('.segment').find('input[type="time"]').prop('disabled', true);
+                }
+            });
+            
+            // Initialize state based on current checkbox values
+            $('.ui.toggle.checkbox').each(function() {
+                var $this = $(this);
+                if (!$this.checkbox('is checked')) {
+                    $this.closest('.segment').find('input[type="time"]').prop('disabled', true);
+                }
+            });
+        });
+    </script>
 {% endblock %}
