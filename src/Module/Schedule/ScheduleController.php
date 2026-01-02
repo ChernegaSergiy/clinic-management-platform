@@ -219,6 +219,8 @@ class ScheduleController
                 $this->doctorScheduleRepository->update($existingSchedule['id'], $scheduleEntry);
             } else {
                 $this->doctorScheduleRepository->create($scheduleEntry);
+            }
+        }
         
         header('Location: /admin/schedules/show?id=' . $targetDoctorId);
         exit;
