@@ -511,12 +511,7 @@ public function create(): void
 
     public function waitlist(): void
     {
-        AuthGuard::check();
-        Gate::authorize('appointments.read');
-        $entries = $this->appointmentRepository->getWaitlistEntries();
-        View::render('@modules/Appointment/templates/waitlist.html.twig', [
-            'entries' => $entries,
-        ]);
+        $this->showWaitlist();
     }
 
     public function update(): void
