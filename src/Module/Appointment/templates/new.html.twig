@@ -62,29 +62,12 @@
     {{ parent() }}
     <script>
         $(document).ready(function() {
-            console.log('Document ready, initializing dropdowns');
             const doctorField = $('#doctor_id');
             const serviceField = $('#service_id');
             const dateField = $('#date');
             const slotsContainer = $('#slots-container');
             const slotLoader = $('#slot-loader');
             const saveButton = $('#save-button');
-            
-            console.log('Doctor field exists:', doctorField.length > 0);
-            console.log('Service field exists:', serviceField.length > 0);
-            console.log('Date field exists:', dateField.length > 0);
-            
-            // Check all select elements
-            console.log('All select elements:', $('select').length);
-            $('select').each(function() {
-                console.log('Select found:', $(this).attr('id'), $(this).attr('name'));
-            });
-            
-            // Check all input elements
-            console.log('All input elements:', $('input[type="date"]').length);
-            $('input[type="date"]').each(function() {
-                console.log('Date input found:', $(this).attr('id'), $(this).attr('name'));
-            });
             const selectedSlotDisplay = $('#selected_slot_display');
             const startTimeHidden = $('#start_time_hidden');
             const endTimeHidden = $('#end_time_hidden');
@@ -101,8 +84,6 @@
                 const doctorId = $('#doctor_id').dropdown('get value');
                 const serviceId = $('#service_id').dropdown('get value');
                 const date = $('#date').val();
-
-                console.log('fetchAvailableSlots called:', { doctorId, serviceId, date });
 
                 
 
@@ -123,7 +104,6 @@
                         date: date
                     },
                     success: function(slots) {
-                        console.log('API response:', slots);
                         slotLoader.hide();
                         if (slots.length > 0) {
                             let content = '<label>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString() + '</label>';
@@ -155,42 +135,13 @@
             }
 
             // Initialize dropdowns and bind events
-            console.log('Initializing doctor dropdown');
-            try {
-                $('#doctor_id').dropdown({
-                    onChange: function(value, text, $choice) {
-                        console.log('Doctor changed:', value, text);
-                        fetchAvailableSlots();
-                    }
-                });
-                console.log('Doctor dropdown initialized');
-            } catch (e) {
-                console.error('Error initializing doctor dropdown:', e);
-            }
-            
-            console.log('Initializing service dropdown');
-            console.log('Service dropdown options:', $('#service_id option').length);
-            $('#service_id option').each(function() {
-                console.log('Service option:', $(this).val(), $(this).text());
+            $('#doctor_id').dropdown({
+                onChange: fetchAvailableSlots
             });
-            try {
-                $('#service_id').dropdown({
-                    onChange: function(value, text, $choice) {
-                        console.log('Service changed:', value, text);
-                        fetchAvailableSlots();
-                    }
-                });
-                // Set initial value to first option
-                $('#service_id').dropdown('set selected', $('#service_id option:first').val());
-                console.log('Service dropdown initialized with value:', $('#service_id').dropdown('get value'));
-            } catch (e) {
-                console.error('Error initializing service dropdown:', e);
-            }
-            
-            dateField.on('change', function() {
-                console.log('Date changed:', $(this).val());
-                fetchAvailableSlots();
+            $('#service_id').dropdown({
+                onChange: fetchAvailableSlots
             });
+            dateField.on('change', fetchAvailableSlots);
 
             // Event delegation for dynamically added slot buttons
             $(document).on('click', '.slot-button', function(e) {

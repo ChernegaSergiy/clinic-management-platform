@@ -121,9 +121,7 @@ class SchedulingService
             $date->format('Y-m-d 00:00:00'),
             $date->format('Y-m-d 23:59:59')
         );
-        
-        
-        
+
         $finalAvailableSlots = [];
         foreach ($availableSlots as $slot) {
             $isBooked = false;
