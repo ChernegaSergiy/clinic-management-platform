@@ -60,7 +60,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <link rel="stylesheet" href="/css/time-slots.css">
     <script>
         $(document).ready(function() {
             const doctorField = $('#doctor_id');
@@ -107,50 +106,53 @@
                     success: function(slots) {
                         slotLoader.hide();
                         if (slots.length > 0) {
-                            let content = '<div class="time-slots-container">';
-                            content += '<h4 class="ui header">Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h4>';
+                            let content = '<div class="ui segment">';
+                            content += '<h3 class="ui header dividing"><i class="calendar alternate outline icon"></i>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h3>';
                             
                             // Group slots by time periods
                             const morningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) < 12);
                             const afternoonSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 12 && parseInt(s.label.split(':')[0]) < 17);
                             const eveningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 17);
                             
-                            function renderSlotGroup(title, slots, icon) {
+                            function renderSlotGroup(title, slots, icon, color) {
                                 if (slots.length === 0) return '';
                                 
-                                let html = '<div class="slot-group">';
-                                html += '<div class="slot-group-header">';
-                                html += '<i class="' + icon + ' icon"></i>';
-                                html += '<span>' + title + '</span>';
-                                html += '<span class="available-count">' + slots.filter(s => s.available).length + '/' + slots.length + '</span>';
+                                let html = '<div class="ui segment">';
+                                html += '<div class="ui header">';
+                                html += '<i class="' + icon + ' ' + color + ' icon"></i>';
+                                html += '<div class="content">';
+                                html += title;
+                                html += '<div class="sub header">Доступно: ' + slots.filter(s => s.available).length + ' з ' + slots.length + '</div>';
                                 html += '</div>';
-                                html += '<div class="slot-buttons">';
+                                html += '</div>';
+                                
+                                html += '<div class="ui ' + (slots.length > 8 ? 'four' : slots.length > 6 ? 'three' : slots.length > 4 ? 'two' : 'one') + ' column grid">';
                                 
                                 slots.forEach(function(slot) {
-                                    let buttonClass = 'slot-button';
+                                    let buttonClass = 'ui basic button';
                                     if (!slot.available) {
-                                        buttonClass += ' disabled';
+                                        buttonClass = 'ui basic disabled button';
+                                        if (slot.is_in_past) {
+                                            buttonClass = 'ui basic grey disabled button';
+                                        } else if (slot.is_booked) {
+                                            buttonClass = 'ui basic red disabled button';
+                                        }
                                     }
-                                    if (slot.is_in_past) {
-                                        buttonClass += ' past';
-                                    } else if (slot.is_booked) {
-                                        buttonClass += ' booked';
-                                    }
-                                    html += '<button class="' + buttonClass + '" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button>';
+                                    html += '<div class="column"><button class="' + buttonClass + ' slot-button" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button></div>';
                                 });
                                 
                                 html += '</div></div>';
                                 return html;
                             }
                             
-                            content += renderSlotGroup('Ранок', morningSlots, 'sun outline');
-                            content += renderSlotGroup('День', afternoonSlots, 'sun');
-                            content += renderSlotGroup('Вечір', eveningSlots, 'moon outline');
+                            content += renderSlotGroup('Ранок', morningSlots, 'sun', 'yellow');
+                            content += renderSlotGroup('День', afternoonSlots, 'sun', 'orange');
+                            content += renderSlotGroup('Вечір', eveningSlots, 'moon', 'blue');
                             
                             content += '</div>';
                             slotsContainer.html(content);
                         } else {
-                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i>На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</div>');
+                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i><div class="content">На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</div></div>');
                         }
                     },
                     error: function() {
@@ -165,6 +167,8 @@
                 startTimeHidden.val('');
                 endTimeHidden.val('');
                 saveButton.addClass('disabled');
+                // Remove primary class from all slot buttons
+                $('.slot-button').removeClass('primary');
             }
 
             // Initialize dropdowns and bind events
