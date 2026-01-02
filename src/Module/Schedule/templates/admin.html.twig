@@ -27,15 +27,42 @@
         <table class="ui celled table">
             <thead>
                 <tr>
-                    <th>Лікар</th>
-                    <th>Понеділок</th>
-                    <th>Вівторок</th>
-                    <th>Середа</th>
-                    <th>Четвер</th>
-                    <th>П'ятниця</th>
-                    <th>Субота</th>
-                    <th>Неділя</th>
-                    <th>Дії</th>
+                    <th class="center aligned">
+                        <i class="user md icon"></i>
+                        Лікар
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Пн
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Вт
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Ср
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Чт
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Пт
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Сб
+                    </th>
+                    <th class="center aligned">
+                        <i class="calendar day icon"></i>
+                        Нд
+                    </th>
+                    <th class="center aligned">
+                        <i class="settings icon"></i>
+                        Дії
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -44,22 +71,41 @@
                         <td><strong>{{ doctorSchedule.doctor.full_name }}</strong></td>
                         {% for day_num in [1,2,3,4,5,6,0] %}
                             {% set day_schedule = doctorSchedule.scheduleByDay[day_num] ?? null %}
-                            <td>
+                            <td class="center aligned">
                                 {% if day_schedule %}
                                     {% if day_schedule.is_available %}
-                                        <span class="ui green label">
-                                            {{ day_schedule.start_time }} - {{ day_schedule.end_time }}
-                                        </span>
+                                        <div class="ui green compact message">
+                                            <i class="clock icon"></i>
+                                            <div class="content">
+                                                <div class="header">Робочий день</div>
+                                                <p>{{ day_schedule.start_time }} - {{ day_schedule.end_time }}</p>
+                                            </div>
+                                        </div>
                                     {% else %}
-                                        <span class="ui red label">Недоступно</span>
+                                        <div class="ui red compact message">
+                                            <i class="close icon"></i>
+                                            <div class="content">
+                                                <div class="header">Вихідний</div>
+                                                <p>Недоступно</p>
+                                            </div>
+                                        </div>
                                     {% endif %}
                                 {% else %}
-                                    <span class="ui grey label">Не встановлено</span>
+                                    <div class="ui grey compact message">
+                                        <i class="question icon"></i>
+                                        <div class="content">
+                                            <div class="header">Не налаштовано</div>
+                                            <p>Встановити час</p>
+                                        </div>
+                                    </div>
                                 {% endif %}
                             </td>
                         {% endfor %}
                         <td>
-                            <a href="/admin/schedules/edit/{{ doctorSchedule.doctor.id }}" class="ui mini primary button">Редагувати</a>
+                            <a href="/admin/schedules/edit/{{ doctorSchedule.doctor.id }}" class="ui mini primary button">
+                                <i class="edit icon"></i>
+                                Редагувати
+                            </a>
                         </td>
                     </tr>
                 {% else %}

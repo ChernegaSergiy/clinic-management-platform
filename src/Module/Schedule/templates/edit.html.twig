@@ -1,0 +1,94 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати графік: {{ doctor.full_name }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h2 class="ui header">
+                    <i class="calendar alternate outline icon"></i>
+                    Редагувати графік: {{ doctor.full_name }}
+                </h2>
+                <div class="ui breadcrumb">
+                    <a href="/admin/schedules" class="section">Управління графіками</a>
+                    <i class="right angle icon divider"></i>
+                    <div class="active section">{{ doctor.full_name }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ui divider"></div>
+        
+        <form class="ui form" method="POST" action="/admin/schedules/update">
+            <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
+            
+            <div class="ui four column grid">
+                {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                    {% set schedule_entry = scheduleByDay[day_num] ?? null %}
+                    <div class="column">
+                        <div class="ui segment">
+                            <h4 class="ui header">{{ day_name }}</h4>
+                            
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                    <label>Робочий день</label>
+                                </div>
+                            </div>
+                            
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>Початок</label>
+                                    <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                </div>
+                                <div class="field">
+                                    <label>Кінець</label>
+                                    <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="ui divider"></div>
+            
+            <div class="ui grid">
+                <div class="eight wide column">
+                    <button class="ui primary button" type="submit">
+                        <i class="save icon"></i>
+                        Зберегти графік
+                    </button>
+                    <a href="/admin/schedules" class="ui button">
+                        <i class="arrow left icon"></i>
+                        Повернутися
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Enable/disable time inputs based on availability checkbox
+            $('.ui.toggle.checkbox').checkbox({
+                onChecked: function() {
+                    $(this).closest('.segment').find('input[type="time"]').prop('disabled', false);
+                },
+                onUnchecked: function() {
+                    $(this).closest('.segment').find('input[type="time"]').prop('disabled', true);
+                }
+            });
+            
+            // Initialize state based on current checkbox values
+            $('.ui.toggle.checkbox').each(function() {
+                var $this = $(this);
+                if (!$this.checkbox('is checked')) {
+                    $this.closest('.segment').find('input[type="time"]').prop('disabled', true);
+                }
+            });
+        });
+    </script>
+{% endblock %}

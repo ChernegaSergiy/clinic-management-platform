@@ -294,4 +294,28 @@ class ScheduleController
         header('Location: /admin/schedules');
         exit;
     }
+
+    public function adminEdit(): void
+    {
+        Gate::authorize('schedules.manage_all');
+        
+        $doctorId = (int)$_GET['id'];
+        $doctor = $this->userRepository->findById($doctorId);
+        
+        if (!$doctor) {
+            header('Location: /admin/schedules');
+            exit;
+        }
+        
+        $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
+        $scheduleByDay = [];
+        foreach ($schedules as $entry) {
+            $scheduleByDay[$entry['day_of_week']] = $entry;
+        }
+        
+        View::render('@modules/Schedule/templates/edit.html.twig', [
+            'doctor' => $doctor,
+            'scheduleByDay' => $scheduleByDay
+        ]);
+    }
 }
