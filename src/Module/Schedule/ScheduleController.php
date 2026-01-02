@@ -65,6 +65,9 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
+        // Debug: Log the target doctor ID
+        error_log("Schedule Debug: sessionUserId=$sessionUserId, targetDoctorId=$targetDoctorId, canManageAllSchedules=" . ($canManageAllSchedules ? 'true' : 'false'));
+        
         View::render('@modules/Schedule/templates/index.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,

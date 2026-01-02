@@ -6,20 +6,20 @@
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">
-                    Управління розкладом 
-                    {% if selectedDoctorId %}
-                        {% set doctorName = '' %}
-                        {% for doc in allDoctors %}
-                            {% if doc.id == selectedDoctorId %}
-                                {% set doctorName = doc.full_name %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if doctorName %}: {{ doctorName }}{% else %}(Невідомий лікар){% endif %}
-                    {% else %}
-                        (Ваш розклад)
+        <h2 class="ui header">
+            Управління розкладом 
+            {% if selectedDoctorId %}
+                {% set doctorName = '' %}
+                {% for doc in allDoctors %}
+                    {% if doc.id == selectedDoctorId %}
+                        {% set doctorName = doc.full_name %}
                     {% endif %}
-                </h2>
+                {% endfor %}
+                {% if doctorName %}: {{ doctorName }} (ID: {{ selectedDoctorId }}){% else %}(Невідомий лікар, ID: {{ selectedDoctorId }}){% endif %}
+            {% else %}
+                (Ваш розклад, ID: {{ selectedDoctorId }})
+            {% endif %}
+        </h2>
             </div>
             <div class="eight wide column right aligned">
                 {# Future action buttons like "Generate Report" or "Settings" could go here #}
