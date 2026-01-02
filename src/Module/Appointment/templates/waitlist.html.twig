@@ -64,6 +64,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Пацієнт</th>
+                        <th>Контакт</th>
                         <th>Бажаний лікар</th>
                         <th>Бажаний час</th>
                         <th>Примітки</th>
@@ -76,7 +77,24 @@
                     {% for entry in waitlistEntries %}
                         <tr>
                             <td>{{ entry.id }}</td>
-                            <td>{{ entry.patient_name }}</td>
+                            <td>
+                                {{ entry.patient_name }}
+                                {% if entry.patient_status == 'pending' %}
+                                    <span class="ui tiny orange label">Публічна заявка</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.patient_status == 'pending' %}
+                                    <div>
+                                        <i class="phone icon"></i> {{ entry.contact_phone ?: entry.patient_phone ?: 'Немає' }}
+                                    </div>
+                                    <div>
+                                        <i class="mail icon"></i> {{ entry.contact_email ?: entry.patient_email ?: 'Немає' }}
+                                    </div>
+                                {% else %}
+                                    <span class="ui mini grey label">Існуючий пацієнт</span>
+                                {% endif %}
+                            </td>
                             <td>{{ entry.doctor_name ?: 'Будь-який' }}</td>
                             <td>
                                 {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}Будь-який{% endif %}
