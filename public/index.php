@@ -143,6 +143,8 @@ $router->add('POST', '/appointments/edit', [AppointmentController::class, 'updat
 $router->add('POST', '/appointments/cancel', [AppointmentController::class, 'cancel']);
 $router->add('GET', '/appointments/waitlist', [AppointmentController::class, 'showWaitlist']);
 $router->add('POST', '/appointments/waitlist/reject', [AppointmentController::class, 'rejectWaitlist']);
+$router->add('GET', '/appointments/waitlist/fulfill', [AppointmentController::class, 'fulfillWaitlist']);
+$router->add('POST', '/appointments/waitlist/cancel', [AppointmentController::class, 'cancelWaitlist']);
 $router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
 $router->add('GET', '/book-appointment', [AppointmentController::class, 'publicForm']);
 $router->add('POST', '/book-appointment', [AppointmentController::class, 'submitPublicForm']);

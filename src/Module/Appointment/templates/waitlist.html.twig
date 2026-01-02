@@ -106,8 +106,11 @@
                             <td>
                                 {# <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a> #}
                                 {# <a href="/appointments/waitlist/cancel?id={{ entry.id }}" class="ui red button">Скасувати</a> #}
-                                <button class="ui green button" onclick="alert('Функціонал виконання запису буде додано пізніше');">Виконати</button>
-                                <button class="ui red button" onclick="alert('Функціонал скасування запису буде додано пізніше');">Скасувати</button>
+                                <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a>
+                                <form action="/appointments/waitlist/cancel" method="POST" style="display:inline;">
+                                    <input type="hidden" name="id" value="{{ entry.id }}">
+                                    <button type="submit" class="ui red button" onclick="return confirm('Ви впевнені, що хочете скасувати цю заявку?');">Скасувати</button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}

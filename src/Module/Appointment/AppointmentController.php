@@ -747,4 +747,67 @@ public function create(): void
             echo json_encode(['error' => 'Invalid date format.']);
         }
     }
+
+    public function fulfillWaitlist(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('appointments.write');
+        $id = (int)($_GET['id'] ?? 0);
+        $entry = $this->appointmentRepository->findWaitlistById($id);
+        if (!$entry) {
+            http_response_code(404);
+            echo "Заявку не знайдено";
+            return;
+        }
+
+        $patients = $this->patientRepository->findAllActive();
+        $doctors = $this->userRepository->findAllDoctors();
+        $services = $this->serviceRepository->findAll();
+
+        $patientOptions = [];
+        foreach ($patients as $patient) {
+            $patientOptions[$patient['id']] = $patient['full_name'];
+        }
+
+        $doctorOptions = [];
+        foreach ($doctors as $doctor) {
+            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        }
+        
+        // Create service options array for template
+        $serviceOptions = [];
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+        }
+
+        View::render('@modules/Appointment/templates/new.html.twig', [
+            'patients' => $patientOptions,
+            'doctors' => $doctorOptions,
+            'services' => $serviceOptions,
+            'servicesForJs' => $services, // Pass original service objects for JavaScript
+            'old' => [
+                'waitlist_id' => $id,
+                'doctor_id' => $entry['desired_doctor_id'],
+                'start_time' => $entry['desired_start_time'] ? (new \DateTime($entry['desired_start_time']))->format('Y-m-d\TH:i') : '',
+                'date' => $entry['desired_start_time'] ? (new \DateTime($entry['desired_start_time']))->format('Y-m-d') : date('Y-m-d'),
+            ],
+            'selectedDate' => $entry['desired_start_time'] ? (new \DateTime($entry['desired_start_time']))->format('Y-m-d') : date('Y-m-d'),
+        ]);
+    }
+
+    public function cancelWaitlist(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('appointments.write');
+        $id = (int)($_POST['id'] ?? 0);
+        $entry = $this->appointmentRepository->findWaitlistById($id);
+        if (!$entry) {
+            http_response_code(404);
+            echo "Заявку не знайдено";
+            return;
+        }
+        $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
+        header('Location: /appointments/waitlist');
+        exit();
+    }
 }
