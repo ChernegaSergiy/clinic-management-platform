@@ -201,7 +201,7 @@ class AppointmentController
             echo "Заявку не знайдено";
             return;
         }
-        $this->appointmentRepository->updateWaitlistStatus($id, 'rejected');
+        $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
         header('Location: /appointments');
         exit();
     }
