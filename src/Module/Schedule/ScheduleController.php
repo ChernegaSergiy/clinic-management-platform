@@ -54,6 +54,10 @@ class ScheduleController
         // Admin schedule management for all doctors
         Gate::authorize('schedules.manage_all');
         
+        $selectedDoctorId = null;
+        $selectedDoctorName = null;
+        $selectedDoctorSchedule = [];
+        
         $allDoctors = $this->userRepository->findAllDoctors();
         $allSchedules = [];
         
@@ -64,15 +68,34 @@ class ScheduleController
                 $scheduleByDay[$entry['day_of_week']] = $entry;
             }
             
-            $allSchedules[] = [
+            $doctorSchedule = [
                 'doctor' => $doctor,
                 'scheduleByDay' => $scheduleByDay
             ];
+            
+            $allSchedules[] = $doctorSchedule;
+        }
+        
+        // If specific doctor is selected, prepare their schedule for editing
+        if (isset($_GET['doctor_id']) && (int)$_GET['doctor_id'] > 0) {
+            $selectedDoctorId = (int)$_GET['doctor_id'];
+            $selectedDoctor = $this->userRepository->findById($selectedDoctorId);
+            $selectedDoctorName = $selectedDoctor['full_name'] ?? null;
+            
+            if ($selectedDoctor) {
+                $schedules = $this->doctorScheduleRepository->findByDoctor($selectedDoctorId);
+                foreach ($schedules as $entry) {
+                    $selectedDoctorSchedule[$entry['day_of_week']] = $entry;
+                }
+            }
         }
         
         View::render('@modules/Schedule/templates/admin.html.twig', [
             'allSchedules' => $allSchedules,
-            'allDoctors' => $allDoctors
+            'allDoctors' => $allDoctors,
+            'selectedDoctorId' => $selectedDoctorId,
+            'selectedDoctorName' => $selectedDoctorName,
+            'selectedDoctorSchedule' => $selectedDoctorSchedule
         ]);
     }
 
