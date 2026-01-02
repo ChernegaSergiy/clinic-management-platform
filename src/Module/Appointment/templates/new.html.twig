@@ -9,56 +9,51 @@
         <h2 class="ui header">Створити новий запис</h2>
         <div class="ui divider"></div>
 
-        {# Step 1: Select Doctor, Service, and Date to find slots #}
-        <form class="ui form" id="find-slots-form">
-            <h4 class="ui dividing header">Крок 1: Знайти вільні години</h4>
-            <div class="three fields">
-                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, null, {'id': 'doctor_selector'}) }}
-                {{ forms.select('service_id', 'Послуга', services|reduce((acc, s) => acc|merge({(s.id): s.name ~ ' (' ~ s.duration_minutes ~ ' хв)'}), {}), old.service_id ?? null, null, {'id': 'service_selector'}) }}
-                {{ forms.input('date', 'Дата', selectedDate, 'date', '', null, {'id': 'date_selector'}) }}
-            </div>
-            <button class="ui secondary button" type="submit">Знайти Години</button>
-        </form>
-
-        <div class="ui divider"></div>
-        
-        {# Step 2: Select a slot and patient #}
         <form class="ui form" method="POST" action="/appointments/new">
-            <h4 class="ui dividing header">Крок 2: Обрати час та пацієнта</h4>
-
-            <input type="hidden" name="doctor_id" value="{{ old.doctor_id ?? '' }}">
-            <input type="hidden" name="service_id" value="{{ old.service_id ?? '' }}">
-            <input type="hidden" name="start_time" id="start_time_hidden">
-            <input type="hidden" name="end_time" id="end_time_hidden">
-             {% if old.waitlist_id %}
+            {% if old.waitlist_id %}
                 <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id }}">
             {% endif %}
 
-            <div class="field {% if availableSlots is empty %}disabled{% endif %}">
-                <label>Доступні години на {{ selectedDate|date("d.m.Y") }}</label>
-                <div class="ui five column grid">
-                    {% for slot in availableSlots %}
-                        <div class="column">
-                            <button class="ui basic button slot-button" data-slot-time="{{ slot|date('Y-m-d H:i:s') }}">{{ slot|date("H:i") }}</button>
-                        </div>
-                    {% else %}
-                        <p>Немає вільних годин на цей день, лікаря або тривалість послуги. Спробуйте інший вибір.</p>
-                    {% endfor %}
-                </div>
+            {# Filters for finding slots #}
+            <h4 class="ui dividing header">1. Оберіть параметри для пошуку</h4>
+            <div class="three fields">
+                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, {'id': 'doctor_selector', 'required': 'required'}) }}
+                {{ forms.select('service_id', 'Послуга', services|reduce((acc, s) => acc|merge({(s.id): s.name ~ ' (' ~ s.duration_minutes ~ ' хв)'}), {}), old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
+                {{ forms.input('date', 'Дата', old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
             </div>
+            
+            <div id="slot-loader" class="ui active inverted dimmer" style="display: none;">
+                <div class="ui text loader">Завантаження...</div>
+            </div>
+            
+            <div id="slots-container" class="field" style="margin-top: 2rem;">
+                {# Slots will be loaded here via AJAX #}
+            </div>
+            
+            <div class="ui hidden divider"></div>
+
+            {# Patient and notes #}
+            <h4 class="ui dividing header">2. Оберіть пацієнта та час</h4>
+
+            {# Hidden fields for selected slot times #}
+            <input type="hidden" name="start_time" id="start_time_hidden" value="{{ old.start_time ?? '' }}">
+            <input type="hidden" name="end_time" id="end_time_hidden" value="{{ old.end_time ?? '' }}">
 
             <div class="two fields">
-                 {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
-                 <div class="field">
+                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                <div class="field">
                     <label>Обраний час</label>
-                    <input type="text" id="selected_slot_display" readonly placeholder="Оберіть час вище">
+                    <input type="text" id="selected_slot_display" readonly placeholder="Оберіть годину зі списку вище">
                  </div>
             </div>
-
+            
             {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до запису') }}
 
-            {{ ui.button('Зберегти запис', 'primary', 'large', 'save', { 'type': 'submit', 'class': 'disabled', 'id': 'save-button' }) }}
-            <a href="/appointments" class="ui button">Скасувати</a>
+            <div style="margin-top: 2rem;">
+                {{ ui.button('Зберегти запис', 'primary', 'large', 'save', { 'type': 'submit', 'id': 'save-button', 'class': 'disabled' }) }}
+                <a href="/appointments" class="ui button">Скасувати</a>
+            </div>
+
         </form>
     </div>
 {% endblock %}
@@ -67,63 +62,115 @@
     {{ parent() }}
     <script>
         $(document).ready(function() {
-            // Handle form submission for finding slots
-            $('#find-slots-form').submit(function(e) {
-                e.preventDefault();
-                const doctorId = $('#doctor_selector').val();
-                const serviceId = $('#service_selector').val();
-                const date = $('#date_selector').val();
+            const doctorField = $('#doctor_selector');
+            const serviceField = $('#service_selector');
+            const dateField = $('#date_selector');
+            const slotsContainer = $('#slots-container');
+            const slotLoader = $('#slot-loader');
+            const saveButton = $('#save-button');
+            const selectedSlotDisplay = $('#selected_slot_display');
+            const startTimeHidden = $('#start_time_hidden');
+            const endTimeHidden = $('#end_time_hidden');
 
-                if (doctorId && date) {
-                    let url = '/appointments/new?doctor_id=' + doctorId + '&date=' + date + '&service_id=' + serviceId;
-                    // Preserve patient_id if it was pre-selected (e.g. from waitlist)
-                     {% if old.patient_id %}
-                        url += '&patient_id={{ old.patient_id }}';
-                    {% endif %}
-                    {% if old.waitlist_id %}
-                        url += '&waitlist_id={{ old.waitlist_id }}';
-                    {% endif %}
-                    window.location.href = url;
+            // Store services data to get duration on the fly
+            const servicesData = {
+                {% for service in services %}
+                    "{{ service.id }}": { duration: {{ service.duration_minutes }} }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            };
+
+            function fetchAvailableSlots() {
+                const doctorId = doctorField.val();
+                const serviceId = serviceField.val();
+                const date = dateField.val();
+
+                if (!doctorId || !serviceId || !date) {
+                    slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря, послугу та дату для пошуку вільних годин.</p></div>');
+                    return;
                 }
-            });
 
-            // Handle slot selection
-            const serviceDuration = {{ (services|filter(s => s.id == (old.service_id ?? 0))|first).duration_minutes ?? 30 }};
+                slotLoader.show();
+                slotsContainer.empty();
+                resetSelection();
+
+                $.ajax({
+                    url: '/api/appointments/available-slots',
+                    data: {
+                        doctor_id: doctorId,
+                        service_id: serviceId,
+                        date: date
+                    },
+                    success: function(slots) {
+                        slotLoader.hide();
+                        if (slots.length > 0) {
+                            let content = '<label>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString() + '</label>';
+                            content += '<div class="ui five column grid">';
+                            slots.forEach(function(slot) {
+                                content += '<div class="column"><button class="ui basic button slot-button" data-slot-time="' + slot.value + '">' + slot.label + '</button></div>';
+                            });
+                            content += '</div>';
+                             if (slots.length > 15) { // Add a tip for many slots
+                                content += '<div class="ui mini message" style="margin-top:1em;">Порада: доступно багато годин, скористайтесь прокруткою, щоб побачити всі.</div>';
+                            }
+                            slotsContainer.html(content);
+                        } else {
+                            slotsContainer.html('<div class="ui warning message"><p>На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</p></div>');
+                        }
+                    },
+                    error: function() {
+                        slotLoader.hide();
+                        slotsContainer.html('<div class="ui negative message"><p>Помилка при завантаженні годин. Спробуйте оновити сторінку.</p></div>');
+                    }
+                });
+            }
             
-            $('.slot-button').click(function(e) {
-                e.preventDefault();
-                const startTimeStr = $(this).data('slot-time');
-                const startTime = new Date(startTimeStr.replace(/-/g, "/")); // JS Date parsing can be tricky with hyphens
-                
-                // Calculate end time
-                let endTime = new Date(startTime.getTime() + serviceDuration * 60000);
+            function resetSelection() {
+                selectedSlotDisplay.val('');
+                startTimeHidden.val('');
+                endTimeHidden.val('');
+                saveButton.addClass('disabled');
+            }
 
-                // Format for hidden inputs (YYYY-MM-DD HH:mm:ss)
+            doctorField.add(serviceField).add(dateField).on('change', fetchAvailableSlots);
+
+            // Event delegation for dynamically added slot buttons
+            $(document).on('click', '.slot-button', function(e) {
+                e.preventDefault();
+                
+                const startTimeStr = $(this).data('slot-time');
+                const serviceId = serviceField.val();
+
+                if (!serviceId || !servicesData[serviceId]) {
+                    alert('Please select a service first.');
+                    return;
+                }
+                const duration = servicesData[serviceId].duration;
+                const startTime = new Date(startTimeStr.replace(/-/g, "/"));
+                let endTime = new Date(startTime.getTime() + duration * 60000);
+
                 const formatForHidden = (date) => {
                     const pad = (num) => num.toString().padStart(2, '0');
-                    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' +
-                           pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+                    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
                 };
-                
-                $('#start_time_hidden').val(formatForHidden(startTime));
-                $('#end_time_hidden').val(formatForHidden(endTime));
 
-                // Update display
-                const displayTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                $('#selected_slot_display').val(displayTime);
+                startTimeHidden.val(formatForHidden(startTime));
+                endTimeHidden.val(formatForHidden(endTime));
 
-                // Highlight selected button
+                selectedSlotDisplay.val(startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
                 $('.slot-button').removeClass('primary');
                 $(this).addClass('primary');
 
-                // Enable save button
-                $('#save-button').removeClass('disabled');
+                saveButton.removeClass('disabled');
             });
-
-            // Pre-select patient if in query params
-            {% if old.patient_id %}
-                $('#patient_id').dropdown('set selected', '{{ old.patient_id }}');
-            {% endif %}
+            
+            // Initial fetch if data is pre-filled
+            if (doctorField.val() && serviceField.val() && dateField.val()) {
+                fetchAvailableSlots();
+            } else {
+                slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря, послугу та дату для пошуку вільних годин.</p></div>');
+            }
         });
     </script>
 {% endblock %}
