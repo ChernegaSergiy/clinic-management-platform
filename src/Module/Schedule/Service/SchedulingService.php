@@ -291,7 +291,7 @@ class SchedulingService
         }
 
         // Check doctor availability
-        $doctorAvailability = $this->isTimeSlotAvailable($doctorId, $roomId, $startTime, $endTime);
+        $doctorAvailability = $this->isTimeSlotAvailable($doctorId, $roomId, $startTime, $endTime, $excludeAppointmentId);
         if (!$doctorAvailability['available']) {
             $result['valid'] = false;
             foreach ($doctorAvailability['conflicts'] as $conflict) {
