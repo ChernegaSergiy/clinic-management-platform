@@ -1,0 +1,6 @@
+name: MedicalRecord
+version: 1.0.0
+description: Модуль управління медичними записами
+author: Serhii
+config:
+    enabled: true
