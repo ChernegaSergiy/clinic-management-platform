@@ -236,7 +236,7 @@ class SchedulingService
         }
 
         // Check room availability
-        if ($roomId && $this->isRoomAvailable($roomId, $startTime, $endTime, $excludeAppointmentId)) {
+        if ($roomId && !$this->isRoomAvailable($roomId, $startTime, $endTime, $excludeAppointmentId)) {
             $result['available'] = false;
             $result['conflicts'][] = [
                 'type' => 'room',
@@ -281,7 +281,7 @@ class SchedulingService
         $roomId = isset($data['room_id']) ? (int)$data['room_id'] : null;
 
         // Check if room is available (if specified)
-        if ($roomId && $this->isRoomAvailable($roomId, $startTime, $endTime)) {
+        if ($roomId && !$this->isRoomAvailable($roomId, $startTime, $endTime)) {
             $result['valid'] = false;
             $result['errors'][] = [
                 'field' => 'room_id',
