@@ -33,11 +33,7 @@
             <a class="ui label yellow">Не з'явився</a>
             <a class="ui label grey">Інше</a>
         </div>
-        <div class="ui labels" style="margin-top: 10px;">
-            <div class="ui header">Типи ресурсів:</div>
-            <a class="ui label">👨‍⚕️ Лікарі</a>
-            <a class="ui label">🏥 Кімнати</a>
-        </div>
+
 
         <div class="ui segment">
             <h3 class="ui header">Список записів</h3>
@@ -101,11 +97,7 @@
                         resourceAreaHeaderContent: 'Ресурси',
                         resources: allResources,
                         events: '/api/appointments',
-                        resourceLabelContent: function(arg) {
-                            var resource = arg.resource;
-                            var typeIcon = resource.extendedProps.type === 'room' ? '🏥' : '👨‍⚕️';
-                            return typeIcon + ' ' + resource.title;
-                        },
+
                         resourceGroupField: 'type',
                         resourceAreaWidth: '250px'
                     });
