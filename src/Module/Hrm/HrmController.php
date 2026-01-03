@@ -3,7 +3,7 @@
 namespace App\Module\Hrm;
 
 use App\Core\View;
-use App\Module\HRM\Repository\HrmRepository;
+use App\Module\Hrm\Repository\HrmRepository;
 use App\Module\User\Repository\UserRepository;
 use App\Core\AuthGuard;
 use App\Core\Gate;
@@ -73,7 +73,7 @@ class HrmController
             $_SESSION['error_message'] = 'Не вдалося додати співробітника.';
         }
 
-        header('Location: /dashboard/hrm');
+        header('Location: /hrm');
         exit();
     }
 
@@ -157,7 +157,7 @@ class HrmController
             $_SESSION['error_message'] = 'Не вдалося оновити дані.';
         }
 
-        header('Location: /dashboard/hrm/show?id=' . $id);
+        header('Location: /hrm/show?id=' . $id);
         exit();
     }
 
@@ -175,7 +175,7 @@ class HrmController
             $_SESSION['success_message'] = 'Статус співробітника оновлено.';
         }
 
-        header('Location: /dashboard/hrm/show?id=' . $id);
+        header('Location: /hrm/show?id=' . $id);
         exit();
     }
 }
