@@ -35,12 +35,14 @@ class AppointmentController
         $this->serviceRepository = new ServiceRepository();
         $doctorScheduleRepository = new DoctorScheduleRepository();
         $scheduleExceptionRepository = new ScheduleExceptionRepository();
+        $roomRepository = new \App\Module\Room\Repository\RoomRepository();
 
         $this->schedulingService = new SchedulingService(
             $doctorScheduleRepository,
             $scheduleExceptionRepository,
             $this->appointmentRepository,
-            $this->serviceRepository
+            $this->serviceRepository,
+            $roomRepository
         );
     }
 
