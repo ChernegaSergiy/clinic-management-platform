@@ -75,7 +75,7 @@ class ServiceRepository
 
     public function findCategories(): array
     {
-        $stmt = $this->pdo->query("SELECT id, name FROM service_categories ORDER BY name ASC");
+        $stmt = $this->pdo->query("SELECT id, name, description FROM service_categories ORDER BY name ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
