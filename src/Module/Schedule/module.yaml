@@ -1,0 +1,6 @@
+name: Schedule
+version: 1.0.0
+description: Модуль для управління розкладом
+author: Serhii
+config:
+    enabled: true
