@@ -561,4 +561,26 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findByRoomIdAndDateRange(int $roomId, string $start, string $end): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                a.id, 
+                a.start_time, 
+                a.end_time, 
+                a.status,
+                a.room_id
+            FROM appointments a
+            WHERE a.room_id = :room_id
+            AND a.start_time < :end_time AND a.end_time > :start_time
+            ORDER BY a.start_time ASC
+        ");
+        $stmt->execute([
+            ':room_id' => $roomId,
+            ':start_time' => $start,
+            ':end_time' => $end,
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

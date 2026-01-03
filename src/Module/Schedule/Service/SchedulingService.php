@@ -161,6 +161,178 @@ class SchedulingService
         return $finalSlots;
     }
 
+    /**
+     * Check if a room is available for given time slot
+     */
+    public function isRoomAvailable(?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): bool
+    {
+        if (!$roomId) {
+            return true; // No room specified, always available
+        }
+
+        // Check if room exists and is available
+        $room = $this->roomRepository->findById($roomId);
+        if (!$room || !$room['is_available']) {
+            return false;
+        }
+
+        // Get existing appointments for the room in the time slot
+        $conflictingAppointments = $this->appointmentRepository->findByRoomIdAndDateRange(
+            $roomId,
+            $startTime->format('Y-m-d H:i:s'),
+            $endTime->format('Y-m-d H:i:s')
+        );
+
+        // Filter out the appointment we're excluding (for editing)
+        if ($excludeAppointmentId) {
+            $conflictingAppointments = array_filter($conflictingAppointments, function($appointment) use ($excludeAppointmentId) {
+                return (int)$appointment['id'] !== $excludeAppointmentId;
+            });
+        }
+
+        // Check if any conflicting appointments are not cancelled
+        foreach ($conflictingAppointments as $appointment) {
+            if (!in_array($appointment['status'], ['cancelled', 'no-show'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+        // Check if room exists and is available
+        $room = $this->roomRepository->findById($roomId);
+        if (!$room || !$room['is_available']) {
+            return false;
+        }
+
+        // Check for conflicting appointments in the same room
+        $sql = "SELECT id FROM appointments 
+                 WHERE room_id = :room_id 
+                 AND status NOT IN ('cancelled', 'no-show')
+                 AND ((start_time < :end_time AND end_time > :start_time))
+                 " . ($excludeAppointmentId ? "AND id != :exclude_id" : "");
+        
+        $stmt = $this->appointmentRepository->getPdo()->prepare($sql);
+        $params = [
+            ':room_id' => $roomId,
+            ':start_time' => $startTime->format('Y-m-d H:i:s'),
+            ':end_time' => $endTime->format('Y-m-d H:i:s')
+        ];
+        
+        if ($excludeAppointmentId) {
+            $params[':exclude_id'] = $excludeAppointmentId;
+        }
+        
+        $stmt->execute($params);
+        return $stmt->rowCount() === 0;
+    }
+
+    /**
+     * Check if a time slot is available for both doctor and room
+     */
+    public function isTimeSlotAvailable(int $doctorId, ?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): array
+    {
+        $result = [
+            'available' => true,
+            'conflicts' => []
+        ];
+
+        // Check doctor availability (existing logic from getAvailableTimeSlots)
+        $doctorAppointments = $this->appointmentRepository->findByDoctorIdAndDateRange(
+            $doctorId,
+            $startTime->format('Y-m-d 00:00:00'),
+            $startTime->format('Y-m-d 23:59:59')
+        );
+
+        foreach ($doctorAppointments as $appointment) {
+            if ($excludeAppointmentId && (int)$appointment['id'] === $excludeAppointmentId) {
+                continue;
+            }
+
+            $appointmentStart = new DateTime($appointment['start_time']);
+            $appointmentEnd = new DateTime($appointment['end_time']);
+
+            if ($startTime < $appointmentEnd && $endTime > $appointmentStart) {
+                $result['available'] = false;
+                $result['conflicts'][] = [
+                    'type' => 'doctor',
+                    'message' => 'Лікар зайнятий в цей час',
+                    'appointment_id' => $appointment['id']
+                ];
+                break;
+            }
+        }
+
+        // Check room availability
+        if ($roomId && $this->isRoomAvailable($roomId, $startTime, $endTime, $excludeAppointmentId)) {
+            $result['available'] = false;
+            $result['conflicts'][] = [
+                'type' => 'room',
+                'message' => 'Кімната зайнята в цей час',
+                'room_id' => $roomId
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get available rooms for a given time slot
+     */
+    public function getAvailableRooms(DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): array
+    {
+        $allRooms = $this->roomRepository->findAvailable();
+        $availableRooms = [];
+
+        foreach ($allRooms as $room) {
+            if ($this->isRoomAvailable($room['id'], $startTime, $endTime, $excludeAppointmentId)) {
+                $availableRooms[] = $room;
+            }
+        }
+
+        return $availableRooms;
+    }
+
+    /**
+     * Validate appointment booking with room conflict detection
+     */
+    public function validateAppointmentBooking(array $data): array
+    {
+        $result = [
+            'valid' => true,
+            'errors' => []
+        ];
+
+        $startTime = new DateTime($data['start_time']);
+        $endTime = new DateTime($data['end_time']);
+        $doctorId = (int)$data['doctor_id'];
+        $roomId = isset($data['room_id']) ? (int)$data['room_id'] : null;
+
+        // Check if room is available (if specified)
+        if ($roomId && $this->isRoomAvailable($roomId, $startTime, $endTime)) {
+            $result['valid'] = false;
+            $result['errors'][] = [
+                'field' => 'room_id',
+                'message' => 'Обрана кімната зайнята в цей час'
+            ];
+        }
+
+        // Check doctor availability
+        $doctorAvailability = $this->isTimeSlotAvailable($doctorId, $roomId, $startTime, $endTime);
+        if (!$doctorAvailability['available']) {
+            $result['valid'] = false;
+            foreach ($doctorAvailability['conflicts'] as $conflict) {
+                $result['errors'][] = [
+                    'field' => 'start_time',
+                    'message' => $conflict['message']
+                ];
+            }
+        }
+
+        return $result;
+    }
+
     // You might also add methods like:
     // public function bookAppointment(int $doctorId, int $patientId, DateTime $startTime, int $serviceId): bool;
     // public function cancelAppointment(int $appointmentId): bool;
