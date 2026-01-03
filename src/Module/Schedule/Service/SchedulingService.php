@@ -279,9 +279,10 @@ class SchedulingService
         $endTime = new DateTime($data['end_time']);
         $doctorId = (int)$data['doctor_id'];
         $roomId = isset($data['room_id']) ? (int)$data['room_id'] : null;
+        $excludeAppointmentId = $data['exclude_id'] ?? null;
 
         // Check if room is available (if specified)
-        if ($roomId && !$this->isRoomAvailable($roomId, $startTime, $endTime)) {
+        if ($roomId && !$this->isRoomAvailable($roomId, $startTime, $endTime, $excludeAppointmentId)) {
             $result['valid'] = false;
             $result['errors'][] = [
                 'field' => 'room_id',
