@@ -1,0 +1,58 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Співробітники - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Список співробітників</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/dashboard/hrm/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати співробітника
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ім'я</th>
+                    <th>Посада</th>
+                    <th>Департамент</th>
+                    <th>Дата найму</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.last_name }} {{ employee.first_name }}</td>
+                        <td>{{ employee.position }}</td>
+                        <td>{{ employee.department }}</td>
+                        <td>{{ employee.hire_date }}</td>
+                        <td>{{ employee.status }}</td>
+                        <td>
+                            <a href="/dashboard/hrm/show?id={{ employee.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="/dashboard/hrm/edit?id={{ employee.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">Немає співробітників для відображення.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
