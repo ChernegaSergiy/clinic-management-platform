@@ -58,7 +58,9 @@
 
 .doctor-card { border: var(--border-medium); background: var(--color-bg-alt); padding: 0.8rem; display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 0.7rem; }
 
-.doctor-avatar { border: var(--border-thick); background: #ddd; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; text-transform: uppercase; height: 72px; flex-shrink: 0; }
+.doctor-avatar { border: var(--border-thick); background: #ddd; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; text-transform: uppercase; height: 72px; flex-shrink: 0; overflow: hidden; }
+
+.doctor-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .doctor-info__name { text-transform: uppercase; font-weight: 900; font-size: 0.85rem; margin-bottom: 0.1rem; }
 
