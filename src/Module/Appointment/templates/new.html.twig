@@ -24,7 +24,11 @@
             {# Filters for finding slots #}
             <h4 class="ui dividing header">1. Оберіть параметри для пошуку</h4>
             <div class="three fields">
-                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, {'id': 'doctor_selector', 'required': 'required'}) }}
+                {% set doctor_select_attrs = {'id': 'doctor_selector', 'required': 'required'} %}
+                {% if session.user.role_name == 'doctor' %}
+                    {% set doctor_select_attrs = doctor_select_attrs|merge({'disabled': 'disabled'}) %}
+                {% endif %}
+                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, doctor_select_attrs) }}
                 {{ forms.select('service_id', 'Послуга', services, old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
                 {{ forms.input('date', 'Дата', old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
             </div>
