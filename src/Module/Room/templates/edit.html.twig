@@ -1,0 +1,31 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати кімнату - Адмін-панель{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагувати кімнату</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/rooms/edit?id={{ room.id }}">
+            {{ forms.input('name', 'Назва кімнати', old.name ?? room.name, 'text', 'Назва кімнати', errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.input('type', 'Тип кімнати', old.type ?? room.type, 'text', 'Напр: кабінет, операційна, лабораторія', errors.type ?? null, {'required': 'required'}) }}
+            <div class="two fields">
+                {{ forms.input('capacity', 'Місткість', old.capacity ?? room.capacity, 'number', 'Кількість місць', errors.capacity ?? null, {'required': 'required', 'min': '1'}) }}
+                {{ forms.input('location', 'Розташування', old.location ?? room.location, 'text', 'Поверх, номер', errors.location ?? null) }}
+            </div>
+            {{ forms.textarea('equipment', 'Обладнання', old.equipment ?? room.equipment, 'Перелік обладнання в кімнаті', errors.equipment ?? null) }}
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" name="is_available" {{ old.is_available is defined ? (old.is_available == 0 ? '' : 'checked') : (room.is_available == 1 ? 'checked' : '') }}>
+                    <label>Доступна для бронювання</label>
+                </div>
+            </div>
+
+            {{ ui.button('Оновити кімнату', 'primary', 'large', 'save') }}
+            <a href="/admin/rooms/show?id={{ room.id }}" class="ui button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}
