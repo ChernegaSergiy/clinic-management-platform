@@ -520,14 +520,27 @@ class AppointmentController
         ];
 
         foreach ($appointments as $appointment) {
+            // Event for doctor resource
             $events[] = [
                 'title' => $appointment['patient_name'] . ' (' . $appointment['doctor_name'] . ')',
                 'start' => $appointment['start_time'],
                 'end' => $appointment['end_time'],
                 'id' => $appointment['id'],
                 'color' => $statusColors[$appointment['status']] ?? '#767676', // Default grey
-                'resourceId' => $appointment['doctor_id'], // This is important for resource view
+                'resourceId' => $appointment['doctor_id'], // Event for doctor resource
             ];
+            
+            // Event for room resource (if room is assigned)
+            if (!empty($appointment['room_id'])) {
+                $events[] = [
+                    'title' => $appointment['patient_name'] . ' (' . ($appointment['room_name'] ?? 'Кімната ' . $appointment['room_id']) . ')',
+                    'start' => $appointment['start_time'],
+                    'end' => $appointment['end_time'],
+                    'id' => 'room_' . $appointment['id'], // Different ID to avoid conflicts
+                    'color' => $statusColors[$appointment['status']] ?? '#767676',
+                    'resourceId' => 'room_' . $appointment['room_id'], // Room resource ID
+                ];
+            }
         }
 
         header('Content-Type: application/json');
