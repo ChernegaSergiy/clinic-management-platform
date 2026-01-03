@@ -1,0 +1,44 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}Наша команда — Міська клінічна лікарня №1{% endblock %}
+
+{% block body %}
+        <section id="doctors" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Команда</div>
+                    <h1 class="section__title section__title--compact">Основні контактні лікарі</h1>
+                    <p class="section__description">На головній сторінці достатньо 3–6 ключових лікарів: завідувачі відділень, черговий по лікарні, відповідальний за комунікацію.</p>
+                </header>
+                <div class="doctors-grid">
+                    <article class="doctor-card">
+                        <div class="doctor-avatar">д.м.н.</div>
+                        <div class="doctor-info">
+                            <div class="doctor-info__name">д-р Іваненко Олександр</div>
+                            <div class="doctor-info__role">Головний лікар</div>
+                            <div class="doctor-info__meta">Керує роботою закладу, відповідає за якість медичної допомоги та організацію маршрутів пацієнтів.</div>
+                             <div class="doctor-tags"><span class="tag">Адміністрація</span><span class="tag">Контроль якості</span></div>
+                        </div>
+                    </article>
+                    <article class="doctor-card">
+                        <div class="doctor-avatar">черг.</div>
+                        <div class="doctor-info">
+                            <div class="doctor-info__name">д-р Петраченко Марія</div>
+                            <div class="doctor-info__role">Черговий лікар приймального</div>
+                            <div class="doctor-info__meta">Координує прийом ургентних пацієнтів, визначає подальший маршрут (госпіталізація, амбулаторне лікування).</div>
+                            <div class="doctor-tags"><span class="tag">Приймальне</span><span class="tag">24/7</span></div>
+                        </div>
+                    </article>
+                    <article class="doctor-card">
+                        <div class="doctor-avatar">хір.</div>
+                        <div class="doctor-info">
+                            <div class="doctor-info__name">д-р Коваленко Сергій</div>
+                            <div class="doctor-info__role">Завідувач хірургічного відділення</div>
+                            <div class="doctor-info__meta">Відповідає за оперативні втручання, післяопераційний супровід та стандарти анестезіологічного забезпечення.</div>
+                             <div class="doctor-tags"><span class="tag">Хірургія</span><span class="tag">Консультації</span></div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+{% endblock %}
