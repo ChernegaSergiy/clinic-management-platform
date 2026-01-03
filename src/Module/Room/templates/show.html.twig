@@ -1,0 +1,67 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ room.name }} - Деталі кімнати{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ room.name }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/rooms/edit?id={{ room.id }}" class="ui primary button">
+                    <i class="edit icon"></i> Редагувати
+                </a>
+                <a href="/admin/rooms" class="ui button">
+                    <i class="arrow left icon"></i> Повернутись
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui items">
+            <div class="item">
+                <div class="content">
+                    <div class="header">Тип кімнати</div>
+                    <div class="description">{{ room.type }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Місткість</div>
+                    <div class="description">{{ room.capacity }} осіб</div>
+                </div>
+            </div>
+            {% if room.location %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">Розташування</div>
+                    <div class="description">{{ room.location }}</div>
+                </div>
+            </div>
+            {% endif %}
+            {% if room.equipment %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">Обладнання</div>
+                    <div class="description">{{ room.equipment|nl2br }}</div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">Статус</div>
+                    <div class="description">
+                        {% if room.is_available %}
+                            <span class="ui green label">Доступна</span>
+                        {% else %}
+                            <span class="ui red label">Недоступна</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
