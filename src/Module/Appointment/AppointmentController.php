@@ -289,6 +289,19 @@ public function create(): void
     public function store(): void
     {
         AuthGuard::check();
+        
+        $role = $_SESSION['user']['role_name'] ?? '';
+        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
+        $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
+
+        // A doctor can only create appointments for themselves.
+        // Users with broader permissions (registrar, admin) are not affected.
+        if ($role === 'doctor' && $loggedInUserId !== $submittedDoctorId) {
+            http_response_code(403);
+            echo "Доступ заборонено: Ви можете створювати записи лише для себе.";
+            exit();
+        }
+        
         Gate::authorize('appointments.write');
 
         $rawInput = $_POST;
