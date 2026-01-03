@@ -43,10 +43,7 @@ class PageController
         View::render('doctors/index.html.twig');
     }
 
-    public function faq(): void
-    {
-        View::render('faq/index.html.twig');
-    }
+
 
     public function ourTeam(): void
     {
