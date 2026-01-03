@@ -61,7 +61,9 @@ class RoomController
             exit();
         }
 
-        $this->roomRepository->create($_POST);
+        $data = $_POST;
+        $data['is_available'] = isset($_POST['is_available']) ? 1 : 0;
+        $this->roomRepository->create($data);
         $_SESSION['success_message'] = "Кімнату успішно створено.";
         header('Location: /admin/rooms');
         exit();
