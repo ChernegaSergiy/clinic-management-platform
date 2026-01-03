@@ -121,7 +121,6 @@ class AppointmentController
 
     public function submitPublicForm(): void
     {
-        error_log('submitPublicForm called with data: ' . json_encode($_POST));
         $rawInput = $_POST;
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
@@ -436,7 +435,6 @@ class AppointmentController
             return;
         }
 
-
         $dataToSave = $rawInput;
         $dataToSave['waitlist_id'] = ($waitlistId > 0) ? $waitlistId : null;
 
@@ -626,8 +624,6 @@ class AppointmentController
         ]);
     }
 
-
-
     public function update(): void
     {
         AuthGuard::check();
@@ -716,7 +712,7 @@ class AppointmentController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-        // Validate room conflicts for existing appointment
+            // Validate room conflicts for existing appointment
             if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
                 $roomValidation = $this->schedulingService->validateAppointmentBooking([
                 'doctor_id' => (int)$_POST['doctor_id'],
@@ -955,33 +951,33 @@ class AppointmentController
         }
 
         // Create service options array for template
-            $serviceOptions = [];
+        $serviceOptions = [];
         foreach ($services as $service) {
             $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
         }
 
-            $roomOptions = [];
+        $roomOptions = [];
         foreach ($rooms as $room) {
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-            // Create prefill data from waitlist entry
-            $prefill = [
-                'patient_id' => $entry['patient_id'],
-                'doctor_id' => $entry['desired_doctor_id'],
-                'waitlist_id' => $id,
-            ];
+        // Create prefill data from waitlist entry
+        $prefill = [
+            'patient_id' => $entry['patient_id'],
+            'doctor_id' => $entry['desired_doctor_id'],
+            'waitlist_id' => $id,
+        ];
 
-            View::render('@modules/Appointment/templates/new.html.twig', [
-                'patients' => $patientOptions,
-                'doctors' => $doctorOptions,
-                'services' => $serviceOptions,
-                'servicesForJs' => $services, // Pass original service objects for JavaScript
-                'rooms' => $roomOptions,
-                'old' => array_merge($prefill, $_GET),
-                'availableSlots' => [],
-                'selectedDate' => date('Y-m-d'),
-            ]);
+        View::render('@modules/Appointment/templates/new.html.twig', [
+            'patients' => $patientOptions,
+            'doctors' => $doctorOptions,
+            'services' => $serviceOptions,
+            'servicesForJs' => $services, // Pass original service objects for JavaScript
+            'rooms' => $roomOptions,
+            'old' => array_merge($prefill, $_GET),
+            'availableSlots' => [],
+            'selectedDate' => date('Y-m-d'),
+        ]);
     }
 
     public function cancelWaitlist(): void
