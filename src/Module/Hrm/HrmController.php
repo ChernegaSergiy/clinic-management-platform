@@ -59,7 +59,7 @@ class HrmController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-        View::render('@modules/Hrm/templates/new.html.twig', [
+            View::render('@modules/Hrm/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'users' => $users,
