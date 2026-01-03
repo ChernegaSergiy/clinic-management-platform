@@ -199,35 +199,6 @@ class SchedulingService
 
         return true;
     }
-
-        // Check if room exists and is available
-        $room = $this->roomRepository->findById($roomId);
-        if (!$room || !$room['is_available']) {
-            return false;
-        }
-
-        // Check for conflicting appointments in the same room
-        $sql = "SELECT id FROM appointments 
-                 WHERE room_id = :room_id 
-                 AND status NOT IN ('cancelled', 'no-show')
-                 AND ((start_time < :end_time AND end_time > :start_time))
-                 " . ($excludeAppointmentId ? "AND id != :exclude_id" : "");
-        
-        $stmt = $this->appointmentRepository->getPdo()->prepare($sql);
-        $params = [
-            ':room_id' => $roomId,
-            ':start_time' => $startTime->format('Y-m-d H:i:s'),
-            ':end_time' => $endTime->format('Y-m-d H:i:s')
-        ];
-        
-        if ($excludeAppointmentId) {
-            $params[':exclude_id'] = $excludeAppointmentId;
-        }
-        
-        $stmt->execute($params);
-        return $stmt->rowCount() === 0;
-    }
-
     /**
      * Check if a time slot is available for both doctor and room
      */
