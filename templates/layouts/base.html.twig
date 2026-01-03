@@ -24,7 +24,7 @@
         {% if canPrescriptions %}<a class="item" href="/prescriptions">Рецепти</a>{% endif %}
         {% if canInventory %}<a class="item" href="/inventory">Склад</a>{% endif %}
         {% if canBilling %}<a class="item" href="/billing">Рахунки</a>{% endif %}
-        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
+        {% if canHrm %}<a class="item" href="/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}<a class="item" href="/admin/users">Користувачі</a>{% endif %}
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
@@ -72,7 +72,7 @@
             <a class="item" href="/insurance/companies">Страх. Компанії</a>
             <a class="item" href="/insurance/claims">Страх. Вимоги</a>
         {% endif %}
-        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
+        {% if canHrm %}<a class="item" href="/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}
             <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
             <a class="item" href="/admin/users">Користувачі</a>
@@ -119,7 +119,7 @@
             <a class="item" href="/insurance/companies">Страх. Компанії</a>
             <a class="item" href="/insurance/claims">Страх. Вимоги</a>
         {% endif %}
-        {% if canHrm %}<a class="item" href="/dashboard/hrm">Співробітники</a>{% endif %}
+        {% if canHrm %}<a class="item" href="/hrm">Співробітники</a>{% endif %}
         {% if canAdminNav %}
             <a class="item" href="/admin/kpi_definitions">Налаштування KPI</a>
             <a class="item" href="/admin/users">Користувачі</a>
