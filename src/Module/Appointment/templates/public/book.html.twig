@@ -105,6 +105,7 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const doctorSelect = document.getElementById('doctor_selector');
