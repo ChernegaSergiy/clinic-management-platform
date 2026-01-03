@@ -62,14 +62,15 @@
 
 {% block javascripts %}
     <script>
-        // Тогл меню
-        const navToggle = document.getElementById('navToggle');
-        const mainNav = document.getElementById('mainNav');
-        if (navToggle && mainNav) {
-            navToggle.addEventListener('click', () => {
-                mainNav.classList.toggle('open');
-            });
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Тогл меню
+            const navToggle = document.getElementById('navToggle');
+            const mainNav = document.getElementById('mainNav');
+            if (navToggle && mainNav) {
+                navToggle.addEventListener('click', () => {
+                    mainNav.classList.toggle('open');
+                });
+            }
         
         // Скрол
         document.addEventListener('click', (e) => {
@@ -123,5 +124,6 @@
                 bookingResult.style.display = 'block';
             });
         }
+        });
     </script>
 {% endblock %}
