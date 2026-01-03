@@ -22,7 +22,7 @@
     </div>
     {% endif %}
 
-    <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/dashboard/hrm/new">
+    <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/hrm/new">
         <div class="two fields">
             <div class="field">
                 <label>Ім'я</label>
@@ -85,7 +85,7 @@
         </div>
 
         <button class="ui primary button" type="submit">Зберегти</button>
-        <a href="/dashboard/hrm" class="ui button">Скасувати</a>
+        <a href="/hrm" class="ui button">Скасувати</a>
     </form>
 </div>
 {% endblock %}
