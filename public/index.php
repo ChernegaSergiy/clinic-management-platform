@@ -26,6 +26,7 @@ use App\Module\Schedule\ScheduleController;
 use App\Module\User\AuthController;
 use App\Module\User\OAuthController;
 use App\Module\User\UserController;
+use App\Module\Room\RoomController;
 
 // Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
 $requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -307,6 +308,15 @@ $router->add('GET', '/admin/service-categories/edit', [AdminController::class, '
 $router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
 $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
 
+// Admin Room routes
+$router->add('GET', '/admin/rooms', [RoomController::class, 'index']);
+$router->add('GET', '/admin/rooms/new', [RoomController::class, 'create']);
+$router->add('POST', '/admin/rooms/new', [RoomController::class, 'store']);
+$router->add('GET', '/admin/rooms/show', [RoomController::class, 'show']);
+$router->add('GET', '/admin/rooms/edit', [RoomController::class, 'edit']);
+$router->add('POST', '/admin/rooms/edit', [RoomController::class, 'update']);
+$router->add('POST', '/admin/rooms/delete', [RoomController::class, 'delete']);
+
 // Schedule routes
 $router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
 $router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
@@ -339,6 +349,9 @@ $router->add('GET', '/api/notifications', [NotificationController::class, 'getUn
 $router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
 $router->add('POST', '/api/notifications/delete', [NotificationController::class, 'delete']);
 $router->add('GET', '/api/appointments/available-slots', [AppointmentController::class, 'getAvailableSlotsApi']);
+
+// API routes - Calendar
+$router->add('GET', '/api/calendar/rooms', [RoomController::class, 'apiRooms']);
 
 // KPI routes (legacy)
 $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
