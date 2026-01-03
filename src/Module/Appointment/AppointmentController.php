@@ -220,6 +220,10 @@ public function create(): void
         AuthGuard::check();
         Gate::authorize('appointments.write');
 
+        // Get logged-in user info
+        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
+        $loggedInUserRole = $_SESSION['user']['role_name'] ?? '';
+
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -265,8 +269,22 @@ public function create(): void
         }
 
         $doctorOptions = [];
-        foreach ($doctors as $doctor) {
-            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        // Filter doctors for 'doctor' role
+        if ($loggedInUserRole === 'doctor') {
+            foreach ($doctors as $doctor) {
+                if ((int)$doctor['id'] === $loggedInUserId) {
+                    $doctorOptions[$doctor['id']] = $doctor['full_name'];
+                    // Pre-select the doctor if it's the only option
+                    if (empty($prefill['doctor_id'])) {
+                        $prefill['doctor_id'] = $doctor['id'];
+                    }
+                    break;
+                }
+            }
+        } else {
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
         }
         
         // Create service options array for template
@@ -504,14 +522,28 @@ public function create(): void
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
 
+        // Get logged-in user info
+        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
+        $loggedInUserRole = $_SESSION['user']['role_name'] ?? '';
+
         $patientOptions = [];
         foreach ($patients as $patient) {
             $patientOptions[$patient['id']] = $patient['full_name'];
         }
 
         $doctorOptions = [];
-        foreach ($doctors as $doctor) {
-            $doctorOptions[$doctor['id']] = $doctor['full_name'];
+        // Filter doctors for 'doctor' role
+        if ($loggedInUserRole === 'doctor') {
+            foreach ($doctors as $doctor) {
+                if ((int)$doctor['id'] === $loggedInUserId) {
+                    $doctorOptions[$doctor['id']] = $doctor['full_name'];
+                    break;
+                }
+            }
+        } else {
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
         }
 
         View::render('@modules/Appointment/templates/edit.html.twig', [
