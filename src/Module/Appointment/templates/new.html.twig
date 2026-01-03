@@ -50,8 +50,9 @@
             <input type="hidden" name="start_time" id="start_time_hidden" value="{{ old.start_time ?? '' }}">
             <input type="hidden" name="end_time" id="end_time_hidden" value="{{ old.end_time ?? '' }}">
 
-            <div class="two fields">
+            <div class="three fields">
                 {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.select('room_id', 'Кімната', rooms, old.room_id ?? null, errors.room_id ?? null, {}) }}
                 <div class="field">
                     <label>Обраний час</label>
                     <input type="text" id="selected_slot_display" readonly placeholder="Оберіть годину зі списку вище">
