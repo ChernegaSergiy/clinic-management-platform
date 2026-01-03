@@ -1,0 +1,95 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Профіль співробітника - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">Профіль: {{ employee.first_name }} {{ employee.last_name }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <form action="/dashboard/hrm/toggle-status" method="POST" style="display: inline-block;">
+                    <input type="hidden" name="id" value="{{ employee.id }}">
+                    <button class="ui {{ employee.status == 'active' ? 'negative' : 'positive' }} button" type="submit">
+                        <i class="user {{ employee.status == 'active' ? 'times' : 'check' }} icon"></i>
+                        {{ employee.status == 'active' ? 'Деактивувати' : 'Активувати' }}
+                    </button>
+                </form>
+                <a href="/dashboard/hrm/edit?id={{ employee.id }}" class="ui primary button">
+                    <i class="edit icon"></i> Редагувати
+                </a>
+                <a href="/dashboard/hrm" class="ui button">
+                    <i class="arrow left icon"></i> До списку
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <div class="ui relaxed divided list">
+            <div class="item">
+                <div class="content">
+                    <div class="header">ID</div>
+                    {{ employee.id }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Повне ім'я</div>
+                    {{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Посада</div>
+                    {{ employee.position }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Департамент</div>
+                    {{ employee.department|default('N/A') }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Дата найму</div>
+                    {{ employee.hire_date }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Контактний телефон</div>
+                    {{ employee.contact_phone|default('N/A') }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Зарплата</div>
+                    {{ employee.salary ? employee.salary|number_format(2, ',', ' ') : 'N/A' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <div class="header">Статус</div>
+                    {{ employee.status }}
+                </div>
+            </div>
+            {% if employee.fire_date %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">Дата звільнення</div>
+                    {{ employee.fire_date }}
+                </div>
+            </div>
+            {% endif %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">ID користувача в системі</div>
+                    {{ employee.user_id|default('Не прив\'язано') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
