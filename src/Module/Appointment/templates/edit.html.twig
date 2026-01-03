@@ -12,20 +12,19 @@
         <form class="ui form" method="POST" action="/appointments/edit?id={{ appointment.id }}">
             <input type="hidden" name="id" value="{{ appointment.id }}">
             <div class="two fields">
-                {{ forms.select('patient_id', 'Пацієнт', patients, appointment.patient_id, errors.patient_id ?? null, {'required': 'required'})
- }}
-                {{ forms.select('doctor_id', 'Лікар', doctors, appointment.doctor_id, errors.doctor_id ?? null, {'required': 'required'})
- }}
+                {{ forms.select('patient_id', 'Пацієнт', patients, appointment.patient_id, errors.patient_id ?? null, {'required': 'required'}) }}
+                {% set doctor_select_attrs = {'required': 'required'} %}
+                {% if session.user.role_name == 'doctor' %}
+                    {% set doctor_select_attrs = doctor_select_attrs|merge({'disabled': 'disabled'}) %}
+                {% endif %}
+                {{ forms.select('doctor_id', 'Лікар', doctors, appointment.doctor_id, errors.doctor_id ?? null, doctor_select_attrs) }}
             </div>
             <div class="two fields">
-                {{ forms.input('start_time', 'Час початку', old.start_time ?? appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.start_time ?? null, {'required': 'required'})
- }}
-                {{ forms.input('end_time', 'Час закінчення', old.end_time ?? appointment.end_time|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.end_time ?? null, {'required': 'required'})
- }}
+                {{ forms.input('start_time', 'Час початку', old.start_time ?? appointment.start_time|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.start_time ?? null, {'required': 'required'}) }}
+                {{ forms.input('end_time', 'Час закінчення', old.end_time ?? appointment.end_time|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.end_time ?? null, {'required': 'required'}) }}
             </div>
             <div class="field">
-                {{ forms.select('status', 'Статус', {'scheduled': 'Заплановано', 'completed': 'Виконано', 'cancelled': 'Скасовано', 'no-show': 'Не з\'явився'}, old.status ?? appointment.status, errors.status ?? null, {'required': 'required'})
- }}
+                {{ forms.select('status', 'Статус', {'scheduled': 'Заплановано', 'completed': 'Виконано', 'cancelled': 'Скасовано', 'no-show': 'Не з\'явився'}, old.status ?? appointment.status, errors.status ?? null, {'required': 'required'}) }}
             </div>
             {{ forms.textarea('notes', 'Примітки', old.notes ?? appointment.notes, 'Додаткові примітки до запису') }}
 
