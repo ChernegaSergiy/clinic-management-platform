@@ -1,0 +1,6 @@
+name: Room
+version: 1.0.0
+description: Модуль для управління приміщеннями
+author: Serhii
+config:
+    enabled: true
