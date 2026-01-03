@@ -1,0 +1,6 @@
+name: Prescription
+version: 1.0.0
+description: Модуль для рецептів
+author: Serhii
+config:
+    enabled: true
