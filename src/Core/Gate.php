@@ -40,7 +40,6 @@ class Gate
             'patients.read_assigned',
             'appointments.read_assigned',
             'appointments.write_assigned',
-            'appointments.write',
             'medical.read_assigned',
             'medical.write_assigned',
             'prescriptions.read_assigned',
@@ -155,14 +154,26 @@ class Gate
 
             case 'appointments.read':
             case 'appointments.write':
-                if (in_array('appointments.read_all', $permissions, true) && $ability === 'appointments.read') {
+                // Allow if user has a global permission
+                if (($ability === 'appointments.read' && in_array('appointments.read_all', $permissions, true)) ||
+                    ($ability === 'appointments.write' && in_array('appointments.write', $permissions, true))) {
                     return;
                 }
-                if (in_array('appointments.write', $permissions, true) && $ability === 'appointments.write') {
-                    return;
-                }
-                if (in_array('appointments.read_assigned', $permissions, true) && isset($context['appointment_id']) && $userId) {
-                    if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
+
+                // Check for assigned permissions
+                if ($userId) {
+                    // For editing/updating an existing appointment, check ownership
+                    if (isset($context['appointment_id'])) {
+                        if ((in_array('appointments.read_assigned', $permissions, true) && $ability === 'appointments.read') ||
+                            (in_array('appointments.write_assigned', $permissions, true) && $ability === 'appointments.write')) {
+                            if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
+                                return;
+                            }
+                        }
+                    } 
+                    // For creating a new appointment, just check if the assigned permission exists.
+                    // The controller is responsible for validating the payload (e.g., doctor_id).
+                    elseif ($ability === 'appointments.write' && in_array('appointments.write_assigned', $permissions, true)) {
                         return;
                     }
                 }
@@ -263,11 +274,26 @@ class Gate
                 break;
 
             case 'appointments.read':
-                if (in_array('appointments.read_all', $permissions, true)) {
+            case 'appointments.write':
+                // Allow if user has a global permission
+                if (($ability === 'appointments.read' && in_array('appointments.read_all', $permissions, true)) ||
+                    ($ability === 'appointments.write' && in_array('appointments.write', $permissions, true))) {
                     return true;
                 }
-                if (in_array('appointments.read_assigned', $permissions, true) && isset($context['appointment_id']) && $userId) {
-                    if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
+
+                // Check for assigned permissions
+                if ($userId) {
+                    // For reading/editing an existing appointment, check ownership
+                    if (isset($context['appointment_id'])) {
+                        if ((in_array('appointments.read_assigned', $permissions, true) && $ability === 'appointments.read') ||
+                            (in_array('appointments.write_assigned', $permissions, true) && $ability === 'appointments.write')) {
+                            if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
+                                return true;
+                            }
+                        }
+                    }
+                    // For creating a new appointment, just check if the assigned permission exists.
+                    elseif ($ability === 'appointments.write' && in_array('appointments.write_assigned', $permissions, true)) {
                         return true;
                     }
                 }
