@@ -24,10 +24,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 a.start_time, 
                 a.end_time, 
                 a.status,
-                a.doctor_id
+                a.doctor_id,
+                a.room_id,
+                r.name as room_name
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
+            LEFT JOIN rooms r ON a.room_id = r.id
             ORDER BY a.start_time DESC
         ");
         return $stmt->fetchAll();
@@ -35,8 +38,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id) 
-                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id)";
+        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id, room_id) 
+                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id, :room_id)";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -48,6 +51,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':status' => $data['status'] ?? 'scheduled', // Встановлюємо статус за замовчуванням
             ':notes' => $data['notes'] ?? null,
             ':waitlist_id' => $data['waitlist_id'] ?? null,
+            ':room_id' => $data['room_id'] ?? null,
         ]);
     }
 
@@ -57,10 +61,12 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             SELECT 
                 a.*, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
+                r.name as room_name
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
+            LEFT JOIN rooms r ON a.room_id = r.id
             WHERE a.id = :id
         ");
         $stmt->execute([':id' => $id]);
@@ -76,7 +82,8 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                     start_time = :start_time, 
                     end_time = :end_time, 
                     status = :status, 
-                    notes = :notes 
+                    notes = :notes,
+                    room_id = :room_id
                 WHERE id = :id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -89,6 +96,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':end_time' => $data['end_time'],
             ':status' => $data['status'],
             ':notes' => $data['notes'] ?? null,
+            ':room_id' => $data['room_id'] ?? null,
         ]);
     }
 
@@ -149,10 +157,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 a.end_time, 
                 a.status,
                 a.doctor_id,
-                a.waitlist_id
+                a.waitlist_id,
+                a.room_id,
+                r.name as room_name
             FROM appointments a
             JOIN patients p ON a.patient_id = p.id
             JOIN users u ON a.doctor_id = u.id
+            LEFT JOIN rooms r ON a.room_id = r.id
             WHERE a.start_time >= :start_time AND a.end_time <= :end_time
             ORDER BY a.start_time ASC
         ");
