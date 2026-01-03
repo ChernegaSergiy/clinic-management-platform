@@ -5,30 +5,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Controller\InstallController;
 use App\Controller\PageController;
 use App\Core\Router;
+use App\Core\ModuleLoader;
+use App\Core\ModuleManager;
 use App\Core\View;
-use App\Module\Admin\AdminController;
-use App\Module\Admin\KpiController;
-use App\Module\Appointment\AppointmentController;
-use App\Module\Billing\BillingController;
-use App\Module\Billing\ContractController;
-use App\Module\ClinicalReference\ClinicalReferenceController;
-use App\Module\Dashboard\DashboardController;
-use App\Module\HRM\HrmController;
-use App\Module\Insurance\InsuranceController;
-use App\Module\Inventory\InventoryController;
-use App\Module\LabOrder\LabOrderController;
-use App\Module\MedicalRecord\MedicalRecordController;
-use App\Module\News\NewsController;
-use App\Module\Notification\NotificationController;
-use App\Module\Patient\PatientController;
-use App\Module\Prescription\PrescriptionController;
-use App\Module\Schedule\ScheduleController;
-use App\Module\User\AuthController;
-use App\Module\User\OAuthController;
-use App\Module\User\UserController;
-use App\Module\Room\RoomController;
 
-// Serve static assets when requests are rewritten to index.php (e.g., missing docroot)
+if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
+    $envPath = __DIR__ . '/../.env';
+    if (file_exists($envPath)) {
+        Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
+    }
+}
+
 $requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $staticFile = realpath(__DIR__ . $requestedPath);
 if ($staticFile && str_starts_with($staticFile, realpath(__DIR__)) && is_file($staticFile)) {
@@ -52,24 +39,16 @@ if ($staticFile && str_starts_with($staticFile, realpath(__DIR__)) && is_file($s
     exit;
 }
 
-// Завантаження .env файлу (може бути відсутній перед інсталяцією)
-$envPath = __DIR__ . '/../.env';
-if (file_exists($envPath)) {
-    Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
-}
-
 if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
     $appUrlParts = parse_url($_ENV['APP_BASE_URL']);
     if (isset($appUrlParts['host'])) {
         $cookieParams = [
             'lifetime' => 0,
             'path' => '/',
-            'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on', // Set secure based on actual request protocol
+            'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
             'httponly' => true,
             'samesite' => 'Lax'
         ];
-        // Omit 'domain' to let PHP default to the current host, which is safest.
-        
         session_set_cookie_params($cookieParams);
     }
 }
@@ -77,7 +56,13 @@ session_start();
 
 $router = new Router();
 
-// Page routes (existing)
+$moduleManager = new ModuleManager();
+$moduleLoader = new ModuleLoader($moduleManager);
+$moduleLoader->loadAll();
+
+$moduleManager->bootstrapAll();
+$moduleManager->registerRoutes($router);
+
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
 $router->add('GET', '/our-team', [PageController::class, 'ourTeam']);
@@ -87,268 +72,8 @@ $router->add('GET', '/privacy', [PageController::class, 'privacy']);
 $router->add('GET', '/departments', [PageController::class, 'departments']);
 $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 
-// News module public routes
-$router->add('GET', '/news', [NewsController::class, 'index']);
-$router->add('GET', '/news/{id}', [NewsController::class, 'show']);
-
-// Admin News routes
-$router->add('GET', '/admin/news', [NewsController::class, 'adminIndex']);
-$router->add('GET', '/admin/news/new', [NewsController::class, 'create']);
-$router->add('POST', '/admin/news/new', [NewsController::class, 'store']);
-$router->add('GET', '/admin/news/edit/{id}', [NewsController::class, 'edit']);
-$router->add('POST', '/admin/news/edit/{id}', [NewsController::class, 'update']);
-$router->add('POST', '/admin/news/delete/{id}', [NewsController::class, 'delete']);
-
-// Install routes
 $router->add('GET', '/install', [InstallController::class, 'check']);
 
-// Auth routes
-$router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
-$router->add('POST', '/login', [AuthController::class, 'login']);
-$router->add('GET', '/logout', [AuthController::class, 'logout']);
-
-// User Profile
-$router->add('GET', '/user/profile', [UserController::class, 'profile']);
-$router->add('POST', '/user/profile/unlink-provider/{provider}', [UserController::class, 'unlinkProvider']);
-$router->add('POST', '/user/profile/upload-photo', [UserController::class, 'uploadPhoto']);
-
-// OAuth routes
-$router->add('GET', '/oauth/redirect/{provider}', [AuthController::class, 'redirectToProvider']);
-$router->add('GET', '/oauth/callback/{provider}', [OAuthController::class, 'callback']);
-
-// Patient routes
-$router->add('GET', '/patients', [PatientController::class, 'index']);
-$router->add('GET', '/patients/new', [PatientController::class, 'create']);
-$router->add('POST', '/patients/new', [PatientController::class, 'store']);
-$router->add('GET', '/patients/show', [PatientController::class, 'show']);
-$router->add('GET', '/patients/edit', [PatientController::class, 'edit']);
-$router->add('POST', '/patients/edit', [PatientController::class, 'update']);
-$router->add('POST', '/patients/toggle-status', [PatientController::class, 'toggleStatus']);
-$router->add('GET', '/patients/export-csv', [PatientController::class, 'exportCsv']);
-$router->add('GET', '/patients/export-json', [PatientController::class, 'exportPatientsToJson']);
-$router->add('GET', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
-$router->add('POST', '/patients/import-json', [PatientController::class, 'importPatientsFromJson']);
-$router->add('GET', '/patients/{patientId}/policies/add', [PatientController::class, 'addPolicy']);
-$router->add('POST', '/patients/{patientId}/policies/store', [PatientController::class, 'storePolicy']);
-$router->add('GET', '/patients/{patientId}/policies/edit', [PatientController::class, 'editPolicy']);
-$router->add('POST', '/patients/{patientId}/policies/update', [PatientController::class, 'updatePolicy']);
-$router->add('POST', '/patients/{patientId}/policies/delete', [PatientController::class, 'deletePolicy']);
-
-// Appointment routes
-$router->add('GET', '/appointments', [AppointmentController::class, 'index']);
-$router->add('GET', '/appointments/new', [AppointmentController::class, 'create']);
-$router->add('POST', '/appointments/new', [AppointmentController::class, 'store']);
-$router->add('GET', '/appointments/show', [AppointmentController::class, 'show']);
-$router->add('GET', '/appointments/edit', [AppointmentController::class, 'edit']);
-$router->add('POST', '/appointments/edit', [AppointmentController::class, 'update']);
-$router->add('POST', '/appointments/cancel', [AppointmentController::class, 'cancel']);
-$router->add('GET', '/appointments/waitlist', [AppointmentController::class, 'showWaitlist']);
-$router->add('POST', '/appointments/waitlist/reject', [AppointmentController::class, 'rejectWaitlist']);
-$router->add('GET', '/appointments/waitlist/fulfill', [AppointmentController::class, 'fulfillWaitlist']);
-$router->add('POST', '/appointments/waitlist/cancel', [AppointmentController::class, 'cancelWaitlist']);
-$router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
-$router->add('GET', '/book-appointment', [AppointmentController::class, 'publicForm']);
-$router->add('POST', '/book-appointment', [AppointmentController::class, 'submitPublicForm']);
-
-// Prescription routes
-$router->add('GET', '/prescriptions', [PrescriptionController::class, 'index']);
-$router->add('GET', '/prescriptions/new', [PrescriptionController::class, 'create']);
-$router->add('POST', '/prescriptions/new', [PrescriptionController::class, 'store']);
-$router->add('GET', '/prescriptions/show', [PrescriptionController::class, 'show']);
-
-// Medical Record routes
-$router->add('GET', '/medical-records', [MedicalRecordController::class, 'index']);
-$router->add('GET', '/medical-records/new', [MedicalRecordController::class, 'create']);
-$router->add('POST', '/medical-records/new', [MedicalRecordController::class, 'store']);
-$router->add('GET', '/medical-records/show', [MedicalRecordController::class, 'show']);
-$router->add('GET', '/medical-records/edit', [MedicalRecordController::class, 'edit']);
-$router->add('POST', '/medical-records/edit', [MedicalRecordController::class, 'update']);
-$router->add('POST', '/medical-records/attachments/upload', [MedicalRecordController::class, 'uploadAttachment']);
-$router->add('GET', '/medical-records/attachments/download', [MedicalRecordController::class, 'downloadAttachment']);
-$router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
-$router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
-
-// Clinical reference routes
-$router->add('GET', '/admin/clinical', [ClinicalReferenceController::class, 'clinicalIndex']);
-$router->add('GET', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportForm']);
-$router->add('POST', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportRun']);
-$router->add('GET', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportForm']);
-$router->add('POST', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportRun']);
-
-// Lab Order routes
-$router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
-$router->add('POST', '/lab-orders/new', [LabOrderController::class, 'store']);
-$router->add('GET', '/lab-orders/show', [LabOrderController::class, 'show']);
-$router->add('GET', '/lab-orders/edit', [LabOrderController::class, 'edit']);
-$router->add('POST', '/lab-orders/edit', [LabOrderController::class, 'update']);
-
-// Inventory routes
-$router->add('GET', '/inventory', [InventoryController::class, 'index']);
-$router->add('GET', '/inventory/new', [InventoryController::class, 'create']);
-$router->add('POST', '/inventory/new', [InventoryController::class, 'store']);
-$router->add('GET', '/inventory/show', [InventoryController::class, 'show']);
-$router->add('GET', '/inventory/edit', [InventoryController::class, 'edit']);
-$router->add('POST', '/inventory/edit', [InventoryController::class, 'update']);
-
-// Billing routes
-$router->add('GET', '/billing', [BillingController::class, 'index']);
-$router->add('GET', '/billing/new', [BillingController::class, 'create']);
-$router->add('POST', '/billing/new', [BillingController::class, 'store']);
-$router->add('GET', '/billing/show', [BillingController::class, 'show']);
-$router->add('GET', '/billing/edit', [BillingController::class, 'edit']);
-$router->add('POST', '/billing/edit', [BillingController::class, 'update']);
-$router->add('POST', '/billing/add-payment', [BillingController::class, 'addPayment']);
-$router->add('GET', '/billing/export-pdf', [BillingController::class, 'exportInvoicesToPdf']);
-$router->add('GET', '/billing/export-excel', [BillingController::class, 'exportInvoicesToExcel']);
-$router->add('GET', '/billing/export-csv', [BillingController::class, 'exportInvoicesToCsv']);
-
-// Contract routes
-$router->add('GET', '/billing/contracts', [ContractController::class, 'index']);
-$router->add('GET', '/billing/contracts/new', [ContractController::class, 'create']);
-$router->add('POST', '/billing/contracts/new', [ContractController::class, 'store']);
-$router->add('GET', '/billing/contracts/show', [ContractController::class, 'show']);
-$router->add('GET', '/billing/contracts/edit', [ContractController::class, 'edit']);
-$router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
-$router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
-$router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
-
-// Insurance routes
-$router->add('GET', '/insurance/companies', [InsuranceController::class, 'index']);
-$router->add('GET', '/insurance/companies/show', [InsuranceController::class, 'show']);
-$router->add('GET', '/insurance/companies/new', [InsuranceController::class, 'create']);
-$router->add('POST', '/insurance/companies/new', [InsuranceController::class, 'store']);
-$router->add('GET', '/insurance/companies/edit', [InsuranceController::class, 'edit']);
-$router->add('POST', '/insurance/companies/edit', [InsuranceController::class, 'update']);
-$router->add('POST', '/insurance/companies/delete', [InsuranceController::class, 'delete']);
-$router->add('GET', '/insurance/claims', [InsuranceController::class, 'listClaims']);
-$router->add('GET', '/insurance/claims/show', [InsuranceController::class, 'showClaim']);
-$router->add('POST', '/insurance/claims/update-status', [InsuranceController::class, 'updateClaimStatus']);
-
-// Admin routes
-$router->add('GET', '/admin/users', [AdminController::class, 'users']);
-$router->add('GET', '/admin/users/new', [AdminController::class, 'createUser']);
-$router->add('POST', '/admin/users/new', [AdminController::class, 'storeUser']);
-$router->add('GET', '/admin/users/show', [AdminController::class, 'showUser']);
-$router->add('GET', '/admin/users/edit', [AdminController::class, 'editUser']);
-$router->add('POST', '/admin/users/edit', [AdminController::class, 'updateUser']);
-$router->add('POST', '/admin/users/delete', [AdminController::class, 'deleteUser']);
-
-// Admin Role routes
-$router->add('GET', '/admin/roles', [AdminController::class, 'listRoles']);
-$router->add('GET', '/admin/roles/new', [AdminController::class, 'createRole']);
-$router->add('POST', '/admin/roles/new', [AdminController::class, 'storeRole']);
-$router->add('GET', '/admin/roles/edit', [AdminController::class, 'editRole']);
-$router->add('POST', '/admin/roles/edit', [AdminController::class, 'updateRole']);
-$router->add('POST', '/admin/roles/delete', [AdminController::class, 'deleteRole']);
-
-// Admin Dictionary routes
-$router->add('GET', '/admin/dictionaries', [AdminController::class, 'listDictionaries']);
-$router->add('GET', '/admin/dictionaries/new', [AdminController::class, 'createDictionary']);
-$router->add('POST', '/admin/dictionaries/new', [AdminController::class, 'storeDictionary']);
-$router->add('GET', '/admin/dictionaries/show', [AdminController::class, 'showDictionary']);
-$router->add('GET', '/admin/dictionaries/edit', [AdminController::class, 'editDictionary']);
-$router->add('POST', '/admin/dictionaries/edit', [AdminController::class, 'updateDictionary']);
-$router->add('POST', '/admin/dictionaries/delete', [AdminController::class, 'deleteDictionary']);
-$router->add('GET', '/admin/dictionaries/values/new', [AdminController::class, 'createDictionaryValue']);
-$router->add('POST', '/admin/dictionaries/values/new', [AdminController::class, 'storeDictionaryValue']);
-$router->add('GET', '/admin/dictionaries/values/edit', [AdminController::class, 'editDictionaryValue']);
-$router->add('POST', '/admin/dictionaries/values/edit', [AdminController::class, 'updateDictionaryValue']);
-$router->add('POST', '/admin/dictionaries/values/delete', [AdminController::class, 'deleteDictionaryValue']);
-
-// Admin Auth Config routes
-$router->add('GET', '/admin/auth_configs', [AdminController::class, 'listAuthConfigs']);
-$router->add('GET', '/admin/auth_configs/show', [AdminController::class, 'showAuthConfig']);
-$router->add('GET', '/admin/auth_configs/new', [AdminController::class, 'createAuthConfig']);
-$router->add('POST', '/admin/auth_configs/new', [AdminController::class, 'storeAuthConfig']);
-$router->add('GET', '/admin/auth_configs/edit', [AdminController::class, 'editAuthConfig']);
-$router->add('POST', '/admin/auth_configs/edit', [AdminController::class, 'updateAuthConfig']);
-$router->add('POST', '/admin/auth_configs/delete', [AdminController::class, 'deleteAuthConfig']);
-
-// Admin Backup Policy routes
-$router->add('GET', '/admin/backup_policies', [AdminController::class, 'listBackupPolicies']);
-$router->add('GET', '/admin/backup_policies/new', [AdminController::class, 'createBackupPolicy']);
-$router->add('POST', '/admin/backup_policies/new', [AdminController::class, 'storeBackupPolicy']);
-$router->add('GET', '/admin/backup_policies/edit', [AdminController::class, 'editBackupPolicy']);
-$router->add('POST', '/admin/backup_policies/edit', [AdminController::class, 'updateBackupPolicy']);
-$router->add('POST', '/admin/backup_policies/delete', [AdminController::class, 'deleteBackupPolicy']);
-
-// Admin KPI Definition routes
-$router->add('GET', '/admin/kpi_definitions', [AdminController::class, 'listKpiDefinitions']);
-$router->add('GET', '/admin/kpi_definitions/new', [AdminController::class, 'createKpiDefinition']);
-$router->add('POST', '/admin/kpi_definitions/new', [AdminController::class, 'storeKpiDefinition']);
-$router->add('GET', '/admin/kpi_definitions/edit', [AdminController::class, 'editKpiDefinition']);
-$router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'updateKpiDefinition']);
-$router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
-
-// Admin Service routes
-$router->add('GET', '/admin/services', [AdminController::class, 'listServices']);
-$router->add('GET', '/admin/services/new', [AdminController::class, 'createService']);
-$router->add('POST', '/admin/services/new', [AdminController::class, 'storeService']);
-$router->add('GET', '/admin/services/edit', [AdminController::class, 'editService']);
-$router->add('POST', '/admin/services/edit', [AdminController::class, 'updateService']);
-$router->add('POST', '/admin/services/delete', [AdminController::class, 'deleteService']);
-
-// Admin Service Category routes
-$router->add('GET', '/admin/service-categories', [AdminController::class, 'listServiceCategories']);
-$router->add('GET', '/admin/service-categories/new', [AdminController::class, 'createServiceCategory']);
-$router->add('POST', '/admin/service-categories/new', [AdminController::class, 'storeServiceCategory']);
-$router->add('GET', '/admin/service-categories/edit', [AdminController::class, 'editServiceCategory']);
-$router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
-$router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
-
-// Admin Room routes
-$router->add('GET', '/admin/rooms', [RoomController::class, 'index']);
-$router->add('GET', '/admin/rooms/new', [RoomController::class, 'create']);
-$router->add('POST', '/admin/rooms/new', [RoomController::class, 'store']);
-$router->add('GET', '/admin/rooms/show', [RoomController::class, 'show']);
-$router->add('GET', '/admin/rooms/edit', [RoomController::class, 'edit']);
-$router->add('POST', '/admin/rooms/edit', [RoomController::class, 'update']);
-$router->add('POST', '/admin/rooms/delete', [RoomController::class, 'delete']);
-
-// Schedule routes
-$router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
-$router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
-$router->add('POST', '/doctor/schedule/exceptions/add', [ScheduleController::class, 'addException']);
-$router->add('POST', '/doctor/schedule/exceptions/delete', [ScheduleController::class, 'deleteException']);
-
-// Admin schedule management routes
-$router->add('GET', '/admin/schedules', [ScheduleController::class, 'adminIndex']);
-$router->add('GET', '/admin/schedules/show', [ScheduleController::class, 'adminShow']);
-$router->add('GET', '/admin/schedules/edit', [ScheduleController::class, 'adminEdit']);
-$router->add('POST', '/admin/schedules/update', [ScheduleController::class, 'adminUpdate']);
-$router->add('POST', '/admin/schedules/exceptions/add', [ScheduleController::class, 'adminAddException']);
-$router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
-
-// Dashboard route
-$router->add('GET', '/dashboard', [DashboardController::class, 'index']);
-$router->add('GET', '/dashboard/hrm', [HrmController::class, 'index']);
-$router->add('GET', '/dashboard/hrm/new', [HrmController::class, 'create']);
-$router->add('POST', '/dashboard/hrm/new', [HrmController::class, 'store']);
-$router->add('GET', '/dashboard/hrm/show', [HrmController::class, 'show']);
-$router->add('GET', '/dashboard/hrm/edit', [HrmController::class, 'edit']);
-$router->add('POST', '/dashboard/hrm/edit', [HrmController::class, 'update']);
-$router->add('POST', '/dashboard/hrm/toggle-status', [HrmController::class, 'toggleStatus']);
-$router->add('GET', '/dashboard/export-csv', [DashboardController::class, 'exportCsv']);
-$router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
-$router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exportExcel']);
-
-// API routes - Notifications
-$router->add('GET', '/api/notifications', [NotificationController::class, 'getUnread']);
-$router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
-$router->add('POST', '/api/notifications/delete', [NotificationController::class, 'delete']);
-$router->add('GET', '/api/appointments/available-slots', [AppointmentController::class, 'getAvailableSlotsApi']);
-
-// API routes - Calendar
-$router->add('GET', '/api/calendar/rooms', [RoomController::class, 'apiRooms']);
-
-// KPI routes (legacy)
-$router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
-$router->add('GET', '/kpi/definitions/new', [KpiController::class, 'createDefinition']);
-$router->add('POST', '/kpi/definitions/new', [KpiController::class, 'storeDefinition']);
-$router->add('GET', '/kpi/results', [KpiController::class, 'listResults']);
-$router->add('POST', '/kpi/calculate', [KpiController::class, 'calculateResults']);
-
-// Якщо додаток не встановлено, перенаправляємо на /install (крім самого інсталятора)
 $installed = $_ENV['APP_INSTALLED'] ?? false;
 if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/install') {
     header('Location: /install');
