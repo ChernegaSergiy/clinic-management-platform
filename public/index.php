@@ -86,7 +86,6 @@ $router->add('GET', '/sitemap', [PageController::class, 'sitemap']);
 $router->add('GET', '/privacy', [PageController::class, 'privacy']);
 $router->add('GET', '/departments', [PageController::class, 'departments']);
 $router->add('GET', '/doctors', [PageController::class, 'doctors']);
-$router->add('GET', '/faq', [PageController::class, 'faq']);
 
 // News module public routes
 $router->add('GET', '/news', [NewsController::class, 'index']);
@@ -167,26 +166,14 @@ $router->add('POST', '/medical-records/edit', [MedicalRecordController::class, '
 $router->add('POST', '/medical-records/attachments/upload', [MedicalRecordController::class, 'uploadAttachment']);
 $router->add('GET', '/medical-records/attachments/download', [MedicalRecordController::class, 'downloadAttachment']);
 $router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
-$router->add(
-    'GET',
-    '/medical-records/intervention-codes',
-    [MedicalRecordController::class, 'getInterventionCodes']
-);
+$router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
 
 // Clinical reference routes
 $router->add('GET', '/admin/clinical', [ClinicalReferenceController::class, 'clinicalIndex']);
-$router->add('GET', '/admin/clinical/icd-import', [
-    ClinicalReferenceController::class, 'icdImportForm'
-]);
-$router->add('POST', '/admin/clinical/icd-import', [
-    ClinicalReferenceController::class, 'icdImportRun'
-]);
-$router->add('GET', '/admin/clinical/intervention-import', [
-    ClinicalReferenceController::class, 'interventionImportForm'
-]);
-$router->add('POST', '/admin/clinical/intervention-import', [
-    ClinicalReferenceController::class, 'interventionImportRun'
-]);
+$router->add('GET', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportForm']);
+$router->add('POST', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportRun']);
+$router->add('GET', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportForm']);
+$router->add('POST', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportRun']);
 
 // Lab Order routes
 $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
