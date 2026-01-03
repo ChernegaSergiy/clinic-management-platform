@@ -56,67 +56,65 @@
         <div class="ui divider"></div>
 
         <h3 class="ui header">Записи в списку очікування</h3>
-        {% if waitlistEntries is empty %}
-            <p>Наразі немає записів у списку очікування.</p>
-        {% else %}
-            <table class="ui celled unstackable table">
-                <thead>
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пацієнт</th>
+                    <th>Контакт</th>
+                    <th>Бажаний лікар</th>
+                    <th>Бажаний час</th>
+                    <th>Примітки</th>
+                    <th>Статус</th>
+                    <th>Дата створення</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in waitlistEntries %}
                     <tr>
-                        <th>ID</th>
-                        <th>Пацієнт</th>
-                        <th>Контакт</th>
-                        <th>Бажаний лікар</th>
-                        <th>Бажаний час</th>
-                        <th>Примітки</th>
-                        <th>Статус</th>
-                        <th>Дата створення</th>
-                        <th>Дії</th>
+                        <td>{{ entry.id }}</td>
+                        <td>
+                            {{ entry.patient_name }}
+                            {% if entry.patient_status == 'pending' %}
+                                <span class="ui tiny orange label">Публічна заявка</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entry.patient_status == 'pending' %}
+                                <div>
+                                    <i class="phone icon"></i> {{ entry.contact_phone ?: entry.patient_phone ?: 'Немає' }}
+                                </div>
+                                <div>
+                                    <i class="mail icon"></i> {{ entry.contact_email ?: entry.patient_email ?: 'Немає' }}
+                                </div>
+                            {% else %}
+                                <span class="ui mini grey label">Існуючий пацієнт</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ entry.doctor_name ?: 'Будь-який' }}</td>
+                        <td>
+                            {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}Будь-який{% endif %}
+                            {% if entry.desired_end_time %} - {{ entry.desired_end_time|date('H:i') }}{% endif %}
+                        </td>
+                        <td>{{ entry.notes ?: 'Немає' }}</td>
+                        <td>{{ entry.status }}</td>
+                        <td>{{ entry.created_at|date('Y-m-d H:i') }}</td>
+                        <td>
+                            <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a>
+                            <form action="/appointments/waitlist/cancel" method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="{{ entry.id }}">
+                                <button type="submit" class="ui red button" onclick="return confirm('Ви впевнені, що хочете скасувати цю заявку?');">Скасувати</button>
+                            </form>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for entry in waitlistEntries %}
-                        <tr>
-                            <td>{{ entry.id }}</td>
-                            <td>
-                                {{ entry.patient_name }}
-                                {% if entry.patient_status == 'pending' %}
-                                    <span class="ui tiny orange label">Публічна заявка</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if entry.patient_status == 'pending' %}
-                                    <div>
-                                        <i class="phone icon"></i> {{ entry.contact_phone ?: entry.patient_phone ?: 'Немає' }}
-                                    </div>
-                                    <div>
-                                        <i class="mail icon"></i> {{ entry.contact_email ?: entry.patient_email ?: 'Немає' }}
-                                    </div>
-                                {% else %}
-                                    <span class="ui mini grey label">Існуючий пацієнт</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ entry.doctor_name ?: 'Будь-який' }}</td>
-                            <td>
-                                {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}Будь-який{% endif %}
-                                {% if entry.desired_end_time %} - {{ entry.desired_end_time|date('H:i') }}{% endif %}
-                            </td>
-                            <td>{{ entry.notes ?: 'Немає' }}</td>
-                            <td>{{ entry.status }}</td>
-                            <td>{{ entry.created_at|date('Y-m-d H:i') }}</td>
-                            <td>
-                                {# <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a> #}
-                                {# <a href="/appointments/waitlist/cancel?id={{ entry.id }}" class="ui red button">Скасувати</a> #}
-                                <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a>
-                                <form action="/appointments/waitlist/cancel" method="POST" style="display:inline;">
-                                    <input type="hidden" name="id" value="{{ entry.id }}">
-                                    <button type="submit" class="ui red button" onclick="return confirm('Ви впевнені, що хочете скасувати цю заявку?');">Скасувати</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="center aligned">Наразі немає записів у списку очікування.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
 
