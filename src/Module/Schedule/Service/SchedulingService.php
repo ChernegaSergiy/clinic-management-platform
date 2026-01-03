@@ -6,6 +6,7 @@ use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\Billing\Repository\ServiceRepository; // Assuming this exists or will be created
+use App\Module\Room\Repository\RoomRepository;
 use DateTime;
 use DateInterval;
 
@@ -15,17 +16,20 @@ class SchedulingService
     private ScheduleExceptionRepository $scheduleExceptionRepository;
     private AppointmentRepository $appointmentRepository;
     private ServiceRepository $serviceRepository; // Assuming ServiceRepository is in App\Module\Billing\Repository
+    private RoomRepository $roomRepository;
 
     public function __construct(
         DoctorScheduleRepository $doctorScheduleRepository,
         ScheduleExceptionRepository $scheduleExceptionRepository,
         AppointmentRepository $appointmentRepository,
-        ServiceRepository $serviceRepository
+        ServiceRepository $serviceRepository,
+        RoomRepository $roomRepository
     ) {
         $this->doctorScheduleRepository = $doctorScheduleRepository;
         $this->scheduleExceptionRepository = $scheduleExceptionRepository;
         $this->appointmentRepository = $appointmentRepository;
         $this->serviceRepository = $serviceRepository;
+        $this->roomRepository = $roomRepository;
     }
 
     /**
