@@ -1,0 +1,10 @@
+name: Patient
+version: 1.0.0
+description: Модуль для управління пацієнтами
+author: Serhii
+config:
+    enabled: true
+    features:
+        insurance: true
+        policies: true
+        export: true
