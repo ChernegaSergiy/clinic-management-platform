@@ -24,13 +24,19 @@
         <div id='calendar'></div>
 
         <div class="ui divider"></div>
-        <h3 class="ui header">Легенда статусів</h3>
+        <h3 class="ui header">Легенда</h3>
         <div class="ui labels">
+            <div class="ui header">Статуси записів:</div>
             <a class="ui label blue">Заплановано</a>
             <a class="ui label green">Виконано</a>
             <a class="ui label red">Скасовано</a>
             <a class="ui label yellow">Не з'явився</a>
             <a class="ui label grey">Інше</a>
+        </div>
+        <div class="ui labels" style="margin-top: 10px;">
+            <div class="ui header">Типи ресурсів:</div>
+            <a class="ui label">👨‍⚕️ Лікарі</a>
+            <a class="ui label">🏥 Кімнати</a>
         </div>
 
         <div class="ui segment">
@@ -74,20 +80,38 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            var resources = {{ doctors|map(d => {'id': d.id, 'title': d.title})|json_encode|raw }} || [];
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-                initialView: 'resourceTimelineDay',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
-                },
-                resourceAreaHeaderContent: 'Лікарі',
-                resources: resources,
-                events: '/api/appointments',
-            });
-            calendar.render();
+            
+            // Load rooms via API
+            fetch('/api/calendar/rooms')
+                .then(response => response.json())
+                .then(rooms => {
+                    // Combine doctors and rooms as resources
+                    var doctorResources = {{ doctors|map(d => {'id': d.id, 'title': d.title, 'type': 'doctor'})|json_encode|raw }} || [];
+                    var roomResources = rooms || [];
+                    var allResources = doctorResources.concat(roomResources);
+                    
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                        initialView: 'resourceTimelineDay',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+                        },
+                        resourceAreaHeaderContent: 'Ресурси',
+                        resources: allResources,
+                        events: '/api/appointments',
+                        resourceLabelContent: function(arg) {
+                            var resource = arg.resource;
+                            var typeIcon = resource.extendedProps.type === 'room' ? '🏥' : '👨‍⚕️';
+                            return typeIcon + ' ' + resource.title;
+                        },
+                        resourceGroupField: 'type',
+                        resourceAreaWidth: '250px'
+                    });
+                    calendar.render();
+                })
+                .catch(error => console.error('Error loading rooms:', error));
         });
     </script>
 {% endblock %}
