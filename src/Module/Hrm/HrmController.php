@@ -26,7 +26,7 @@ class HrmController
 
         $employees = $this->hrmRepository->findAll();
 
-        View::render('@modules/HRM/templates/index.html.twig', [
+        View::render('@modules/Hrm/templates/index.html.twig', [
             'employees' => $employees,
         ]);
     }
@@ -59,7 +59,7 @@ class HrmController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            View::render('@modules/HRM/templates/new.html.twig', [
+        View::render('@modules/Hrm/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'users' => $users,
@@ -91,7 +91,7 @@ class HrmController
             return;
         }
 
-        View::render('@modules/HRM/templates/show.html.twig', [
+        View::render('@modules/Hrm/templates/show.html.twig', [
             'employee' => $employee,
         ]);
     }
@@ -143,7 +143,7 @@ class HrmController
         if (!$validator->validate($_POST, $rules)) {
              // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            View::render('@modules/HRM/templates/edit.html.twig', [
+        View::render('@modules/Hrm/templates/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'employee' => array_merge($employee, $_POST),
                 'users' => $users,
