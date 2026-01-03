@@ -7,7 +7,7 @@ use App\Core\View;
 use App\Module\User\Repository\UserRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
-use App\Module\HRM\Repository\HrmRepository;
+use App\Module\Hrm\Repository\HrmRepository;
 
 class UserController
 {
