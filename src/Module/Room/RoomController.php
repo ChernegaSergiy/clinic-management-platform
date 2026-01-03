@@ -186,6 +186,6 @@ class RoomController
     private function authorizeAdmin(): void
     {
         AuthGuard::check();
-        Gate::authorize('system.manage');
+        Gate::authorize('rooms.manage');
     }
 }

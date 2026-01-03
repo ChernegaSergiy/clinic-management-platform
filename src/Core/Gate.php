@@ -9,7 +9,7 @@ use App\Module\Prescription\Repository\PrescriptionRepository;
 class Gate
 {
     private const ROLE_PERMISSIONS = [
-        'admin' => ['*', 'system.manage', 'schedules.manage_all'],
+        'admin' => ['*', 'system.manage', 'schedules.manage_all', 'rooms.manage'],
         'medical_manager' => [
             'dashboard.view',
             'dashboard.export',
