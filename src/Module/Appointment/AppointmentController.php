@@ -70,8 +70,10 @@ class AppointmentController
         // Prepare doctors for calendar (need objects with id and title)
         $calendarDoctors = [];
         foreach ($doctors as $doctor) {
-            if (Gate::allows('appointments.read_all') || 
-                (Gate::allows('appointments.read_assigned') && (int)$doctor['id'] === $userId)) {
+            if (
+                Gate::allows('appointments.read_all') ||
+                (Gate::allows('appointments.read_assigned') && (int)$doctor['id'] === $userId)
+            ) {
                 $calendarDoctors[] = [
                     'id' => $doctor['id'],
                     'title' => $doctor['full_name']
@@ -121,7 +123,7 @@ class AppointmentController
     {
         error_log('submitPublicForm called with data: ' . json_encode($_POST));
         $rawInput = $_POST;
-        
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
@@ -147,7 +149,7 @@ class AppointmentController
         $startTime = new \DateTime($rawInput['start_time']);
 
         $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
-        
+
         $isSlotAvailable = false;
         foreach ($availableSlots as $slot) {
             if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
@@ -172,7 +174,7 @@ class AppointmentController
                 'phone' => $rawInput['phone_number'],
                 'email' => $rawInput['email'],
                 // These are required by DB but not on the form, so use placeholders
-                'birth_date' => '1900-01-01', 
+                'birth_date' => '1900-01-01',
                 'gender' => 'other',
             ]);
             if (!$patientId) {
@@ -218,7 +220,7 @@ class AppointmentController
         exit();
     }
 
-public function create(): void
+    public function create(): void
     {
         AuthGuard::check();
         Gate::authorize('appointments.write');
@@ -231,7 +233,7 @@ public function create(): void
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
         $rooms = $this->roomRepository->findAvailable();
-        
+
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
         $selectedDateStr = $_GET['date'] ?? date('Y-m-d');
         $selectedServiceId = (int)($_GET['service_id'] ?? $services[0]['id'] ?? 0);
@@ -290,7 +292,7 @@ public function create(): void
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
         }
-        
+
         // Create service options array for template
         $serviceOptions = [];
         foreach ($services as $service) {
@@ -318,7 +320,7 @@ public function create(): void
     public function store(): void
     {
         AuthGuard::check();
-        
+
         $role = $_SESSION['user']['role_name'] ?? '';
         $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
@@ -330,17 +332,19 @@ public function create(): void
             echo "Доступ заборонено: Ви можете створювати записи лише для себе.";
             exit();
         }
-        
+
         Gate::authorize('appointments.write');
 
         $rawInput = $_POST;
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
-        
+        $errors = null;
+
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
             'service_id' => ['required', 'numeric'],
+            'room_id' => ['numeric'],
             'start_time' => ['required', 'datetime'],
             'end_time' => ['required', 'datetime'],
         ];
@@ -388,12 +392,11 @@ public function create(): void
         }
 
         if (!empty($errors)) {
-
             // Re-render the form with all the necessary data
-        $patients = $this->patientRepository->findAllActive();
-        $doctors = $this->userRepository->findAllDoctors();
-        $services = $this->serviceRepository->findAll();
-        $rooms = $this->roomRepository->findAvailable();
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+            $services = $this->serviceRepository->findAll();
+            $rooms = $this->roomRepository->findAvailable();
 
             $patientOptions = [];
             foreach ($patients as $patient) {
@@ -403,16 +406,30 @@ public function create(): void
             foreach ($doctors as $doctor) {
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
-            
+
             $selectedDateStr = $startTime->format('Y-m-d');
             $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+
+            // Create room options
+            $roomOptions = [];
+            foreach ($rooms as $room) {
+                $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+            }
+
+            // Create service options
+            $serviceOptions = [];
+            foreach ($services as $service) {
+                $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+            }
 
             View::render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
                 'old' => $rawInput,
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
-                'services' => $services,
+                'services' => $serviceOptions,
+                'servicesForJs' => $services, // Pass original service objects for JavaScript
+                'rooms' => $roomOptions,
                 'availableSlots' => $availableSlots,
                 'selectedDate' => $selectedDateStr,
             ]);
@@ -550,7 +567,7 @@ public function create(): void
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
-        $rooms = $this->roomRepository->findAvailable();
+        $rooms = $this->roomRepository->findAll();
 
         // Get logged-in user info
         $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
@@ -576,10 +593,23 @@ public function create(): void
             }
         }
 
+        // Create room options
+        $roomOptions = [];
+        foreach ($rooms as $room) {
+            $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+        }
+
+        // Create room options
+        $roomOptions = [];
+        foreach ($rooms as $room) {
+            $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+        }
+
         View::render('@modules/Appointment/templates/edit.html.twig', [
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
+            'rooms' => $roomOptions,
         ]);
     }
 
@@ -615,10 +645,12 @@ public function create(): void
             return;
         }
 
+        $errors = null;
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
+            'room_id' => ['numeric'],
             'start_time' => ['required', 'datetime'],
             'end_time' => ['required', 'datetime'],
             'status' => ['required', 'in:scheduled,completed,cancelled,no-show'],
@@ -657,6 +689,7 @@ public function create(): void
         if (!empty($errors)) {
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
+            $rooms = $this->roomRepository->findAll();
             $patientOptions = [];
             foreach ($patients as $patient) {
                 $patientOptions[$patient['id']] = $patient['full_name'];
@@ -665,43 +698,46 @@ public function create(): void
             foreach ($doctors as $doctor) {
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
-
-        // Validate room conflicts for existing appointment
-        if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
-            $roomValidation = $this->schedulingService->validateAppointmentBooking([
-                'doctor_id' => (int)$_POST['doctor_id'],
-                'start_time' => $_POST['start_time'],
-                'end_time' => $_POST['end_time'],
-                'room_id' => $_POST['room_id'] ?? null,
-                'exclude_id' => $id
-            ]);
-
-            if (!$roomValidation['valid']) {
-                foreach ($roomValidation['errors'] as $error) {
-                    $errors[$error['field']] = $error['message'];
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-
-            $patients = $this->patientRepository->findAllActive();
-            $doctors = $this->userRepository->findAllDoctors();
-            $patientOptions = [];
-            foreach ($patients as $patient) {
-                $patientOptions[$patient['id']] = $patient['full_name'];
-            }
-            $doctorOptions = [];
-            foreach ($doctors as $doctor) {
-                $doctorOptions[$doctor['id']] = $doctor['full_name'];
-            }
-
             $roomOptions = [];
             foreach ($rooms as $room) {
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            View::render('@modules/Appointment/templates/edit.html.twig', [
+        // Validate room conflicts for existing appointment
+            if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
+                $roomValidation = $this->schedulingService->validateAppointmentBooking([
+                'doctor_id' => (int)$_POST['doctor_id'],
+                'start_time' => $_POST['start_time'],
+                'end_time' => $_POST['end_time'],
+                'room_id' => $_POST['room_id'] ?? null,
+                'exclude_id' => $id
+                ]);
+
+                if (!$roomValidation['valid']) {
+                    foreach ($roomValidation['errors'] as $error) {
+                        $errors[$error['field']] = $error['message'];
+                    }
+                }
+            }
+
+            if ($errors) { // @phpstan-ignore-line
+                $patients = $this->patientRepository->findAllActive();
+                $doctors = $this->userRepository->findAllDoctors();
+                $patientOptions = [];
+                foreach ($patients as $patient) {
+                    $patientOptions[$patient['id']] = $patient['full_name'];
+                }
+                $doctorOptions = [];
+                foreach ($doctors as $doctor) {
+                    $doctorOptions[$doctor['id']] = $doctor['full_name'];
+                }
+
+                $roomOptions = [];
+                foreach ($rooms as $room) {
+                    $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+                }
+
+                View::render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -711,9 +747,9 @@ public function create(): void
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
                 'rooms' => $roomOptions,
-            ]);
-            return;
-        }
+                ]);
+                return;
+            }
         }
 
         $this->appointmentRepository->update($id, $_POST);
@@ -846,7 +882,7 @@ public function create(): void
     public function getAvailableSlotsApi(): void
     {
         header('Content-Type: application/json');
-        
+
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
         $selectedDateStr = $_GET['date'] ?? null;
         $selectedServiceId = (int)($_GET['service_id'] ?? 0);
@@ -859,7 +895,7 @@ public function create(): void
         try {
             $selectedDate = new \DateTime($selectedDateStr);
             $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
-            
+
             $formattedSlots = [];
             foreach ($availableSlots as $slot) {
                 $formattedSlots[] = [
@@ -870,9 +906,8 @@ public function create(): void
                     'is_booked' => $slot['is_booked']
                 ];
             }
-            
-            echo json_encode($formattedSlots);
 
+            echo json_encode($formattedSlots);
         } catch (\Exception $e) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid date format.']);
@@ -894,6 +929,7 @@ public function create(): void
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
+        $rooms = $this->roomRepository->findAll();
 
         $patientOptions = [];
         foreach ($patients as $patient) {
@@ -904,17 +940,24 @@ public function create(): void
         foreach ($doctors as $doctor) {
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
-        
+
         // Create service options array for template
             $serviceOptions = [];
-            foreach ($services as $service) {
-                $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
-            }
+        foreach ($services as $service) {
+            $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
+        }
 
             $roomOptions = [];
-            foreach ($rooms as $room) {
-                $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
-            }
+        foreach ($rooms as $room) {
+            $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+        }
+
+            // Create prefill data from waitlist entry
+            $prefill = [
+                'patient_id' => $entry['patient_id'],
+                'doctor_id' => $entry['desired_doctor_id'],
+                'waitlist_id' => $id,
+            ];
 
             View::render('@modules/Appointment/templates/new.html.twig', [
                 'patients' => $patientOptions,
@@ -923,8 +966,8 @@ public function create(): void
                 'servicesForJs' => $services, // Pass original service objects for JavaScript
                 'rooms' => $roomOptions,
                 'old' => array_merge($prefill, $_GET),
-                'availableSlots' => $availableSlots,
-                'selectedDate' => $selectedDateStr,
+                'availableSlots' => [],
+                'selectedDate' => date('Y-m-d'),
             ]);
     }
 
