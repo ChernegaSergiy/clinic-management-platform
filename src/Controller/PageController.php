@@ -48,4 +48,9 @@ class PageController
         View::render('faq/index.html.twig');
     }
 
+    public function ourTeam(): void
+    {
+        View::render('our-team/index.html.twig');
+    }
+
 }
