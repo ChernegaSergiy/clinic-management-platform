@@ -1,0 +1,6 @@
+name: LabOrder
+version: 1.0.0
+description: Модуль для замовлень лабораторних досліджень
+author: Serhii
+config:
+    enabled: true
