@@ -10,7 +10,7 @@ class ModuleLoader
 
     public function __construct(
         ModuleManager $moduleManager,
-        string $modulesPath = __DIR__ . '/../Module',
+        string $modulesPath = __DIR__ . '/../../Module',
         string $namespacePrefix = 'App\\Module\\'
     ) {
         $this->moduleManager = $moduleManager;

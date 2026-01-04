@@ -2,7 +2,7 @@
 
 namespace App\Module\Hrm\Repository;
 
-use Api\Database\Database;
+use App\Database;
 use PDO;
 
 class HrmRepository implements HrmRepositoryInterface

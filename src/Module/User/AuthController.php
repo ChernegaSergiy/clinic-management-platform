@@ -2,7 +2,7 @@
 
 namespace App\Module\User;
 
-use Api\Database\Database;
+use App\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;

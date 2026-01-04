@@ -2,7 +2,7 @@
 
 namespace App\Module\Inventory\Repository;
 
-use Api\Database\Database;
+use App\Database;
 use App\Module\Billing\Repository\InvoiceRepository;
 use PDO;
 

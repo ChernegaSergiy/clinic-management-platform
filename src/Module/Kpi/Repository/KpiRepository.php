@@ -2,7 +2,7 @@
 
 namespace App\Module\Kpi\Repository;
 
-use Api\Database\Database;
+use App\Database;
 use PDO;
 
 class KpiRepository

@@ -2,7 +2,7 @@
 
 namespace App\Module\Billing;
 
-use Api\Database\Database;
+use App\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;

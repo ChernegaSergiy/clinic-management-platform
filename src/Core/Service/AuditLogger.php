@@ -2,7 +2,7 @@
 
 namespace App\Core\Service;
 
-use Api\Database\Database;
+use App\Database\Database;
 use PDO;
 
 class AuditLogger

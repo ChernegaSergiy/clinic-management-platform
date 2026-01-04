@@ -2,7 +2,7 @@
 
 namespace App\Module\Room\Repository;
 
-use Api\Database\Database;
+use App\Database;
 use PDO;
 
 class RoomRepository

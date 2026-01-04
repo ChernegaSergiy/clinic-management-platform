@@ -2,7 +2,7 @@
 
 namespace App\Module\ClinicalReference\Repository;
 
-use Api\Database\Database;
+use App\Database;
 use PDO;
 
 class InterventionCodeRepository

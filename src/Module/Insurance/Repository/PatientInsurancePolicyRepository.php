@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance\Repository;
 
-use Api\Database\Database;
+use App\Database;
 
 class PatientInsurancePolicyRepository
 {
