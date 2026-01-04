@@ -2,16 +2,16 @@
 
 namespace App\Module\MedicalRecord;
 
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Service\AttachmentService;
+use App\Core\Service\AuditLogger;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Core\AttachmentService;
-use App\Core\AuditLogger;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class MedicalRecordController
 {
@@ -41,7 +41,7 @@ class MedicalRecordController
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
-        
+
         if (!$appointment) {
             http_response_code(404);
             echo "Запис не знайдено";
@@ -84,7 +84,7 @@ class MedicalRecordController
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
-        
+
         if (!$appointment) {
             http_response_code(404);
             echo "Запис не знайдено";
@@ -99,7 +99,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'diagnosis_code' => ['required'],
             'visit_date' => ['required', 'datetime'],
@@ -246,7 +246,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate(
             $_POST,
             [

@@ -2,8 +2,8 @@
 
 namespace App\Module\MedicalRecord;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 
 class MedicalRecordPolicy implements Policy
@@ -23,7 +23,9 @@ class MedicalRecordPolicy implements Policy
 
         if ($user->hasPermission('medical_record.view.own')) {
             $recordId = $context['id'] ?? null;
-            if (!$recordId) return false;
+            if (!$recordId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$recordId);
         }
@@ -39,7 +41,9 @@ class MedicalRecordPolicy implements Policy
 
         if ($user->hasPermission('medical_record.edit.own')) {
             $recordId = $context['id'] ?? null;
-            if (!$recordId) return false;
+            if (!$recordId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$recordId);
         }

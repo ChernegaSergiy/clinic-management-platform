@@ -191,7 +191,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         $deleteStmt = $this->pdo->prepare($deleteSql);
         $deleteStmt->execute([':medical_record_id' => $medicalRecordId]);
 
-        $icdCodeIds = array_filter($icdCodeIds, fn($id) => is_numeric($id) && $id > 0);
+        $icdCodeIds = array_filter($icdCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
         if (empty($icdCodeIds)) {
             return true; // No codes to attach, but delete was successful
@@ -235,7 +235,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
         $deleteStmt = $this->pdo->prepare($deleteSql);
         $deleteStmt->execute([':medical_record_id' => $medicalRecordId]);
 
-        $interventionCodeIds = array_filter($interventionCodeIds, fn($id) => is_numeric($id) && $id > 0);
+        $interventionCodeIds = array_filter($interventionCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
         if (empty($interventionCodeIds)) {
             return true; // No codes to attach, but delete was successful
