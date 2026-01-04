@@ -29,10 +29,11 @@ class MedicalRecordModule extends BaseModule
         $registry->add('medical_record.view.any', 'Перегляд будь-якого медичного запису');
         $registry->add('medical_record.view.own', 'Перегляд власних медичних записів');
         $registry->add('medical_record.edit.own', 'Редагування власних медичних записів');
+        $registry->add('medical_record.edit.any', 'Редагування будь-яких медичних записів');
         $registry->add('medical_record.create', 'Створення медичних записів');
 
-        $registry->addRoleMapping('admin', ['medical_record.view.any', 'medical_record.edit.own', 'medical_record.create']);
-        $registry->addRoleMapping('medical_manager', ['medical_record.view.any']);
+        $registry->addRoleMapping('admin', ['medical_record.view.any', 'medical_record.edit.any', 'medical_record.create']);
+        $registry->addRoleMapping('medical_manager', ['medical_record.view.any', 'medical_record.edit.any']);
         $registry->addRoleMapping('doctor', ['medical_record.view.own', 'medical_record.edit.own', 'medical_record.create']);
         $registry->addRoleMapping('nurse', ['medical_record.view.own']);
     }
