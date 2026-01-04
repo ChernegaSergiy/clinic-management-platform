@@ -4,6 +4,8 @@ namespace App\Module\Insurance;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Insurance\InsuranceController;
 
 class InsuranceModule extends BaseModule
@@ -20,5 +22,16 @@ class InsuranceModule extends BaseModule
         $router->add('GET', '/insurance/claims', [InsuranceController::class, 'listClaims']);
         $router->add('GET', '/insurance/claims/show', [InsuranceController::class, 'showClaim']);
         $router->add('POST', '/insurance/claims/update-status', [InsuranceController::class, 'updateClaimStatus']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('insurance.manage', 'Керування страховкою');
+
+        $registry->addRoleMapping('admin', ['insurance.manage']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
