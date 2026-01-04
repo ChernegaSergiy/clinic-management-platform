@@ -2,9 +2,9 @@
 
 namespace App\Module\Notification;
 
-use App\Core\AuthGuard;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
 use App\Module\Notification\Repository\NotificationRepository;
-use App\Core\Gate;
 
 class NotificationController
 {
