@@ -8,6 +8,9 @@ use App\Module\Prescription\Repository\PrescriptionRepository;
 
 class Gate
 {
+    private static ?PermissionRegistry $permissionRegistry = null;
+    private static ?PolicyRegistry $policyRegistry = null;
+
     private const ROLE_PERMISSIONS = [
         'admin' => ['*', 'system.manage', 'schedules.manage_all', 'rooms.manage'],
         'medical_manager' => [
@@ -128,7 +131,7 @@ class Gate
             return;
         }
 
-        $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
+        $permissions = self::getRolePermissions($role);
 
         // Explicit permission check
         if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
@@ -253,7 +256,7 @@ class Gate
             return true;
         }
 
-        $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
+        $permissions = self::getRolePermissions($role);
 
         // Explicit permission check
         if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
@@ -341,5 +344,27 @@ class Gate
         }
 
         return false;
+    }
+
+    public static function setPermissionRegistry(PermissionRegistry $registry): void
+    {
+        self::$permissionRegistry = $registry;
+    }
+
+    public static function setPolicyRegistry(PolicyRegistry $registry): void
+    {
+        self::$policyRegistry = $registry;
+    }
+
+    private static function getRolePermissions(string $role): array
+    {
+        if (self::$permissionRegistry) {
+            $modulePermissions = self::$permissionRegistry->getRolePermissions($role);
+            if (!empty($modulePermissions)) {
+                return $modulePermissions;
+            }
+        }
+
+        return self::ROLE_PERMISSIONS[$role] ?? [];
     }
 }
