@@ -2,7 +2,7 @@
 
 namespace App\Module\Dashboard\Service;
 
-use App\Module\Admin\Repository\KpiRepository;
+use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\User\Repository\UserRepository;
