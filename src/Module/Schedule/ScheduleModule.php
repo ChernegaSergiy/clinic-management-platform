@@ -27,13 +27,16 @@ class ScheduleModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('schedules.manage', 'Керування розкладами');
+        $registry->add('schedules.manage_all', 'Керування всіма розкладами');
+        $registry->add('schedules.manage_own', 'Керування власним розкладом');
 
-        $registry->addRoleMapping('admin', ['schedules.manage']);
-        $registry->addRoleMapping('doctor', ['schedules.manage']);
+        $registry->addRoleMapping('admin', ['schedules.manage_all']);
+        $registry->addRoleMapping('medical_manager', ['schedules.manage_all']);
+        $registry->addRoleMapping('doctor', ['schedules.manage_own']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('schedules', SchedulePolicy::class);
     }
 }
