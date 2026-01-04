@@ -22,14 +22,17 @@ class LabOrderModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('lab.read', 'Перегляд лабораторних досліджень');
-        $registry->add('lab.write', 'Редагування лабораторних досліджень');
+        $registry->add('lab_order.view.any', 'Перегляд будь-якого лабораторного дослідження');
+        $registry->add('lab_order.view.own', 'Перегляд власних лабораторних досліджень');
+        $registry->add('lab_order.edit.any', 'Редагування будь-якого лабораторного дослідження');
+        $registry->add('lab_order.edit.own', 'Редагування власних лабораторних досліджень');
+        $registry->add('lab_order.create', 'Створення лабораторних досліджень');
 
-        $registry->addRoleMapping('admin', ['lab.read', 'lab.write']);
-        $registry->addRoleMapping('medical_manager', ['lab.read']);
-        $registry->addRoleMapping('doctor', ['lab.read', 'lab.write']);
-        $registry->addRoleMapping('nurse', ['lab.read', 'lab.write']);
-        $registry->addRoleMapping('lab_technician', ['lab.read', 'lab.write']);
+        $registry->addRoleMapping('admin', ['lab_order.view.any', 'lab_order.edit.any', 'lab_order.create']);
+        $registry->addRoleMapping('medical_manager', ['lab_order.view.any']);
+        $registry->addRoleMapping('lab_technician', ['lab_order.view.any', 'lab_order.edit.any', 'lab_order.create']);
+        $registry->addRoleMapping('doctor', ['lab_order.view.own', 'lab_order.edit.own', 'lab_order.create']);
+        $registry->addRoleMapping('nurse', ['lab_order.view.own']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
