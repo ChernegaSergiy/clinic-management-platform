@@ -4,6 +4,8 @@ namespace App\Module\Hrm;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Hrm\HrmController;
 
 class HrmModule extends BaseModule
@@ -17,5 +19,21 @@ class HrmModule extends BaseModule
         $router->add('GET', '/hrm/edit', [HrmController::class, 'edit']);
         $router->add('POST', '/hrm/edit', [HrmController::class, 'update']);
         $router->add('POST', '/hrm/toggle-status', [HrmController::class, 'toggleStatus']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('hrm.read', 'Перегляд співробітників');
+        $registry->add('hrm.write', 'Редагування співробітників');
+        $registry->add('hrm.manage', 'Керування співробітниками');
+
+        $registry->addRoleMapping('admin', ['hrm.read', 'hrm.write', 'hrm.manage']);
+        $registry->addRoleMapping('hr_manager', ['hrm.read', 'hrm.write', 'hrm.manage']);
+        $registry->addRoleMapping('medical_manager', ['hrm.read']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+        $registry->register('hrm', HrmPolicy::class);
     }
 }
