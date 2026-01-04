@@ -30,7 +30,6 @@ class LabOrderModule extends BaseModule
         $registry->addRoleMapping('doctor', ['lab.read', 'lab.write']);
         $registry->addRoleMapping('nurse', ['lab.read', 'lab.write']);
         $registry->addRoleMapping('lab_technician', ['lab.read', 'lab.write']);
-        $registry->addRoleMapping('lab_technician', ['lab.read', 'lab.write']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
