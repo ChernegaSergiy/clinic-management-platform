@@ -2,15 +2,15 @@
 
 namespace App\Module\Prescription;
 
-use App\Core\Validator;
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
+use App\Module\Inventory\Repository\InventoryItemRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\Patient\Repository\PatientRepository;
 use App\Module\Prescription\Repository\PrescriptionRepository;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\User\Repository\UserRepository;
-use App\Module\Inventory\Repository\InventoryItemRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class PrescriptionController
 {
@@ -85,7 +85,7 @@ class PrescriptionController
         AuthGuard::check();
         Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
             'doctor_id' => ['required'],

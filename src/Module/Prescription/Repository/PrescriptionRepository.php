@@ -160,7 +160,7 @@ class PrescriptionRepository
         }
 
         $sql .= " ORDER BY p.issue_date DESC";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -2,10 +2,10 @@
 
 namespace App\Module\Prescription;
 
-use App\Core\Policy;
-use App\Core\User;
-use App\Module\Prescription\Repository\PrescriptionRepository;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Prescription\Repository\PrescriptionRepository;
 
 class PrescriptionPolicy implements Policy
 {
@@ -26,7 +26,9 @@ class PrescriptionPolicy implements Policy
 
         if ($user->hasPermission('prescription.view.own')) {
             $prescriptionId = $context['id'] ?? null;
-            if (!$prescriptionId) return false;
+            if (!$prescriptionId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$prescriptionId);
         }
@@ -61,7 +63,9 @@ class PrescriptionPolicy implements Policy
 
         if ($user->hasPermission('prescription.edit.own')) {
             $prescriptionId = $context['id'] ?? null;
-            if (!$prescriptionId) return false;
+            if (!$prescriptionId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$prescriptionId);
         }
