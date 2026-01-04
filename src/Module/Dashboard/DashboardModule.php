@@ -39,5 +39,6 @@ class DashboardModule extends BaseModule
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('dashboard', DashboardPolicy::class);
     }
 }
