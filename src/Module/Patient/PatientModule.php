@@ -4,6 +4,8 @@ namespace App\Module\Patient;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Patient\PatientController;
 
 class PatientModule extends BaseModule
@@ -29,5 +31,23 @@ class PatientModule extends BaseModule
             $router->add('POST', '/patients/{patientId}/policies/update', [PatientController::class, 'updatePolicy']);
             $router->add('POST', '/patients/{patientId}/policies/delete', [PatientController::class, 'deletePolicy']);
         }
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('patients.read', 'Перегляд пацієнтів');
+        $registry->add('patients.write', 'Редагування пацієнтів');
+        $registry->add('patients.manage', 'Керування пацієнтами');
+
+        $registry->addRoleMapping('admin', ['patients.read', 'patients.write', 'patients.manage']);
+        $registry->addRoleMapping('medical_manager', ['patients.read', 'patients.write', 'patients.manage']);
+        $registry->addRoleMapping('registrar', ['patients.read', 'patients.write', 'patients.manage']);
+        $registry->addRoleMapping('doctor', ['patients.read']);
+        $registry->addRoleMapping('nurse', ['patients.read']);
+        $registry->addRoleMapping('billing', ['patients.read']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
