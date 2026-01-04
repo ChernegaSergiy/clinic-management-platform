@@ -3,28 +3,17 @@
 namespace App\Module\Dashboard;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class DashboardPolicy extends Policy
+class DashboardPolicy implements Policy
 {
-    public function view(mixed $resource = null): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager', 'registrar', 'doctor', 'nurse', 'lab_technician', 'billing', 'inventory_manager', 'hr_manager']);
+        return $user->hasPermission('dashboard.view');
     }
 
-    public function export(mixed $resource = null): bool
+    public function export(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager', 'billing']);
+        return $user->hasPermission('dashboard.export');
     }
 }
