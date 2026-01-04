@@ -29,14 +29,14 @@ class KpiController
         AuthGuard::check();
         Gate::authorize('kpi.manage');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('@modules/Kpi/templates/index.html.twig', ['definitions' => $definitions]);
+        View::render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createDefinition(): void
     {
         AuthGuard::check();
         Gate::authorize('kpi.manage');
-        View::render('@modules/Kpi/templates/new.html.twig', [
+        View::render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -82,7 +82,7 @@ class KpiController
             $userId = $_SESSION['user']['id'];
             $results = $this->kpiRepository->findKpiResultsForUser($userId);
         }
-        View::render('@modules/Kpi/templates/results.html.twig', ['results' => $results]);
+        View::render('@modules/Kpi/templates/results/index.html.twig', ['results' => $results]);
     }
 
     // This would be called by a cron job or background process
