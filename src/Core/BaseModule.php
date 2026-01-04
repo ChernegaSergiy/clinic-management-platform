@@ -32,6 +32,14 @@ abstract class BaseModule implements ModuleInterface
     {
     }
 
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+    }
+
     protected function getManifest(): array
     {
         if ($this->manifest === null) {
