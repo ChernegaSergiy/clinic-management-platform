@@ -22,13 +22,19 @@ class NewsModule extends BaseModule
         $router->add('POST', '/admin/news/delete/{id}', [NewsController::class, 'delete']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->register('news', NewsPolicy::class);
+        $registry->add('news.read', 'Перегляд новин');
+        $registry->add('news.manage', 'Керування новинами');
+
+        $registry->addRoleMapping('admin', ['news.read', 'news.manage']);
+        $registry->add('news.manage', 'Керування новинами');
+
+        $registry->addRoleMapping('admin', ['news.read', 'news.manage']);
     }
-}
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('news', NewsPolicy::class);
     }
 }
