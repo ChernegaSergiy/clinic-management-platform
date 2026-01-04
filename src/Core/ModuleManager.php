@@ -94,6 +94,34 @@ class ModuleManager
         }
     }
 
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        foreach ($this->modules as $moduleClass => $config) {
+            if (!$config['enabled']) {
+                continue;
+            }
+
+            $module = $this->getModule($moduleClass);
+            if ($module) {
+                $module->registerPermissions($registry);
+            }
+        }
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+        foreach ($this->modules as $moduleClass => $config) {
+            if (!$config['enabled']) {
+                continue;
+            }
+
+            $module = $this->getModule($moduleClass);
+            if ($module) {
+                $module->registerPolicies($registry);
+            }
+        }
+    }
+
     private function loadModule(string $moduleClass): void
     {
         if (!class_exists($moduleClass)) {
