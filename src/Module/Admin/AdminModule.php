@@ -60,7 +60,7 @@ class AdminModule extends BaseModule
         $router->add('POST', '/admin/service-categories/new', [AdminController::class, 'storeServiceCategory']);
         $router->add('GET', '/admin/service-categories/edit', [AdminController::class, 'editServiceCategory']);
         $router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
-            $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
+        $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
