@@ -30,5 +30,6 @@ class PrescriptionModule extends BaseModule
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('prescription', PrescriptionPolicy::class);
     }
 }
