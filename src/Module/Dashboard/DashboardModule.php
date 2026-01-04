@@ -4,6 +4,8 @@ namespace App\Module\Dashboard;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Dashboard\DashboardController;
 
 class DashboardModule extends BaseModule
@@ -17,5 +19,25 @@ class DashboardModule extends BaseModule
             $router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
             $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exportExcel']);
         }
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('dashboard.view', 'Перегляд панелі');
+        $registry->add('dashboard.export', 'Експорт даних');
+
+        $registry->addRoleMapping('admin', ['dashboard.view', 'dashboard.export']);
+        $registry->addRoleMapping('medical_manager', ['dashboard.view', 'dashboard.export']);
+        $registry->addRoleMapping('registrar', ['dashboard.view']);
+        $registry->addRoleMapping('doctor', ['dashboard.view']);
+        $registry->addRoleMapping('nurse', ['dashboard.view']);
+        $registry->addRoleMapping('lab_technician', ['dashboard.view']);
+        $registry->addRoleMapping('billing', ['dashboard.view', 'dashboard.export']);
+        $registry->addRoleMapping('inventory_manager', ['dashboard.view']);
+        $registry->addRoleMapping('hr_manager', ['dashboard.view']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
