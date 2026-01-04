@@ -3,50 +3,12 @@
 namespace App\Module\Inventory;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class InventoryPolicy extends Policy
+class InventoryPolicy implements Policy
 {
-    public function view(mixed $resource = null): bool
+    public function manage(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['inventory_manager']);
-    }
-
-    public function create(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['inventory_manager']);
-    }
-
-    public function update(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['inventory_manager']);
-    }
-
-    public function delete(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['inventory_manager']);
+        return $user->hasPermission('inventory.manage');
     }
 }
