@@ -4,10 +4,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controller\InstallController;
 use App\Controller\PageController;
-use App\Core\Router;
-use App\Core\ModuleLoader;
-use App\Core\ModuleManager;
-use App\Core\View;
+use App\Core\Http\Router;
+use App\Core\Http\View;
+use App\Core\Module\ModuleLoader;
+use App\Core\Module\ModuleManager;
 
 if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
     $envPath = __DIR__ . '/../.env';
@@ -56,8 +56,8 @@ session_start();
 
 $router = new Router();
 
-$permissionRegistry = new \App\Core\PermissionRegistry();
-$policyRegistry = new \App\Core\PolicyRegistry();
+$permissionRegistry = new \App\Core\Auth\PermissionRegistry();
+$policyRegistry = new \App\Core\Auth\PolicyRegistry();
 
 $moduleManager = new ModuleManager();
 $moduleLoader = new ModuleLoader($moduleManager);
@@ -69,8 +69,8 @@ $moduleManager->registerPermissions($permissionRegistry);
 $moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerRoutes($router);
 
-\App\Core\Gate::setPermissionRegistry($permissionRegistry);
-\App\Core\Gate::setPolicyRegistry($policyRegistry);
+\App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
+\App\Core\Auth\Gate::setPolicyRegistry($policyRegistry);
 
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
