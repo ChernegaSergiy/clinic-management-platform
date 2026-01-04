@@ -4,15 +4,15 @@ namespace App\Module\Schedule;
 
 use App\Core\Policy;
 use App\Core\User;
-use App\Module\Schedule\Repository\ScheduleRepository;
+use App\Module\Schedule\Repository\DoctorScheduleRepository;
 
 class SchedulePolicy implements Policy
 {
-    private ScheduleRepository $scheduleRepository;
+    private DoctorScheduleRepository $doctorScheduleRepository;
 
     public function __construct()
     {
-        $this->scheduleRepository = new ScheduleRepository();
+        $this->doctorScheduleRepository = new DoctorScheduleRepository();
     }
 
     public function view(User $user, array $context): bool
