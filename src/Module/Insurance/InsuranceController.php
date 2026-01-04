@@ -74,7 +74,7 @@ class InsuranceController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new Validator(\App\Database::getInstance());
+        $validator = new Validator(Database::getInstance());
         $rules = [
             'name' => ['required'],
         ];
@@ -133,7 +133,7 @@ class InsuranceController
             return;
         }
 
-        $validator = new Validator(\App\Database::getInstance());
+        $validator = new Validator(Database::getInstance());
         $rules = [
             'name' => ['required'],
         ];
