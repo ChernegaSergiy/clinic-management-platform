@@ -14,6 +14,17 @@ class LabOrderPolicy extends Policy
         $this->labOrderRepository = new LabOrderRepository();
     }
 
+    private function isOwner(int $labOrderId): bool
+    {
+        $userId = $this->userId();
+        if (!$userId) {
+            return false;
+        }
+
+        $labOrder = $this->labOrderRepository->findById($labOrderId);
+        return $labOrder && (int)$labOrder['doctor_id'] === $userId;
+    }
+
     public function view(mixed $resource): bool
     {
         if ($this->isAdmin()) {
@@ -21,18 +32,13 @@ class LabOrderPolicy extends Policy
         }
 
         $role = $this->userRole();
-        $labOrderId = (int)$resource;
-        $userId = $this->userId();
 
-        if (in_array($role, ['admin', 'medical_manager'])) {
+        if (in_array($role, ['medical_manager', 'lab_technician'])) {
             return true;
         }
 
-        if (in_array($role, ['lab_technician', 'doctor', 'nurse']) && $userId) {
-            $labOrder = $this->labOrderRepository->findById($labOrderId);
-            if ($labOrder && (int)$labOrder['doctor_id'] === $userId) {
-                return true;
-            }
+        if (in_array($role, ['doctor', 'nurse'])) {
+            return $this->isOwner((int)$resource);
         }
 
         return false;
@@ -46,16 +52,30 @@ class LabOrderPolicy extends Policy
 
         $role = $this->userRole();
 
-        return in_array($role, ['admin', 'medical_manager', 'doctor', 'lab_technician']);
+        return in_array($role, ['doctor', 'lab_technician']);
     }
 
     public function update(mixed $resource): bool
     {
-        return $this->view($resource);
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $role = $this->userRole();
+
+        if ($role === 'lab_technician') {
+            return true;
+        }
+
+        if ($role === 'doctor') {
+            return $this->isOwner((int)$resource);
+        }
+
+        return false;
     }
 
     public function delete(mixed $resource): bool
     {
-        return $this->view($resource);
+        return $this->isAdmin();
     }
 }
