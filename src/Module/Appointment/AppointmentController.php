@@ -2,6 +2,7 @@
 
 namespace App\Module\Appointment;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -119,7 +120,7 @@ class AppointmentController
     {
         $rawInput = $_POST;
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -324,7 +325,7 @@ class AppointmentController
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
         $errors = null;
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -615,7 +616,7 @@ class AppointmentController
         }
 
         $errors = null;
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -778,7 +779,7 @@ class AppointmentController
         AuthGuard::check();
         Gate::authorize('appointment.create');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
         ];

@@ -2,7 +2,7 @@
 
 namespace App\Module\Appointment\Repository;
 
-use App\Database;
+use Api\Database\Database;
 use PDO;
 
 class AppointmentRepository implements AppointmentRepositoryInterface

@@ -2,6 +2,7 @@
 
 namespace App\Module\Kpi;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -48,7 +49,7 @@ class KpiController
         AuthGuard::check();
         Gate::authorize('kpi.manage');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],

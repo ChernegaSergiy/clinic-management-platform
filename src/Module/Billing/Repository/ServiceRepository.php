@@ -2,7 +2,7 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Database;
+use Api\Database\Database;
 use PDO;
 
 class ServiceRepository

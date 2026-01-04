@@ -2,6 +2,7 @@
 
 namespace App\Module\Patient;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Export\CsvExporter;
@@ -74,7 +75,7 @@ class PatientController
         AuthGuard::check();
         Gate::authorize('patient.create');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
@@ -167,7 +168,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
@@ -286,7 +287,7 @@ class PatientController
         $errors = [];
 
         foreach ($patientsData as $patientData) {
-            $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+            $validator = new \App\Core\Validation\Validator(Database::getInstance());
             $rules = [
                 'last_name' => ['required'],
                 'first_name' => ['required'],
@@ -385,7 +386,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'insurance_company_id' => ['required'],
             'policy_number' => ['required'],
@@ -458,7 +459,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'insurance_company_id' => ['required'],
             'policy_number' => ['required'],

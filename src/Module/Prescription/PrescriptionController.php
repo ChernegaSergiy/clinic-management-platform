@@ -2,6 +2,7 @@
 
 namespace App\Module\Prescription;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -85,7 +86,7 @@ class PrescriptionController
         AuthGuard::check();
         Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
             'doctor_id' => ['required'],

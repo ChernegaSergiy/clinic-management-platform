@@ -3,7 +3,7 @@
 namespace App\Module\Patient\Repository;
 
 use App\Core\Service\AuditLogger;
-use App\Database\Database;
+use Api\Database\Database;
 use PDO;
 
 class PatientRepository implements PatientRepositoryInterface

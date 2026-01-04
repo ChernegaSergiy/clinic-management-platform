@@ -2,6 +2,7 @@
 
 namespace App\Module\User;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
@@ -41,7 +42,7 @@ class AuthController
         // Ensure at least one admin exists (useful for fresh installs without seeding)
         $this->userRepository->ensureDefaultAdminExists();
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'email' => ['required', 'email'],
             'password' => ['required'],

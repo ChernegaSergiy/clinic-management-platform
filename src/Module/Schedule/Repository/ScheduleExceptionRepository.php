@@ -2,7 +2,7 @@
 
 namespace App\Module\Schedule\Repository;
 
-use App\Database;
+use Api\Database\Database;
 use PDO;
 
 class ScheduleExceptionRepository

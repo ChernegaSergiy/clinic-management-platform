@@ -2,6 +2,7 @@
 
 namespace App\Module\Room;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -47,7 +48,7 @@ class RoomController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],
@@ -123,7 +124,7 @@ class RoomController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],

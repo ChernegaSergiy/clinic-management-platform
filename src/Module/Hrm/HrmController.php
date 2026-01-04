@@ -2,6 +2,7 @@
 
 namespace App\Module\Hrm;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -48,7 +49,7 @@ class HrmController
         AuthGuard::check();
         Gate::authorize('hrm.write');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -132,7 +133,7 @@ class HrmController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],

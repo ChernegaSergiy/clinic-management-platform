@@ -2,6 +2,7 @@
 
 namespace App\Module\Billing;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Export\CsvExporter;
@@ -86,7 +87,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -132,7 +133,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -203,7 +204,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
@@ -285,7 +286,7 @@ class BillingController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'payment_method' => ['required'],
@@ -382,7 +383,7 @@ class BillingController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'in:pending,paid,cancelled'],

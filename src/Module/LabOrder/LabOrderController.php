@@ -2,6 +2,7 @@
 
 namespace App\Module\LabOrder;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -73,7 +74,7 @@ class LabOrderController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
         ]);
@@ -182,7 +183,7 @@ class LabOrderController
 
         Gate::authorize('lab_order.edit', ['id' => $id]);
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
             'status' => ['required', 'in:ordered,in_progress,completed,cancelled'],

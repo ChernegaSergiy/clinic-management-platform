@@ -2,6 +2,7 @@
 
 namespace App\Module\MedicalRecord;
 
+use Api\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
@@ -99,7 +100,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate($_POST, [
             'diagnosis_code' => ['required'],
             'visit_date' => ['required', 'datetime'],
@@ -246,7 +247,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
         $validator->validate(
             $_POST,
             [
