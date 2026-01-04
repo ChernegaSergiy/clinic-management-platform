@@ -3,9 +3,10 @@
 namespace App\Module\Schedule;
 
 use App\Core\Policy;
+use App\Core\User;
 use App\Module\Schedule\Repository\ScheduleRepository;
 
-class SchedulePolicy extends Policy
+class SchedulePolicy implements Policy
 {
     private ScheduleRepository $scheduleRepository;
 
@@ -14,42 +15,34 @@ class SchedulePolicy extends Policy
         $this->scheduleRepository = new ScheduleRepository();
     }
 
-    public function view(mixed $resource = null): bool
+    public function view(User $user, array $context): bool
     {
-        $role = $this->userRole();
-        if (in_array($role, ['admin', 'medical_manager'])) {
+        if ($user->hasPermission('schedules.manage_all')) {
             return true;
         }
-
-        if ($role === 'doctor') {
-            // A doctor can view their own schedule.
-            // If no resource is provided, we can assume they are trying to access their own schedule page.
-            // If a resource (doctor_id) is provided, we check ownership.
-            return $resource === null || $this->userId() === (int) $resource;
+        if ($user->hasPermission('schedules.manage_own')) {
+            $doctorId = $context['doctor_id'] ?? null;
+            if (!$doctorId) {
+                // If no doctor id is specified, we assume the user wants to see their own schedule.
+                return true;
+            }
+            return $user->getId() === (int)$doctorId;
         }
-
         return false;
     }
 
-    public function update(mixed $resource = null): bool
+    public function update(User $user, array $context): bool
     {
-        $role = $this->userRole();
-        if (in_array($role, ['admin', 'medical_manager'])) {
+        if ($user->hasPermission('schedules.manage_all')) {
             return true;
         }
-
-        if ($role === 'doctor') {
-            // A doctor can update their own schedule.
-            // $resource here is the user_id associated with the schedule being updated.
-            if ($resource !== null) {
-                return $this->userId() === (int) $resource;
+        if ($user->hasPermission('schedules.manage_own')) {
+            $doctorId = $context['doctor_id'] ?? null;
+            if (!$doctorId) {
+                return true;
             }
-            // If we are on a route like /doctor/schedule/update, resource might be null.
-            // The controller should enforce that the update only targets the logged-in doctor.
-            // For the Gate, we can allow it if the role is doctor, assuming the controller does its job.
-            return true;
+            return $user->getId() === (int)$doctorId;
         }
-
         return false;
     }
 }
