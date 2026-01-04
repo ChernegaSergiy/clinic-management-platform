@@ -55,6 +55,10 @@ class PrescriptionPolicy implements Policy
 
     public function edit(User $user, array $context): bool
     {
+        if ($user->hasPermission('prescription.edit.any')) {
+            return true;
+        }
+
         if ($user->hasPermission('prescription.edit.own')) {
             $prescriptionId = $context['id'] ?? null;
             if (!$prescriptionId) return false;
