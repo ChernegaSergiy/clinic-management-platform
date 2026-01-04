@@ -35,12 +35,6 @@ class AppointmentModule extends BaseModule
         }
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
-    {
-        $registry->register('appointment', AppointmentPolicy::class);
-    }
-}
-
     public function registerPermissions(PermissionRegistry $registry): void
     {
         $registry->add('appointments.read', 'Перегляд записів');
@@ -52,9 +46,13 @@ class AppointmentModule extends BaseModule
         $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
         $registry->addRoleMapping('nurse', ['appointments.read']);
         $registry->addRoleMapping('billing', ['appointments.read']);
-    }
         $registry->addRoleMapping('registrar', ['appointments.read', 'appointments.write']);
         $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
         $registry->addRoleMapping('nurse', ['appointments.read']);
-        $registry->addRoleMapping('billing', ['appointments.read']);
     }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+        $registry->register('appointment', AppointmentPolicy::class);
+    }
+}
