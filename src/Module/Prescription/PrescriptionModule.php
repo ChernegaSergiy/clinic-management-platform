@@ -4,6 +4,8 @@ namespace App\Module\Prescription;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Prescription\PrescriptionController;
 
 class PrescriptionModule extends BaseModule
@@ -14,5 +16,19 @@ class PrescriptionModule extends BaseModule
         $router->add('GET', '/prescriptions/new', [PrescriptionController::class, 'create']);
         $router->add('POST', '/prescriptions/new', [PrescriptionController::class, 'store']);
         $router->add('GET', '/prescriptions/show', [PrescriptionController::class, 'show']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('prescriptions.read', 'Перегляд рецептів');
+        $registry->add('prescriptions.write', 'Редагування рецептів');
+
+        $registry->addRoleMapping('admin', ['prescriptions.read', 'prescriptions.write']);
+        $registry->addRoleMapping('doctor', ['prescriptions.read', 'prescriptions.write']);
+        $registry->addRoleMapping('nurse', ['prescriptions.read', 'prescriptions.write']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
