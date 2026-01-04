@@ -3,12 +3,12 @@
 namespace App\Module\Schedule\Service;
 
 use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Schedule\Repository\DoctorScheduleRepository;
-use App\Module\Schedule\Repository\ScheduleExceptionRepository;
-use App\Module\Billing\Repository\ServiceRepository; // Assuming this exists or will be created
+use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Room\Repository\RoomRepository;
-use DateTime;
+use App\Module\Schedule\Repository\DoctorScheduleRepository; // Assuming this exists or will be created
+use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use DateInterval;
+use DateTime;
 
 class SchedulingService
 {
@@ -120,7 +120,7 @@ class SchedulingService
 
         // 4. Check if slots are in the past
         $now = new DateTime();
-        
+
         // 5. Check which slots conflict with existing appointments
         // This findByDoctorAndDate method might not exist in the AppointmentRepository yet.
         // I will assume it returns appointments for the given doctor and date.
@@ -133,7 +133,7 @@ class SchedulingService
         $finalSlots = [];
         foreach ($allSlots as $slot) {
             $isInPast = $slot < $now;
-            
+
             $isBooked = false;
             foreach ($bookedAppointments as $appointment) {
                 $appointmentStart = new DateTime($appointment['start_time']);
@@ -147,9 +147,9 @@ class SchedulingService
                     break;
                 }
             }
-            
+
             $isAvailable = !$isInPast && !$isBooked;
-            
+
             $finalSlots[] = [
                 'time' => $slot,
                 'available' => $isAvailable,
@@ -185,7 +185,7 @@ class SchedulingService
 
         // Filter out the appointment we're excluding (for editing)
         if ($excludeAppointmentId) {
-            $conflictingAppointments = array_filter($conflictingAppointments, function($appointment) use ($excludeAppointmentId) {
+            $conflictingAppointments = array_filter($conflictingAppointments, function ($appointment) use ($excludeAppointmentId) {
                 return (int)$appointment['id'] !== $excludeAppointmentId;
             });
         }

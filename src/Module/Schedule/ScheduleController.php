@@ -2,9 +2,9 @@
 
 namespace App\Module\Schedule;
 
-use App\Core\AuthGuard;
-use App\Core\View;
-use App\Core\Gate;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepository;
@@ -29,7 +29,7 @@ class ScheduleController
     {
         // Personal schedule for doctors
         Gate::authorize('schedules.manage_own');
-        
+
         $userId = (int)$_SESSION['user']['id'];
         $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
         $exceptions = $this->scheduleExceptionRepository->findByDoctorAndDateRange(
@@ -42,7 +42,7 @@ class ScheduleController
         foreach ($schedule as $entry) {
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
-        
+
         View::render('@modules/Schedule/templates/personal.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
@@ -53,9 +53,9 @@ class ScheduleController
     {
         // Admin schedule management for all doctors
         Gate::authorize('schedules.manage_all');
-        
+
         $allDoctors = $this->userRepository->findAllDoctors();
-        
+
         View::render('@modules/Schedule/templates/admin.html.twig', [
             'allDoctors' => $allDoctors,
         ]);
@@ -64,21 +64,21 @@ class ScheduleController
     public function adminShow(): void
     {
         Gate::authorize('schedules.manage_all');
-        
+
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
-        
+
         if (!$doctor) {
             header('Location: /admin/schedules');
             exit;
         }
-        
+
         $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
         $scheduleByDay = [];
         foreach ($schedules as $entry) {
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
-        
+
         View::render('@modules/Schedule/templates/show.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
@@ -118,7 +118,7 @@ class ScheduleController
                 $this->doctorScheduleRepository->create($scheduleEntry);
             }
         }
-        
+
         // TODO: Add flash message for success
         $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
         header('Location: ' . $redirectUrl);
@@ -176,10 +176,10 @@ class ScheduleController
         if ($targetDoctorId !== $sessionUserId) {
             Gate::authorize('schedules.manage_all');
         }
-        
+
         // Final check that exception belongs to the intended targetDoctorId
         if ($targetDoctorId === $sessionUserId || Gate::allows('schedules.manage_all')) { // Double check for safety
-             $this->scheduleExceptionRepository->delete($exceptionId);
+            $this->scheduleExceptionRepository->delete($exceptionId);
             // TODO: Add flash message
         } else {
             // TODO: Add error flash message (permission denied)
@@ -194,9 +194,9 @@ class ScheduleController
     public function adminUpdate(): void
     {
         Gate::authorize('schedules.manage_all');
-        
+
         $targetDoctorId = (int)$_POST['doctor_id'];
-        
+
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
             Gate::authorize('schedules.manage_all');
@@ -221,7 +221,7 @@ class ScheduleController
                 $this->doctorScheduleRepository->create($scheduleEntry);
             }
         }
-        
+
         header('Location: /admin/schedules/show?id=' . $targetDoctorId);
         exit;
     }
@@ -229,9 +229,9 @@ class ScheduleController
     public function adminAddException(): void
     {
         Gate::authorize('schedules.manage_all');
-        
+
         $targetDoctorId = (int)$_POST['doctor_id'];
-        
+
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
             Gate::authorize('schedules.manage_all');
@@ -255,7 +255,7 @@ class ScheduleController
     public function adminDeleteException(): void
     {
         Gate::authorize('schedules.manage_all');
-        
+
         $exceptionId = (int)$_POST['exception_id'];
 
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
@@ -271,12 +271,12 @@ class ScheduleController
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
             Gate::authorize('schedules.manage_all');
         }
-        
+
         // Final check that exception belongs to the intended targetDoctorId
         if ($targetDoctorId === (int)$_SESSION['user']['id'] || Gate::allows('schedules.manage_all')) { // Double check for safety
-             $this->scheduleExceptionRepository->delete($exceptionId);
+            $this->scheduleExceptionRepository->delete($exceptionId);
         }
-        
+
         header('Location: /admin/schedules');
         exit;
     }
@@ -284,21 +284,21 @@ class ScheduleController
     public function adminEdit(): void
     {
         Gate::authorize('schedules.manage_all');
-        
+
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
-        
+
         if (!$doctor) {
             header('Location: /admin/schedules');
             exit;
         }
-        
+
         $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
         $scheduleByDay = [];
         foreach ($schedules as $entry) {
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
-        
+
         View::render('@modules/Schedule/templates/edit.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay

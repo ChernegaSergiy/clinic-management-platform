@@ -2,10 +2,10 @@
 
 namespace App\Module\Schedule;
 
-use App\Core\BaseModule;
-use App\Core\Router;
-use App\Core\PermissionRegistry;
-use App\Core\PolicyRegistry;
+use App\Core\Auth\PermissionRegistry;
+use App\Core\Auth\PolicyRegistry;
+use App\Core\Http\Router;
+use App\Core\Module\BaseModule;
 use App\Module\Schedule\ScheduleController;
 
 class ScheduleModule extends BaseModule

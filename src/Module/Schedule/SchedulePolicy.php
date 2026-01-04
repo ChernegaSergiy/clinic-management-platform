@@ -2,8 +2,8 @@
 
 namespace App\Module\Schedule;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 
 class SchedulePolicy implements Policy
