@@ -7,7 +7,6 @@ use App\Core\Router;
 use App\Core\PermissionRegistry;
 use App\Core\PolicyRegistry;
 use App\Module\Admin\AdminController;
-use App\Module\Admin\KpiController;
 
 class AdminModule extends BaseModule
 {
@@ -40,13 +39,6 @@ class AdminModule extends BaseModule
         $router->add('GET', '/admin/dictionaries/values/edit', [AdminController::class, 'editDictionaryValue']);
         $router->add('POST', '/admin/dictionaries/values/edit', [AdminController::class, 'updateDictionaryValue']);
         $router->add('POST', '/admin/dictionaries/values/delete', [AdminController::class, 'deleteDictionaryValue']);
-
-        $router->add('GET', '/admin/kpi_definitions', [AdminController::class, 'listKpiDefinitions']);
-        $router->add('GET', '/admin/kpi_definitions/new', [AdminController::class, 'createKpiDefinition']);
-        $router->add('POST', '/admin/kpi_definitions/new', [AdminController::class, 'storeKpiDefinition']);
-        $router->add('GET', '/admin/kpi_definitions/edit', [AdminController::class, 'editKpiDefinition']);
-        $router->add('POST', '/admin/kpi_definitions/edit', [AdminController::class, 'updateKpiDefinition']);
-        $router->add('POST', '/admin/kpi_definitions/delete', [AdminController::class, 'deleteKpiDefinition']);
 
         $router->add('GET', '/admin/services', [AdminController::class, 'listServices']);
         $router->add('GET', '/admin/services/new', [AdminController::class, 'createService']);
