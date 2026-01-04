@@ -4,6 +4,8 @@ namespace App\Module\Appointment;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Appointment\AppointmentController;
 
 class AppointmentModule extends BaseModule
@@ -31,5 +33,22 @@ class AppointmentModule extends BaseModule
             $router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
             $router->add('GET', '/api/appointments/available-slots', [AppointmentController::class, 'getAvailableSlotsApi']);
         }
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('appointments.read', 'Перегляд записів');
+        $registry->add('appointments.write', 'Редагування записів');
+
+        $registry->addRoleMapping('admin', ['appointments.read', 'appointments.write']);
+        $registry->addRoleMapping('medical_manager', ['appointments.read', 'appointments.write']);
+        $registry->addRoleMapping('registrar', ['appointments.read', 'appointments.write']);
+        $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
+        $registry->addRoleMapping('nurse', ['appointments.read']);
+        $registry->addRoleMapping('billing', ['appointments.read']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
