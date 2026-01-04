@@ -29,5 +29,6 @@ class KpiModule extends BaseModule
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('kpi', KpiPolicy::class);
     }
 }
