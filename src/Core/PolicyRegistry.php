@@ -6,32 +6,22 @@ class PolicyRegistry
 {
     private array $policies = [];
 
-    public function register(string $resource, string $policyClass): void
+    public function register(string $resourceKey, string $policyClass): void
     {
         if (!class_exists($policyClass)) {
             return;
         }
 
-        $this->policies[$resource] = $policyClass;
+        $this->policies[$resourceKey] = $policyClass;
     }
 
-    public function getPolicy(string $resource): ?object
+    public function get(string $resourceKey): ?object
     {
-        if (!isset($this->policies[$resource])) {
+        if (!isset($this->policies[$resourceKey])) {
             return null;
         }
 
-        $policyClass = $this->policies[$resource];
+        $policyClass = $this->policies[$resourceKey];
         return new $policyClass();
-    }
-
-    public function hasPolicy(string $resource): bool
-    {
-        return isset($this->policies[$resource]);
-    }
-
-    public function clear(): void
-    {
-        $this->policies = [];
     }
 }
