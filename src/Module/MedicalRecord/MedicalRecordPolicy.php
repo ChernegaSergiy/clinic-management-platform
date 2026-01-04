@@ -33,6 +33,10 @@ class MedicalRecordPolicy implements Policy
 
     public function edit(User $user, array $context): bool
     {
+        if ($user->hasPermission('medical_record.edit.any')) {
+            return true;
+        }
+
         if ($user->hasPermission('medical_record.edit.own')) {
             $recordId = $context['id'] ?? null;
             if (!$recordId) return false;
