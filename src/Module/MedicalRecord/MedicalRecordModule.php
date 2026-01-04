@@ -26,13 +26,15 @@ class MedicalRecordModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('medical.read', 'Перегляд медичних записів');
-        $registry->add('medical.write', 'Редагування медичних записів');
+        $registry->add('medical_record.view.any', 'Перегляд будь-якого медичного запису');
+        $registry->add('medical_record.view.own', 'Перегляд власних медичних записів');
+        $registry->add('medical_record.edit.own', 'Редагування власних медичних записів');
+        $registry->add('medical_record.create', 'Створення медичних записів');
 
-        $registry->addRoleMapping('admin', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('medical_manager', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('doctor', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('nurse', ['medical.read', 'medical.write']);
+        $registry->addRoleMapping('admin', ['medical_record.view.any', 'medical_record.edit.own', 'medical_record.create']);
+        $registry->addRoleMapping('medical_manager', ['medical_record.view.any']);
+        $registry->addRoleMapping('doctor', ['medical_record.view.own', 'medical_record.edit.own', 'medical_record.create']);
+        $registry->addRoleMapping('nurse', ['medical_record.view.own']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
