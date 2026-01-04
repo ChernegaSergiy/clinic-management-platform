@@ -20,12 +20,15 @@ class PrescriptionModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('prescriptions.read', 'Перегляд рецептів');
-        $registry->add('prescriptions.write', 'Редагування рецептів');
+        $registry->add('prescription.view.any', 'Перегляд будь-якого рецепту');
+        $registry->add('prescription.view.own', 'Перегляд власних рецептів');
+        $registry->add('prescription.edit.own', 'Редагування власних рецептів');
+        $registry->add('prescription.create', 'Створення рецептів');
 
-        $registry->addRoleMapping('admin', ['prescriptions.read', 'prescriptions.write']);
-        $registry->addRoleMapping('doctor', ['prescriptions.read', 'prescriptions.write']);
-        $registry->addRoleMapping('nurse', ['prescriptions.read', 'prescriptions.write']);
+        $registry->addRoleMapping('admin', ['prescription.view.any', 'prescription.edit.own', 'prescription.create']);
+        $registry->addRoleMapping('medical_manager', ['prescription.view.any']);
+        $registry->addRoleMapping('doctor', ['prescription.view.own', 'prescription.edit.own', 'prescription.create']);
+        $registry->addRoleMapping('nurse', ['prescription.view.own']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
