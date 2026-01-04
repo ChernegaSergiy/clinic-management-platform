@@ -3,50 +3,12 @@
 namespace App\Module\ClinicalReference;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class ClinicalReferencePolicy extends Policy
+class ClinicalReferencePolicy implements Policy
 {
-    public function view(mixed $resource = null): bool
+    public function manage(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager']);
-    }
-
-    public function create(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager']);
-    }
-
-    public function update(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager']);
-    }
-
-    public function delete(mixed $resource = null): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['medical_manager']);
+        return $user->hasPermission('clinical.manage');
     }
 }
