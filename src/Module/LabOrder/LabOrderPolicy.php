@@ -2,8 +2,8 @@
 
 namespace App\Module\LabOrder;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\LabOrder\Repository\LabOrderRepository;
 
 class LabOrderPolicy implements Policy
@@ -23,7 +23,9 @@ class LabOrderPolicy implements Policy
 
         if ($user->hasPermission('lab_order.view.own')) {
             $labOrderId = $context['id'] ?? null;
-            if (!$labOrderId) return false;
+            if (!$labOrderId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$labOrderId);
         }
@@ -44,7 +46,9 @@ class LabOrderPolicy implements Policy
 
         if ($user->hasPermission('lab_order.edit.own')) {
             $labOrderId = $context['id'] ?? null;
-            if (!$labOrderId) return false;
+            if (!$labOrderId) {
+                return false;
+            }
 
             return $this->isOwner($user, (int)$labOrderId);
         }

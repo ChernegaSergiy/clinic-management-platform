@@ -2,17 +2,17 @@
 
 namespace App\Module\LabOrder;
 
-use App\Core\View;
-use App\Core\Validator;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Service\NotificationService;
+use App\Core\Service\QrCodeGenerator;
+use App\Core\Validation\Validator;
 use App\Module\LabOrder\Repository\LabOrderRepository;
-use App\Module\User\Repository\UserRepository;
-use App\Core\NotificationService;
-use App\Core\QrCodeGenerator;
-use App\Module\LabOrder\Service\LabImportService;
 use App\Module\LabOrder\Repository\LabResourceRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
+use App\Module\LabOrder\Service\LabImportService;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\User\Repository\UserRepository;
 
 class LabOrderController
 {
@@ -73,7 +73,7 @@ class LabOrderController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
         ]);
@@ -182,7 +182,7 @@ class LabOrderController
 
         Gate::authorize('lab_order.edit', ['id' => $id]);
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'order_code' => ['required'],
             'status' => ['required', 'in:ordered,in_progress,completed,cancelled'],
