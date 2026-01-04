@@ -37,15 +37,18 @@ class AppointmentModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('appointments.read', 'Перегляд записів');
-        $registry->add('appointments.write', 'Редагування записів');
+        $registry->add('appointment.view.any', 'Перегляд будь-якого запису');
+        $registry->add('appointment.view.own', 'Перегляд власних записів');
+        $registry->add('appointment.edit.any', 'Редагування будь-якого запису');
+        $registry->add('appointment.edit.own', 'Редагування власних записів');
+        $registry->add('appointment.create', 'Створення записів');
 
-        $registry->addRoleMapping('admin', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('medical_manager', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('registrar', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('nurse', ['appointments.read']);
-        $registry->addRoleMapping('billing', ['appointments.read']);
+        $registry->addRoleMapping('admin', ['appointment.view.any', 'appointment.edit.any', 'appointment.create']);
+        $registry->addRoleMapping('medical_manager', ['appointment.view.any', 'appointment.edit.any', 'appointment.create']);
+        $registry->addRoleMapping('registrar', ['appointment.view.any', 'appointment.edit.any', 'appointment.create']);
+        $registry->addRoleMapping('doctor', ['appointment.view.own', 'appointment.edit.own', 'appointment.create']);
+        $registry->addRoleMapping('nurse', ['appointment.view.own']);
+        $registry->addRoleMapping('billing', ['appointment.view.any']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
