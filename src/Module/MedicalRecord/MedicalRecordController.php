@@ -37,12 +37,11 @@ class MedicalRecordController
     public function create(): void
     {
         AuthGuard::check();
+        Gate::authorize('medical_record.create');
+
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
-        if ($appointment) {
-            Gate::authorize('medical_record.create', ['patient_id' => $appointment['patient_id']]);
-        }
-
+        
         if (!$appointment) {
             http_response_code(404);
             echo "Запис не знайдено";
@@ -81,12 +80,11 @@ class MedicalRecordController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('medical_record.create');
+
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
-        if ($appointment) {
-            Gate::authorize('medical_record.create', ['patient_id' => $appointment['patient_id']]);
-        }
-
+        
         if (!$appointment) {
             http_response_code(404);
             echo "Запис не знайдено";
@@ -159,7 +157,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical_record.view', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.view', ['id' => $id]);
 
         $this->auditLogger->log(
             'medical_record',
@@ -216,7 +214,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['id' => $id]);
 
         View::render('@modules/MedicalRecord/templates/edit.html.twig', [
             'record' => $record,
@@ -238,7 +236,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['id' => $id]);
 
         if (!empty($_POST['visit_date'])) {
             try {
@@ -292,7 +290,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['id' => $medicalRecordId]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
@@ -339,7 +337,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical_record.view', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.view', ['id' => $medicalRecordId]);
 
         $uploadBase = dirname(__DIR__, 3) . '/uploads/';
         $candidates = [];
