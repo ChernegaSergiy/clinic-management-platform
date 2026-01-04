@@ -2,244 +2,72 @@
 
 namespace App\Core;
 
-use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\LabOrder\Repository\LabOrderRepository;
-use App\Module\Prescription\Repository\PrescriptionRepository;
-
 class Gate
 {
     private static ?PermissionRegistry $permissionRegistry = null;
     private static ?PolicyRegistry $policyRegistry = null;
 
-    private const ROLE_PERMISSIONS = [
-        'admin' => ['*', 'system.manage', 'schedules.manage_all', 'rooms.manage'],
-        'medical_manager' => [
-            'dashboard.view',
-            'dashboard.export',
-            'patients.read_all',
-            'appointments.read_all',
-            'appointments.read_analytics',
-            'medical.read_all',
-            'clinical.manage',
-            'kpi.read',
-            'lab.read_all',
-            'prescriptions.read_all',
-            'notifications.read',
-            'hrm.read',
-            'schedules.manage_all',
-        ],
-        'registrar' => [
-            'patients.read_all',
-            'patients.write',
-            'patients.manage',
-            'appointments.read_all',
-            'appointments.write',
-            'billing.read',
-            'notifications.read',
-            'dashboard.view',
-        ],
-        'doctor' => [
-            'dashboard.view',
-            'patients.read_assigned',
-            'appointments.read_assigned',
-            'appointments.write_assigned',
-            'medical.read_assigned',
-            'medical.write_assigned',
-            'prescriptions.read_assigned',
-            'prescriptions.write_assigned',
-            'lab.read_assigned',
-            'lab.write_assigned',
-            'notifications.read',
-            'schedules.manage_own',
-        ],
-        'nurse' => [
-            'dashboard.view',
-            'patients.read_assigned',
-            'appointments.read_assigned',
-            'medical.read_assigned',
-            'prescriptions.read_assigned',
-            'prescriptions.write_assigned',
-            'lab.read_assigned',
-            'lab.write_assigned',
-            'notifications.read',
-        ],
-        'lab_technician' => [
-            'lab.read_all',
-            'lab.write_all',
-            'lab.manage',
-            'notifications.read',
-        ],
-        'billing' => [
-            'billing.read',
-            'billing.manage',
-            'patients.read_all',
-            'appointments.read_all',
-            'notifications.read',
-            'dashboard.view',
-            'dashboard.export',
-        ],
-        'inventory_manager' => [
-            'inventory.manage',
-            'notifications.read',
-            'dashboard.view',
-        ],
-        'hr_manager' => [
-            'hrm.read',
-            'hrm.write',
-            'hrm.manage',
-            'notifications.read',
-            'dashboard.view',
-        ],
-    ];
-
-    private static ?AppointmentRepository $appointmentRepository = null;
-    private static ?LabOrderRepository $labOrderRepository = null;
-    private static ?PrescriptionRepository $prescriptionRepository = null;
-
-    private static function appointmentRepo(): AppointmentRepository
+    private static function mapAbilityToPolicyMethod(string $verb): string
     {
-        if (!self::$appointmentRepository) {
-            self::$appointmentRepository = new AppointmentRepository();
+        switch ($verb) {
+            case 'read':
+                return 'view';
+            case 'write':
+            case 'manage':
+            case 'update':
+                 return 'update';
+            case 'create':
+            case 'new':
+                return 'create';
+            case 'delete':
+                return 'delete';
+            default:
+                return $verb;
         }
-        return self::$appointmentRepository;
-    }
-
-    private static function labOrderRepo(): LabOrderRepository
-    {
-        if (!self::$labOrderRepository) {
-            self::$labOrderRepository = new LabOrderRepository();
-        }
-        return self::$labOrderRepository;
-    }
-
-    private static function prescriptionRepo(): PrescriptionRepository
-    {
-        if (!self::$prescriptionRepository) {
-            self::$prescriptionRepository = new PrescriptionRepository();
-        }
-        return self::$prescriptionRepository;
     }
 
     public static function authorize(string $ability, array $context = []): void
     {
         AuthGuard::check(); // Also backfills role_name
 
-        $role = $_SESSION['user']['role_name'] ?? '';
-        $userId = $_SESSION['user']['id'] ?? null;
+        $user = $_SESSION['user'] ?? null;
+        $role = $user['role_name'] ?? '';
 
         if ($role === 'admin') {
             return;
         }
 
-        $permissions = self::getRolePermissions($role);
+        // --- Policy Check ---
+        if (self::$policyRegistry) {
+            $parts = explode('.', $ability, 2);
+            if (count($parts) === 2) {
+                $resourceName = $parts[0];
+                $verb = $parts[1];
 
-        // Explicit permission check
-        if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
+                $policyKey = rtrim($resourceName, 's');
+
+
+                if ($policy = self::$policyRegistry->get($policyKey)) {
+                    $method = self::mapAbilityToPolicyMethod($verb);
+                    $resourceId = $context[$policyKey . '_id'] ?? $context['id'] ?? null;
+                    
+                    if (method_exists($policy, $method)) {
+                        if ($policy->$method($resourceId)) {
+                            return; // Authorized by policy
+                        }
+                    }
+                }
+            }
+        }
+        // --- End Policy Check ---
+
+        // Fallback to direct permission check for simple, non-policy-based permissions
+        $permissions = self::getRolePermissions($role);
+        if (in_array($ability, $permissions, true)) {
             return;
         }
 
-        // Handle specific granular permissions like 'read_assigned'
-        switch ($ability) {
-            case 'patients.read':
-            case 'patients.write':
-                if (in_array('patients.read_all', $permissions, true) && $ability === 'patients.read') {
-                    return;
-                }
-                if (in_array('patients.manage', $permissions, true) && $ability === 'patients.write') {
-                    return;
-                }
-                if (in_array('patients.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return;
-                    }
-                }
-                break;
-
-            case 'appointments.read':
-            case 'appointments.write':
-                // Allow if user has a global permission
-                if (($ability === 'appointments.read' && in_array('appointments.read_all', $permissions, true)) ||
-                    ($ability === 'appointments.write' && in_array('appointments.write', $permissions, true))) {
-                    return;
-                }
-
-                // Check for assigned permissions
-                if ($userId) {
-                    // For editing/updating an existing appointment, check ownership
-                    if (isset($context['appointment_id'])) {
-                        if ((in_array('appointments.read_assigned', $permissions, true) && $ability === 'appointments.read') ||
-                            (in_array('appointments.write_assigned', $permissions, true) && $ability === 'appointments.write')) {
-                            if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
-                                return;
-                            }
-                        }
-                    } 
-                    // For creating a new appointment, just check if the assigned permission exists.
-                    // The controller is responsible for validating the payload (e.g., doctor_id).
-                    elseif ($ability === 'appointments.write' && in_array('appointments.write_assigned', $permissions, true)) {
-                        return;
-                    }
-                }
-                break;
-            
-            case 'medical.read':
-            case 'medical.write':
-                if (in_array('medical.read_all', $permissions, true) && $ability === 'medical.read') {
-                    return;
-                }
-                if (in_array('medical.write_assigned', $permissions, true) && $ability === 'medical.write') {
-                    return;
-                }
-                if (in_array('medical.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return;
-                    }
-                }
-                break;
-            
-            case 'lab.read':
-            case 'lab.write':
-                if (in_array('lab.read_all', $permissions, true) && $ability === 'lab.read') {
-                    return;
-                }
-                if (in_array('lab.write_all', $permissions, true) && $ability === 'lab.write') {
-                    return;
-                }
-                if (in_array('lab.read_assigned', $permissions, true) && isset($context['lab_order_id']) && $userId) {
-                    $labOrder = self::labOrderRepo()->findById((int)$context['lab_order_id']);
-                    if ($labOrder && (int)$labOrder['doctor_id'] === (int)$userId) {
-                        return;
-                    }
-                }
-                break;
-            
-            case 'prescriptions.read':
-            case 'prescriptions.write':
-                if (in_array('prescriptions.read_all', $permissions, true) && $ability === 'prescriptions.read') {
-                    return;
-                }
-                if (in_array('prescriptions.write_assigned', $permissions, true) && $ability === 'prescriptions.write' && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return;
-                    }
-                }
-                if (in_array('prescriptions.read_assigned', $permissions, true) && isset($context['prescription_id']) && $userId) {
-                    $prescription = self::prescriptionRepo()->findById((int)$context['prescription_id']);
-                    if ($prescription && (int)$prescription['doctor_id'] === (int)$userId) {
-                        return;
-                    }
-                }
-                // Also check by patient_id if medical records are linked
-                if (in_array('prescriptions.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return;
-                    }
-                }
-                break;
-            // Add other granular permissions as needed
-        }
-
-        // If none of the above conditions returned, access is denied.
+        // If no policy and no direct permission matched, access is denied.
         http_response_code(403);
         echo "Доступ заборонено";
         exit();
@@ -249,98 +77,38 @@ class Gate
     {
         AuthGuard::check(); // Ensure user data (including role_name) is hydrated
 
-        $role = $_SESSION['user']['role_name'] ?? '';
-        $userId = $_SESSION['user']['id'] ?? null;
+        $user = $_SESSION['user'] ?? null;
+        $role = $user['role_name'] ?? '';
 
         if ($role === 'admin') {
             return true;
         }
 
-        $permissions = self::getRolePermissions($role);
+        // --- Policy Check ---
+        if (self::$policyRegistry) {
+            $parts = explode('.', $ability, 2);
+            if (count($parts) === 2) {
+                $resourceName = $parts[0];
+                $verb = $parts[1];
 
-        // Explicit permission check
-        if (in_array('*', $permissions, true) || in_array($ability, $permissions, true)) {
-            return true;
+                $policyKey = rtrim($resourceName, 's');
+
+                if ($policy = self::$policyRegistry->get($policyKey)) {
+                    $method = self::mapAbilityToPolicyMethod($verb);
+                    $resourceId = $context[$policyKey . '_id'] ?? $context['id'] ?? null;
+
+                    if (method_exists($policy, $method)) {
+                        return $policy->$method($resourceId);
+                    }
+                }
+            }
         }
+        // --- End Policy Check ---
 
-        // Handle specific granular permissions like 'read_assigned' for allows()
-        switch ($ability) {
-            case 'patients.read':
-                if (in_array('patients.read_all', $permissions, true)) {
-                    return true;
-                }
-                if (in_array('patients.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return true;
-                    }
-                }
-                break;
-
-            case 'appointments.read':
-            case 'appointments.write':
-                // Allow if user has a global permission
-                if (($ability === 'appointments.read' && in_array('appointments.read_all', $permissions, true)) ||
-                    ($ability === 'appointments.write' && in_array('appointments.write', $permissions, true))) {
-                    return true;
-                }
-
-                // Check for assigned permissions
-                if ($userId) {
-                    // For reading/editing an existing appointment, check ownership
-                    if (isset($context['appointment_id'])) {
-                        if ((in_array('appointments.read_assigned', $permissions, true) && $ability === 'appointments.read') ||
-                            (in_array('appointments.write_assigned', $permissions, true) && $ability === 'appointments.write')) {
-                            if (self::appointmentRepo()->isAppointmentOwnedByDoctor((int)$context['appointment_id'], (int)$userId)) {
-                                return true;
-                            }
-                        }
-                    }
-                    // For creating a new appointment, just check if the assigned permission exists.
-                    elseif ($ability === 'appointments.write' && in_array('appointments.write_assigned', $permissions, true)) {
-                        return true;
-                    }
-                }
-                break;
-
-            case 'medical.read':
-                if (in_array('medical.read_all', $permissions, true)) {
-                    return true;
-                }
-                if (in_array('medical.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return true;
-                    }
-                }
-                break;
-
-            case 'lab.read':
-                if (in_array('lab.read_all', $permissions, true)) {
-                    return true;
-                }
-                if (in_array('lab.read_assigned', $permissions, true) && isset($context['lab_order_id']) && $userId) {
-                    $labOrder = self::labOrderRepo()->findById((int)$context['lab_order_id']);
-                    if ($labOrder && (int)$labOrder['doctor_id'] === (int)$userId) {
-                        return true;
-                    }
-                }
-                break;
-
-            case 'prescriptions.read':
-                if (in_array('prescriptions.read_all', $permissions, true)) {
-                    return true;
-                }
-                if (in_array('prescriptions.read_assigned', $permissions, true) && isset($context['prescription_id']) && $userId) {
-                    $prescription = self::prescriptionRepo()->findById((int)$context['prescription_id']);
-                    if ($prescription && (int)$prescription['doctor_id'] === (int)$userId) {
-                        return true;
-                    }
-                }
-                if (in_array('prescriptions.read_assigned', $permissions, true) && isset($context['patient_id']) && $userId) {
-                    if (self::appointmentRepo()->isPatientAssignedToDoctor((int)$context['patient_id'], (int)$userId)) {
-                        return true;
-                    }
-                }
-                break;
+        // Fallback for simple permissions
+        $permissions = self::getRolePermissions($role);
+        if (in_array($ability, $permissions, true)) {
+            return true;
         }
 
         return false;
@@ -365,6 +133,20 @@ class Gate
             }
         }
 
-        return self::ROLE_PERMISSIONS[$role] ?? [];
+        // This part can be removed if all permissions are moved to modules.
+        // For now, it serves as a fallback.
+        $legacyPermissions = [
+            'admin' => ['*'],
+            'medical_manager' => ['dashboard.view', 'dashboard.export', 'kpi.read', 'hrm.read'],
+            'registrar' => ['dashboard.view', 'billing.read'],
+            'doctor' => ['dashboard.view', 'notifications.read'],
+            'nurse' => ['dashboard.view', 'notifications.read'],
+            'lab_technician' => ['notifications.read'],
+            'billing' => ['dashboard.view', 'dashboard.export'],
+            'inventory_manager' => ['dashboard.view'],
+            'hr_manager' => ['dashboard.view', 'hrm.read', 'hrm.write', 'hrm.manage'],
+        ];
+
+        return $legacyPermissions[$role] ?? [];
     }
 }
