@@ -2,11 +2,11 @@
 
 namespace App\Module\Hrm;
 
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\Hrm\Repository\HrmRepository;
 use App\Module\User\Repository\UserRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class HrmController
 {
@@ -35,7 +35,7 @@ class HrmController
     {
         AuthGuard::check();
         Gate::authorize('hrm.write');
-        
+
         $users = $this->userRepository->findAll();
 
         View::render('@modules/HRM/templates/new.html.twig', [
@@ -48,7 +48,7 @@ class HrmController
         AuthGuard::check();
         Gate::authorize('hrm.write');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -66,7 +66,7 @@ class HrmController
             ]);
             return;
         }
-        
+
         if ($this->hrmRepository->save($_POST)) {
             $_SESSION['success_message'] = 'Співробітника успішно додано.';
         } else {
@@ -132,7 +132,7 @@ class HrmController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -141,13 +141,13 @@ class HrmController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-             // Re-fetch users for the form
+            // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-        View::render('@modules/Hrm/templates/edit.html.twig', [
-                'errors' => $validator->getErrors(),
-                'employee' => array_merge($employee, $_POST),
-                'users' => $users,
-            ]);
+            View::render('@modules/Hrm/templates/edit.html.twig', [
+                    'errors' => $validator->getErrors(),
+                    'employee' => array_merge($employee, $_POST),
+                    'users' => $users,
+                ]);
             return;
         }
 
@@ -165,7 +165,7 @@ class HrmController
     {
         AuthGuard::check();
         Gate::authorize('hrm.manage');
-        
+
         $id = (int)($_POST['id'] ?? 0);
         $employee = $this->hrmRepository->findById($id);
 
