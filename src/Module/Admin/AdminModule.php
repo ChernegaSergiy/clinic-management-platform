@@ -4,6 +4,8 @@ namespace App\Module\Admin;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Admin\AdminController;
 use App\Module\Admin\KpiController;
 
@@ -58,6 +60,17 @@ class AdminModule extends BaseModule
         $router->add('POST', '/admin/service-categories/new', [AdminController::class, 'storeServiceCategory']);
         $router->add('GET', '/admin/service-categories/edit', [AdminController::class, 'editServiceCategory']);
         $router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
-        $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
+            $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('admin.manage', 'Керування адмінпанеллю');
+
+        $registry->addRoleMapping('admin', ['admin.manage']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
