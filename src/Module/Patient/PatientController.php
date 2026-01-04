@@ -2,19 +2,19 @@
 
 namespace App\Module\Patient;
 
-use App\Core\Validator;
-use App\Core\View;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\Patient\Repository\PatientRepository;
-use App\Core\CsvExporter;
-use App\Core\JsonExporter;
-use App\Core\AuthGuard;
-use App\Core\Gate;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Export\CsvExporter;
+use App\Core\Export\JsonExporter;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\Insurance\Service\InsuranceService;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
+use App\Module\Insurance\Service\InsuranceService;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\Patient\Repository\PatientRepository;
 
 class PatientController
 {
@@ -55,7 +55,7 @@ class PatientController
                 $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
             }
         }
-        
+
         View::render('@modules/Patient/templates/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,
@@ -74,7 +74,7 @@ class PatientController
         AuthGuard::check();
         Gate::authorize('patient.create');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
@@ -167,7 +167,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'last_name' => ['required'],
             'first_name' => ['required'],
@@ -286,7 +286,7 @@ class PatientController
         $errors = [];
 
         foreach ($patientsData as $patientData) {
-            $validator = new \App\Core\Validator(\App\Database::getInstance());
+            $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
             $rules = [
                 'last_name' => ['required'],
                 'first_name' => ['required'],
@@ -385,7 +385,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'insurance_company_id' => ['required'],
             'policy_number' => ['required'],
@@ -458,7 +458,7 @@ class PatientController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'insurance_company_id' => ['required'],
             'policy_number' => ['required'],

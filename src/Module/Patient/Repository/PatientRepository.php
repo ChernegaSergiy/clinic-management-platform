@@ -2,9 +2,9 @@
 
 namespace App\Module\Patient\Repository;
 
-use App\Database;
+use App\Core\Service\AuditLogger;
+use App\Database\Database;
 use PDO;
-use App\Core\AuditLogger;
 
 class PatientRepository implements PatientRepositoryInterface
 {
@@ -109,7 +109,7 @@ class PatientRepository implements PatientRepositoryInterface
                     ':status' => $data['status'] ?? 'active',
                 ]
             );
-            
+
             if ($success) {
                 return (int)$this->pdo->lastInsertId();
             }

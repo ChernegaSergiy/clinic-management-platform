@@ -2,8 +2,8 @@
 
 namespace App\Module\Patient;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Patient\Repository\PatientRepository;
 
@@ -26,8 +26,10 @@ class PatientPolicy implements Policy
 
         if ($user->hasPermission('patient.view.own')) {
             $patientId = $context['id'] ?? null;
-            if (!$patientId) return false;
-            
+            if (!$patientId) {
+                return false;
+            }
+
             return $this->isUserAssignedToPatient($user, (int)$patientId);
         }
 
@@ -42,7 +44,9 @@ class PatientPolicy implements Policy
 
         if ($user->hasPermission('patient.edit.own')) {
             $patientId = $context['id'] ?? null;
-            if (!$patientId) return false;
+            if (!$patientId) {
+                return false;
+            }
 
             return $this->isUserAssignedToPatient($user, (int)$patientId);
         }
