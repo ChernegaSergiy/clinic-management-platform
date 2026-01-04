@@ -2,13 +2,13 @@
 
 namespace App\Module\Kpi;
 
-use App\Core\View;
-use App\Core\Validator;
-use App\Module\Kpi\Repository\KpiRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
-use App\Module\Billing\Repository\InvoiceRepository;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\Kpi\Repository\KpiRepository;
 
 class KpiController
 {
@@ -48,7 +48,7 @@ class KpiController
         AuthGuard::check();
         Gate::authorize('kpi.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
