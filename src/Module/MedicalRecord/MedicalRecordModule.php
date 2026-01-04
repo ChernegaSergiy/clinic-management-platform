@@ -33,10 +33,6 @@ class MedicalRecordModule extends BaseModule
         $registry->addRoleMapping('medical_manager', ['medical.read', 'medical.write']);
         $registry->addRoleMapping('doctor', ['medical.read', 'medical.write']);
         $registry->addRoleMapping('nurse', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('admin', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('medical_manager', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('doctor', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('nurse', ['medical.read', 'medical.write']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
