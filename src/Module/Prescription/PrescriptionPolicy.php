@@ -3,10 +3,11 @@
 namespace App\Module\Prescription;
 
 use App\Core\Policy;
+use App\Core\User;
 use App\Module\Prescription\Repository\PrescriptionRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
 
-class PrescriptionPolicy extends Policy
+class PrescriptionPolicy implements Policy
 {
     private PrescriptionRepository $prescriptionRepository;
     private AppointmentRepository $appointmentRepository;
@@ -17,51 +18,54 @@ class PrescriptionPolicy extends Policy
         $this->appointmentRepository = new AppointmentRepository();
     }
 
-    public function view(mixed $resource): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
+        if ($user->hasPermission('prescription.view.any')) {
             return true;
         }
 
-        $role = $this->userRole();
-        $prescriptionId = (int)$resource;
-        $userId = $this->userId();
+        if ($user->hasPermission('prescription.view.own')) {
+            $prescriptionId = $context['id'] ?? null;
+            if (!$prescriptionId) return false;
 
-        if (in_array($role, ['admin', 'medical_manager'])) {
-            return true;
-        }
-
-        if (in_array($role, ['doctor', 'nurse']) && $userId) {
-            $prescription = $this->prescriptionRepository->findById($prescriptionId);
-            if ($prescription && (int)$prescription['doctor_id'] === $userId) {
-                return true;
-            }
-            if (isset($prescription['patient_id']) && $userId) {
-                return $this->appointmentRepository->isPatientAssignedToDoctor((int)$prescription['patient_id'], $userId);
-            }
+            return $this->isOwner($user, (int)$prescriptionId);
         }
 
         return false;
     }
 
-    public function create(): bool
+    public function create(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
+        return $user->hasPermission('prescription.create');
+    }
+
+    public function edit(User $user, array $context): bool
+    {
+        if ($user->hasPermission('prescription.edit.own')) {
+            $prescriptionId = $context['id'] ?? null;
+            if (!$prescriptionId) return false;
+
+            return $this->isOwner($user, (int)$prescriptionId);
         }
 
-        $role = $this->userRole();
-
-        return in_array($role, ['admin', 'doctor']);
+        return false;
     }
 
-    public function update(mixed $resource): bool
+    private function isOwner(User $user, int $prescriptionId): bool
     {
-        return $this->view($resource);
-    }
+        $userId = $user->getId();
+        if (!$userId) {
+            return false;
+        }
 
-    public function delete(mixed $resource): bool
-    {
-        return $this->view($resource);
+        $prescription = $this->prescriptionRepository->findById($prescriptionId);
+        if ($prescription && (int)$prescription['doctor_id'] === $userId) {
+            return true;
+        }
+        if (isset($prescription['patient_id']) && $userId) {
+            return $this->appointmentRepository->isPatientAssignedToDoctor((int)$prescription['patient_id'], $userId);
+        }
+
+        return false;
     }
 }
