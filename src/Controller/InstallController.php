@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\View;
+use App\Core\Http\View;
 use PDO;
 
 class InstallController
@@ -38,14 +38,16 @@ class InstallController
                 $checks['seeding'] = $this->checkSeedingStatus($dbConfig);
             }
         }
-        
+
         $allOk = array_reduce($checks, function ($carry, $check) {
             if (isset($check['status'])) {
                 return $carry && $check['status'];
             }
             // Handle nested checks like extensions
             foreach ($check as $subCheck) {
-                if (!$subCheck['status']) return false;
+                if (!$subCheck['status']) {
+                    return false;
+                }
             }
             return $carry;
         }, true);
@@ -109,7 +111,7 @@ class InstallController
             'message' => $status ? '.env файл знайдено' : '.env файл не знайдено. Скопіюйте `.env.example` в `.env` та налаштуйте його.',
         ];
     }
-    
+
     private function loadDbConfigFromEnv(): array
     {
         if (file_exists(__DIR__ . '/../../.env')) {
@@ -145,25 +147,25 @@ class InstallController
         $returnVar = 0;
         $phinxPath = realpath(__DIR__ . '/../../vendor/bin/phinx');
         $configFile = realpath(__DIR__ . '/../../phinx.php');
-        
+
         if (!$phinxPath || !$configFile) {
             return ['status' => false, 'message' => 'Phinx не знайдено. Виконайте `composer install`.'];
         }
 
         $fullCommand = sprintf('php %s status -c %s 2>&1', $phinxPath, $configFile);
         exec($fullCommand, $output, $returnVar);
-        
+
         $outputString = implode("\n", $output);
         $hasMissing = str_contains($outputString, ' down ');
 
         if ($returnVar !== 0 && !str_contains($outputString, 'Could not connect to the database')) {
-             return ['status' => false, 'message' => "Помилка виконання `phinx status`: " . $outputString];
+            return ['status' => false, 'message' => "Помилка виконання `phinx status`: " . $outputString];
         }
 
         if ($hasMissing) {
             return ['status' => false, 'message' => 'Є незастосовані міграції. Виконайте `composer db:migrate`.'];
         }
-        
+
         return ['status' => true, 'message' => 'Всі міграції застосовані.'];
     }
 
@@ -172,14 +174,14 @@ class InstallController
         try {
             $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s', $config['host'], $config['port'], $config['database']);
             $pdo = new PDO($dsn, $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            
+
             $stmt = $pdo->query("SELECT COUNT(*) as count FROM `roles`");
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($result && $result['count'] > 0) {
-                 return ['status' => true, 'message' => 'База даних містить початкові дані (ролі).'];
+                return ['status' => true, 'message' => 'База даних містить початкові дані (ролі).'];
             } else {
-                 return ['status' => false, 'message' => 'База даних порожня. Виконайте `composer db:seed` для наповнення.'];
+                return ['status' => false, 'message' => 'База даних порожня. Виконайте `composer db:seed` для наповнення.'];
             }
         } catch (\Throwable $e) {
             // This can happen if database doesn't exist yet, which is fine. Migrations check handles it.
