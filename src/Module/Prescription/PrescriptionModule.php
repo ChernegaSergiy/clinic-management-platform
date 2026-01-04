@@ -23,11 +23,12 @@ class PrescriptionModule extends BaseModule
         $registry->add('prescription.view.any', 'Перегляд будь-якого рецепту');
         $registry->add('prescription.view.own', 'Перегляд власних рецептів');
         $registry->add('prescription.edit.own', 'Редагування власних рецептів');
-        $registry->add('prescription.create', 'Створення рецептів');
+        $registry->add('prescription.create.own', 'Створення власних рецептів');
+        $registry->add('prescription.create.any', 'Створення рецептів від імені будь-якого лікаря');
 
-        $registry->addRoleMapping('admin', ['prescription.view.any', 'prescription.edit.own', 'prescription.create']);
-        $registry->addRoleMapping('medical_manager', ['prescription.view.any']);
-        $registry->addRoleMapping('doctor', ['prescription.view.own', 'prescription.edit.own', 'prescription.create']);
+        $registry->addRoleMapping('admin', ['prescription.view.any', 'prescription.edit.own', 'prescription.create.any']);
+        $registry->addRoleMapping('medical_manager', ['prescription.view.any', 'prescription.create.any']);
+        $registry->addRoleMapping('doctor', ['prescription.view.own', 'prescription.edit.own', 'prescription.create.own']);
         $registry->addRoleMapping('nurse', ['prescription.view.own']);
     }
 
