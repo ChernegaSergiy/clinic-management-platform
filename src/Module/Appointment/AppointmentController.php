@@ -50,29 +50,25 @@ class AppointmentController
     public function index(): void
     {
         AuthGuard::check();
+        $user = Gate::getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
-        $userId = (int)($_SESSION['user']['id'] ?? 0);
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
         $appointments = [];
 
-        if (Gate::allows('appointments.read_all')) {
+        if (Gate::allows('appointment.view.any')) {
             $appointments = $this->appointmentRepository->findAll();
-        } elseif (Gate::allows('appointments.read_assigned')) {
-            if ($userId) {
-                $appointments = $this->appointmentRepository->findByDoctorId($userId);
+        } elseif (Gate::allows('appointment.view.own')) {
+            if ($user && $user->getId()) {
+                $appointments = $this->appointmentRepository->findByDoctorId($user->getId());
             }
         }
-        // If neither permission is allowed, $appointments remains an empty array.
-        // Filter doctor options for assigned view if not allowed to read all
 
-
-        // Prepare doctors for calendar (need objects with id and title)
         $calendarDoctors = [];
         foreach ($doctors as $doctor) {
             if (
-                Gate::allows('appointments.read_all') ||
-                (Gate::allows('appointments.read_assigned') && (int)$doctor['id'] === $userId)
+                Gate::allows('appointment.view.any') ||
+                (Gate::allows('appointment.view.own') && (int)$doctor['id'] === $user->getId())
             ) {
                 $calendarDoctors[] = [
                     'id' => $doctor['id'],
@@ -206,7 +202,7 @@ class AppointmentController
     public function rejectWaitlist(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.write');
+        Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
@@ -222,12 +218,10 @@ class AppointmentController
     public function create(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.write');
+        Gate::authorize('appointment.create');
 
-        // Get logged-in user info
-        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
-        $loggedInUserRole = $_SESSION['user']['role_name'] ?? '';
-
+        $user = Gate::getUser();
+        
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -274,12 +268,10 @@ class AppointmentController
         }
 
         $doctorOptions = [];
-        // Filter doctors for 'doctor' role
-        if ($loggedInUserRole === 'doctor') {
-            foreach ($doctors as $doctor) {
-                if ((int)$doctor['id'] === $loggedInUserId) {
+        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
+             foreach ($doctors as $doctor) {
+                if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
-                    // Pre-select the doctor if it's the only option
                     if (empty($prefill['doctor_id'])) {
                         $prefill['doctor_id'] = $doctor['id'];
                     }
@@ -292,13 +284,11 @@ class AppointmentController
             }
         }
 
-        // Create service options array for template
         $serviceOptions = [];
         foreach ($services as $service) {
             $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
         }
 
-        // Create room options
         $roomOptions = [];
         foreach ($rooms as $room) {
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
@@ -308,7 +298,7 @@ class AppointmentController
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
-            'servicesForJs' => $services, // Pass original service objects for JavaScript
+            'servicesForJs' => $services, 
             'rooms' => $roomOptions,
             'old' => array_merge($prefill, $_GET),
             'availableSlots' => $availableSlots,
@@ -319,20 +309,16 @@ class AppointmentController
     public function store(): void
     {
         AuthGuard::check();
+        Gate::authorize('appointment.create');
 
-        $role = $_SESSION['user']['role_name'] ?? '';
-        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
+        $user = Gate::getUser();
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
-        // A doctor can only create appointments for themselves.
-        // Users with broader permissions (registrar, admin) are not affected.
-        if ($role === 'doctor' && $loggedInUserId !== $submittedDoctorId) {
+        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any') && $user->getId() !== $submittedDoctorId) {
             http_response_code(403);
             echo "Доступ заборонено: Ви можете створювати записи лише для себе.";
             exit();
         }
-
-        Gate::authorize('appointments.write');
 
         $rawInput = $_POST;
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
@@ -349,15 +335,12 @@ class AppointmentController
         ];
 
         if (!$validator->validate($rawInput, $rules)) {
-            // This is a basic failure, redirect back with a generic error
-            // A more robust solution would re-render the form, which is complex.
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $rawInput;
             header('Location: /appointments/new?' . http_build_query($rawInput));
             exit();
         }
 
-        // Advanced validation: Check if the slot is still available
         $selectedDoctorId = (int)$rawInput['doctor_id'];
         $selectedServiceId = (int)$rawInput['service_id'];
         $startTime = new \DateTime($rawInput['start_time']);
@@ -376,7 +359,6 @@ class AppointmentController
              $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
         }
 
-        // Validate room conflicts using SchedulingService
         $roomValidation = $this->schedulingService->validateAppointmentBooking([
             'doctor_id' => $selectedDoctorId,
             'start_time' => $rawInput['start_time'],
@@ -391,7 +373,6 @@ class AppointmentController
         }
 
         if (!empty($errors)) {
-            // Re-render the form with all the necessary data
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
             $services = $this->serviceRepository->findAll();
@@ -409,13 +390,11 @@ class AppointmentController
             $selectedDateStr = $startTime->format('Y-m-d');
             $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
 
-            // Create room options
             $roomOptions = [];
             foreach ($rooms as $room) {
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            // Create service options
             $serviceOptions = [];
             foreach ($services as $service) {
                 $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
@@ -427,7 +406,7 @@ class AppointmentController
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
                 'services' => $serviceOptions,
-                'servicesForJs' => $services, // Pass original service objects for JavaScript
+                'servicesForJs' => $services,
                 'rooms' => $roomOptions,
                 'availableSlots' => $availableSlots,
                 'selectedDate' => $selectedDateStr,
@@ -444,7 +423,6 @@ class AppointmentController
             $this->appointmentRepository->updateWaitlistStatus($waitlistId, 'booked');
         }
 
-        // Send notifications
         $patient = $this->patientRepository->findById((int)$rawInput['patient_id']);
         $doctor = $this->userRepository->findById($selectedDoctorId);
         if ($patient && $doctor) {
@@ -463,7 +441,6 @@ class AppointmentController
 
     private function normalizeDateTime(string $value): \DateTime
     {
-        // Try common formats: datetime-local (with T), locale with comma, plain
         $formats = [
             'Y-m-d\TH:i',
             'Y-m-d H:i',
@@ -478,65 +455,60 @@ class AppointmentController
                 return $dt;
             }
         }
-        // Fallback to PHP's parser
         return new \DateTime($value);
     }
 
     public function json(): void
     {
-        AuthGuard::check(); // Ensure user is authenticated for API access
+        AuthGuard::check();
+        $user = Gate::getUser();
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
-        $userId = $_SESSION['user']['id'] ?? 0;
         $appointments = [];
 
-        if (Gate::allows('appointments.read_all')) {
+        if (Gate::allows('appointment.view.any')) {
             if ($start && $end) {
                 $appointments = $this->appointmentRepository->findByDateRange($start, $end);
             } else {
                 $appointments = $this->appointmentRepository->findAll();
             }
-        } elseif (Gate::allows('appointments.read_assigned')) {
-            if ($userId) {
+        } elseif (Gate::allows('appointment.view.own')) {
+            if ($user && $user->getId()) {
                 if ($start && $end) {
-                    $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($userId, $start, $end); // Assuming this method exists or needs to be created
+                    $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($user->getId(), $start, $end);
                 } else {
-                    $appointments = $this->appointmentRepository->findByDoctorId($userId);
+                    $appointments = $this->appointmentRepository->findByDoctorId($user->getId());
                 }
             }
         }
-        // If neither permission is allowed, $appointments remains an empty array.
-        // If only read_assigned is allowed, ensure results are filtered by doctor_id.
 
         $events = [];
 
         $statusColors = [
-            'scheduled' => '#2185d0', // Semantic UI Blue
-            'completed' => '#21ba45', // Semantic UI Green
-            'cancelled' => '#db2828', // Semantic UI Red
-            'no-show' => '#fbbd08',   // Semantic UI Yellow
+            'scheduled' => '#2185d0', 
+            'completed' => '#21ba45', 
+            'cancelled' => '#db2828', 
+            'no-show' => '#fbbd08',
         ];
 
         foreach ($appointments as $appointment) {
-            // Event for doctor resource
             $events[] = [
                 'title' => $appointment['patient_name'] . ' (' . $appointment['doctor_name'] . ')',
                 'start' => $appointment['start_time'],
                 'end' => $appointment['end_time'],
                 'id' => $appointment['id'],
-                'color' => $statusColors[$appointment['status']] ?? '#767676', // Default grey
-                'resourceId' => $appointment['doctor_id'], // Event for doctor resource
+                'color' => $statusColors[$appointment['status']] ?? '#767676',
+                'resourceId' => $appointment['doctor_id'],
             ];
             
-            // Event for room resource (if room is assigned)
             if (!empty($appointment['room_id'])) {
                 $events[] = [
                     'title' => $appointment['patient_name'] . ' (' . ($appointment['room_name'] ?? 'Кімната ' . $appointment['room_id']) . ')',
                     'start' => $appointment['start_time'],
                     'end' => $appointment['end_time'],
-                    'id' => 'room_' . $appointment['id'], // Different ID to avoid conflicts
+                    'id' => 'room_' . $appointment['id'],
                     'color' => $statusColors[$appointment['status']] ?? '#767676',
-                    'resourceId' => 'room_' . $appointment['room_id'], // Room resource ID
+                    'resourceId' => 'room_' . $appointment['room_id'],
                 ];
             }
         }
@@ -549,7 +521,7 @@ class AppointmentController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('appointments.read', ['appointment_id' => $id]);
+        Gate::authorize('appointment.view', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -566,7 +538,7 @@ class AppointmentController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('appointments.write', ['appointment_id' => $id]);
+        Gate::authorize('appointment.edit', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -576,13 +548,10 @@ class AppointmentController
             return;
         }
 
+        $user = Gate::getUser();
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $rooms = $this->roomRepository->findAll();
-
-        // Get logged-in user info
-        $loggedInUserId = (int)($_SESSION['user']['id'] ?? 0);
-        $loggedInUserRole = $_SESSION['user']['role_name'] ?? '';
 
         $patientOptions = [];
         foreach ($patients as $patient) {
@@ -590,10 +559,9 @@ class AppointmentController
         }
 
         $doctorOptions = [];
-        // Filter doctors for 'doctor' role
-        if ($loggedInUserRole === 'doctor') {
-            foreach ($doctors as $doctor) {
-                if ((int)$doctor['id'] === $loggedInUserId) {
+        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
+             foreach ($doctors as $doctor) {
+                if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
                     break;
                 }
@@ -604,13 +572,6 @@ class AppointmentController
             }
         }
 
-        // Create room options
-        $roomOptions = [];
-        foreach ($rooms as $room) {
-            $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
-        }
-
-        // Create room options
         $roomOptions = [];
         foreach ($rooms as $room) {
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
@@ -628,11 +589,10 @@ class AppointmentController
     {
         AuthGuard::check();
         $id = (int)($_POST['id'] ?? 0);
-        Gate::authorize('appointments.write', ['appointment_id' => $id]);
+        Gate::authorize('appointment.edit', ['id' => $id]);
 
         $rawInput = $_POST;
 
-        // Normalize datetime inputs
         foreach (['start_time', 'end_time'] as $field) {
             if (!empty($_POST[$field])) {
                 try {
@@ -678,7 +638,6 @@ class AppointmentController
             }
         }
 
-        // Validate room conflicts for existing appointment
         if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
             $roomValidation = $this->schedulingService->validateAppointmentBooking([
                 'doctor_id' => (int)$_POST['doctor_id'],
@@ -712,24 +671,7 @@ class AppointmentController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            // Validate room conflicts for existing appointment
-            if (!empty($_POST['start_time']) && !empty($_POST['end_time'])) {
-                $roomValidation = $this->schedulingService->validateAppointmentBooking([
-                'doctor_id' => (int)$_POST['doctor_id'],
-                'start_time' => $_POST['start_time'],
-                'end_time' => $_POST['end_time'],
-                'room_id' => $_POST['room_id'] ?? null,
-                'exclude_id' => $id
-                ]);
-
-                if (!$roomValidation['valid']) {
-                    foreach ($roomValidation['errors'] as $error) {
-                        $errors[$error['field']] = $error['message'];
-                    }
-                }
-            }
-
-            if ($errors) { // @phpstan-ignore-line
+            if ($errors) {
                 $patients = $this->patientRepository->findAllActive();
                 $doctors = $this->userRepository->findAllDoctors();
                 $patientOptions = [];
@@ -770,7 +712,7 @@ class AppointmentController
     {
         AuthGuard::check();
         $id = (int)($_POST['id'] ?? 0);
-        Gate::authorize('appointments.write', ['appointment_id' => $id]);
+        Gate::authorize('appointment.cancel', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -791,7 +733,6 @@ class AppointmentController
                 $doctor['first_name'] . ' ' . $doctor['last_name'],
                 $appointment['start_time']
             );
-            $this->notificationService->createNotification($patient['id'], $messagePatient); // Assuming patient ID is user ID for notification
         }
         if ($doctor) {
             $messageDoctor = sprintf(
@@ -809,7 +750,7 @@ class AppointmentController
     public function showWaitlist(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.read');
+        Gate::authorize('appointment.view.any');
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -835,13 +776,11 @@ class AppointmentController
     public function addPatientToWaitlist(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.write');
+        Gate::authorize('appointment.create');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
-            // 'desired_start_time' => ['required', 'date'],
-            // 'desired_end_time' => ['date'],
         ];
 
         if (!$validator->validate($_POST, $rules)) {
@@ -877,7 +816,7 @@ class AppointmentController
     public function showLoadAnalytics(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.read_analytics'); // Or a more specific permission like 'dashboard.view_analytics'
+        Gate::authorize('appointment.view.any'); 
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
@@ -926,7 +865,7 @@ class AppointmentController
     public function fulfillWaitlist(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.write');
+        Gate::authorize('appointment.create');
         $id = (int)($_GET['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
@@ -950,7 +889,6 @@ class AppointmentController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        // Create service options array for template
         $serviceOptions = [];
         foreach ($services as $service) {
             $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
@@ -961,7 +899,6 @@ class AppointmentController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        // Create prefill data from waitlist entry
         $prefill = [
             'patient_id' => $entry['patient_id'],
             'doctor_id' => $entry['desired_doctor_id'],
@@ -972,7 +909,7 @@ class AppointmentController
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
-            'servicesForJs' => $services, // Pass original service objects for JavaScript
+            'servicesForJs' => $services,
             'rooms' => $roomOptions,
             'old' => array_merge($prefill, $_GET),
             'availableSlots' => [],
@@ -983,7 +920,7 @@ class AppointmentController
     public function cancelWaitlist(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointments.write');
+        Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
