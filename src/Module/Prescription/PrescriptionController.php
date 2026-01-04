@@ -53,9 +53,9 @@ class PrescriptionController
     public function create(): void
     {
         AuthGuard::check();
-        $patientId = (int)($_GET['patient_id'] ?? 0);
-        Gate::authorize('prescription.create', ['patient_id' => $patientId]);
+        Gate::authorize('prescription.create', ['doctor_id' => Gate::getUser()->getId()]); // Check if current user can create prescriptions
 
+        $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
 
         if (!$patient) {
@@ -83,7 +83,7 @@ class PrescriptionController
     public function store(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescription.create', ['patient_id' => $_POST['patient_id']]);
+        Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
