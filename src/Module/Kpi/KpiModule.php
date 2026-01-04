@@ -6,7 +6,7 @@ use App\Core\BaseModule;
 use App\Core\Router;
 use App\Core\PermissionRegistry;
 use App\Core\PolicyRegistry;
-use App\Module\Admin\KpiController;
+use App\Module\Kpi\Controller\KpiController;
 
 class KpiModule extends BaseModule
 {
