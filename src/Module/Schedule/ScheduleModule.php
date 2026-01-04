@@ -22,7 +22,7 @@ class ScheduleModule extends BaseModule
         $router->add('GET', '/admin/schedules/edit', [ScheduleController::class, 'adminEdit']);
         $router->add('POST', '/admin/schedules/update', [ScheduleController::class, 'adminUpdate']);
         $router->add('POST', '/admin/schedules/exceptions/add', [ScheduleController::class, 'adminAddException']);
-            $router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
+        $router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
