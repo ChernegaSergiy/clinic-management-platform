@@ -35,16 +35,17 @@ class PatientModule extends BaseModule
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('patients.read', 'Перегляд пацієнтів');
-        $registry->add('patients.write', 'Редагування пацієнтів');
-        $registry->add('patients.manage', 'Керування пацієнтами');
+        $registry->add('patient.view.any', 'Перегляд будь-якого пацієнта');
+        $registry->add('patient.view.own', 'Перегляд призначених пацієнтів');
+        $registry->add('patient.edit.any', 'Редагування будь-якого пацієнта');
+        $registry->add('patient.edit.own', 'Редагування призначених пацієнтів');
+        $registry->add('patient.create', 'Створення пацієнтів');
 
-        $registry->addRoleMapping('admin', ['patients.read', 'patients.write', 'patients.manage']);
-        $registry->addRoleMapping('medical_manager', ['patients.read', 'patients.write', 'patients.manage']);
-        $registry->addRoleMapping('registrar', ['patients.read', 'patients.write', 'patients.manage']);
-        $registry->addRoleMapping('doctor', ['patients.read']);
-        $registry->addRoleMapping('nurse', ['patients.read']);
-        $registry->addRoleMapping('billing', ['patients.read']);
+        $registry->addRoleMapping('admin', ['patient.view.any', 'patient.edit.any', 'patient.create']);
+        $registry->addRoleMapping('medical_manager', ['patient.view.any']);
+        $registry->addRoleMapping('registrar', ['patient.view.any', 'patient.edit.any', 'patient.create']);
+        $registry->addRoleMapping('doctor', ['patient.view.own', 'patient.edit.own']);
+        $registry->addRoleMapping('nurse', ['patient.view.own']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
