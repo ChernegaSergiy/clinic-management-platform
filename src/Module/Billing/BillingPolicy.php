@@ -3,50 +3,27 @@
 namespace App\Module\Billing;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class BillingPolicy extends Policy
+class BillingPolicy implements Policy
 {
-    public function view(mixed $resource = null): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['billing']);
+        return $user->hasPermission('billing.read');
     }
 
-    public function create(mixed $resource = null): bool
+    public function create(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['billing']);
+        return $user->hasPermission('billing.manage');
     }
 
-    public function update(mixed $resource = null): bool
+    public function update(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['billing']);
+        return $user->hasPermission('billing.manage');
     }
 
-    public function delete(mixed $resource = null): bool
+    public function delete(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['billing']);
+        return $user->hasPermission('billing.manage');
     }
 }
