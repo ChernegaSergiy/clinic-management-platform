@@ -44,19 +44,18 @@ class PatientController
     {
         AuthGuard::check();
         $searchTerm = $_GET['search'] ?? '';
-        $currentUserId = $_SESSION['user']['id'] ?? 0;
+        $user = Gate::getUser();
         $patients = [];
 
-        if (Gate::allows('patients.read_all')) {
+        if (Gate::allows('patient.view.any')) {
             $patients = $this->patientRepository->findAll($searchTerm);
-        } elseif (Gate::allows('patients.read_assigned')) {
-            if ($currentUserId) {
-                $patientIds = $this->appointmentRepository->findPatientIdsByDoctor((int)$currentUserId);
+        } elseif (Gate::allows('patient.view.own')) {
+            if ($user && $user->getId()) {
+                $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($user->getId());
                 $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
             }
         }
-        // If neither permission is allowed, $patients remains an empty array.
-
+        
         View::render('@modules/Patient/templates/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,
@@ -66,14 +65,14 @@ class PatientController
     public function create(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write');
+        Gate::authorize('patient.create');
         View::render('@modules/Patient/templates/new.html.twig');
     }
 
     public function store(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write');
+        Gate::authorize('patient.create');
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -117,7 +116,7 @@ class PatientController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patients.read', ['patient_id' => $id]);
+        Gate::authorize('patient.view', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -141,7 +140,7 @@ class PatientController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patients.write', ['patient_id' => $id]);
+        Gate::authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -158,7 +157,7 @@ class PatientController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patients.write', ['patient_id' => $id]);
+        Gate::authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -207,7 +206,7 @@ class PatientController
     public function exportCsv(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.read_all');
+        Gate::authorize('patient.view.any');
 
         $patients = $this->patientRepository->findAll();
 
@@ -225,7 +224,7 @@ class PatientController
     public function exportPatientsToJson(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.read_all');
+        Gate::authorize('patient.view.any');
 
         $patients = $this->patientRepository->findAll();
 
@@ -242,7 +241,7 @@ class PatientController
     public function importPatientsFromJson(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.manage');
+        Gate::authorize('patient.create');
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             View::render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
@@ -340,7 +339,7 @@ class PatientController
     public function toggleStatus(): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.manage');
+        Gate::authorize('patient.edit.any');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -357,7 +356,7 @@ class PatientController
     public function addPolicy(int $patientId): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+        Gate::authorize('patient.edit', ['id' => $patientId]);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -377,7 +376,7 @@ class PatientController
     public function storePolicy(int $patientId): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+        Gate::authorize('patient.edit', ['id' => $patientId]);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -423,7 +422,7 @@ class PatientController
     public function editPolicy(int $patientId): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+        Gate::authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -447,7 +446,7 @@ class PatientController
     public function updatePolicy(int $patientId): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+        Gate::authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -498,7 +497,7 @@ class PatientController
     public function deletePolicy(int $patientId): void
     {
         AuthGuard::check();
-        Gate::authorize('patients.write', ['patient_id' => $patientId]);
+        Gate::authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_POST['id'] ?? 0);
         $policy = $this->insuranceService->getPatientPolicy($policyId);
@@ -510,6 +509,4 @@ class PatientController
         header('Location: /patients/show?id=' . $patientId);
         exit();
     }
-
-
 }
