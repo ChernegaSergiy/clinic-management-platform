@@ -21,21 +21,28 @@ class MedicalRecordModule extends BaseModule
         $router->add('POST', '/medical-records/attachments/upload', [MedicalRecordController::class, 'uploadAttachment']);
         $router->add('GET', '/medical-records/attachments/download', [MedicalRecordController::class, 'downloadAttachment']);
         $router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
-        $router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
-    }
-
-    public function registerPermissions(PermissionRegistry $registry): void
-    {
-        $registry->add('medical.read', 'Перегляд медичних записів');
-        $registry->add('medical.write', 'Редагування медичних записів');
-
-        $registry->addRoleMapping('admin', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('medical_manager', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('doctor', ['medical.read', 'medical.write']);
-        $registry->addRoleMapping('nurse', ['medical.read', 'medical.write']);
+            $router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('medical_record', MedicalRecordPolicy::class);
     }
 }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+        $registry->register('medical_record', MedicalRecordPolicy::class);
+    }
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
+        $registry->register('medical_record', MedicalRecordPolicy::class);
+    }
