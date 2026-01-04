@@ -33,14 +33,14 @@ class PrescriptionController
     {
         AuthGuard::check();
         $searchTerm = $_GET['search'] ?? '';
-        $currentUserId = $_SESSION['user']['id'] ?? 0;
+        $user = Gate::getUser();
         $prescriptions = [];
 
-        if (Gate::allows('prescriptions.read_all')) {
+        if (Gate::allows('prescription.view.any')) {
             $prescriptions = $this->prescriptionRepository->findAll($searchTerm);
-        } elseif (Gate::allows('prescriptions.read_assigned')) {
-            if ($currentUserId) {
-                $prescriptions = $this->prescriptionRepository->findByDoctorId($currentUserId, $searchTerm);
+        } elseif (Gate::allows('prescription.view.own')) {
+            if ($user && $user->getId()) {
+                $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);
             }
         }
 
@@ -54,7 +54,7 @@ class PrescriptionController
     {
         AuthGuard::check();
         $patientId = (int)($_GET['patient_id'] ?? 0);
-        Gate::authorize('prescriptions.write', ['patient_id' => $patientId]);
+        Gate::authorize('prescription.create', ['patient_id' => $patientId]);
 
         $patient = $this->patientRepository->findById($patientId);
 
@@ -76,14 +76,14 @@ class PrescriptionController
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
-            'currentDoctorId' => $_SESSION['user']['id'],
+            'currentDoctorId' => Gate::getUser()->getId(),
         ]);
     }
 
     public function store(): void
     {
         AuthGuard::check();
-        Gate::authorize('prescriptions.write', ['patient_id' => $_POST['patient_id']]);
+        Gate::authorize('prescription.create', ['patient_id' => $_POST['patient_id']]);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $rules = [
@@ -112,7 +112,7 @@ class PrescriptionController
                 'patient' => $patient,
                 'doctors' => $doctorOptions,
                 'medicalRecords' => $medicalRecords,
-                'currentDoctorId' => $_SESSION['user']['id'],
+                'currentDoctorId' => Gate::getUser()->getId(),
             ]);
             return;
         }
@@ -121,20 +121,16 @@ class PrescriptionController
 
         if ($prescriptionId && !empty($_POST['items'])) {
             foreach ($_POST['items'] as $itemData) {
-                // Find inventory item by medication name
-                // This is a simplified approach. In a real system, you'd link by ID.
                 $inventoryItem = $this->inventoryItemRepository->findByName($itemData['medication_name']);
 
                 if ($inventoryItem && isset($itemData['dosage'])) {
-                    // Assuming dosage is a simple number for quantity to deduct
-                    // Or, more complex logic to parse dosage to quantity
                     $quantityToDeduct = (int)$itemData['dosage'];
 
                     if ($quantityToDeduct > 0) {
                         $this->inventoryItemRepository->decreaseQuantity(
                             $inventoryItem['id'],
                             $quantityToDeduct,
-                            $_SESSION['user']['id'] ?? null,
+                            Gate::getUser()->getId(),
                             'Виконання рецепту #' . $prescriptionId
                         );
                     }
@@ -149,7 +145,7 @@ class PrescriptionController
     {
         AuthGuard::check();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('prescriptions.read', ['prescription_id' => $id]);
+        Gate::authorize('prescription.view', ['id' => $id]);
 
         $prescription = $this->prescriptionRepository->findById($id);
 
