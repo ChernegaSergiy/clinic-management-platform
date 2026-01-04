@@ -36,7 +36,7 @@ class LabOrderController
     public function create(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.write_assigned');
+        Gate::authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -62,7 +62,7 @@ class LabOrderController
     public function store(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.write_assigned');
+        Gate::authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -94,7 +94,7 @@ class LabOrderController
 
         if ($labOrderId) {
             $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $labOrderId;
-            $qrCodeHash = hash('sha256', $qrCodeData); // Generate a hash of the QR code data
+            $qrCodeHash = hash('sha256', $qrCodeData);
             $updateSuccess = $this->labOrderRepository->updateQrCodeHash($labOrderId, $qrCodeHash);
             if (!$updateSuccess) {
                 error_log("Failed to update QR code hash for lab order ID: " . $labOrderId);
@@ -129,9 +129,9 @@ class LabOrderController
             return;
         }
 
-        Gate::authorize('lab.read', ['lab_order_id' => $id]);
+        Gate::authorize('lab_order.view', ['id' => $id]);
 
-        $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id; // URL to the order details
+        $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
         View::render('@modules/LabOrder/templates/show.html.twig', [
@@ -153,7 +153,7 @@ class LabOrderController
             return;
         }
 
-        Gate::authorize('lab.write', ['lab_order_id' => $id]);
+        Gate::authorize('lab_order.edit', ['id' => $id]);
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -180,7 +180,7 @@ class LabOrderController
             return;
         }
 
-        Gate::authorize('lab.write', ['lab_order_id' => $id]);
+        Gate::authorize('lab_order.edit', ['id' => $id]);
 
         $validator = new \App\Core\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
@@ -204,7 +204,7 @@ class LabOrderController
     public function import(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.manage');
+        Gate::authorize('lab_order.edit.any');
 
         View::render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -216,7 +216,7 @@ class LabOrderController
     public function processImport(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.manage');
+        Gate::authorize('lab_order.edit.any');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -232,7 +232,6 @@ class LabOrderController
             exit();
         }
 
-        // Save the file temporarily for processing
         $tempDir = dirname(__DIR__, 3) . '/uploads/temp/';
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0775, true);
@@ -255,7 +254,7 @@ class LabOrderController
             header('Location: /lab-orders/import/confirm');
             exit();
         } catch (\Exception $e) {
-            unlink($tempPath); // Clean up temp file
+            unlink($tempPath);
             $_SESSION['errors']['file'] = 'Помилка структурної валідації: ' . $e->getMessage();
             header('Location: /lab-orders/import');
             exit();
@@ -265,7 +264,7 @@ class LabOrderController
     public function confirmImport(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.manage');
+        Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -283,7 +282,7 @@ class LabOrderController
     public function finalizeImport(): void
     {
         AuthGuard::check();
-        Gate::authorize('lab.manage');
+        Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
@@ -298,13 +297,12 @@ class LabOrderController
             $validatedData = $this->labImportService->validateLogical($parsedData);
             $orderId = $this->labImportService->importLabOrder($validatedData);
 
-            // Clean up session and temp file
             unset($_SESSION['hl7_dicom_parsed_data']);
             unset($_SESSION['hl7_dicom_temp_path']);
             unlink($tempPath);
 
             $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
-            header('Location: /lab-orders/show?id=' . $orderId); // Redirect to the new order
+            header('Location: /lab-orders/show?id=' . $orderId);
             exit();
         } catch (\Exception $e) {
             $_SESSION['errors']['import'] = 'Помилка логічної валідації або імпорту: ' . $e->getMessage();
@@ -312,6 +310,4 @@ class LabOrderController
             exit();
         }
     }
-
-
 }
