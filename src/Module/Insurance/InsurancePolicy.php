@@ -3,26 +3,12 @@
 namespace App\Module\Insurance;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class InsurancePolicy extends Policy
+class InsurancePolicy implements Policy
 {
-    public function view(mixed $resource = null): bool
+    public function manage(User $user, array $context): bool
     {
-        return $this->isAdmin();
-    }
-
-    public function create(mixed $resource = null): bool
-    {
-        return $this->isAdmin();
-    }
-
-    public function update(mixed $resource = null): bool
-    {
-        return $this->isAdmin();
-    }
-
-    public function delete(mixed $resource = null): bool
-    {
-        return $this->isAdmin();
+        return $user->hasPermission('insurance.manage');
     }
 }
