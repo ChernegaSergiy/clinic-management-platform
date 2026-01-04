@@ -3,46 +3,27 @@
 namespace App\Module\Hrm;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class HrmPolicy extends Policy
+class HrmPolicy implements Policy
 {
-    public function view(mixed $resource): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        if (in_array($role, ['admin', 'hr_manager', 'medical_manager'])) {
-            return true;
-        }
-
-        return false;
+        return $user->hasPermission('hrm.read');
     }
 
-    public function create(): bool
+    public function create(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        if (in_array($role, ['admin', 'hr_manager'])) {
-            return true;
-        }
-
-        return false;
+        return $user->hasPermission('hrm.write');
     }
 
-    public function update(mixed $resource): bool
+    public function update(User $user, array $context): bool
     {
-        return $this->create();
+        return $user->hasPermission('hrm.write');
     }
 
-    public function delete(mixed $resource): bool
+    public function delete(User $user, array $context): bool
     {
-        return $this->create();
+        return $user->hasPermission('hrm.manage');
     }
 }
