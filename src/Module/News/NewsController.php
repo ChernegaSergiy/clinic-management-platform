@@ -2,10 +2,10 @@
 
 namespace App\Module\News;
 
-use App\Core\AuthGuard;
-use App\Core\Gate;
-use App\Core\View;
-use App\Core\Validator;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Database;
 use App\Module\News\Repository\NewsRepository;
 use App\Module\User\Repository\UserRepository; // To get author info
