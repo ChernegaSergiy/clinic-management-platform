@@ -46,7 +46,7 @@ class RoleSeeder extends AbstractSeed
         ];
 
         $rolesTable = $this->table('roles');
-        
+
         $existingRoles = $this->fetchAll('SELECT name FROM roles');
         $existingRoleNames = array_column($existingRoles, 'name');
 
