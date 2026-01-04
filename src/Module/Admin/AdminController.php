@@ -2,7 +2,7 @@
 
 namespace App\Module\Admin;
 
-use App\Database;
+use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;

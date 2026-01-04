@@ -6,7 +6,7 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
-use App\Database;
+use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
 use App\Module\User\Repository\UserRepository; // To get author info
 

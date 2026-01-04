@@ -2,7 +2,7 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Database;
+use App\Database\Database;
 use PDO;
 
 class InvoiceRepository implements InvoiceRepositoryInterface

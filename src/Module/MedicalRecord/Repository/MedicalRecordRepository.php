@@ -2,7 +2,7 @@
 
 namespace App\Module\MedicalRecord\Repository;
 
-use App\Database;
+use App\Database\Database;
 use PDO;
 
 class MedicalRecordRepository implements MedicalRecordRepositoryInterface

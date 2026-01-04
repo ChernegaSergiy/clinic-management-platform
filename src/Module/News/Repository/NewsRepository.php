@@ -2,7 +2,7 @@
 
 namespace App\Module\News\Repository;
 
-use App\Database;
+use App\Database\Database;
 use PDO;
 
 class NewsRepository

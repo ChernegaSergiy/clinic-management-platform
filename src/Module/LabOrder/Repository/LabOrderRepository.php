@@ -2,7 +2,7 @@
 
 namespace App\Module\LabOrder\Repository;
 
-use App\Database;
+use App\Database\Database;
 use PDO;
 
 class LabOrderRepository implements LabOrderRepositoryInterface

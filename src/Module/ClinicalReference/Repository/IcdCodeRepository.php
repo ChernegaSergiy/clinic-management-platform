@@ -2,7 +2,7 @@
 
 namespace App\Module\ClinicalReference\Repository;
 
-use App\Database;
+use App\Database\Database;
 use PDO;
 
 class IcdCodeRepository
