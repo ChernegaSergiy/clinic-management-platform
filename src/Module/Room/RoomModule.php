@@ -4,6 +4,8 @@ namespace App\Module\Room;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Room\RoomController;
 
 class RoomModule extends BaseModule
@@ -18,5 +20,16 @@ class RoomModule extends BaseModule
         $router->add('POST', '/admin/rooms/edit', [RoomController::class, 'update']);
         $router->add('POST', '/admin/rooms/delete', [RoomController::class, 'delete']);
         $router->add('GET', '/api/calendar/rooms', [RoomController::class, 'apiRooms']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('rooms.manage', 'Керування приміщеннями');
+
+        $registry->addRoleMapping('admin', ['rooms.manage']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
