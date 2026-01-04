@@ -48,7 +48,7 @@ class RoomRepository
             ':equipment' => $data['equipment'] ?? null,
             ':is_available' => $data['is_available'] ?? true,
         ]);
-        
+
         return (int)$this->pdo->lastInsertId();
     }
 
@@ -56,22 +56,22 @@ class RoomRepository
     {
         $setParts = [];
         $params = [':id' => $id];
-        
+
         $allowedFields = ['name', 'type', 'capacity', 'location', 'equipment', 'is_available'];
-        
+
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $data)) {
                 $setParts[] = "$field = :$field";
                 $params[":$field"] = $data[$field];
             }
         }
-        
+
         if (empty($setParts)) {
             return true;
         }
-        
+
         $sql = "UPDATE rooms SET " . implode(', ', $setParts) . ", updated_at = CURRENT_TIMESTAMP WHERE id = :id";
-        
+
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute($params);
     }

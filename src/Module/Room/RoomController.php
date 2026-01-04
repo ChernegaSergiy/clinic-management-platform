@@ -2,10 +2,10 @@
 
 namespace App\Module\Room;
 
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\Room\Repository\RoomRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class RoomController
 {
@@ -21,7 +21,7 @@ class RoomController
         $this->authorizeAdmin();
         $searchTerm = $_GET['search'] ?? '';
         $rooms = $this->roomRepository->findAll();
-        
+
         View::render('@modules/Room/templates/index.html.twig', [
             'rooms' => $rooms,
             'searchTerm' => $searchTerm,
@@ -47,7 +47,7 @@ class RoomController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],
@@ -123,7 +123,7 @@ class RoomController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],
@@ -167,10 +167,10 @@ class RoomController
     public function apiRooms(): void
     {
         header('Content-Type: application/json');
-        
+
         $rooms = $this->roomRepository->findAvailable();
         $resources = [];
-        
+
         foreach ($rooms as $room) {
             $resources[] = [
                 'id' => 'room_' . $room['id'],
@@ -181,7 +181,7 @@ class RoomController
                 'equipment' => $room['equipment']
             ];
         }
-        
+
         echo json_encode($resources);
     }
 
