@@ -30,5 +30,6 @@ class InventoryModule extends BaseModule
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('inventory', InventoryPolicy::class);
     }
 }
