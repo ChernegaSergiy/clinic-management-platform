@@ -1,7 +1,10 @@
-
 <?php
 
 namespace App\Core\Module;
+
+use App\Core\Auth\PermissionRegistry;
+use App\Core\Auth\PolicyRegistry;
+use App\Core\Http\Router;
 
 abstract class BaseModule implements ModuleInterface
 {

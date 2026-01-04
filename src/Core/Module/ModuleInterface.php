@@ -2,6 +2,10 @@
 
 namespace App\Core\Module;
 
+use App\Core\Auth\PermissionRegistry;
+use App\Core\Auth\PolicyRegistry;
+use App\Core\Http\Router;
+
 interface ModuleInterface
 {
     public function getName(): string;
