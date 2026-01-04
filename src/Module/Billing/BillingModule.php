@@ -4,6 +4,8 @@ namespace App\Module\Billing;
 
 use App\Core\BaseModule;
 use App\Core\Router;
+use App\Core\PermissionRegistry;
+use App\Core\PolicyRegistry;
 use App\Module\Billing\BillingController;
 use App\Module\Billing\ContractController;
 
@@ -30,5 +32,18 @@ class BillingModule extends BaseModule
         $router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
         $router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
         $router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
+    }
+
+    public function registerPermissions(PermissionRegistry $registry): void
+    {
+        $registry->add('billing.read', 'Перегляд рахунків');
+        $registry->add('billing.manage', 'Керування рахунками');
+
+        $registry->addRoleMapping('admin', ['billing.read', 'billing.manage']);
+        $registry->addRoleMapping('billing', ['billing.read', 'billing.manage']);
+    }
+
+    public function registerPolicies(PolicyRegistry $registry): void
+    {
     }
 }
