@@ -28,9 +28,6 @@ class NewsModule extends BaseModule
         $registry->add('news.manage', 'Керування новинами');
 
         $registry->addRoleMapping('admin', ['news.read', 'news.manage']);
-        $registry->add('news.manage', 'Керування новинами');
-
-        $registry->addRoleMapping('admin', ['news.read', 'news.manage']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
