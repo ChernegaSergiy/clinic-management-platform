@@ -2,11 +2,11 @@
 
 namespace App\Module\Dashboard\Service;
 
-use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\User\Repository\UserRepository;
 use DateTimeImmutable;
 
 class KpiCalculatorService

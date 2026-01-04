@@ -2,12 +2,12 @@
 
 namespace App\Module\Dashboard\Service;
 
-use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\Patient\Repository\PatientRepository;
 use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Inventory\Repository\InventoryItemRepository;
+use App\Module\Kpi\Repository\KpiRepository;
+use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use DateTime;
 
 class DashboardService
