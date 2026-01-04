@@ -2,18 +2,18 @@
 
 namespace App\Module\Appointment;
 
-use App\Core\Validator;
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Service\NotificationService;
+use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Patient\Repository\PatientRepository;
-use App\Module\User\Repository\UserRepository;
-use App\Core\NotificationService;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 use App\Module\Billing\Repository\ServiceRepository;
+use App\Module\Patient\Repository\PatientRepository;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\Schedule\Service\SchedulingService;
+use App\Module\User\Repository\UserRepository;
 
 class AppointmentController
 {
@@ -119,7 +119,7 @@ class AppointmentController
     {
         $rawInput = $_POST;
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -173,10 +173,10 @@ class AppointmentController
                 'gender' => 'other',
             ]);
             if (!$patientId) {
-                 $_SESSION['errors'] = ['patient' => ['Could not create a new patient record.']];
-                 $_SESSION['old'] = $rawInput;
-                 header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
-                 exit();
+                $_SESSION['errors'] = ['patient' => ['Could not create a new patient record.']];
+                $_SESSION['old'] = $rawInput;
+                header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
+                exit();
             }
         } else {
             $patientId = $patient['id'];
@@ -221,7 +221,7 @@ class AppointmentController
         Gate::authorize('appointment.create');
 
         $user = Gate::getUser();
-        
+
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -269,7 +269,7 @@ class AppointmentController
 
         $doctorOptions = [];
         if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
-             foreach ($doctors as $doctor) {
+            foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
                     if (empty($prefill['doctor_id'])) {
@@ -298,7 +298,7 @@ class AppointmentController
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
-            'servicesForJs' => $services, 
+            'servicesForJs' => $services,
             'rooms' => $roomOptions,
             'old' => array_merge($prefill, $_GET),
             'availableSlots' => $availableSlots,
@@ -324,7 +324,7 @@ class AppointmentController
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
         $errors = null;
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -346,7 +346,7 @@ class AppointmentController
         $startTime = new \DateTime($rawInput['start_time']);
 
         $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
-        
+
         $isSlotAvailable = false;
         foreach ($availableSlots as $slot) {
             if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
@@ -356,7 +356,7 @@ class AppointmentController
         }
 
         if (!$isSlotAvailable) {
-             $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
+            $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
         }
 
         $roomValidation = $this->schedulingService->validateAppointmentBooking([
@@ -485,9 +485,9 @@ class AppointmentController
         $events = [];
 
         $statusColors = [
-            'scheduled' => '#2185d0', 
-            'completed' => '#21ba45', 
-            'cancelled' => '#db2828', 
+            'scheduled' => '#2185d0',
+            'completed' => '#21ba45',
+            'cancelled' => '#db2828',
             'no-show' => '#fbbd08',
         ];
 
@@ -500,7 +500,7 @@ class AppointmentController
                 'color' => $statusColors[$appointment['status']] ?? '#767676',
                 'resourceId' => $appointment['doctor_id'],
             ];
-            
+
             if (!empty($appointment['room_id'])) {
                 $events[] = [
                     'title' => $appointment['patient_name'] . ' (' . ($appointment['room_name'] ?? 'Кімната ' . $appointment['room_id']) . ')',
@@ -560,7 +560,7 @@ class AppointmentController
 
         $doctorOptions = [];
         if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
-             foreach ($doctors as $doctor) {
+            foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
                     break;
@@ -615,7 +615,7 @@ class AppointmentController
         }
 
         $errors = null;
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -778,7 +778,7 @@ class AppointmentController
         AuthGuard::check();
         Gate::authorize('appointment.create');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'patient_id' => ['required'],
         ];
@@ -816,7 +816,7 @@ class AppointmentController
     public function showLoadAnalytics(): void
     {
         AuthGuard::check();
-        Gate::authorize('appointment.view.any'); 
+        Gate::authorize('appointment.view.any');
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);

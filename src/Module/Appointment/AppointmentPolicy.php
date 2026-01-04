@@ -2,8 +2,8 @@
 
 namespace App\Module\Appointment;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 use App\Module\Appointment\Repository\AppointmentRepository;
 
 class AppointmentPolicy implements Policy
@@ -23,7 +23,9 @@ class AppointmentPolicy implements Policy
 
         if ($user->hasPermission('appointment.view.own')) {
             $appointmentId = $context['id'] ?? null;
-            if (!$appointmentId) return false;
+            if (!$appointmentId) {
+                return false;
+            }
 
             return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
         }
@@ -39,7 +41,9 @@ class AppointmentPolicy implements Policy
 
         if ($user->hasPermission('appointment.edit.own')) {
             $appointmentId = $context['id'] ?? null;
-            if (!$appointmentId) return false;
+            if (!$appointmentId) {
+                return false;
+            }
 
             return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
         }
@@ -50,7 +54,7 @@ class AppointmentPolicy implements Policy
     {
         return $user->hasPermission('appointment.create');
     }
-    
+
     public function cancel(User $user, array $context): bool
     {
         return $this->edit($user, $context);
