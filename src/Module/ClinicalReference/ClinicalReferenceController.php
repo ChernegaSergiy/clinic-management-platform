@@ -2,13 +2,13 @@
 
 namespace App\Module\ClinicalReference;
 
-use App\Core\AuthGuard;
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use ChernegaSergiy\Nk0252021Parser\Parser;
 use ChernegaSergiy\Nk0262021Parser\Parser as Nk026Parser;
-use App\Core\Gate;
 
 class ClinicalReferenceController
 {
