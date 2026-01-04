@@ -4,15 +4,15 @@ namespace App\Module\MedicalRecord;
 
 use App\Core\Policy;
 use App\Core\User;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 
 class MedicalRecordPolicy implements Policy
 {
-    private AppointmentRepository $appointmentRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
 
     public function __construct()
     {
-        $this->appointmentRepository = new AppointmentRepository();
+        $this->medicalRecordRepository = new MedicalRecordRepository();
     }
 
     public function view(User $user, array $context): bool
@@ -22,10 +22,10 @@ class MedicalRecordPolicy implements Policy
         }
 
         if ($user->hasPermission('medical_record.view.own')) {
-            $patientId = $context['patient_id'] ?? null;
-            if (!$patientId) return false;
+            $recordId = $context['id'] ?? null;
+            if (!$recordId) return false;
 
-            return $this->isUserAssignedToPatient($user, (int)$patientId);
+            return $this->isOwner($user, (int)$recordId);
         }
 
         return false;
@@ -34,10 +34,10 @@ class MedicalRecordPolicy implements Policy
     public function edit(User $user, array $context): bool
     {
         if ($user->hasPermission('medical_record.edit.own')) {
-            $patientId = $context['patient_id'] ?? null;
-            if (!$patientId) return false;
+            $recordId = $context['id'] ?? null;
+            if (!$recordId) return false;
 
-            return $this->isUserAssignedToPatient($user, (int)$patientId);
+            return $this->isOwner($user, (int)$recordId);
         }
         return false;
     }
@@ -47,12 +47,13 @@ class MedicalRecordPolicy implements Policy
         return $user->hasPermission('medical_record.create');
     }
 
-    private function isUserAssignedToPatient(User $user, int $patientId): bool
+    private function isOwner(User $user, int $recordId): bool
     {
         $userId = $user->getId();
         if (!$userId) {
             return false;
         }
-        return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $userId);
+        $medicalRecord = $this->medicalRecordRepository->findById($recordId);
+        return $medicalRecord && (int)$medicalRecord['doctor_id'] === $userId;
     }
 }
