@@ -2,10 +2,10 @@
 
 namespace App\Module\Inventory;
 
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\Inventory\Repository\InventoryItemRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class InventoryController
 {
@@ -55,7 +55,7 @@ class InventoryController
         AuthGuard::check();
         Gate::authorize('inventory.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],
@@ -140,7 +140,7 @@ class InventoryController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],

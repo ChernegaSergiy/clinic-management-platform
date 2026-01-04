@@ -3,8 +3,8 @@
 namespace App\Module\Inventory\Repository;
 
 use App\Database;
-use PDO;
 use App\Module\Billing\Repository\InvoiceRepository;
+use PDO;
 
 class InventoryItemRepository implements InventoryItemRepositoryInterface
 {
