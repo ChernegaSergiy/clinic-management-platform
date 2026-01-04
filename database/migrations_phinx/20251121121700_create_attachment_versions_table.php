@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateAttachmentVersionsTable extends AbstractMigration
 {
     public function change()
@@ -13,8 +15,8 @@ class CreateAttachmentVersionsTable extends AbstractMigration
               ->addColumn('size', 'integer')
               ->addColumn('created_by', 'integer', ['null' => true, 'signed' => false])
               ->addTimestamps()
-              ->addForeignKey('attachment_id', 'attachments', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('created_by', 'users', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('attachment_id', 'attachments', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('created_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
               ->addIndex(['attachment_id', 'version_number'], ['unique' => true])
               ->addIndex(['attachment_id'])
               ->addIndex(['created_by'])

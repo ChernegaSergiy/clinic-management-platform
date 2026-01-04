@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateAttachmentAclTable extends AbstractMigration
 {
     public function change()
@@ -12,9 +14,9 @@ class CreateAttachmentAclTable extends AbstractMigration
               ->addColumn('can_view', 'boolean', ['default' => false])
               ->addColumn('can_edit', 'boolean', ['default' => false])
               ->addTimestamps()
-              ->addForeignKey('attachment_id', 'attachments', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('user_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('role_id', 'roles', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('attachment_id', 'attachments', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['attachment_id', 'user_id', 'role_id'], ['unique' => true])
               ->addIndex(['attachment_id'])
               ->addIndex(['user_id'])

@@ -17,8 +17,8 @@ final class CreatePatientInsurancePoliciesTable extends AbstractMigration
               ->addColumn('valid_to', 'date', ['null' => true])
               ->addColumn('is_active', 'boolean', ['default' => true])
               ->addTimestamps()
-              ->addForeignKey('patient_id', 'patients', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('insurance_company_id', 'insurance_companies', 'id', ['delete'=> 'RESTRICT', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('patient_id', 'patients', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('insurance_company_id', 'insurance_companies', 'id', ['delete' => 'RESTRICT', 'update' => 'NO_ACTION'])
               ->create();
     }
 }

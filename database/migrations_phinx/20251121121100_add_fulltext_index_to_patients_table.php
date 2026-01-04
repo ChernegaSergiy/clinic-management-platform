@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class AddFulltextIndexToPatientsTable extends AbstractMigration
 {
     public function up()

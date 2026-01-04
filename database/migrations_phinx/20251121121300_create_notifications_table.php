@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateNotificationsTable extends AbstractMigration
 {
     public function change()
@@ -10,7 +12,7 @@ class CreateNotificationsTable extends AbstractMigration
               ->addColumn('message', 'text')
               ->addColumn('is_read', 'boolean', ['default' => false])
               ->addTimestamps()
-              ->addForeignKey('user_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['user_id'])
               ->create();
     }

@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreatePatientsTable extends AbstractMigration
 {
     public function change()

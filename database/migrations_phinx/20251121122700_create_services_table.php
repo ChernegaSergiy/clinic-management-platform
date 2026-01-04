@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateServicesTable extends AbstractMigration
 {
     public function change()
@@ -11,7 +13,7 @@ class CreateServicesTable extends AbstractMigration
               ->addColumn('price', 'decimal', ['precision' => 10, 'scale' => 2])
               ->addColumn('category_id', 'integer', ['null' => true, 'signed' => false])
               ->addColumn('is_active', 'boolean', ['default' => true])
-              ->addForeignKey('category_id', 'service_categories', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('category_id', 'service_categories', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
               ->addIndex(['name'], ['unique' => true])
               ->addIndex(['category_id'])
               ->create();

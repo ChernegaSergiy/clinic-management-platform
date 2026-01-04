@@ -18,7 +18,7 @@ class CreateUsersTable extends AbstractMigration
               ->addIndex(['username'], ['unique' => true])
               ->addIndex(['email'], ['unique' => true])
               ->addIndex(['role_id'])
-              ->addForeignKey('role_id', 'roles', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
               ->create();
     }
 }

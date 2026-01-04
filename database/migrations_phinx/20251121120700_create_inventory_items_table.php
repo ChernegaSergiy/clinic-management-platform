@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateInventoryItemsTable extends AbstractMigration
 {
     public function change()

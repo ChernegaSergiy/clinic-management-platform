@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
@@ -16,7 +17,7 @@ final class CreateScheduleExceptionsTable extends AbstractMigration
               ->addColumn('is_available', 'boolean')
               ->addColumn('notes', 'text', ['null' => true])
               ->addTimestamps()
-              ->addForeignKey('doctor_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('doctor_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['doctor_id', 'exception_date'])
               ->create();
     }

@@ -14,7 +14,7 @@ final class CreateUserOAuthIdentitiesTable extends AbstractMigration
               ->addColumn('provider_id', 'string', ['limit' => 255, 'null' => false])
               ->addTimestamps()
               ->addIndex(['user_id', 'provider', 'provider_id'], ['unique' => true])
-              ->addForeignKey('user_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->create();
     }
 }

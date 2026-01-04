@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateLabOrdersTable extends AbstractMigration
 {
     public function change()
@@ -14,9 +16,9 @@ class CreateLabOrdersTable extends AbstractMigration
               ->addColumn('qr_code_hash', 'string', ['limit' => 255, 'null' => true])
               ->addColumn('results', 'text', ['null' => true])
               ->addTimestamps()
-              ->addForeignKey('patient_id', 'patients', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('doctor_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('medical_record_id', 'medical_records', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('patient_id', 'patients', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('doctor_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('medical_record_id', 'medical_records', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['qr_code_hash'], ['unique' => true])
               ->addIndex(['patient_id'])
               ->addIndex(['doctor_id'])

@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreatePrescriptionItemsTable extends AbstractMigration
 {
     public function change()
@@ -12,7 +14,7 @@ class CreatePrescriptionItemsTable extends AbstractMigration
               ->addColumn('frequency', 'string', ['limit' => 255])
               ->addColumn('duration', 'string', ['limit' => 255, 'null' => true])
               ->addColumn('notes', 'text', ['null' => true])
-              ->addForeignKey('prescription_id', 'prescriptions', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('prescription_id', 'prescriptions', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['prescription_id'])
               ->create();
     }

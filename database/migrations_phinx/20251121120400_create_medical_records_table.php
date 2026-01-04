@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateMedicalRecordsTable extends AbstractMigration
 {
     public function change()
@@ -16,9 +18,9 @@ class CreateMedicalRecordsTable extends AbstractMigration
               ->addColumn('ehealth_record_id', 'string', ['limit' => 36, 'null' => true])
               ->addColumn('notes', 'text', ['null' => true])
               ->addTimestamps()
-              ->addForeignKey('patient_id', 'patients', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('appointment_id', 'appointments', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('doctor_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('patient_id', 'patients', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('appointment_id', 'appointments', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('doctor_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['ehealth_record_id'], ['unique' => true])
               ->addIndex(['patient_id'])
               ->addIndex(['appointment_id'])

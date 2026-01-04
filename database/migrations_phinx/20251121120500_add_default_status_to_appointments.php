@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class AddDefaultStatusToAppointments extends AbstractMigration
 {
     public function up()

@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateDictionaryValuesTable extends AbstractMigration
 {
     public function change()
@@ -12,7 +14,7 @@ class CreateDictionaryValuesTable extends AbstractMigration
               ->addColumn('order_num', 'integer', ['default' => 0])
               ->addColumn('is_active', 'boolean', ['default' => true])
               ->addTimestamps()
-              ->addForeignKey('dictionary_id', 'dictionaries', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('dictionary_id', 'dictionaries', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['dictionary_id', 'value'], ['unique' => true])
               ->addIndex(['dictionary_id'])
               ->create();

@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateLabResourcesTable extends AbstractMigration
 {
     public function change()

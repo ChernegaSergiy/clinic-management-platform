@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateInvoicesTable extends AbstractMigration
 {
     public function change()
@@ -15,9 +17,9 @@ class CreateInvoicesTable extends AbstractMigration
               ->addColumn('paid_date', 'datetime', ['null' => true])
               ->addColumn('notes', 'text', ['null' => true])
               ->addTimestamps()
-              ->addForeignKey('patient_id', 'patients', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('appointment_id', 'appointments', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('medical_record_id', 'medical_records', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('patient_id', 'patients', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('appointment_id', 'appointments', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
+              ->addForeignKey('medical_record_id', 'medical_records', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
               ->addIndex(['patient_id'])
               ->addIndex(['appointment_id'])
               ->addIndex(['medical_record_id'])

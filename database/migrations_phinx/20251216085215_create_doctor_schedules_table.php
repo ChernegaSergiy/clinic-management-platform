@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
@@ -15,7 +16,7 @@ final class CreateDoctorSchedulesTable extends AbstractMigration
               ->addColumn('end_time', 'time')
               ->addColumn('is_available', 'boolean', ['default' => true])
               ->addTimestamps()
-              ->addForeignKey('doctor_id', 'users', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('doctor_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['doctor_id', 'day_of_week'], ['unique' => true])
               ->create();
     }

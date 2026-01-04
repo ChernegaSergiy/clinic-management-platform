@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateDictionariesTable extends AbstractMigration
 {
     public function change()

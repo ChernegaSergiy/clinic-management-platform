@@ -32,7 +32,7 @@ final class CreateEmployeesTable extends AbstractMigration
             ->addColumn('salary', 'decimal', ['precision' => 10, 'scale' => 2, 'null' => true])
             ->addColumn('contact_phone', 'string', ['limit' => 20, 'null' => true])
             ->addColumn('status', 'string', ['limit' => 50, 'default' => 'active', 'comment' => 'e.g., active, on_leave, terminated'])
-            ->addForeignKey('user_id', 'users', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+            ->addForeignKey('user_id', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
             ->addIndex(['last_name', 'first_name'])
             ->addIndex(['status'])
             ->create();

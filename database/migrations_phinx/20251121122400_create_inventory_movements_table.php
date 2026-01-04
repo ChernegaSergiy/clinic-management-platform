@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateInventoryMovementsTable extends AbstractMigration
 {
     public function change()
@@ -13,8 +15,8 @@ class CreateInventoryMovementsTable extends AbstractMigration
               ->addColumn('new_quantity', 'integer')
               ->addColumn('reason', 'text', ['null' => true])
               ->addTimestamps()
-              ->addForeignKey('inventory_item_id', 'inventory_items', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
-              ->addForeignKey('user_id', 'users', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('inventory_item_id', 'inventory_items', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
+              ->addForeignKey('user_id', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
               ->addIndex(['inventory_item_id'])
               ->addIndex(['user_id'])
               ->create();

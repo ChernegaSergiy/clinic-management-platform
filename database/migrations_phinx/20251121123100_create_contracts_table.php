@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreateContractsTable extends AbstractMigration
 {
     public function change()

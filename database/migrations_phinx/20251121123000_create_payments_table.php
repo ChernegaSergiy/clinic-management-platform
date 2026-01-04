@@ -1,5 +1,7 @@
 <?php
+
 use Phinx\Migration\AbstractMigration;
+
 class CreatePaymentsTable extends AbstractMigration
 {
     public function change()
@@ -12,7 +14,7 @@ class CreatePaymentsTable extends AbstractMigration
               ->addColumn('transaction_id', 'string', ['limit' => 255, 'null' => true])
               ->addColumn('payment_date', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
               ->addColumn('notes', 'text', ['null' => true])
-              ->addForeignKey('invoice_id', 'invoices', 'id', ['delete'=> 'CASCADE', 'update'=> 'NO_ACTION'])
+              ->addForeignKey('invoice_id', 'invoices', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->addIndex(['invoice_id'])
               ->create();
     }

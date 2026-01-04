@@ -7,7 +7,7 @@ class AddPendingStatusToPatients extends AbstractMigration
     public function change()
     {
         $table = $this->table('patients');
-        
+
         // Modify the enum column to include 'pending' status
         $this->execute("
             ALTER TABLE patients 
