@@ -49,5 +49,6 @@ class PatientModule extends BaseModule
 
     public function registerPolicies(PolicyRegistry $registry): void
     {
+        $registry->register('patient', PatientPolicy::class);
     }
 }
