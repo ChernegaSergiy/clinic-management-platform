@@ -2,11 +2,11 @@
 
 namespace App\Module\Billing;
 
-use App\Core\View;
-use App\Core\Validator;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Billing\Repository\ContractRepository;
-use App\Core\AuthGuard;
-use App\Core\Gate;
 
 class ContractController
 {
@@ -41,7 +41,7 @@ class ContractController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],
@@ -140,7 +140,7 @@ class ContractController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],

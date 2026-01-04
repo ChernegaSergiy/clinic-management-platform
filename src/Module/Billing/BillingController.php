@@ -2,23 +2,23 @@
 
 namespace App\Module\Billing;
 
-use App\Core\View;
-use App\Core\Validator;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Export\CsvExporter;
+use App\Core\Export\ExcelExporter;
+use App\Core\Export\PdfExporter;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\Patient\Repository\PatientRepository;
-use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
-use App\Core\CsvExporter;
-use App\Core\PdfExporter;
-use App\Core\ExcelExporter;
-use App\Core\AuthGuard;
-use App\Core\Gate;
+use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 use App\Module\Insurance\Service\InsuranceService;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\Patient\Repository\PatientRepository;
 
 class BillingController
 {
@@ -38,7 +38,7 @@ class BillingController
         $this->medicalRecordRepository = new MedicalRecordRepository();
         $this->serviceRepository = new ServiceRepository();
         $this->serviceBundleRepository = new ServiceBundleRepository();
-        
+
         $this->insuranceService = new InsuranceService(
             new InsuranceCompanyRepository(),
             new PatientInsurancePolicyRepository(),
@@ -86,7 +86,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -132,7 +132,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -203,7 +203,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
@@ -244,7 +244,7 @@ class BillingController
                 $this->invoiceRepository->updateInsuranceDue($invoiceId, 0.00, $amount);
             }
         }
-        
+
         $_SESSION['success_message'] = "Рахунок успішно створено.";
         header('Location: /billing');
         exit();
@@ -285,7 +285,7 @@ class BillingController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'payment_method' => ['required'],
@@ -382,7 +382,7 @@ class BillingController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'in:pending,paid,cancelled'],
@@ -435,7 +435,7 @@ class BillingController
             ];
         }
 
-        $exporter = new \App\Core\CsvExporter($headers, $exportData);
+        $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
         $exporter->download('invoices_export.csv');
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Module\Billing;
 
-use App\Core\Policy;
-use App\Core\User;
+use App\Core\Auth\Policy;
+use App\Core\Model\User;
 
 class BillingPolicy implements Policy
 {
