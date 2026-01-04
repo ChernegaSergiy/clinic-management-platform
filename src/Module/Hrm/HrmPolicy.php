@@ -12,7 +12,6 @@ class HrmPolicy extends Policy
             return true;
         }
 
-        $userId = $this->userId();
         $role = $this->userRole();
 
         if (in_array($role, ['admin', 'hr_manager', 'medical_manager'])) {
