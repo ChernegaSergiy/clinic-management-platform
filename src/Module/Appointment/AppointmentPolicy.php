@@ -3,9 +3,10 @@
 namespace App\Module\Appointment;
 
 use App\Core\Policy;
+use App\Core\User;
 use App\Module\Appointment\Repository\AppointmentRepository;
 
-class AppointmentPolicy extends Policy
+class AppointmentPolicy implements Policy
 {
     private AppointmentRepository $appointmentRepository;
 
@@ -14,45 +15,53 @@ class AppointmentPolicy extends Policy
         $this->appointmentRepository = new AppointmentRepository();
     }
 
-    public function view(mixed $resource): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
+        if ($user->hasPermission('appointment.view.any')) {
             return true;
         }
 
-        $role = $this->userRole();
-        $appointmentId = (int)$resource;
-        $userId = $this->userId();
+        if ($user->hasPermission('appointment.view.own')) {
+            $appointmentId = $context['id'] ?? null;
+            if (!$appointmentId) return false;
 
-        if (in_array($role, ['admin', 'medical_manager', 'registrar', 'nurse'])) {
-            return true;
-        }
-
-        if ($role === 'doctor' && $userId) {
-            return $this->appointmentRepository->isAppointmentOwnedByDoctor($appointmentId, $userId);
+            return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
         }
 
         return false;
     }
 
-    public function create(): bool
+    public function edit(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
+        if ($user->hasPermission('appointment.edit.any')) {
             return true;
         }
 
-        $role = $this->userRole();
+        if ($user->hasPermission('appointment.edit.own')) {
+            $appointmentId = $context['id'] ?? null;
+            if (!$appointmentId) return false;
 
-        return in_array($role, ['admin', 'medical_manager', 'registrar', 'doctor']);
+            return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
+        }
+        return false;
     }
 
-    public function update(mixed $resource): bool
+    public function create(User $user, array $context): bool
     {
-        return $this->view($resource);
+        return $user->hasPermission('appointment.create');
+    }
+    
+    public function cancel(User $user, array $context): bool
+    {
+        return $this->edit($user, $context);
     }
 
-    public function delete(mixed $resource): bool
+    private function isUserOwnerOfAppointment(User $user, int $appointmentId): bool
     {
-        return $this->view($resource);
+        $userId = $user->getId();
+        if (!$userId) {
+            return false;
+        }
+        return $this->appointmentRepository->isAppointmentOwnedByDoctor($appointmentId, $userId);
     }
 }
