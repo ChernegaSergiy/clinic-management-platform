@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Core\View;
+use App\Core\Http\View;
 use Symfony\Component\Yaml\Yaml;
 
 class PageController
