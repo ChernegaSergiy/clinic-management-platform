@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance;
 
-use App\Core\AuthGuard;
-use App\Core\Gate;
-use App\Core\Validator;
-use App\Core\View;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Database;
-use App\Module\Insurance\Service\InsuranceService;
 use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\Insurance\Service\InsuranceService;
 
 class InsuranceController
 {
