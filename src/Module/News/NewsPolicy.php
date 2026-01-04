@@ -3,38 +3,27 @@
 namespace App\Module\News;
 
 use App\Core\Policy;
+use App\Core\User;
 
-class NewsPolicy extends Policy
+class NewsPolicy implements Policy
 {
-    public function view(mixed $resource): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return in_array($role, ['admin', 'medical_manager', 'registrar', 'doctor', 'nurse', 'billing', 'lab_technician', 'inventory_manager', 'hr_manager']);
+        return $user->hasPermission('news.read');
     }
 
-    public function create(): bool
+    public function create(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        $role = $this->userRole();
-
-        return $role === 'admin';
+        return $user->hasPermission('news.manage');
     }
 
-    public function update(mixed $resource): bool
+    public function update(User $user, array $context): bool
     {
-        return $this->create();
+        return $user->hasPermission('news.manage');
     }
 
-    public function delete(mixed $resource): bool
+    public function delete(User $user, array $context): bool
     {
-        return $this->create();
+        return $user->hasPermission('news.manage');
     }
 }
