@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\Admin\Repository;
+namespace App\Module\Kpi\Repository;
 
 use App\Database;
 use PDO;
