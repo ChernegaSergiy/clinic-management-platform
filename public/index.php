@@ -56,12 +56,21 @@ session_start();
 
 $router = new Router();
 
+$permissionRegistry = new \App\Core\PermissionRegistry();
+$policyRegistry = new \App\Core\PolicyRegistry();
+
 $moduleManager = new ModuleManager();
 $moduleLoader = new ModuleLoader($moduleManager);
 $moduleLoader->loadAll();
 
 $moduleManager->bootstrapAll();
+
+$moduleManager->registerPermissions($permissionRegistry);
+$moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerRoutes($router);
+
+\App\Core\Gate::setPermissionRegistry($permissionRegistry);
+\App\Core\Gate::setPolicyRegistry($policyRegistry);
 
 $router->add('GET', '/', [PageController::class, 'home']);
 $router->add('GET', '/about', [PageController::class, 'about']);
