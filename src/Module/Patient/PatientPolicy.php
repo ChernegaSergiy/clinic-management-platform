@@ -3,72 +3,59 @@
 namespace App\Module\Patient;
 
 use App\Core\Policy;
+use App\Core\User;
 use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Patient\Repository\PatientRepository;
 
-class PatientPolicy extends Policy
+class PatientPolicy implements Policy
 {
     private AppointmentRepository $appointmentRepository;
+    private PatientRepository $patientRepository;
 
     public function __construct()
     {
         $this->appointmentRepository = new AppointmentRepository();
+        $this->patientRepository = new PatientRepository();
     }
 
-    public function view(mixed $resource): bool
+    public function view(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
+        if ($user->hasPermission('patient.view.any')) {
             return true;
         }
 
-        $role = $this->userRole();
-        $patientId = (int)$resource;
-        $userId = $this->userId();
-
-        if (in_array($role, ['admin', 'medical_manager', 'registrar'])) {
-            return true;
-        }
-
-        if (in_array($role, ['doctor', 'nurse']) && $userId) {
-            return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $userId);
+        if ($user->hasPermission('patient.view.own')) {
+            $patientId = $context['id'] ?? null;
+            if (!$patientId) return false;
+            
+            return $this->isUserAssignedToPatient($user, (int)$patientId);
         }
 
         return false;
     }
 
-    public function create(): bool
+    public function edit(User $user, array $context): bool
     {
-        if ($this->isAdmin()) {
+        if ($user->hasPermission('patient.edit.any')) {
             return true;
         }
 
-        $role = $this->userRole();
+        if ($user->hasPermission('patient.edit.own')) {
+            $patientId = $context['id'] ?? null;
+            if (!$patientId) return false;
 
-        return in_array($role, ['admin', 'medical_manager', 'registrar']);
-    }
-
-    public function update(mixed $resource): bool
-    {
-        if ($this->isAdmin()) {
-            return true;
+            return $this->isUserAssignedToPatient($user, (int)$patientId);
         }
-
-        $role = $this->userRole();
-        $patientId = (int)$resource;
-        $userId = $this->userId();
-
-        if (in_array($role, ['admin', 'medical_manager', 'registrar'])) {
-            return true;
-        }
-
-        if (in_array($role, ['doctor']) && $userId) {
-            return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $userId);
-        }
-
         return false;
     }
 
-    public function delete(mixed $resource): bool
+    public function create(User $user, array $context): bool
     {
-        return $this->create();
+        return $user->hasPermission('patient.create');
+    }
+
+    private function isUserAssignedToPatient(User $user, int $patientId): bool
+    {
+        return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
     }
 }
