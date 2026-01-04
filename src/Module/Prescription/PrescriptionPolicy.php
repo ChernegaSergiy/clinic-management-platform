@@ -36,7 +36,21 @@ class PrescriptionPolicy implements Policy
 
     public function create(User $user, array $context): bool
     {
-        return $user->hasPermission('prescription.create');
+        if ($user->hasPermission('prescription.create.any')) {
+            return true;
+        }
+
+        if ($user->hasPermission('prescription.create.own')) {
+            $submittedDoctorId = $context['doctor_id'] ?? null;
+            if (!$submittedDoctorId) {
+                // If doctor_id is not provided, assume it's for the current user,
+                // or the controller should ensure it's the current user's ID.
+                return true;
+            }
+            return $user->getId() === (int)$submittedDoctorId;
+        }
+
+        return false;
     }
 
     public function edit(User $user, array $context): bool
