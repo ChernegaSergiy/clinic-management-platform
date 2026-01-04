@@ -2,12 +2,12 @@
 
 namespace App\Module\User;
 
-use App\Core\AuthGuard;
-use App\Core\View;
-use App\Module\User\Repository\UserRepository;
+use App\Core\Auth\AuthGuard;
+use App\Core\Http\View;
 use App\Module\Admin\Repository\AuthConfigRepository;
-use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\Hrm\Repository\HrmRepository;
+use App\Module\User\Repository\UserOAuthIdentityRepository;
+use App\Module\User\Repository\UserRepository;
 
 class UserController
 {

@@ -2,13 +2,13 @@
 
 namespace App\Module\User;
 
-use App\Core\BaseModule;
-use App\Core\Router;
-use App\Core\PermissionRegistry;
-use App\Core\PolicyRegistry;
+use App\Core\Auth\PermissionRegistry;
+use App\Core\Auth\PolicyRegistry;
+use App\Core\Http\Router;
+use App\Core\Module\BaseModule;
 use App\Module\User\AuthController;
-use App\Module\User\UserController;
 use App\Module\User\OAuthController;
+use App\Module\User\UserController;
 
 class UserModule extends BaseModule
 {

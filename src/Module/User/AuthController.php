@@ -2,12 +2,12 @@
 
 namespace App\Module\User;
 
-use App\Core\View;
-use App\Core\Validator;
-use App\Module\User\Repository\UserRepository;
-use App\Core\AuthGuard;
+use App\Core\Auth\AuthGuard;
+use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\User\Repository\RoleRepository;
+use App\Module\User\Repository\UserRepository;
 
 class AuthController
 {
@@ -41,7 +41,7 @@ class AuthController
         // Ensure at least one admin exists (useful for fresh installs without seeding)
         $this->userRepository->ensureDefaultAdminExists();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'email' => ['required', 'email'],
             'password' => ['required'],

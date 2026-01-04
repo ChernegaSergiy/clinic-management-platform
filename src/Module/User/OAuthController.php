@@ -2,13 +2,13 @@
 
 namespace App\Module\User;
 
-use App\Module\User\Repository\UserRepository;
-use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
-use League\OAuth2\Client\Provider\Google;
+use App\Module\User\Repository\UserOAuthIdentityRepository;
+use App\Module\User\Repository\UserRepository;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\Facebook;
 use League\OAuth2\Client\Provider\Github;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\Google;
 
 class OAuthController
 {
