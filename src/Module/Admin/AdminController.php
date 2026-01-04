@@ -2,16 +2,16 @@
 
 namespace App\Module\Admin;
 
-use App\Core\View;
-use App\Module\User\Repository\UserRepository;
-use App\Module\User\Repository\RoleRepository;
-use App\Module\Admin\Repository\DictionaryRepository;
+use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
+use App\Core\Http\View;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
-use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\Billing\Repository\ServiceRepository; // Added
-use App\Core\AuthGuard;
-use App\Core\Gate;
+use App\Module\Admin\Repository\DictionaryRepository;
+use App\Module\Billing\Repository\ServiceRepository;
+use App\Module\Kpi\Repository\KpiRepository; // Added
+use App\Module\User\Repository\RoleRepository;
+use App\Module\User\Repository\UserRepository;
 
 class AdminController
 {
@@ -78,7 +78,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -196,7 +196,7 @@ class AdminController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -275,7 +275,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:roles'], // Need to implement unique validation in Validator
             'description' => ['required'],
@@ -328,7 +328,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:roles,name,' . $id], // Need to implement unique validation in Validator
             'description' => ['required'],
@@ -407,7 +407,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:dictionaries,name'], // Corrected unique validation
             'description' => ['required'],
@@ -460,7 +460,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:dictionaries,name,' . $id], // Corrected unique validation
             'description' => ['required'],
@@ -508,7 +508,7 @@ class AdminController
         $this->authorizeAdmin();
 
         $dictionaryId = (int)($_POST['dictionary_id'] ?? 0);
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'dictionary_id' => ['required'],
             'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId],
@@ -557,7 +557,7 @@ class AdminController
         $value = $this->dictionaryRepository->findValueById($id);
         $dictionaryId = $value['dictionary_id'];
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'dictionary_id' => ['required'],
             'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId . ',id,' . $id],
@@ -616,7 +616,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'provider' => ['required', 'unique:auth_configs,provider'],
         ]);
@@ -673,7 +673,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'provider' => ['required', 'unique:auth_configs,provider,' . $id],
         ]);
@@ -748,7 +748,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:backup_policies,name'],
             'frequency' => ['required'],
@@ -803,7 +803,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:backup_policies,name,' . $id],
             'frequency' => ['required'],
@@ -857,7 +857,7 @@ class AdminController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:kpi_definitions,name'],
             'kpi_type' => ['required'],
@@ -916,7 +916,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:kpi_definitions,name,' . $id],
             'kpi_type' => ['required'],
@@ -984,7 +984,7 @@ class AdminController
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:services,name'],
             'price' => ['required', 'numeric'],
@@ -1050,7 +1050,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:services,name,' . $id],
             'price' => ['required', 'numeric'],
@@ -1110,7 +1110,7 @@ class AdminController
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:service_categories,name'],
             'description' => [], // Optional
@@ -1165,7 +1165,7 @@ class AdminController
             return;
         }
 
-        $validator = new \App\Core\Validator(\App\Database::getInstance());
+        $validator = new \App\Core\Validation\Validator(\App\Database::getInstance());
         $validator->validate($_POST, [
             'name' => ['required', 'unique:service_categories,name,' . $id],
             'description' => [], // Optional
