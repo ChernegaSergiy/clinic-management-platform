@@ -8,7 +8,7 @@ use App\Module\User\Repository\RoleRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
-use App\Module\Admin\Repository\KpiRepository;
+use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\Billing\Repository\ServiceRepository; // Added
 use App\Core\AuthGuard;
 use App\Core\Gate;
