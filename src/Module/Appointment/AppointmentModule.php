@@ -46,9 +46,6 @@ class AppointmentModule extends BaseModule
         $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
         $registry->addRoleMapping('nurse', ['appointments.read']);
         $registry->addRoleMapping('billing', ['appointments.read']);
-        $registry->addRoleMapping('registrar', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('doctor', ['appointments.read', 'appointments.write']);
-        $registry->addRoleMapping('nurse', ['appointments.read']);
     }
 
     public function registerPolicies(PolicyRegistry $registry): void
