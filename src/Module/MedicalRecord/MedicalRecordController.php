@@ -40,7 +40,7 @@ class MedicalRecordController
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
         if ($appointment) {
-            Gate::authorize('medical.write', ['patient_id' => $appointment['patient_id']]);
+            Gate::authorize('medical_record.create', ['patient_id' => $appointment['patient_id']]);
         }
 
         if (!$appointment) {
@@ -60,15 +60,15 @@ class MedicalRecordController
     public function index(): void
     {
         AuthGuard::check();
+        $user = Gate::getUser();
         $searchTerm = $_GET['search'] ?? '';
-        $currentUserId = $_SESSION['user']['id'] ?? 0;
         $records = [];
 
-        if (Gate::allows('medical.read_all')) {
+        if (Gate::allows('medical_record.view.any')) {
             $records = $this->medicalRecordRepository->findAll($searchTerm);
-        } elseif (Gate::allows('medical.read_assigned')) {
-            if ($currentUserId) {
-                $records = $this->medicalRecordRepository->findByDoctorId((int)$currentUserId, $searchTerm);
+        } elseif (Gate::allows('medical_record.view.own')) {
+            if ($user && $user->getId()) {
+                $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);
             }
         }
 
@@ -84,7 +84,7 @@ class MedicalRecordController
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
         if ($appointment) {
-            Gate::authorize('medical.write', ['patient_id' => $appointment['patient_id']]);
+            Gate::authorize('medical_record.create', ['patient_id' => $appointment['patient_id']]);
         }
 
         if (!$appointment) {
@@ -93,13 +93,11 @@ class MedicalRecordController
             return;
         }
 
-        // Normalize visit_date to DB format
         if (!empty($_POST['visit_date'])) {
             try {
                 $dt = new \DateTime($_POST['visit_date']);
                 $_POST['visit_date'] = $dt->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
-                // let validator catch it
             }
         }
 
@@ -137,13 +135,12 @@ class MedicalRecordController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $_SESSION['user']['id'] ?? null
+                        Gate::getUser()->getId()
                     );
                 }
             }
         }
 
-        // Оновлюємо статус запису на "виконано"
         $this->appointmentRepository->updateStatus($appointmentId, 'completed');
 
         header('Location: /patients/show?id=' . $appointment['patient_id']);
@@ -162,16 +159,15 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.view', ['patient_id' => $record['patient_id']]);
 
-        // Log the view event
         $this->auditLogger->log(
             'medical_record',
             $id,
             'view',
             null,
             null,
-            $_SESSION['user']['id'] ?? null
+            Gate::getUser()->getId()
         );
 
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
@@ -220,7 +216,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
 
         View::render('@modules/MedicalRecord/templates/edit.html.twig', [
             'record' => $record,
@@ -242,14 +238,13 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
 
         if (!empty($_POST['visit_date'])) {
             try {
                 $dt = new \DateTime($_POST['visit_date']);
                 $_POST['visit_date'] = $dt->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
-                // Let validator handle invalid date.
             }
         }
 
@@ -297,7 +292,7 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical.write', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.edit', ['patient_id' => $record['patient_id']]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
@@ -313,7 +308,7 @@ class MedicalRecordController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $_SESSION['user']['id'] ?? null
+                        Gate::getUser()->getId()
                     );
                 }
             }
@@ -344,17 +339,13 @@ class MedicalRecordController
             return;
         }
 
-        Gate::authorize('medical.read', ['patient_id' => $record['patient_id']]);
+        Gate::authorize('medical_record.view', ['patient_id' => $record['patient_id']]);
 
-        // Check ACL (simplified for now, assuming only uploader can download or public)
-        // More complex ACL check would go here, using AttachmentService::checkViewAccess
         $uploadBase = dirname(__DIR__, 3) . '/uploads/';
         $candidates = [];
-        // Stored relative filepath from AttachmentService (expected)
         if (!empty($attachment['filepath'])) {
             $candidates[] = $uploadBase . ltrim($attachment['filepath'], '/');
         }
-        // Fallback: search by filename within entity folder (in case filepath stored differently)
         $path = $uploadBase . 'medical_record/' . $medicalRecordId . '/';
         $path .= ($attachment['filename'] ?? '');
         $candidates[] = $path;
