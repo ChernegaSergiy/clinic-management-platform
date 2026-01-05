@@ -35,7 +35,34 @@
                 <form method="GET" action="/logout" style="display: grid; gap: 0.8rem;">
                     <button type="submit" class="btn btn--ghost" style="width: 100%;">Вийти з системи</button>
                 </form>
+
+                <p style="text-align: center; font-size: 0.75rem; margin-top: 1.5rem;">
+                    Немає доступу до додатку? <a href="#" onclick="toggleBackupCodeField(); return false;" style="color: var(--color-primary);">Введіть код відновлення</a>
+                </p>
+
+                <div id="backup-code-field" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: var(--border-thin);">
+                    <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">Введіть один з ваших кодів відновлення:</p>
+                    <form method="POST" action="/user/mfa/verify" style="display: grid; gap: 0.8rem;">
+                        <div>
+                            <input class="booking-input" type="text" name="code" placeholder="XXXX-XXXX" required autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn btn--secondary" style="width: 100%;">Використати код відновлення</button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function toggleBackupCodeField() {
+    var field = document.getElementById('backup-code-field');
+    field.style.display = field.style.display === 'none' ? 'block' : 'none';
+    if (field.style.display === 'block') {
+        field.querySelector('input').focus();
+    }
+}
+</script>
 {% endblock %}
