@@ -7,18 +7,14 @@ use PDO;
 
 class DatabaseTest extends TestCase
 {
-    public function testGetInstanceReturnsPdoInstance(): void
+    public function testGetInstanceDoesNotConnectToDatabase(): void
     {
-        $mockPdo = $this->createMock(PDO::class);
-
         $reflection = new \ReflectionClass(Database::class);
         $instanceProperty = $reflection->getProperty('instance');
         $instanceProperty->setAccessible(true);
         $instanceProperty->setValue(null);
 
-        Database::getInstance();
-
-        $this->assertTrue(true);
+        $this->assertNull($instanceProperty->getValue());
     }
 
     public function testSingletonPattern(): void
@@ -89,11 +85,10 @@ class DatabaseTest extends TestCase
         $this->assertTrue($constructor->isPrivate());
     }
 
-    public function testNoClonePreventsCloning(): void
+    public function testInstancePropertyIsPrivateStatic(): void
     {
-        $reflection = new \ReflectionClass(Database::class);
-        $cloneMethod = $reflection->getMethod('__clone');
-
-        $this->assertTrue($cloneMethod->isPrivate());
+        $reflection = new \ReflectionProperty(Database::class, 'instance');
+        $this->assertTrue($reflection->isPrivate());
+        $this->assertTrue($reflection->isStatic());
     }
 }

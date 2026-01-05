@@ -76,9 +76,10 @@ class RouterTest extends TestCase
 
     public function testParseUrlRemovesQueryString(): void
     {
+        $_SERVER['REQUEST_URI'] = '/api?foo=bar&baz=qux';
         $capturedPath = null;
         $this->router->add('GET', '/api', function () use (&$capturedPath) {
-            $capturedPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+            $capturedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         });
         $this->router->dispatch('GET', '/api?foo=bar&baz=qux');
         $this->assertEquals('/api', $capturedPath);
