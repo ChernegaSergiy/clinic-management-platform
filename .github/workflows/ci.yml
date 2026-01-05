@@ -10,9 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  phpstan:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
 
@@ -21,8 +20,6 @@ jobs:
       with:
         php-version: '8.2'
         extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
-        ini-values: post_max_size=256M, upload_max_filesize=256M
-        coverage: none # Disable Xdebug or PCOV for faster execution if not needed for coverage reports
 
     - name: Install Composer dependencies
       run: composer install --prefer-dist --no-interaction --no-progress
@@ -30,8 +27,36 @@ jobs:
     - name: Run PHPStan
       run: composer stan
 
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
+
     - name: Run PHP_CodeSniffer
       run: composer cs
+
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
 
     - name: Run PHPUnit tests
       run: composer test
