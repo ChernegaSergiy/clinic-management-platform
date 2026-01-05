@@ -22,7 +22,7 @@
                 {% set _ = session.error_message is null %}
             {% endif %}
 
-            <div class="ui two column grid">
+            <div class="ui stackable two column grid">
                 <div class="column">
                     <h3 class="ui header">1. Встановіть додаток</h3>
                     <p>Завантажте Google Authenticator або інший TOTP-сумісний додаток:</p>
@@ -34,13 +34,13 @@
                 </div>
                 <div class="column">
                     <h3 class="ui header">2. Відскануйте QR-код</h3>
-                    <div class="ui card">
-                        <div class="image">
-                            <img src="{{ qrCode }}" alt="QR Code" style="width: 200px; margin: 0 auto;">
+                    <div class="ui card" style="margin: 0 auto;">
+                        <div class="image" style="padding: 20px; text-align: center; background: #fff;">
+                            <img src="{{ qrCode }}" alt="QR Code" style="max-width: 180px; width: 100%; height: auto; display: block; margin: 0 auto;">
                         </div>
                         <div class="content">
                             <div class="header">Або введіть вручну:</div>
-                            <code style="word-break: break-all;">{{ secret }}</code>
+                            <code style="word-break: break-all; font-size: 12px;">{{ secret }}</code>
                         </div>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
             <form action="/user/mfa/setup" method="POST" class="ui form">
                 <div class="field">
                     <label for="code">Код 2FA</label>
-                    <input type="text" id="code" name="code" placeholder="000000" required>
+                    <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 18px; letter-spacing: 3px; max-width: 200px;">
                 </div>
                 <button type="submit" class="ui primary button">Підтвердити</button>
             </form>
@@ -65,11 +65,9 @@
             <p>Збережіть ці коди в безпечному місці. Ви можете використати їх для входу, якщо втратите доступ до додатку:</p>
 
             <div class="ui segment" style="background-color: #f8f9fa;">
-                <div class="ui two column grid">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                     {% for code in backupCodes %}
-                        <div class="column">
-                            <code>{{ code }}</code>
-                        </div>
+                        <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
                     {% endfor %}
                 </div>
             </div>
@@ -94,6 +92,14 @@
             });
 
             document.getElementById('code').focus();
+
+            document.getElementById('code').addEventListener('input', function(e) {
+                var value = e.target.value.replace(/\D/g, '');
+                if (value.length > 6) {
+                    value = value.substring(0, 6);
+                }
+                e.target.value = value;
+            });
         });
     </script>
 {% endblock %}
