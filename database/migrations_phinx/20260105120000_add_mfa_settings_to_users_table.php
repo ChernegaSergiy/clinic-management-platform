@@ -12,7 +12,7 @@ final class AddMfaSettingsToUsersTable extends AbstractMigration
 
         $table->addColumn('mfa_enabled', 'boolean', [
             'default' => false,
-            'after' => 'password',
+            'after' => 'password_hash',
         ]);
 
         $table->addColumn('mfa_type', 'enum', [
