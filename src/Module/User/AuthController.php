@@ -61,7 +61,17 @@ class AuthController
         $user = $this->userRepository->findByEmail($email);
         $role = $user ? $this->roleRepository->findById((int)$user['role_id']) : null;
 
-        if ($user && password_verify($password, $user['password_hash'])) { // Corrected column name
+        if ($user && password_verify($password, $user['password_hash'])) {
+            $mfaService = new MfaService();
+
+            if ($mfaService->isMfaEnabled($user['id'])) {
+                $_SESSION['mfa_pending_user_id'] = $user['id'];
+                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
+                unset($_SESSION['intended_url']);
+                header('Location: /user/mfa/verify');
+                exit();
+            }
+
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'first_name' => $user['first_name'],
