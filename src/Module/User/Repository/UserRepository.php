@@ -24,7 +24,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name FROM users";
+        $sql = "SELECT id, first_name, last_name, email, role_id, mfa_enabled, CONCAT(first_name, ' ', last_name) AS full_name FROM users";
         $params = [];
 
         if (!empty($searchTerm)) {
@@ -92,9 +92,14 @@ class UserRepository implements UserRepositoryInterface
                 last_name, 
                 email, 
                 role_id, 
+                password_hash,
                 created_at, 
                 updated_at,
                 profile_photo_path,
+                mfa_enabled,
+                mfa_type,
+                mfa_verified_at,
+                mfa_pending,
                 CONCAT(first_name, ' ', last_name) AS full_name
             FROM users 
             WHERE id = :id

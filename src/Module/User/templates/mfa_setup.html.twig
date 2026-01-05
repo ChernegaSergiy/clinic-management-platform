@@ -1,0 +1,112 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Налаштування 2FA - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segments">
+        <div class="ui segment">
+            <h1 class="ui header">Налаштування двофакторної автентифікації</h1>
+        </div>
+        <div class="ui secondary segment">
+            {% if isReset %}
+                <div class="ui warning message">
+                    <div class="header">Переналаштування 2FA</div>
+                    <p>Буде згенеровано новий секрет та QR-код. Старі коди працювати не будуть.</p>
+                </div>
+            {% else %}
+                <div class="ui warning message">
+                    <div class="header">Важливо</div>
+                    <p>Після увімкнення 2FA для входу в систему вам потрібно буде вводити код з додатку автентифікатора.</p>
+                </div>
+            {% endif %}
+
+            {% if session.error_message %}
+                <div class="ui error message">
+                    <i class="close icon"></i>
+                    <div class="header">Помилка!</div>
+                    <p>{{ session.error_message }}</p>
+                </div>
+                {% set _ = session.error_message is null %}
+            {% endif %}
+
+            <div class="ui stackable two column grid">
+                <div class="column">
+                    <h3 class="ui header">1. Встановіть додаток</h3>
+                    <p>Завантажте Google Authenticator або інший TOTP-сумісний додаток:</p>
+                    <div class="ui list">
+                        <div class="item"><i class="android icon"></i> Google Authenticator (Android, iOS)</div>
+                        <div class="item"><i class="apple icon"></i> Authy (Android, iOS)</div>
+                        <div class="item"><i class="desktop icon"></i> 1Password</div>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3 class="ui header">2. Відскануйте QR-код</h3>
+                    <div class="ui card" style="margin: 0 auto;">
+                        <div class="image" style="padding: 20px; text-align: center; background: #fff;">
+                            <img src="{{ qrCode }}" alt="QR Code" style="max-width: 180px; width: 100%; height: auto; display: block; margin: 0 auto;">
+                        </div>
+                        <div class="content">
+                            <div class="header">Або введіть вручну:</div>
+                            <code style="word-break: break-all; font-size: 12px;">{{ secret }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">3. Підтвердіть налаштування</h3>
+            <p>Введіть код з вашого додатку автентифікатора:</p>
+
+            <form action="/user/mfa/setup" method="POST" class="ui form">
+                <div class="field">
+                    <label for="code">Код 2FA</label>
+                    <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 18px; letter-spacing: 3px; max-width: 200px;">
+                </div>
+                <button type="submit" class="ui primary button">Підтвердити</button>
+            </form>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Коди відновлення</h3>
+            <p>Збережіть ці коди в безпечному місці. Ви можете використати їх для входу, якщо втратите доступ до додатку:</p>
+
+            <div class="ui segment" style="background-color: #f8f9fa;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for code in backupCodes %}
+                        <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <a href="/user/profile" class="ui button">Повернутися до профілю</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.message .close').on('click', function() {
+                $(this).closest('.message').transition('fade');
+            });
+
+            document.getElementById('code').focus();
+
+            document.getElementById('code').addEventListener('input', function(e) {
+                var value = e.target.value.replace(/\D/g, '');
+                if (value.length > 6) {
+                    value = value.substring(0, 6);
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
+{% endblock %}

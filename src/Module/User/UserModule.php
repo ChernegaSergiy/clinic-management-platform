@@ -29,6 +29,14 @@ class UserModule extends BaseModule
             $router->add('GET', '/oauth/redirect/{provider}', [AuthController::class, 'redirectToProvider']);
             $router->add('GET', '/oauth/callback/{provider}', [OAuthController::class, 'callback']);
         }
+
+        $router->add('GET', '/user/mfa/setup', [MfaController::class, 'showMfaSetup']);
+        $router->add('POST', '/user/mfa/setup', [MfaController::class, 'verifyMfaSetup']);
+        $router->add('POST', '/user/mfa/disable', [MfaController::class, 'disableMfa']);
+        $router->add('GET', '/user/mfa/verify', [MfaController::class, 'showMfaVerify']);
+        $router->add('POST', '/user/mfa/verify', [MfaController::class, 'verifyMfa']);
+        $router->add('GET', '/user/mfa/clear-backup-codes', [MfaController::class, 'clearNewBackupCodes']);
+        $router->add('POST', '/user/mfa/regenerate-backup-codes', [MfaController::class, 'regenerateBackupCodes']);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
