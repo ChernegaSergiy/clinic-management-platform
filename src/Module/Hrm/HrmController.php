@@ -39,7 +39,7 @@ class HrmController
 
         $users = $this->userRepository->findAll();
 
-        View::render('@modules/HRM/templates/new.html.twig', [
+        View::render('@modules/Hrm/templates/new.html.twig', [
             'users' => $users,
         ]);
     }
@@ -113,7 +113,7 @@ class HrmController
 
         $users = $this->userRepository->findAll();
 
-        View::render('@modules/HRM/templates/edit.html.twig', [
+        View::render('@modules/Hrm/templates/edit.html.twig', [
             'employee' => $employee,
             'users' => $users,
         ]);

@@ -10,4 +10,5 @@ interface HrmRepositoryInterface
     public function update(int $id, array $data): bool;
     public function updateStatus(int $id, string $status): bool;
     public function findByUserId(int $userId): ?array;
+    public function findByDepartment(int $departmentId): array;
 }

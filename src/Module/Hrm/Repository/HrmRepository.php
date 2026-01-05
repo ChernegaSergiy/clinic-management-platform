@@ -98,4 +98,20 @@ class HrmRepository implements HrmRepositoryInterface
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
+
+    public function findByDepartment(int $departmentId): array
+    {
+        $sql = "
+            SELECT e.*, d.name as department_name, dp.name as parent_name 
+            FROM employees e 
+            LEFT JOIN departments d ON e.department_id = d.id 
+            LEFT JOIN departments dp ON d.parent_id = dp.id 
+            WHERE e.department_id = :department_id 
+            ORDER BY e.last_name, e.first_name
+        ";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':department_id' => $departmentId]);
+        return $stmt->fetchAll();
+    }
 }
