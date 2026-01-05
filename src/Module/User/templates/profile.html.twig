@@ -122,6 +122,26 @@
                 <h3 class="ui header">Коди відновлення</h3>
                 <p style="margin-bottom: 1rem;">Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора.</p>
 
+                {% if session.new_backup_codes %}
+                    <div class="ui success message">
+                        <i class="check circle icon"></i>
+                        <div class="header">Коди оновлено!</div>
+                        <p>Збережіть нові коди. Старі коди більше не діють.</p>
+                    </div>
+
+                    <div class="ui segment" style="background-color: #f8f9fa; margin-bottom: 1rem;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            {% for code in session.new_backup_codes %}
+                                <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <a href="/user/mfa/clear-backup-codes" class="ui primary button">Зрозуміло</a>
+
+                    <div class="ui divider"></div>
+                {% endif %}
+
                 <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
                     <div class="ui form">
                         <div class="required field">
