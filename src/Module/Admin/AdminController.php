@@ -62,11 +62,16 @@ class AdminController
 
         $clinicName = $_POST['clinic_name'] ?? '';
         $mfaPolicy = $_POST['mfa_policy'] ?? 'optional';
-        $mfaForceRoles = $_POST['mfa_force_roles'] ?? [];
+        $mfaForceRolesRaw = $_POST['mfa_force_roles'] ?? '';
+
+        $mfaForceRoles = [];
+        if (!empty($mfaForceRolesRaw)) {
+            $mfaForceRoles = array_map('intval', explode(',', $mfaForceRolesRaw));
+        }
 
         $this->settingsRepository->set('clinic_name', $clinicName);
         $this->settingsRepository->setMfaPolicy($mfaPolicy);
-        $this->settingsRepository->setMfaForceRoles(array_map('intval', $mfaForceRoles));
+        $this->settingsRepository->setMfaForceRoles($mfaForceRoles);
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
         header('Location: /admin/settings');
