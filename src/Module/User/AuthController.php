@@ -63,6 +63,20 @@ class AuthController
 
         if ($user && password_verify($password, $user['password_hash'])) {
             $mfaService = new MfaService();
+            $settingsRepository = new \App\Core\Repository\SettingsRepository();
+            $mfaForceRoles = $settingsRepository->getMfaForceRoles();
+
+            $roleRequiresMfa = in_array((int)$user['role_id'], $mfaForceRoles, true);
+
+            if ($roleRequiresMfa && !$mfaService->isMfaEnabled($user['id'])) {
+                $_SESSION['mfa_required'] = true;
+                $_SESSION['mfa_pending_user_id'] = $user['id'];
+                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
+                unset($_SESSION['intended_url']);
+                $_SESSION['error_message'] = 'Двофакторна автентифікація обов\'язкова для вашої ролі. Будь ласка, налаштуйте 2FA.';
+                header('Location: /user/mfa/setup');
+                exit();
+            }
 
             if ($mfaService->isMfaEnabled($user['id'])) {
                 $_SESSION['mfa_pending_user_id'] = $user['id'];

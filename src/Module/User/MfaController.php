@@ -3,6 +3,7 @@
 namespace App\Module\User;
 
 use App\Core\Auth\AuthGuard;
+use App\Core\Auth\MfaGuard;
 use App\Core\Http\View;
 use App\Module\User\Repository\UserRepository;
 
@@ -78,6 +79,7 @@ class MfaController
             $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes);
 
             unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
+            MfaGuard::clearRequired();
 
             $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
             header('Location: /user/profile');
@@ -156,6 +158,7 @@ class MfaController
 
         if ($this->mfaService->verifyUserMfa($userId, $code)) {
             unset($_SESSION['mfa_pending_user_id']);
+            MfaGuard::clearRequired();
 
             $user = $this->userRepository->findById($userId);
             $roleRepository = new \App\Module\User\Repository\RoleRepository();

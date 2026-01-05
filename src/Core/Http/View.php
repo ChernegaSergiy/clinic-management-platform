@@ -2,6 +2,7 @@
 
 namespace App\Core\Http;
 
+use App\Core\Auth\MfaGuard;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -50,6 +51,11 @@ class View
 
     public static function render(string $template, array $data = []): void
     {
+        if (MfaGuard::isRequired() && strpos($template, 'mfa_setup') === false) {
+            header('Location: /user/mfa/setup');
+            exit();
+        }
+
         echo self::getTwig()->render($template, $data);
     }
 

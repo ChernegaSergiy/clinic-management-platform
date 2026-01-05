@@ -38,4 +38,19 @@ class MfaGuard
     {
         unset($_SESSION['mfa_pending_user_id']);
     }
+
+    public static function isRequired(): bool
+    {
+        return isset($_SESSION['mfa_required']) && $_SESSION['mfa_required'] === true;
+    }
+
+    public static function setRequired(): void
+    {
+        $_SESSION['mfa_required'] = true;
+    }
+
+    public static function clearRequired(): void
+    {
+        unset($_SESSION['mfa_required']);
+    }
 }

@@ -70,6 +70,75 @@ class KpiController
         exit();
     }
 
+    public function editDefinition(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('kpi.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
+
+        if (!$definition) {
+            http_response_code(404);
+            echo "Визначення KPI не знайдено";
+            return;
+        }
+
+        View::render('@modules/Kpi/templates/definitions/edit.html.twig', [
+            'definition' => $definition,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+    }
+
+    public function updateDefinition(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('kpi.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
+
+        if (!$definition) {
+            http_response_code(404);
+            echo "Визначення KPI не знайдено";
+            return;
+        }
+
+        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator->validate($_POST, [
+            'name' => ['required'],
+            'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
+            'target_value' => ['numeric', 'min_value:0'],
+            'unit' => ['required'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            header('Location: /kpi/definitions/edit?id=' . $id);
+            exit();
+        }
+
+        $this->kpiRepository->updateKpiDefinition($id, $_POST);
+        $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
+        header('Location: /kpi/definitions');
+        exit();
+    }
+
+    public function deleteDefinition(): void
+    {
+        AuthGuard::check();
+        Gate::authorize('kpi.manage');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->kpiRepository->deleteKpiDefinition($id);
+        $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
+        header('Location: /kpi/definitions');
+        exit();
+    }
+
     // --- KPI Results ---
     public function listResults(): void
     {

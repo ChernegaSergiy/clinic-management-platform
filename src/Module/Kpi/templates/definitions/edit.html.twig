@@ -29,7 +29,7 @@
         } %}
         {% set selected_period = old.period ?? definition.period ?? 'day' %}
 
-        <form class="ui form" method="POST" action="/admin/kpi_definitions/edit?id={{ definition.id }}">
+        <form class="ui form" method="POST" action="/kpi/definitions/edit?id={{ definition.id }}">
             {{ forms.input('name', 'Назва', old.name ?? definition.name, 'text', 'Наприклад, Patient Wait Time', errors.name ?? null, {'required': 'required'}) }}
             {{ forms.textarea('description', 'Опис', old.description ?? definition.description, 'Детальний опис KPI', errors.description ?? null) }}
             {{ forms.select('kpi_type', 'Тип KPI', kpi_options, selected_type, errors.kpi_type ?? null, {'required': 'required'}) }}
@@ -45,7 +45,7 @@
             </div>
 
             {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
-            <a href="/admin/kpi_definitions" class="ui button">Скасувати</a>
+            <a href="/kpi/definitions" class="ui button">Скасувати</a>
         </form>
     </div>
 {% endblock %}

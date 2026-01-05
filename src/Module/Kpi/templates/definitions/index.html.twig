@@ -10,7 +10,7 @@
                 <h2 class="ui header">Керування визначеннями KPI</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/kpi_definitions/new" class="ui primary button">
+                <a href="/kpi/definitions/new" class="ui primary button">
                     <i class="plus icon"></i> Додати визначення
                 </a>
             </div>
@@ -51,10 +51,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/admin/kpi_definitions/edit?id={{ definition.id }}" class="ui icon button">
+                                <a href="/kpi/definitions/edit?id={{ definition.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/kpi_definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити це визначення KPI?');">
+                                <form action="/kpi/definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити це визначення KPI?');">
                                     <input type="hidden" name="id" value="{{ definition.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>
