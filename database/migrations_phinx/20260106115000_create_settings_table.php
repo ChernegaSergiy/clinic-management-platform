@@ -10,7 +10,7 @@ final class CreateSettingsTable extends AbstractMigration
     {
         $table = $this->table('settings', ['id' => false, 'primary_key' => 'key']);
 
-        $table->addColumn('key', 'string', ['limit' => 100])
+        $table->addColumn('key', 'string', ['limit' => 100, 'null' => false])
               ->addColumn('value', 'text', ['null' => true])
               ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
               ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
