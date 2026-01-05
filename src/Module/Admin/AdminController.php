@@ -10,7 +10,7 @@ use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Billing\Repository\ServiceRepository;
-use App\Module\Kpi\Repository\KpiRepository; // Added
+use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\User\Repository\RoleRepository;
 use App\Module\User\Repository\UserRepository;
 
@@ -22,7 +22,7 @@ class AdminController
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
     private KpiRepository $kpiRepository;
-    private ServiceRepository $serviceRepository; // Added
+    private ServiceRepository $serviceRepository;
 
     public function __construct()
     {
@@ -32,7 +32,7 @@ class AdminController
         $this->authConfigRepository = new AuthConfigRepository();
         $this->backupPolicyRepository = new BackupPolicyRepository();
         $this->kpiRepository = new KpiRepository();
-        $this->serviceRepository = new ServiceRepository(); // Added
+        $this->serviceRepository = new ServiceRepository();
     }
 
     public function users(): void
