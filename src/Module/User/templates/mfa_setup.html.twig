@@ -21,7 +21,7 @@
             {% endif %}
 
             {% if session.error_message %}
-                <div class="ui error message">
+                <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
                     <div class="header">Помилка!</div>
                     <p>{{ session.error_message }}</p>
@@ -90,23 +90,46 @@
     {{ parent() }}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('.message .close').on('click', function() {
-                $(this).closest('.message').transition('fade');
-            });
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                $('.message .close').on('click', function() {
+                    $(this).closest('.message').transition({
+                        animation: 'fade',
+                        duration: 300,
+                        onComplete: function() {
+                            $(this).remove();
+                        }
+                    });
+                    fetch('/user/clear-messages', {method: 'POST'});
+                });
 
-            document.getElementById('code').focus();
-
-            document.getElementById('code').addEventListener('input', function(e) {
-                var value = e.target.value.replace(/\D/g, '');
-                if (value.length > 6) {
-                    value = value.substring(0, 6);
+                var flashMessages = document.querySelectorAll('[data-flash]');
+                if (flashMessages.length > 0) {
+                    setTimeout(function() {
+                        flashMessages.forEach(function(el) {
+                            $(el).transition({
+                                animation: 'fade',
+                                duration: 300,
+                                onComplete: function() {
+                                    $(el).remove();
+                                }
+                            });
+                        });
+                        fetch('/user/clear-messages', {method: 'POST'});
+                    }, 5000);
                 }
-                e.target.value = value;
+
+                document.getElementById('code').focus();
+
+                document.getElementById('code').addEventListener('input', function(e) {
+                    var value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 6) {
+                        value = value.substring(0, 6);
+                    }
+                    e.target.value = value;
+                });
             });
-        });
-    </script>
-{% endblock %}
+        </script>
+    {% endblock %}

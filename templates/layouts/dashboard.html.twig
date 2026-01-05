@@ -81,14 +81,14 @@
         </div>
         <div class="sixteen wide mobile thirteen wide tablet thirteen wide computer right floated column" id="content">
             {% if session.success_message %}
-                <div class="ui success message">
+                <div class="ui success message" data-flash="success">
                     <i class="close icon"></i>
                     <div class="header">Успіх!</div>
                     <p>{{ session.success_message }}</p>
                 </div>
             {% endif %}
             {% if session.error_message %}
-                <div class="ui error message">
+                <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
                     <div class="header">Помилка!</div>
                     <p>{{ session.error_message }}</p>
@@ -104,6 +104,32 @@
             $(document).ready(function() {
                 $('.ui.toggle.button').click(function() {
                     $('.ui.mobile.only.grid .mobile-nav-menu').toggle(100);
+                });
+
+                var flashMessages = document.querySelectorAll('[data-flash]');
+                if (flashMessages.length > 0) {
+                    setTimeout(function() {
+                        flashMessages.forEach(function(el) {
+                            $(el).transition({
+                                animation: 'fade',
+                                duration: 300,
+                                onComplete: function() {
+                                    $(this).remove();
+                                }
+                            });
+                        });
+                        fetch('/user/clear-messages', {method: 'POST'});
+                    }, 5000);
+                }
+                $('.message .close.icon').click(function() {
+                    $(this).closest('.message').transition({
+                        animation: 'fade',
+                        duration: 300,
+                        onComplete: function() {
+                            $(this).remove();
+                        }
+                    });
+                    fetch('/user/clear-messages', {method: 'POST'});
                 });
             });
         </script>

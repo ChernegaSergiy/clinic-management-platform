@@ -115,4 +115,11 @@ class UserController
         header('Location: /user/profile');
         exit();
     }
+
+    public function clearMessages(): void
+    {
+        unset($_SESSION['success_message'], $_SESSION['error_message']);
+        http_response_code(200);
+        exit();
+    }
 }

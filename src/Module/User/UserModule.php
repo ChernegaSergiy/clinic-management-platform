@@ -20,6 +20,7 @@ class UserModule extends BaseModule
 
         $router->add('GET', '/user/profile', [UserController::class, 'profile']);
         $router->add('POST', '/user/profile/unlink-provider/{provider}', [UserController::class, 'unlinkProvider']);
+        $router->add('POST', '/user/clear-messages', [UserController::class, 'clearMessages']);
 
         if ($this->getConfig('features.profile_photo', true)) {
             $router->add('POST', '/user/profile/upload-photo', [UserController::class, 'uploadPhoto']);

@@ -9,19 +9,19 @@
         </div>
         <div class="ui secondary segment">
             {% if successMessage %}
-                <div class="ui success message">
+                <div class="ui success message" data-flash="success">
                     <i class="close icon"></i>
                     <div class="header">Успіх!</div>
                     <p>{{ successMessage }}</p>
                 </div>
             {% endif %}
-             {% if session.error_message %}
-                <div class="ui error message">
+            {% if session.error_message %}
+                <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
                     <div class="header">Помилка!</div>
                     <p>{{ session.error_message }}</p>
                 </div>
-                 {% set _ = session.error_message is null %}
+                {% set _ = session.error_message is null %}
             {% endif %}
 
             <div class="ui grid">
@@ -263,8 +263,32 @@
 
             // Script to dismiss messages
             $('.message .close').on('click', function() {
-                $(this).closest('.message').transition('fade');
+                $(this).closest('.message').transition({
+                    animation: 'fade',
+                    duration: 300,
+                    onComplete: function() {
+                        $(this).remove();
+                    }
+                });
+                fetch('/user/clear-messages', {method: 'POST'});
             });
+
+            // Auto-hide flash messages after 5 seconds
+            var flashMessages = document.querySelectorAll('[data-flash]');
+            if (flashMessages.length > 0) {
+                setTimeout(function() {
+                    flashMessages.forEach(function(el) {
+                        $(el).transition({
+                            animation: 'fade',
+                            duration: 300,
+                            onComplete: function() {
+                                $(el).remove();
+                            }
+                        });
+                    });
+                    fetch('/user/clear-messages', {method: 'POST'});
+                }, 5000);
+            }
 
             // Initialize Semantic UI modal
             $('#disable-mfa-modal').modal({
