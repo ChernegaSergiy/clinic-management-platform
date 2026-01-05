@@ -22,7 +22,7 @@ jobs:
         extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
 
     - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-interaction --no-progress
+      run: composer install --prefer-dist --no-progress
 
     - name: Run PHPUnit tests
       run: composer test
