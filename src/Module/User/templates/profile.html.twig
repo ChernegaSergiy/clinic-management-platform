@@ -182,23 +182,33 @@
     </div>
 
     {% if mfaStatus.enabled %}
-    <div class="ui modal" id="disable-mfa-modal">
-        <i class="close icon"></i>
-        <div class="header">Вимкнути двофакторну автентифікацію</div>
+    <div class="ui small modal" id="disable-mfa-modal">
+        <div class="header">
+            <i class="shield alternate red icon"></i>
+            Вимкнути двофакторну автентифікацію
+        </div>
         <div class="content">
-            <p>Введіть пароль для підтвердження:</p>
+            <div class="ui warning message">
+                <div class="header">Увага!</div>
+                <p>Після вимкнення 2FA ваш акаунт буде менш захищений.</p>
+            </div>
             <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
                 <div class="ui form">
-                    <div class="field">
-                        <label>Пароль</label>
-                        <input type="password" name="password" required>
+                    <div class="required field">
+                        <label>Введіть ваш пароль для підтвердження</label>
+                        <div class="ui input">
+                            <input type="password" name="password" placeholder="Ваш пароль" required autofocus>
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="actions">
             <div class="ui black deny button">Скасувати</div>
-            <button type="submit" form="disable-mfa-form" class="ui red button">Вимкнути 2FA</button>
+            <div class="ui red deny button" form="disable-mfa-form" onclick="document.getElementById('disable-mfa-form').submit()">
+                <i class="shield icon"></i>
+                Вимкнути 2FA
+            </div>
         </div>
     </div>
     {% endif %}
@@ -229,6 +239,13 @@
             // Script to dismiss messages
             $('.message .close').on('click', function() {
                 $(this).closest('.message').transition('fade');
+            });
+
+            // Initialize Semantic UI modal
+            $('#disable-mfa-modal').modal({
+                closable: true,
+                duration: 300,
+                transition: 'scale'
             });
         });
 
