@@ -95,6 +95,10 @@ class UserRepository implements UserRepositoryInterface
                 created_at, 
                 updated_at,
                 profile_photo_path,
+                mfa_enabled,
+                mfa_type,
+                mfa_verified_at,
+                mfa_pending,
                 CONCAT(first_name, ' ', last_name) AS full_name
             FROM users 
             WHERE id = :id
