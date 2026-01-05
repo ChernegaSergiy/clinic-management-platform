@@ -30,7 +30,9 @@ class MfaController
             exit();
         }
 
-        if ($this->mfaService->isMfaEnabled($userId)) {
+        $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
+
+        if ($this->mfaService->isMfaEnabled($userId) && !$isReset) {
             header('Location: /user/profile');
             exit();
         }
@@ -47,6 +49,7 @@ class MfaController
             'secret' => $secret,
             'qrCode' => $qrCode,
             'backupCodes' => $backupCodes,
+            'isReset' => $isReset,
         ]);
     }
 
