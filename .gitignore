@@ -1,7 +1,8 @@
 /vendor
 /.env
 /var/
-uploads/
+uploads/*
+!uploads/.gitkeep
 node_modules/
 .phpunit.result.cache
 build/
