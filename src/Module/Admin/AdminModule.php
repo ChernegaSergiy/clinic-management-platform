@@ -53,6 +53,14 @@ class AdminModule extends BaseModule
         $router->add('GET', '/admin/service-categories/edit', [AdminController::class, 'editServiceCategory']);
         $router->add('POST', '/admin/service-categories/edit', [AdminController::class, 'updateServiceCategory']);
         $router->add('POST', '/admin/service-categories/delete', [AdminController::class, 'deleteServiceCategory']);
+
+        $router->add('GET', '/admin/auth_configs', [AdminController::class, 'listAuthConfigs']);
+        $router->add('GET', '/admin/auth_configs/new', [AdminController::class, 'createAuthConfig']);
+        $router->add('POST', '/admin/auth_configs/new', [AdminController::class, 'storeAuthConfig']);
+        $router->add('GET', '/admin/auth_configs/edit', [AdminController::class, 'editAuthConfig']);
+        $router->add('POST', '/admin/auth_configs/edit', [AdminController::class, 'updateAuthConfig']);
+        $router->add('POST', '/admin/auth_configs/delete', [AdminController::class, 'deleteAuthConfig']);
+        $router->add('GET', '/admin/auth_configs/show', [AdminController::class, 'showAuthConfig']);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
