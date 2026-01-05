@@ -7,17 +7,6 @@
     <div class="ui segment">
         <h2 class="ui header">Налаштування системи</h2>
 
-        {% if session.success_message %}
-            <div class="ui success message">
-                <i class="check circle icon"></i>
-                <div class="content">
-                    <div class="header">Успіх!</div>
-                    <p>{{ session.success_message }}</p>
-                </div>
-            </div>
-            {% set _ = session.success_message is null %}
-        {% endif %}
-
         <form action="/admin/settings" method="POST" class="ui form">
             <h3 class="ui header">Загальна інформація</h3>
             <div class="field">
