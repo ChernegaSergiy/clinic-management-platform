@@ -1,0 +1,92 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Налаштування - Адмін-панель{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Налаштування системи</h2>
+
+        {% if session.success_message %}
+            <div class="ui success message">
+                <i class="check circle icon"></i>
+                <div class="content">
+                    <div class="header">Успіх!</div>
+                    <p>{{ session.success_message }}</p>
+                </div>
+            </div>
+            {% set _ = session.success_message is null %}
+        {% endif %}
+
+        <form action="/admin/settings" method="POST" class="ui form">
+            <h3 class="ui header">Загальна інформація</h3>
+            <div class="field">
+                <label for="clinic_name">Назва клініки</label>
+                <input type="text" id="clinic_name" name="clinic_name" value="{{ settings.clinic_name }}" placeholder="Міська клінічна лікарня №1">
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Політика двофакторної автентифікації (2FA)</h3>
+
+            <div class="field">
+                <label>Режим MFA</label>
+                <div class="ui selection dropdown">
+                    <input type="hidden" name="mfa_policy" value="{{ settings.mfa_policy }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть режим</div>
+                    <div class="menu">
+                        <div class="item" data-value="optional">
+                            <i class="grey shield icon"></i>
+                            Вибірково
+                            <div class="description">Користувач сам вирішує увімкнути 2FA</div>
+                        </div>
+                        <div class="item" data-value="admin_required">
+                            <i class="orange shield icon"></i>
+                            Обов'язково для адмінів
+                            <div class="description">Всі користувачі з роллю admin повинні мати 2FA</div>
+                        </div>
+                        <div class="item" data-value="all_required">
+                            <i class="red shield icon"></i>
+                            Обов'язково для всіх
+                            <div class="description">Всі користувачі повинні мати 2FA</div>
+                        </div>
+                        <div class="item" data-value="disabled">
+                            <i class="disabled shield icon"></i>
+                            Вимкнено
+                            <div class="description">2FA недоступний</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Вимагати MFA для ролей (якщо вибрано "Обов'язково для всіх")</label>
+                <div class="ui multiple selection dropdown">
+                    <input type="hidden" name="mfa_force_roles" value="{{ settings.mfa_force_roles|join(',') }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Виберіть ролі</div>
+                    <div class="menu">
+                        {% for role in roles %}
+                            <div class="item" data-value="{{ role.id }}">{{ role.name }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="ui primary button">
+                <i class="save icon"></i>
+                Зберегти
+            </button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}

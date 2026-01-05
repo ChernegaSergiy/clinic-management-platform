@@ -6,6 +6,7 @@ use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
+use App\Core\Repository\SettingsRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
@@ -23,6 +24,7 @@ class AdminController
     private BackupPolicyRepository $backupPolicyRepository;
     private KpiRepository $kpiRepository;
     private ServiceRepository $serviceRepository;
+    private SettingsRepository $settingsRepository;
 
     public function __construct()
     {
@@ -33,6 +35,42 @@ class AdminController
         $this->backupPolicyRepository = new BackupPolicyRepository();
         $this->kpiRepository = new KpiRepository();
         $this->serviceRepository = new ServiceRepository();
+        $this->settingsRepository = new SettingsRepository();
+    }
+
+    public function showSettings(): void
+    {
+        $this->authorizeAdmin();
+
+        $roles = $this->roleRepository->findAll();
+
+        $settings = [
+            'clinic_name' => $this->settingsRepository->get('clinic_name', ''),
+            'mfa_policy' => $this->settingsRepository->getMfaPolicy(),
+            'mfa_force_roles' => $this->settingsRepository->getMfaForceRoles(),
+        ];
+
+        View::render('@modules/Admin/templates/settings.html.twig', [
+            'settings' => $settings,
+            'roles' => $roles,
+        ]);
+    }
+
+    public function updateSettings(): void
+    {
+        $this->authorizeAdmin();
+
+        $clinicName = $_POST['clinic_name'] ?? '';
+        $mfaPolicy = $_POST['mfa_policy'] ?? 'optional';
+        $mfaForceRoles = $_POST['mfa_force_roles'] ?? [];
+
+        $this->settingsRepository->set('clinic_name', $clinicName);
+        $this->settingsRepository->setMfaPolicy($mfaPolicy);
+        $this->settingsRepository->setMfaForceRoles(array_map('intval', $mfaForceRoles));
+
+        $_SESSION['success_message'] = 'Налаштування збережено.';
+        header('Location: /admin/settings');
+        exit();
     }
 
     public function users(): void

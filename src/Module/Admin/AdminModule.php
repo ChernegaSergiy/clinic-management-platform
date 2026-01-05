@@ -62,6 +62,9 @@ class AdminModule extends BaseModule
         $router->add('POST', '/admin/auth_configs/delete', [AdminController::class, 'deleteAuthConfig']);
         $router->add('GET', '/admin/auth_configs/show', [AdminController::class, 'showAuthConfig']);
         $router->add('POST', '/admin/users/disable-mfa', [AdminController::class, 'disableUserMfa']);
+
+        $router->add('GET', '/admin/settings', [AdminController::class, 'showSettings']);
+        $router->add('POST', '/admin/settings', [AdminController::class, 'updateSettings']);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
