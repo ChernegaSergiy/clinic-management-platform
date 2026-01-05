@@ -10,7 +10,7 @@ final class CreateScheduleExceptionsTable extends AbstractMigration
     {
         $table = $this->table('schedule_exceptions', ['id' => false, 'primary_key' => ['id']]);
         $table->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-              ->addColumn('doctor_id', 'integer', ['signed' => false])
+              ->addColumn('doctor_id', 'integer', ['signed' => false, 'null' => false])
               ->addColumn('exception_date', 'date')
               ->addColumn('start_time', 'time')
               ->addColumn('end_time', 'time')
