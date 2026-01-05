@@ -32,7 +32,7 @@ class MfaService
         $totp->setLabel($userEmail);
         $totp->setIssuer($this->issuerName);
 
-        $otpauthUri = $totp->getUri();
+        $otpauthUri = $totp->getProvisioningUri();
         $base64Image = $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
 
         return 'data:image/png;base64,' . $base64Image;
