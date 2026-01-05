@@ -143,30 +143,6 @@
                     Увімкнути 2FA
                 </a>
             {% endif %}
-        </div>
-    </div>
-
-    {% if mfaStatus.enabled %}
-    <div class="ui modal" id="disable-mfa-modal">
-        <i class="close icon"></i>
-        <div class="header">Вимкнути двофакторну автентифікацію</div>
-        <div class="content">
-            <p>Введіть пароль для підтвердження:</p>
-            <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
-                <div class="ui form">
-                    <div class="field">
-                        <label>Пароль</label>
-                        <input type="password" name="password" required>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="actions">
-            <div class="ui black deny button">Скасувати</div>
-            <button type="submit" form="disable-mfa-form" class="ui red button">Вимкнути 2FA</button>
-        </div>
-    </div>
-            {% endif %}
 
             <div class="ui divider"></div>
 
@@ -204,6 +180,28 @@
             </div>
         </div>
     </div>
+
+    {% if mfaStatus.enabled %}
+    <div class="ui modal" id="disable-mfa-modal">
+        <i class="close icon"></i>
+        <div class="header">Вимкнути двофакторну автентифікацію</div>
+        <div class="content">
+            <p>Введіть пароль для підтвердження:</p>
+            <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
+                <div class="ui form">
+                    <div class="field">
+                        <label>Пароль</label>
+                        <input type="password" name="password" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">Скасувати</div>
+            <button type="submit" form="disable-mfa-form" class="ui red button">Вимкнути 2FA</button>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
