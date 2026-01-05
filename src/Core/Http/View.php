@@ -4,6 +4,7 @@ namespace App\Core\Http;
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use App\Core\Twig\SettingsExtension;
 
 class View
 {
@@ -16,6 +17,7 @@ class View
             $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
             self::$twig = new Environment($loader, [
             ]);
+            self::$twig->addExtension(new SettingsExtension());
             self::$twig->addGlobal('session', $_SESSION);
         }
         return self::$twig;
