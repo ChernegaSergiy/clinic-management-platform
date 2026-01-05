@@ -96,16 +96,6 @@
             {% endif %}
             {% block body %}{% endblock %}
         </div>
-            {% endif %}
-            {% if session.error_message %}
-                <div class="ui error message">
-                    <i class="close icon"></i>
-                    <div class="header">Помилка!</div>
-                    <p>{{ session.error_message }}</p>
-                </div>
-            {% endif %}
-            {% block body %}{% endblock %}
-        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
