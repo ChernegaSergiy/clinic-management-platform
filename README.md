@@ -1,5 +1,9 @@
 # Система управління клінікою (Clinic Management Platform)
 
+![PHPStan](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpstan.yml/badge.svg)
+![PHPCS](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpcs.yml/badge.svg)
+![PHPUnit](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml/badge.svg)
+
 Це навчальний курсовий проєкт, метою якого є розробка трирівневої веб-системи для автоматизації ключових процесів сучасної клініки. Система розробляється з урахуванням українських реалій та нормативних вимог.
 
 ## Огляд
