@@ -21,9 +21,9 @@
             <a class="header item" href="#">{% block brand %}Clinic Admin{% endblock %}</a>
             <div class="right menu">
                 {% block top_menu %}
-                    <a class="item">Панель</a>
-                    <a class="item">Налаштування</a>
-                    <a class="item">Профіль</a>
+                    <a class="item" href="/dashboard">Панель</a>
+                    <a class="item" href="/admin/settings">Налаштування</a>
+                    <a class="item" href="/user/profile">Профіль</a>
                     <a class="item">Довідка</a>
                 {% endblock %}
             </div>
@@ -51,9 +51,9 @@
             </div>
             <div class="ui vertical borderless inverted fluid menu mobile-nav-menu">
                 {% block mobile_menu %}
-                    <a class="item">Панель</a>
-                    <a class="item">Налаштування</a>
-                    <a class="item">Профіль</a>
+                    <a class="item" href="/dashboard">Панель</a>
+                    <a class="item" href="/admin/settings">Налаштування</a>
+                    <a class="item" href="/user/profile">Профіль</a>
                     <a class="item">Довідка</a>
                     <div class="ui fitted divider"></div>
                 {% endblock %}
@@ -71,7 +71,7 @@
                     <div class="ui hidden divider"></div>
                     <a class="item">Навігація</a>
                     <a class="item">Ще пункт</a>
-                    <a class="item">Налаштування</a>
+                    <a class="item" href="/admin/settings">Налаштування</a>
                     <div class="ui hidden divider"></div>
                     <a class="item">Macintosh</a>
                     <a class="item">Linux</a>
