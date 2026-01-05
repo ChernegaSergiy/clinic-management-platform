@@ -1,0 +1,85 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Підтвердження 2FA - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui middle aligned center aligned grid" style="min-height: 100vh; background-color: #f5f5f5;">
+        <div class="column" style="max-width: 450px;">
+            <div class="ui segment">
+                <h2 class="ui header">
+                    <div class="content">
+                        Двофакторна автентифікація
+                    </div>
+                </h2>
+
+                <div class="ui info message">
+                    <p>Будь ласка, введіть код з вашого додатку автентифікатора.</p>
+                </div>
+
+                {% if errorMessage %}
+                    <div class="ui error message">
+                        <i class="close icon"></i>
+                        <div class="header">Помилка!</div>
+                        <p>{{ errorMessage }}</p>
+                    </div>
+                {% endif %}
+
+                <form action="/user/mfa/verify" method="POST" class="ui form">
+                    <div class="field">
+                        <label for="code">Код 2FA</label>
+                        <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="ui fluid primary button">Підтвердити</button>
+                </form>
+
+                <div class="ui divider"></div>
+
+                <form action="/logout" method="GET">
+                    <button type="submit" class="ui fluid basic button">Вийти</button>
+                </form>
+            </div>
+
+            <div class="ui message">
+                <p>Немає доступу до додатку? Ви можете використати <a href="#" onclick="toggleBackupCodeField()">код відновлення</a>.</p>
+                <div id="backup-code-field" style="display: none;">
+                    <p>Введіть код відновлення замість коду з додатку.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function toggleBackupCodeField() {
+            var field = document.getElementById('backup-code-field');
+            field.style.display = field.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('code').focus();
+
+            document.getElementById('code').addEventListener('input', function(e) {
+                var value = e.target.value.replace(/\D/g, '');
+                if (value.length > 6) {
+                    value = value.substring(0, 6);
+                }
+                e.target.value = value;
+            });
+
+            $('.message .close').on('click', function() {
+                $(this).closest('.message').transition('fade');
+            });
+        });
+    </script>
+{% endblock %}
