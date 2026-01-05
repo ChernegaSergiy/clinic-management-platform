@@ -119,14 +119,22 @@
 
                 <div class="ui divider"></div>
 
-                <h3 class="ui header">Коди відновлення</h3>
+                <h3 class="ui header">
+                    <i class="refresh icon"></i>
+                    Коди відновлення
+                </h3>
+                <p style="margin-bottom: 1rem;">Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора.</p>
+
                 <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
-                    <div class="field">
-                        <label for="mfa-password">Введіть пароль для підтвердження</label>
-                        <div class="ui action input">
-                            <input type="password" id="mfa-password" name="password" required>
-                            <button type="submit" class="ui yellow button">Оновити коди</button>
+                    <div class="ui form">
+                        <div class="required field">
+                            <label for="mfa-password">Введіть пароль для підтвердження</label>
+                            <input type="password" id="mfa-password" name="password" placeholder="Ваш пароль" required>
                         </div>
+                        <button type="submit" class="ui yellow button">
+                            <i class="refresh icon"></i>
+                            Оновити коди
+                        </button>
                     </div>
                 </form>
             {% else %}
