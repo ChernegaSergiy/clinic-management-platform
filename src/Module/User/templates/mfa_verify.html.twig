@@ -4,16 +4,16 @@
 
 {% block body %}
     <section class="section">
-        <div class="container" style="max-width: 400px; padding-top: 2rem; padding-bottom: 2rem;">
-            <div class="booking-form">
-                <header class="section__header text-center">
+        <div class="container" style="max-width: 400px; padding: 2rem 0;">
+            <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
+                <header class="section__header" style="text-align: center; margin-bottom: 1.5rem;">
                     <div class="section__eyebrow">Безпека</div>
-                    <h1 class="section__title section__title--compact">Двофакторна автентифікація</h1>
+                    <h1 class="section__title section__title--compact" style="margin-bottom: 0.5rem;">Двофакторна автентифікація</h1>
                     <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть код з додатку автентифікатора</p>
                 </header>
 
                 {% if errorMessage %}
-                    <div class="text-center" style="background: #ffe6e6; border: var(--border-medium); padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem;">
+                    <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem; text-align: center;">
                         <strong>Помилка:</strong> {{ errorMessage }}
                     </div>
                 {% endif %}
@@ -24,19 +24,19 @@
                         <input class="booking-input" type="text" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 700;" autofocus>
                     </div>
                     <div style="margin-top: 1rem;">
-                        <button type="submit" class="btn btn--primary w-full">Підтвердити</button>
+                        <button type="submit" class="btn btn--primary" style="width: 100%;">Підтвердити</button>
                     </div>
                 </form>
 
-                <div class="text-center" style="text-transform: uppercase; font-size: 0.75rem; margin: 1.5rem 0; border-top: var(--border-thin); padding-top: 1.5rem; position: relative;">
+                <div style="text-align: center; margin: 1.5rem 0; font-size: 0.75rem; text-transform: uppercase; border-top: var(--border-thin); padding-top: 1.5rem; position: relative;">
                     <span style="background: var(--color-bg-alt); padding: 0 0.5rem; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);">або</span>
                 </div>
 
                 <form method="GET" action="/logout" style="display: grid; gap: 0.8rem;">
-                    <button type="submit" class="btn btn--ghost w-full">Вийти з системи</button>
+                    <button type="submit" class="btn btn--ghost" style="width: 100%;">Вийти з системи</button>
                 </form>
 
-                <p class="text-center" style="font-size: 0.75rem; margin-top: 1.5rem;">
+                <p style="text-align: center; font-size: 0.75rem; margin-top: 1.5rem;">
                     Немає доступу до додатку? <a href="#" onclick="toggleBackupCodeField(); return false;" style="color: var(--color-accent);">Введіть код відновлення</a>
                 </p>
 
@@ -46,7 +46,7 @@
                         <div>
                             <input class="booking-input" type="text" name="code" placeholder="XXXX-XXXX" required autocomplete="off">
                         </div>
-                        <button type="submit" class="btn w-full">Використати код відновлення</button>
+                        <button type="submit" class="btn" style="width: 100%;">Використати код відновлення</button>
                     </form>
                 </div>
             </div>
