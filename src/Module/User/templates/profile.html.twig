@@ -94,7 +94,80 @@
 
             <div class="ui divider"></div>
 
-            <h2 class="ui header">Зв'язані акаунти</h2>
+            <h2 class="ui header">Двофакторна автентифікація (2FA)</h2>
+
+            {% set mfaStatus = {
+                enabled: user.mfa_enabled,
+                type: user.mfa_type,
+                verified_at: user.mfa_verified_at
+            } %}
+
+            {% if mfaStatus.enabled %}
+                <div class="ui success message">
+                    <i class="check circle icon"></i>
+                    <div class="content">
+                        <div class="header">2FA увімкнено</div>
+                        <p>Тип: {{ mfaStatus.type|upper }} | Увімкнено: {{ user.mfa_verified_at|date('d.m.Y H:i') }}</p>
+                    </div>
+                </div>
+
+                <div class="ui buttons">
+                    <a href="/user/mfa/setup" class="ui button">Переналаштувати 2FA</a>
+                    <div class="or" data-text="або"></div>
+                    <button type="button" class="ui red button" onclick="showDisableMfaModal()">Вимкнути 2FA</button>
+                </div>
+
+                <div class="ui divider"></div>
+
+                <h3 class="ui header">Коди відновлення</h3>
+                <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
+                    <div class="field">
+                        <label for="mfa-password">Введіть пароль для підтвердження</label>
+                        <div class="ui action input">
+                            <input type="password" id="mfa-password" name="password" required>
+                            <button type="submit" class="ui yellow button">Оновити коди</button>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="ui warning message">
+                    <i class="exclamation triangle icon"></i>
+                    <div class="content">
+                        <div class="header">2FA не увімкнено</div>
+                        <p>Рекомендуємо увімкнути двофакторну автентифікацію для захисту вашого акаунту.</p>
+                    </div>
+                </div>
+
+                <a href="/user/mfa/setup" class="ui primary button">
+                    <i class="shield icon"></i>
+                    Увімкнути 2FA
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if mfaStatus.enabled %}
+    <div class="ui modal" id="disable-mfa-modal">
+        <i class="close icon"></i>
+        <div class="header">Вимкнути двофакторну автентифікацію</div>
+        <div class="content">
+            <p>Введіть пароль для підтвердження:</p>
+            <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
+                <div class="ui form">
+                    <div class="field">
+                        <label>Пароль</label>
+                        <input type="password" name="password" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">Скасувати</div>
+            <button type="submit" form="disable-mfa-form" class="ui red button">Вимкнути 2FA</button>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
             <div class="ui relaxed divided list">
                 {% for config in authConfigs %}
                     <div class="item">
@@ -157,5 +230,9 @@
                 $(this).closest('.message').transition('fade');
             });
         });
+
+        function showDisableMfaModal() {
+            $('#disable-mfa-modal').modal('show');
+        }
     </script>
 {% endblock %}
