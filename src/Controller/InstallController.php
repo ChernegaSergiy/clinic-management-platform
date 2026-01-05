@@ -52,6 +52,13 @@ class InstallController
             return $carry;
         }, true);
 
+        // If all checks pass, mark system as installed
+        if ($allOk) {
+            $this->markAsInstalled();
+            header('Location: /login');
+            exit;
+        }
+
         View::render('install/index.html.twig', [
             'checks' => $checks,
             'allOk' => $allOk,
@@ -186,6 +193,22 @@ class InstallController
         } catch (\Throwable $e) {
             // This can happen if database doesn't exist yet, which is fine. Migrations check handles it.
             return ['status' => false, 'message' => 'База даних порожня або не існує. Виконайте `composer db:migrate` та `composer db:seed`.'];
+        }
+    }
+
+    private function markAsInstalled(): void
+    {
+        $envPath = __DIR__ . '/../../.env';
+        if (file_exists($envPath)) {
+            $envContent = file_get_contents($envPath);
+            
+            // Remove existing APP_INSTALLED if present
+            $envContent = preg_replace('/^APP_INSTALLED=.*$/m', '', $envContent);
+            
+            // Add APP_INSTALLED=true at the end
+            $envContent = trim($envContent) . "\nAPP_INSTALLED=true\n";
+            
+            file_put_contents($envPath, $envContent);
         }
     }
 }
