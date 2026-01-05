@@ -166,14 +166,17 @@
             <button type="submit" form="disable-mfa-form" class="ui red button">Вимкнути 2FA</button>
         </div>
     </div>
-    {% endif %}
-{% endblock %}
+            {% endif %}
+
+            <div class="ui divider"></div>
+
+            <h2 class="ui header">Зв'язані акаунти</h2>
             <div class="ui relaxed divided list">
                 {% for config in authConfigs %}
                     <div class="item">
                         <div class="right floated content">
                             {% if config.provider in linkedProviders %}
-                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\\'язати свій {{ config.provider|capitalize }} акаунт?');">
+                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
                                     <button type="submit" class="ui small red button">Відв'язати</button>
                                 </form>
                             {% else %}
