@@ -3,3 +3,4 @@
 /var/
 uploads/
 node_modules/
+.phpunit.result.cache
