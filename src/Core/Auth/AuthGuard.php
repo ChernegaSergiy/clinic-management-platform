@@ -36,6 +36,8 @@ class AuthGuard
             header('Location: /login');
             exit();
         }
+
+        MfaGuard::check();
         self::hydrateRoleName();
     }
 
