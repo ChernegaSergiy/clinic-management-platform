@@ -92,6 +92,7 @@ class UserRepository implements UserRepositoryInterface
                 last_name, 
                 email, 
                 role_id, 
+                password_hash,
                 created_at, 
                 updated_at,
                 profile_photo_path,
