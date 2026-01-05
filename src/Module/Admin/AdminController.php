@@ -254,6 +254,27 @@ class AdminController
         exit();
     }
 
+    public function disableUserMfa(): void
+    {
+        $this->authorizeAdmin();
+
+        $id = (int)($_POST['id'] ?? 0);
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            http_response_code(404);
+            echo "Користувача не знайдено";
+            return;
+        }
+
+        $mfaService = new \App\Module\User\MfaService();
+        $mfaService->disableMfaForUser($id);
+
+        $_SESSION['success_message'] = "2FA для користувача " . $user['email'] . " успішно вимкнено.";
+        header('Location: /admin/users');
+        exit();
+    }
+
     // --- Role Management ---
     public function listRoles(): void
     {
