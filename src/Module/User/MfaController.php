@@ -4,11 +4,12 @@ namespace App\Module\User;
 
 use App\Core\Auth\AuthGuard;
 use App\Core\Http\View;
+use App\Module\User\Repository\UserRepository;
 
 class MfaController
 {
     private MfaService $mfaService;
-    private UserRepository $userRepository;
+    private \App\Module\User\Repository\UserRepository $userRepository;
 
     public function __construct()
     {
