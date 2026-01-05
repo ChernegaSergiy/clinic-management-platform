@@ -7,17 +7,20 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Hrm\Repository\HrmRepository;
+use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\User\Repository\UserRepository;
 
 class HrmController
 {
     private HrmRepository $hrmRepository;
     private UserRepository $userRepository;
+    private DepartmentRepository $departmentRepository;
 
     public function __construct()
     {
         $this->hrmRepository = new HrmRepository();
         $this->userRepository = new UserRepository();
+        $this->departmentRepository = new DepartmentRepository();
     }
 
     public function index(): void
@@ -38,9 +41,11 @@ class HrmController
         Gate::authorize('hrm.write');
 
         $users = $this->userRepository->findAll();
+        $departments = $this->departmentRepository->findAllActive();
 
         View::render('@modules/Hrm/templates/new.html.twig', [
             'users' => $users,
+            'departments' => $departments,
         ]);
     }
 
@@ -112,10 +117,12 @@ class HrmController
         }
 
         $users = $this->userRepository->findAll();
+        $departments = $this->departmentRepository->findAllActive();
 
         View::render('@modules/Hrm/templates/edit.html.twig', [
             'employee' => $employee,
             'users' => $users,
+            'departments' => $departments,
         ]);
     }
 
