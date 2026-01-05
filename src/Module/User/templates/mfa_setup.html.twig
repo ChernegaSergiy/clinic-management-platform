@@ -8,10 +8,17 @@
             <h1 class="ui header">Налаштування двофакторної автентифікації</h1>
         </div>
         <div class="ui secondary segment">
-            <div class="ui warning message">
-                <div class="header">Важливо</div>
-                <p>Після увімкнення 2FA для входу в систему вам потрібно буде вводити код з додатку автентифікатора.</p>
-            </div>
+            {% if isReset %}
+                <div class="ui warning message">
+                    <div class="header">Переналаштування 2FA</div>
+                    <p>Буде згенеровано новий секрет та QR-код. Старі коди працювати не будуть.</p>
+                </div>
+            {% else %}
+                <div class="ui warning message">
+                    <div class="header">Важливо</div>
+                    <p>Після увімкнення 2FA для входу в систему вам потрібно буде вводити код з додатку автентифікатора.</p>
+                </div>
+            {% endif %}
 
             {% if session.error_message %}
                 <div class="ui error message">
