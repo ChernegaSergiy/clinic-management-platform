@@ -33,9 +33,7 @@ class MfaService
         $totp->setIssuer($this->issuerName);
 
         $otpauthUri = $totp->getProvisioningUri();
-        $base64Image = $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
-
-        return 'data:image/png;base64,' . $base64Image;
+        return $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
     }
 
     public function verifyCode(string $secret, string $code): bool
