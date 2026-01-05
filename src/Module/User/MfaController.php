@@ -209,8 +209,27 @@ class MfaController
         ");
         $stmt->execute(['id' => $userId, 'codes' => json_encode($backupCodes)]);
 
+        $_SESSION['new_backup_codes'] = $backupCodes;
         $_SESSION['success_message'] = 'Коди відновлення оновлено.';
-        header('Location: /user/profile');
+        header('Location: /user/mfa/backup-codes');
         exit();
+    }
+
+    public function showBackupCodes(): void
+    {
+        AuthGuard::check();
+
+        $backupCodes = $_SESSION['new_backup_codes'] ?? null;
+
+        if (!$backupCodes) {
+            header('Location: /user/profile');
+            exit();
+        }
+
+        unset($_SESSION['new_backup_codes']);
+
+        View::render('@modules/User/templates/backup_codes.html.twig', [
+            'backupCodes' => $backupCodes,
+        ]);
     }
 }

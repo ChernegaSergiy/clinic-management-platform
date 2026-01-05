@@ -1,0 +1,46 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Коди відновлення - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segments">
+        <div class="ui segment">
+            <h1 class="ui header">Нові коди відновлення</h1>
+        </div>
+        <div class="ui secondary segment">
+            {% if successMessage %}
+                <div class="ui success message">
+                    <i class="check circle icon"></i>
+                    <div class="content">
+                        <div class="header">Успіх!</div>
+                        <p>{{ successMessage }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="ui warning message">
+                <i class="exclamation triangle icon"></i>
+                <div class="content">
+                    <div class="header">Важливо!</div>
+                    <p>Ці коди показуються лише один раз. Збережіть їх у безпечному місці.</p>
+                    <p>Старі коди відновлення більше не діють.</p>
+                </div>
+            </div>
+
+            <div class="ui segment" style="background-color: #f8f9fa;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for code in backupCodes %}
+                        <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <a href="/user/profile" class="ui primary button">
+                <i class="arrow left icon"></i>
+                Повернутися до профілю
+            </a>
+        </div>
+    </div>
+{% endblock %}
