@@ -1,0 +1,6 @@
+name: Department
+version: 1.0.0
+description: Модуль для управління відділеннями клініки
+author: Serhii
+config:
+    enabled: true

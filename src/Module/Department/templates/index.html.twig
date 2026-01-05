@@ -1,0 +1,98 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Відділення - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="twelve wide column">
+                <h2 class="ui header">Відділення клініки</h2>
+            </div>
+            <div class="four wide column right aligned">
+                <a href="/admin/departments/new" class="ui primary button">
+                    <i class="plus icon"></i> Додати відділ
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if flash.success_message is defined %}
+            <div class="ui success message">
+                <i class="close icon"></i>
+                {{ flash.success_message }}
+            </div>
+        {% endif %}
+
+        {% if flash.error_message is defined %}
+            <div class="ui error message">
+                <i class="close icon"></i>
+                {{ flash.error_message }}
+            </div>
+        {% endif %}
+
+        {% if departments is not empty %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Батьківський відділ</th>
+                        <th>Статус</th>
+                        <th>Порядок</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                        <tr>
+                            <td>
+                                <strong>{{ department.name }}</strong>
+                                {% if department.children is defined and department.children is not empty %}
+                                    <span class="ui tiny label">Батьківський</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ department.description|default('—') }}</td>
+                            <td>{{ department.parent_name|default('—') }}</td>
+                            <td>
+                                {% if department.is_active %}
+                                    <span class="ui green label">Активний</span>
+                                {% else %}
+                                    <span class="ui red label">Неактивний</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ department.sort_order }}</td>
+                            <td>
+                                <a href="/admin/departments/show?id={{ department.id }}" class="ui mini blue button">
+                                    <i class="eye icon"></i>
+                                </a>
+                                <a href="/admin/departments/edit?id={{ department.id }}" class="ui mini yellow button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <form method="POST" action="/admin/departments/toggle-status" style="display: inline-block;">
+                                    <input type="hidden" name="id" value="{{ department.id }}">
+                                    <button type="submit" class="ui mini {% if department.is_active %}orange{% else %}green{% endif %} button">
+                                        <i class="power off icon"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="/admin/departments/delete" style="display: inline-block;" 
+                                      onsubmit="return confirm('Видалити відділ?');">
+                                    <input type="hidden" name="id" value="{{ department.id }}">
+                                    <button type="submit" class="ui mini red button">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="ui info message">
+                <div class="header">Відділення не знайдено</div>
+                <p>Створіть перше відділення для початку роботи.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

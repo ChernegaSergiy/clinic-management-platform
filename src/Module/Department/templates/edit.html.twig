@@ -1,0 +1,80 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}Редагувати відділ - {{ department.name }} - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">Редагування відділу: {{ department.name }}</h2>
+        
+        <div class="ui divider"></div>
+        
+        {% if errors is defined and errors is not empty %}
+            <div class="ui error message">
+                <div class="header">Помилка валідації</div>
+                <ul class="list">
+                    {% for field, messages in errors %}
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/admin/departments/edit?id={{ department.id }}">
+            <div class="field">
+                <label>Назва відділу *</label>
+                <input type="text" name="name" placeholder="напр. Терапевтичне відділення" 
+                       value="{{ department.name }}" required>
+            </div>
+
+            <div class="field">
+                <label>Опис</label>
+                <textarea name="description" rows="4" placeholder="Опис функцій відділення">{{ department.description }}</textarea>
+            </div>
+
+            <div class="field">
+                <label>Батьківський відділ</label>
+                <select name="parent_id" class="ui dropdown">
+                    <option value="">Оберіть батьківський відділ (необов'язково)</option>
+                    {% for dept in parentOptions %}
+                        {% if dept.id != department.id %}
+                            <option value="{{ dept.id }}" 
+                                    {% if department.parent_id == dept.id %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="two fields">
+                <div class="field">
+                    <label>Статус</label>
+                    <select name="is_active" class="ui dropdown">
+                        <option value="1" {% if department.is_active %}selected{% endif %}>Активний</option>
+                        <option value="0" {% if not department.is_active %}selected{% endif %}>Неактивний</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Порядок сортування</label>
+                    <input type="number" name="sort_order" value="{{ department.sort_order }}" min="0">
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <button type="submit" class="ui primary button">
+                <i class="save icon"></i> Зберегти зміни
+            </button>
+            <a href="/admin/departments/show?id={{ department.id }}" class="ui secondary button">
+                <i class="arrow left icon"></i> Скасувати
+            </a>
+            <a href="/admin/departments" class="ui secondary button">
+                <i class="list icon"></i> До списку
+            </a>
+        </form>
+    </div>
+{% endblock %}
