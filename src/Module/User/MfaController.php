@@ -20,9 +20,7 @@ class MfaController
 
     public function showMfaSetup(): void
     {
-        $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
-
-        if ($isReset) {
+        if (isset($_SESSION['user'])) {
             AuthGuard::check();
         } else {
             AuthGuard::requireMfaSetup();
@@ -42,6 +40,8 @@ class MfaController
             header('Location: /login');
             exit();
         }
+
+        $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
 
         if ($this->mfaService->isMfaEnabled($userId) && !$isReset) {
             header('Location: /user/profile');
@@ -141,7 +141,7 @@ class MfaController
         }
 
         if ($this->mfaService->verifyCode($secret, $code)) {
-            $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes);
+            $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes, 'totp');
 
             unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes'], $_SESSION['mfa_setup_is_reset']);
             MfaGuard::clearRequired();
