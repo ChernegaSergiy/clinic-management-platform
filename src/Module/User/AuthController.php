@@ -73,8 +73,7 @@ class AuthController
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
                 $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
-                $_SESSION['error_message'] = 'Двофакторна автентифікація обов\'язкова для вашої ролі. Будь ласка, налаштуйте 2FA.';
-                header('Location: /user/mfa/setup');
+                header('Location: /user/mfa/required');
                 exit();
             }
 
