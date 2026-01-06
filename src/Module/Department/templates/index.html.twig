@@ -89,10 +89,23 @@
                 </tbody>
             </table>
         {% else %}
-            <div class="ui info message">
-                <div class="header">Відділення не знайдено</div>
-                <p>Створіть перше відділення для початку роботи.</p>
-            </div>
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Опис</th>
+                        <th>Батьківський відділ</th>
+                        <th>Статус</th>
+                        <th>Порядок</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="center aligned">Немає відділень для відображення.</td>
+                    </tr>
+                </tbody>
+            </table>
         {% endif %}
     </div>
 {% endblock %}
