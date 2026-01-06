@@ -26,6 +26,15 @@ class MfaController
 
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
+
+            $settingsRepository = new \App\Core\Repository\SettingsRepository();
+            $mfaPolicy = $settingsRepository->getMfaPolicy();
+
+            if ($mfaPolicy === 'disabled') {
+                $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
+                header('Location: /user/profile');
+                exit();
+            }
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
@@ -188,6 +197,15 @@ class MfaController
 
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
+
+            $settingsRepository = new \App\Core\Repository\SettingsRepository();
+            $mfaPolicy = $settingsRepository->getMfaPolicy();
+
+            if ($mfaPolicy === 'disabled') {
+                $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
+                header('Location: /user/profile');
+                exit();
+            }
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;

@@ -31,7 +31,7 @@ class UserController
         $user = $this->userRepository->findById($_SESSION['user']['id']);
 
         if (!$user) {
-            // This should not happen if the user is logged in
+            // This should not happen if user is logged in
             session_destroy();
             header('Location: /login');
             exit();
@@ -44,12 +44,16 @@ class UserController
 
         $linkedProviders = $this->userOAuthIdentityRepository->findAllByUserId($user['id']);
 
+        $settingsRepository = new \App\Core\Repository\SettingsRepository();
+        $mfaPolicy = $settingsRepository->getMfaPolicy();
+
         View::render('@modules/User/templates/profile.html.twig', [
             'user' => $user,
             'employee' => $employee,
             'successMessage' => $successMessage,
             'authConfigs' => $this->authConfigRepository->findActive(),
             'linkedProviders' => array_column($linkedProviders, 'provider'),
+            'mfaPolicy' => $mfaPolicy,
         ]);
     }
 

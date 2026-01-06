@@ -94,6 +94,7 @@
 
             <div class="ui divider"></div>
 
+            {% if mfaPolicy != 'disabled' %}
             <h2 class="ui header">Двофакторна автентифікація (2FA)</h2>
 
             {% set mfaStatus = {
@@ -194,6 +195,14 @@
                                 Увімкнути HOTP
                             </a>
                         </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="ui info message">
+                    <i class="info circle icon"></i>
+                    <div class="content">
+                        <div class="header">2FA вимкнено</div>
+                        <p>Двофакторна автентифікація недоступна на даний момент.</p>
                     </div>
                 </div>
             {% endif %}

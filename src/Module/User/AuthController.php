@@ -64,7 +64,23 @@ class AuthController
         if ($user && password_verify($password, $user['password_hash'])) {
             $mfaService = new MfaService();
             $settingsRepository = new \App\Core\Repository\SettingsRepository();
+            $mfaPolicy = $settingsRepository->getMfaPolicy();
             $mfaForceRoles = $settingsRepository->getMfaForceRoles();
+
+            if ($mfaPolicy === 'disabled') {
+                $_SESSION['user'] = [
+                    'id' => $user['id'],
+                    'first_name' => $user['first_name'],
+                    'last_name' => $user['last_name'],
+                    'email' => $user['email'],
+                    'role_id' => $user['role_id'],
+                    'role_name' => $role['name'] ?? null,
+                ];
+                $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                unset($_SESSION['intended_url']);
+                header('Location: ' . $redirect);
+                exit();
+            }
 
             $roleRequiresMfa = in_array((int)$user['role_id'], $mfaForceRoles, true);
 
