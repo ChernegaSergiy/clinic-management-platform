@@ -35,6 +35,8 @@ class UserModule extends BaseModule
         $router->add('POST', '/user/mfa/setup', [MfaController::class, 'verifyMfaSetup']);
         $router->add('GET', '/user/mfa/required', [MfaController::class, 'showMfaRequired']);
         $router->add('POST', '/user/mfa/required', [MfaController::class, 'verifyMfaRequired']);
+        $router->add('GET', '/user/mfa/hotp/setup', [MfaController::class, 'showHotpSetup']);
+        $router->add('POST', '/user/mfa/hotp/setup', [MfaController::class, 'verifyHotpSetup']);
         $router->add('POST', '/user/mfa/disable', [MfaController::class, 'disableMfa']);
         $router->add('GET', '/user/mfa/verify', [MfaController::class, 'showMfaVerify']);
         $router->add('POST', '/user/mfa/verify', [MfaController::class, 'verifyMfa']);
