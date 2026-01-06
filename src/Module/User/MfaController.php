@@ -20,7 +20,13 @@ class MfaController
 
     public function showMfaSetup(): void
     {
-        AuthGuard::requireMfaSetup();
+        $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
+
+        if ($isReset) {
+            AuthGuard::check();
+        } else {
+            AuthGuard::requireMfaSetup();
+        }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
 
@@ -37,8 +43,6 @@ class MfaController
             exit();
         }
 
-        $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
-
         if ($this->mfaService->isMfaEnabled($userId) && !$isReset) {
             header('Location: /user/profile');
             exit();
@@ -50,6 +54,7 @@ class MfaController
 
         $_SESSION['mfa_setup_secret'] = $secret;
         $_SESSION['mfa_setup_backup_codes'] = $backupCodes;
+        $_SESSION['mfa_setup_is_reset'] = $isReset;
 
         View::render('@modules/User/templates/mfa_setup.html.twig', [
             'user' => $user,
@@ -103,7 +108,11 @@ class MfaController
 
     public function verifyMfaSetup(): void
     {
-        AuthGuard::requireMfaSetup();
+        if (isset($_SESSION['user'])) {
+            AuthGuard::check();
+        } else {
+            AuthGuard::requireMfaSetup();
+        }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
 
@@ -114,9 +123,11 @@ class MfaController
 
         $secret = $_SESSION['mfa_setup_secret'] ?? null;
         $backupCodes = $_SESSION['mfa_setup_backup_codes'] ?? [];
+        $isReset = $_SESSION['mfa_setup_is_reset'] ?? false;
 
         if (!$secret) {
-            header('Location: /user/mfa/setup');
+            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            header('Location: ' . $redirectUrl);
             exit();
         }
 
@@ -124,22 +135,44 @@ class MfaController
 
         if (empty($code)) {
             $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
-            header('Location: /user/mfa/setup');
+            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            header('Location: ' . $redirectUrl);
             exit();
         }
 
         if ($this->mfaService->verifyCode($secret, $code)) {
             $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes);
 
-            unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
+            unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes'], $_SESSION['mfa_setup_is_reset']);
             MfaGuard::clearRequired();
 
-            $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
-            header('Location: /user/profile');
+            if (isset($_SESSION['user'])) {
+                $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
+                header('Location: /user/profile');
+            } else {
+                $user = $this->userRepository->findById($userId);
+                $roleRepository = new \App\Module\User\Repository\RoleRepository();
+                $role = $roleRepository->findById((int)$user['role_id']);
+
+                $_SESSION['user'] = [
+                    'id' => $user['id'],
+                    'first_name' => $user['first_name'],
+                    'last_name' => $user['last_name'],
+                    'email' => $user['email'],
+                    'role_id' => $user['role_id'],
+                    'role_name' => $role['name'] ?? null,
+                ];
+
+                $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                unset($_SESSION['intended_url']);
+
+                header('Location: ' . $redirect);
+            }
             exit();
         } else {
             $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
-            header('Location: /user/mfa/setup');
+            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            header('Location: ' . $redirectUrl);
             exit();
         }
     }
