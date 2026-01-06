@@ -59,4 +59,16 @@ class MfaGuard
     {
         unset($_SESSION['mfa_required']);
     }
+
+    public static function getUserMfaType(int $userId): ?string
+    {
+        $mfaService = new MfaService();
+        $status = $mfaService->getUserMfaStatus($userId);
+        return $status['type'] ?? null;
+    }
+
+    public static function isHotpEnabled(int $userId): bool
+    {
+        return self::getUserMfaType($userId) === 'hotp';
+    }
 }
