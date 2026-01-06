@@ -163,10 +163,39 @@
                     </div>
                 </div>
 
-                <a href="/user/mfa/setup" class="ui primary button">
-                    <i class="shield icon"></i>
-                    Увімкнути 2FA
-                </a>
+                <div class="ui cards" style="margin-top: 1rem;">
+                    <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
+                        <div class="content">
+                            <div class="header"><i class="clock icon"></i> TOTP</div>
+                            <div class="description">
+                                <p>На основі часу. Код змінюється кожні 30 секунд.</p>
+                                <p><strong>Найпоширеніший варіант</strong> - сумісний з Google Authenticator, Authy, 1Password.</p>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/user/mfa/setup" class="ui primary fluid button">
+                                <i class="shield icon"></i>
+                                Увімкнути TOTP
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
+                        <div class="content">
+                            <div class="header"><i class="hashtag icon"></i> HOTP</div>
+                            <div class="description">
+                                <p>На основі лічильника. Новий код генерується при кожному запиті.</p>
+                                <p><strong>Спеціальний варіант</strong> - не залежить від часу, підходить для офлайн сценаріїв.</p>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/user/mfa/hotp/setup" class="ui primary fluid button">
+                                <i class="shield icon"></i>
+                                Увімкнути HOTP
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
 
             <div class="ui divider"></div>
