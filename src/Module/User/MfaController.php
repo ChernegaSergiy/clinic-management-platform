@@ -20,9 +20,15 @@ class MfaController
 
     public function showMfaSetup(): void
     {
-        AuthGuard::check();
+        AuthGuard::requireMfaSetup();
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
@@ -56,9 +62,15 @@ class MfaController
 
     public function verifyMfaSetup(): void
     {
-        AuthGuard::check();
+        AuthGuard::requireMfaSetup();
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
         $secret = $_SESSION['mfa_setup_secret'] ?? null;
         $backupCodes = $_SESSION['mfa_setup_backup_codes'] ?? [];
 
