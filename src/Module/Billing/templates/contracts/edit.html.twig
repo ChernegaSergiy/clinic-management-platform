@@ -46,7 +46,9 @@
                 {% if errors.status %}<div class="ui red basic pointing label">{{ errors.status | first }}</div>{% endif %}
             </div>
 
-            {{ ui.button('Зберегти зміни', 'primary', 'large', 'save') }}
+            <div class="ui divider"></div>
+
+            {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
             <a href="/billing/contracts/show?id={{ contract.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>
