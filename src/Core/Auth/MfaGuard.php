@@ -21,7 +21,11 @@ class MfaGuard
                 self::clearPending();
             }
         } elseif ($step->requiresMfaSetup()) {
-            header('Location: /user/mfa/setup');
+            if (self::isRequired()) {
+                header('Location: /user/mfa/required');
+            } else {
+                header('Location: /user/mfa/setup');
+            }
             exit();
         }
     }
