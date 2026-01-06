@@ -29,6 +29,8 @@
             </div>
             {{ forms.textarea('notes', 'Примітки', old.notes ?? appointment.notes, 'Додаткові примітки до запису') }}
 
+            <div class="ui divider"></div>
+
             {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
             <a href="/appointments/show?id={{ appointment.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>

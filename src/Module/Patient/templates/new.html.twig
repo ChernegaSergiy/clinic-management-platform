@@ -29,6 +29,7 @@
                 {{ forms.input('document_id', 'ID-картка/паспорт', '', 'text', '001234567') }}
                 {{ forms.select('marital_status', 'Сімейний стан', {'single': 'Неодружений/Незаміжня', 'married': 'Одружений/Заміжня', 'divorced': 'Розлучений/Розлучена', 'widowed': 'Вдівець/Вдова'}, '', errors.marital_status ?? null) }}
             </div>
+            <div class="ui divider"></div>
 
             {{ ui.button('Зберегти пацієнта', 'primary', '', 'save') }}
             <a href="/patients" class="ui button"><i class="arrow left icon"></i> Скасувати</a>

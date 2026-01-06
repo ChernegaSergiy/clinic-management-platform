@@ -30,6 +30,8 @@
             </div>
             {{ forms.input('location', 'Місце зберігання', old.location ?? item.location, 'text', 'Наприклад, Склад 1, полиця А', errors.location ?? null) }}
 
+            <div class="ui divider"></div>
+
             {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
             <a href="/inventory/show?id={{ item.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>

@@ -49,6 +49,8 @@
             {{ forms.textarea('treatment', 'Лікування', old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
             {{ forms.textarea('notes', 'Примітки', old.notes ?? record.notes, 'Додаткові примітки') }}
 
+            <div class="ui divider"></div>
+
             {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
             <a href="/medical-records/show?id={{ record.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
