@@ -278,9 +278,12 @@ class MfaController
         $errorMessage = $_SESSION['mfa_error'] ?? null;
         unset($_SESSION['mfa_error']);
 
+        $mfaType = $_SESSION['mfa_type'] ?? $this->mfaService->getUserMfaStatus($userId)['type'] ?? 'totp';
+
         View::render('@modules/User/templates/mfa_verify.html.twig', [
             'user' => $user,
             'errorMessage' => $errorMessage,
+            'mfaType' => $mfaType,
         ]);
     }
 
