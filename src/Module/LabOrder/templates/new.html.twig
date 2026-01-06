@@ -17,7 +17,7 @@
             {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до замовлення', errors.notes ?? null) }}
 
             {{ ui.button('Зберегти замовлення', 'primary', 'large', 'save') }}
-            <a href="/medical-records/show?id={{ medical_record.id }}" class="ui button">Скасувати</a>
+            <a href="/medical-records/show?id={{ medical_record.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>
 {% endblock %}

@@ -15,7 +15,7 @@
             {{ forms.input('type', 'Тип словника (необов\'язково)', old.type ?? '', 'text', 'Наприклад, appointment_status', errors.type ?? null) }}
 
             {{ ui.button('Зберегти словник', 'primary', 'large', 'save') }}
-            <a href="/admin/dictionaries" class="ui button">Скасувати</a>
+            <a href="/admin/dictionaries" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>
 {% endblock %}
