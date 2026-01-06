@@ -45,7 +45,14 @@
         <div class="two fields">
             <div class="field">
                 <label>Департамент</label>
-                <input type="text" name="department" placeholder="Напр. Кардіологія" value="{{ employee.department ?? '' }}">
+                <select name="department_id" class="ui dropdown">
+                    <option value="">Не обрано</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}" {{ (employee.department_id ?? '') == department.id ? 'selected' : '' }}>
+                            {{ department.name }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
              <div class="field">
                 <label>Дата найму</label>
