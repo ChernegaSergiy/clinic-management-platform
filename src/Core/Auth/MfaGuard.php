@@ -6,7 +6,7 @@ use App\Module\User\MfaService;
 
 class MfaGuard
 {
-    public static function check(): void
+    public static function check(?string $currentTemplate = null): void
     {
         $step = AuthStep::current();
 
@@ -22,11 +22,15 @@ class MfaGuard
             }
         } elseif ($step->requiresMfaSetup()) {
             if (self::isRequired()) {
-                header('Location: /user/mfa/required');
+                $template = $currentTemplate ?? '';
+                if (strpos($template, 'mfa_required') === false) {
+                    header('Location: /user/mfa/required');
+                    exit();
+                }
             } else {
                 header('Location: /user/mfa/setup');
+                exit();
             }
-            exit();
         }
     }
 
