@@ -34,9 +34,7 @@
             <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
 
-        <div class="ui divider"></div>
-
-        <form action="/insurance/companies/delete" method="POST">
+        <form action="/insurance/companies/delete" method="POST" style="display: inline-block; margin-left: 0.5em;">
             <input type="hidden" name="id" value="{{ company.id }}">
             <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?');">Видалити</button>
         </form>
