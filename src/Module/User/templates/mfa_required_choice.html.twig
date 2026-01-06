@@ -1,0 +1,69 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Обов'язкове налаштування 2FA - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segments">
+        <div class="ui segment">
+            <h1 class="ui header">Обов'язкове налаштування двофакторної автентифікації</h1>
+        </div>
+        <div class="ui secondary segment">
+            <div class="ui warning message">
+                <div class="header">Вимога безпеки</div>
+                <p>Двофакторна автентифікація обов'язкова для вашої ролі. Оберіть метод 2FA для налаштування:</p>
+            </div>
+
+            <div class="ui cards" style="margin-top: 1rem;">
+                <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
+                    <div class="content">
+                        <div class="header"><i class="clock icon"></i> TOTP</div>
+                        <div class="meta">Time-based (на основі часу)</div>
+                        <div class="description">
+                            <p>Код змінюється кожні 30 секунд.</p>
+                            <ul>
+                                <li><strong>Найпоширеніший варіант</strong></li>
+                                <li>Сумісний з Google Authenticator, Authy, 1Password</li>
+                                <li>Автоматична синхронізація часу</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <a href="/user/mfa/totp/required" class="ui primary fluid button">
+                            <i class="shield icon"></i>
+                            Обрати TOTP
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
+                    <div class="content">
+                        <div class="header"><i class="hashtag icon"></i> HOTP</div>
+                        <div class="meta">Counter-based (на основі лічильника)</div>
+                        <div class="description">
+                            <p>Новий код генерується при кожному запиті.</p>
+                            <ul>
+                                <li><strong>Спеціальний варіант</strong></li>
+                                <li>Не залежить від синхронізації часу</li>
+                                <li>Підходить для офлайн сценаріїв</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <a href="/user/mfa/hotp/required" class="ui primary fluid button">
+                            <i class="shield icon"></i>
+                            Обрати HOTP
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
