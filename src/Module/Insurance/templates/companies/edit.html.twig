@@ -30,15 +30,13 @@
             </div>
             <div class="ui divider"></div>
 
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <button class="ui primary button" type="submit"><i class="save icon"></i> Оновити</button>
-                <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            <button class="ui primary button" type="submit"><i class="save icon"></i> Оновити</button>
+            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
 
-                <form action="/insurance/companies/delete" method="POST" style="display: inline; margin: 0;">
-                    <input type="hidden" name="id" value="{{ company.id }}">
-                    <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?');">Видалити</button>
-                </form>
-            </div>
+            <form action="/insurance/companies/delete" method="POST" style="display: inline-block;">
+                <input type="hidden" name="id" value="{{ company.id }}">
+                <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?');">Видалити</button>
+            </form>
         </form>
     </div>
 {% endblock %}
