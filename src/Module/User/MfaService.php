@@ -4,6 +4,7 @@ namespace App\Module\User;
 
 use App\Database\Database;
 use OTPHP\TOTP;
+use OTPHP\HOTP;
 use App\Core\Service\QrCodeGenerator;
 use PDO;
 
@@ -26,6 +27,12 @@ class MfaService
         return $totp->getSecret();
     }
 
+    public function generateHotpSecret(): string
+    {
+        $hotp = HOTP::create();
+        return $hotp->getSecret();
+    }
+
     public function generateQRCode(string $secret, string $userEmail): string
     {
         $totp = TOTP::create($secret);
@@ -36,10 +43,27 @@ class MfaService
         return $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
     }
 
+    public function generateHotpQRCode(string $secret, string $userEmail, int $counter = 0): string
+    {
+        $hotp = HOTP::create($secret);
+        $hotp->setLabel($userEmail);
+        $hotp->setIssuer($this->issuerName);
+        $hotp->setCounter($counter);
+
+        $otpauthUri = $hotp->getProvisioningUri();
+        return $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
+    }
+
     public function verifyCode(string $secret, string $code): bool
     {
         $totp = TOTP::create($secret);
         return $totp->verify($code);
+    }
+
+    public function verifyHotpCode(string $secret, string $code, int $counter, int $window = 10): bool
+    {
+        $hotp = HOTP::create($secret);
+        return $hotp->verify($code, $counter, $window);
     }
 
     public function generateBackupCodes(int $count = 10): array
@@ -64,12 +88,14 @@ class MfaService
         return $code;
     }
 
-    public function enableMfaForUser(int $userId, string $secret, array $backupCodes): bool
+    public function enableMfaForUser(int $userId, string $secret, array $backupCodes, string $mfaType = 'totp'): bool
     {
+        $mfaType = in_array($mfaType, ['totp', 'hotp', 'sms', 'email'], true) ? $mfaType : 'totp';
+
         $stmt = $this->db->prepare("
             UPDATE users
             SET mfa_enabled = 1,
-                mfa_type = 'totp',
+                mfa_type = :mfa_type,
                 mfa_secret = :secret,
                 mfa_backup_codes = :backup_codes,
                 mfa_verified_at = NOW(),
@@ -80,8 +106,32 @@ class MfaService
 
         return $stmt->execute([
             'id' => $userId,
+            'mfa_type' => $mfaType,
             'secret' => $secret,
             'backup_codes' => json_encode($backupCodes),
+        ]);
+    }
+
+    public function enableHotpForUser(int $userId, string $secret, array $backupCodes, int $counter = 0): bool
+    {
+        $stmt = $this->db->prepare("
+            UPDATE users
+            SET mfa_enabled = 1,
+                mfa_type = 'hotp',
+                mfa_secret = :secret,
+                mfa_backup_codes = :backup_codes,
+                mfa_counter = :counter,
+                mfa_verified_at = NOW(),
+                mfa_pending = 0,
+                updated_at = NOW()
+            WHERE id = :id
+        ");
+
+        return $stmt->execute([
+            'id' => $userId,
+            'secret' => $secret,
+            'backup_codes' => json_encode($backupCodes),
+            'counter' => $counter,
         ]);
     }
 
@@ -90,8 +140,10 @@ class MfaService
         $stmt = $this->db->prepare("
             UPDATE users
             SET mfa_enabled = 0,
+                mfa_type = 'totp',
                 mfa_secret = NULL,
                 mfa_backup_codes = NULL,
+                mfa_counter = 0,
                 mfa_verified_at = NULL,
                 mfa_pending = 0,
                 updated_at = NOW()
@@ -103,7 +155,7 @@ class MfaService
 
     public function verifyUserMfa(int $userId, string $code): bool
     {
-        $stmt = $this->db->prepare("SELECT mfa_secret, mfa_backup_codes FROM users WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT mfa_secret, mfa_type, mfa_counter, mfa_backup_codes FROM users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch();
 
@@ -111,8 +163,19 @@ class MfaService
             return false;
         }
 
-        if ($this->verifyCode($user['mfa_secret'], $code)) {
-            return true;
+        $mfaType = $user['mfa_type'] ?? 'totp';
+        $secret = $user['mfa_secret'];
+        $counter = $user['mfa_counter'] ?? 0;
+
+        if ($mfaType === 'hotp') {
+            if ($this->verifyHotpCode($secret, $code, $counter)) {
+                $this->incrementHotpCounter($userId, $counter);
+                return true;
+            }
+        } else {
+            if ($this->verifyCode($secret, $code)) {
+                return true;
+            }
         }
 
         $backupCodes = json_decode($user['mfa_backup_codes'] ?? '[]', true);
@@ -122,6 +185,12 @@ class MfaService
         }
 
         return false;
+    }
+
+    private function incrementHotpCounter(int $userId, int $currentCounter): void
+    {
+        $stmt = $this->db->prepare("UPDATE users SET mfa_counter = :counter WHERE id = :id");
+        $stmt->execute(['id' => $userId, 'counter' => $currentCounter + 1]);
     }
 
     private function removeUsedBackupCode(int $userId, string $code): void
