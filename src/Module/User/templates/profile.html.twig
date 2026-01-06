@@ -95,119 +95,114 @@
             <div class="ui divider"></div>
 
             {% if mfaPolicy != 'disabled' %}
-            <h2 class="ui header">Двофакторна автентифікація (2FA)</h2>
+                <h2 class="ui header">Двофакторна автентифікація (2FA)</h2>
 
-            {% set mfaStatus = {
-                enabled: user.mfa_enabled,
-                type: user.mfa_type,
-                verified_at: user.mfa_verified_at
-            } %}
+                {% set mfaStatus = {
+                    enabled: user.mfa_enabled,
+                    type: user.mfa_type,
+                    verified_at: user.mfa_verified_at
+                } %}
 
-            {% if mfaStatus.enabled %}
-                <div class="ui success message">
-                    <i class="check circle icon"></i>
-                    <div class="content">
-                        <div class="header">2FA увімкнено</div>
-                        <p>Тип: {{ mfaStatus.type|upper }} | Увімкнено: {{ user.mfa_verified_at|date('d.m.Y H:i') }}</p>
-                    </div>
-                </div>
-
-                <div class="ui buttons">
-                    <a href="/user/mfa/setup/{{ mfaStatus.type|lower }}?reset=1" class="ui button">Переналаштувати 2FA</a>
-                    <div class="or" data-text="або"></div>
-                    <button type="button" class="ui red button" onclick="showDisableMfaModal()">Вимкнути 2FA</button>
-                </div>
-
-                <div class="ui divider"></div>
-
-                <h3 class="ui header">Коди відновлення</h3>
-                <p style="margin-bottom: 1rem;">Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора.</p>
-
-                {% if session.new_backup_codes %}
+                {% if mfaStatus.enabled %}
                     <div class="ui success message">
                         <i class="check circle icon"></i>
-                        <div class="header">Коди оновлено!</div>
-                        <p>Збережіть нові коди. Старі коди більше не діють.</p>
-                    </div>
-
-                    <div class="ui segment" style="background-color: #f8f9fa; margin-bottom: 1rem;">
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                            {% for code in session.new_backup_codes %}
-                                <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
-                            {% endfor %}
+                        <div class="content">
+                            <div class="header">2FA увімкнено</div>
+                            <p>Тип: {{ mfaStatus.type|upper }} | Увімкнено: {{ user.mfa_verified_at|date('d.m.Y H:i') }}</p>
                         </div>
                     </div>
 
-                    <a href="/user/mfa/clear-backup-codes" class="ui primary button">Зрозуміло</a>
+                    <div class="ui buttons">
+                        <a href="/user/mfa/setup/{{ mfaStatus.type|lower }}?reset=1" class="ui button">Переналаштувати 2FA</a>
+                        <div class="or" data-text="або"></div>
+                        <button type="button" class="ui red button" onclick="showDisableMfaModal()">Вимкнути 2FA</button>
+                    </div>
 
                     <div class="ui divider"></div>
+
+                    <h3 class="ui header">Коди відновлення</h3>
+                    <p style="margin-bottom: 1rem;">Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора.</p>
+
+                    {% if session.new_backup_codes %}
+                        <div class="ui success message">
+                            <i class="check circle icon"></i>
+                            <div class="header">Коди оновлено!</div>
+                            <p>Збережіть нові коди. Старі коди більше не діють.</p>
+                        </div>
+
+                        <div class="ui segment" style="background-color: #f8f9fa; margin-bottom: 1rem;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                {% for code in session.new_backup_codes %}
+                                    <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <a href="/user/mfa/clear-backup-codes" class="ui primary button">Зрозуміло</a>
+
+                        <div class="ui divider"></div>
+                    {% endif %}
+
+                    <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
+                        <div class="ui form">
+                            <div class="required field">
+                                <label for="mfa-password">Введіть пароль для підтвердження</label>
+                                <input type="password" id="mfa-password" name="password" placeholder="Ваш пароль" required>
+                            </div>
+                            <button type="submit" class="ui yellow button">
+                                <i class="refresh icon"></i>
+                                Оновити коди
+                            </button>
+                        </div>
+                    </form>
                 {% endif %}
 
-                <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
-                    <div class="ui form">
-                        <div class="required field">
-                            <label for="mfa-password">Введіть пароль для підтвердження</label>
-                            <input type="password" id="mfa-password" name="password" placeholder="Ваш пароль" required>
-                        </div>
-                        <button type="submit" class="ui yellow button">
-                            <i class="refresh icon"></i>
-                            Оновити коди
-                        </button>
-                    </div>
-                </form>
-            {% else %}
-                <div class="ui warning message">
-                    <i class="exclamation triangle icon"></i>
-                    <div class="content">
-                        <div class="header">2FA не увімкнено</div>
-                        <p>Рекомендуємо увімкнути двофакторну автентифікацію для захисту вашого акаунту.</p>
-                    </div>
-                </div>
-
-                <div class="ui two stackable cards">
-                    <div class="card">
+                {% if not mfaStatus.enabled %}
+                    <div class="ui warning message">
+                        <i class="exclamation triangle icon"></i>
                         <div class="content">
-                            <div class="header"><i class="clock icon"></i> TOTP</div>
-                            <div class="description">
-                                <p>На основі часу. Код змінюється кожні 30 секунд.</p>
-                                <p><strong>Найпоширеніший варіант</strong> - сумісний з Google Authenticator, Authy, 1Password.</p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <a href="/user/mfa/setup/totp" class="ui primary fluid button">
-                                <i class="shield icon"></i>
-                                Увімкнути TOTP
-                            </a>
+                            <div class="header">2FA не увімкнено</div>
+                            <p>Рекомендуємо увімкнути двофакторну автентифікацію для захисту вашого акаунту.</p>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="content">
-                            <div class="header"><i class="hashtag icon"></i> HOTP</div>
-                            <div class="description">
-                                <p>На основі лічильника. Новий код генерується при кожному запиті.</p>
-                                <p><strong>Спеціальний варіант</strong> - не залежить від часу, підходить для офлайн сценаріїв.</p>
+                    <div class="ui two stackable cards">
+                        <div class="card">
+                            <div class="content">
+                                <div class="header"><i class="clock icon"></i> TOTP</div>
+                                <div class="description">
+                                    <p>На основі часу. Код змінюється кожні 30 секунд.</p>
+                                    <p><strong>Найпоширеніший варіант</strong> - сумісний з Google Authenticator, Authy, 1Password.</p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <a href="/user/mfa/setup/totp" class="ui primary fluid button">
+                                    <i class="shield icon"></i>
+                                    Увімкнути TOTP
+                                </a>
                             </div>
                         </div>
-                        <div class="extra content">
-                            <a href="/user/mfa/setup/hotp" class="ui primary fluid button">
-                                <i class="shield icon"></i>
-                                Увімкнути HOTP
-                            </a>
+
+                        <div class="card">
+                            <div class="content">
+                                <div class="header"><i class="hashtag icon"></i> HOTP</div>
+                                <div class="description">
+                                    <p>На основі лічильника. Новий код генерується при кожному запиті.</p>
+                                    <p><strong>Спеціальний варіант</strong> - не залежить від часу, підходить для офлайн сценаріїв.</p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <a href="/user/mfa/setup/hotp" class="ui primary fluid button">
+                                    <i class="shield icon"></i>
+                                    Увімкнути HOTP
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% else %}
-                <div class="ui info message">
-                    <i class="info circle icon"></i>
-                    <div class="content">
-                        <div class="header">2FA вимкнено</div>
-                        <p>Двофакторна автентифікація недоступна на даний момент.</p>
-                    </div>
-                </div>
+                {% endif %}
+
+                <div class="ui divider"></div>
             {% endif %}
-
-            <div class="ui divider"></div>
 
             <h2 class="ui header">Зв'язані акаунти</h2>
             <div class="ui relaxed divided list">
@@ -218,7 +213,8 @@
                                 <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
                                     <button type="submit" class="ui small red button">Відв'язати</button>
                                 </form>
-                            {% else %}
+                            {% endif %}
+                            {% if config.provider not in linkedProviders %}
                                 <a href="/oauth/redirect/{{ config.provider }}" class="ui button {{ config.provider }}">
                                     <i class="{{ config.provider }} icon"></i>
                                     Прив'язати {{ config.provider|capitalize }}
@@ -231,7 +227,8 @@
                             <div class="description">
                                 {% if config.provider in linkedProviders %}
                                     Акаунт прив'язано
-                                {% else %}
+                                {% endif %}
+                                {% if config.provider not in linkedProviders %}
                                     Не прив'язано
                                 {% endif %}
                             </div>
@@ -244,7 +241,7 @@
         </div>
     </div>
 
-    {% if mfaStatus.enabled %}
+    {% if mfaPolicy != 'disabled' and mfaStatus.enabled %}
     <div class="ui small modal" id="disable-mfa-modal">
         <div class="header">
             <i class="shield alternate red icon"></i>
@@ -268,7 +265,7 @@
         </div>
         <div class="actions">
             <div class="ui black deny button">Скасувати</div>
-            <div class="ui red deny button" form="disable-mfa-form" onclick="document.getElementById('disable-mfa-form').submit()">
+            <div class="ui red button" onclick="document.getElementById('disable-mfa-form').submit()">
                 <i class="shield icon"></i>
                 Вимкнути 2FA
             </div>
