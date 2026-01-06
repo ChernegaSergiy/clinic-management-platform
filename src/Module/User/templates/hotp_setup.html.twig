@@ -7,12 +7,7 @@
         <div class="ui segment">
             <h1 class="ui header">Налаштування двофакторної автентифікації (HOTP)</h1>
         </div>
-        <div class="ui secondary segment">
-            <div class="ui warning message">
-                <div class="header">Важливо</div>
-                <p>HOTP використовує лічильник замість часу. Кожного разу, коли ви запитуєте новий код, лічильник збільшується.</p>
-            </div>
-
+        <div class="ui segment" style="padding: 2rem;">
             {% if session.error_message %}
                 <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
@@ -20,67 +15,59 @@
                     <p>{{ session.error_message }}</p>
                 </div>
                 {% set _ = session.error_message is null %}
+            {% else %}
+                <div class="ui warning message">
+                    <div class="header">Важливо</div>
+                    <p>HOTP використовує лічильник замість часу. Кожного разу, коли ви запитуєте новий код, лічильник збільшується.</p>
+                </div>
             {% endif %}
 
-            <div class="ui stackable two column grid">
-                <div class="column">
-                    <h3 class="ui header">1. Встановіть додаток</h3>
-                    <p>Завантажте Google Authenticator або інший HOTP-сумісний додаток:</p>
-                    <div class="ui list">
-                        <div class="item"><i class="android icon"></i> Google Authenticator (Android, iOS)</div>
-                        <div class="item"><i class="apple icon"></i> Authy (Android, iOS)</div>
-                        <div class="item"><i class="desktop icon"></i> 1Password</div>
-                    </div>
-                    <p style="color: #e67e22; margin-top: 10px;">
-                        <strong>Увага:</strong> При додавання оберіть тип "HMAC-based" або "Counter-based", не Time-based (TOTP).
-                    </p>
-                </div>
-                <div class="column">
-                    <h3 class="ui header">2. Відскануйте QR-код</h3>
-                    <div class="ui card" style="margin: 0 auto;">
-                        <div class="image" style="padding: 20px; text-align: center; background: #fff;">
-                            <img src="{{ qrCode }}" alt="QR Code" style="max-width: 180px; width: 100%; height: auto; display: block; margin: 0 auto;">
+            <div class="ui grid stackable" style="margin-top: 2rem;">
+                <div class="eight wide column">
+                    <div class="ui centered card" style="box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div class="content" style="padding: 2rem;">
+                            <h2 class="ui header" style="text-align: center; margin-bottom: 1.5rem;">Відскануйте QR-код</h2>
+                            <div style="text-align: center; background: #fff; padding: 1.5rem; border-radius: 8px; border: 2px solid #e0e0e0;">
+                                <img src="{{ qrCode }}" alt="QR Code" style="max-width: 220px; width: 100%;">
+                            </div>
+                            <div style="text-align: center; margin-top: 1rem;">
+                                <p style="color: #666; font-size: 0.9rem;">або введіть вручну:</p>
+                                <code style="display: block; padding: 0.5rem 1rem; background: #f5f5f5; border-radius: 4px; font-size: 0.85rem; word-break: break-all;">{{ secret }}</code>
+                                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #999;">Лічильник: {{ counter }}</div>
+                            </div>
                         </div>
-                        <div class="content">
-                            <div class="header">Або введіть вручну:</div>
-                            <code style="word-break: break-all; font-size: 12px;">{{ secret }}</code>
-                            <div style="margin-top: 10px; font-size: 12px; color: #666;">
-                                Лічильник: {{ counter }}
+                    </div>
+                </div>
+
+                <div class="eight wide column">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 class="ui header" style="margin-bottom: 0.5rem;">Підтвердьте налаштування</h3>
+                        <p style="color: #666; margin-bottom: 1rem;">Введіть код з вашого додатку автентифікатора:</p>
+                        <form action="/user/mfa/setup/hotp" method="POST">
+                            <div style="margin-bottom: 1rem;">
+                                <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off" style="width: 100%; text-align: center; font-size: 2rem; letter-spacing: 5px; padding: 1rem; border: 2px solid #ddd; border-radius: 8px;">
+                            </div>
+                            <button type="submit" class="ui primary fluid button" style="padding: 1rem; font-size: 1.1rem;">Підтвердити</button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3 class="ui header" style="margin-bottom: 0.5rem;">Коди відновлення</h3>
+                        <p style="color: #666; margin-bottom: 1rem;">Збережіть ці коди в безпечному місці:</p>
+                        <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem;">
+                                {% for code in backupCodes %}
+                                    <code style="padding: 0.5rem; text-align: center; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem;">{{ code }}</code>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="ui divider"></div>
+            <div class="ui divider" style="margin: 2rem 0;"></div>
 
-            <h3 class="ui header">3. Підтвердьте налаштування</h3>
-            <p>Введіть код з вашого додатку автентифікатора:</p>
-
-            <form action="/user/mfa/hotp/setup" method="POST" class="ui form">
-                <div class="field">
-                    <label for="code">Код HOTP</label>
-                    <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 18px; letter-spacing: 3px; max-width: 200px;">
-                </div>
-                <button type="submit" class="ui primary button">Підтвердити</button>
-            </form>
-
-            <div class="ui divider"></div>
-
-            <h3 class="ui header">Коди відновлення</h3>
-            <p>Збережіть ці коди в безпечному місці. Ви можете використати їх для входу, якщо втратите доступ до додатку:</p>
-
-            <div class="ui segment" style="background-color: #f8f9fa;">
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    {% for code in backupCodes %}
-                        <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="ui divider"></div>
-
-            <a href="/user/profile" class="ui button">Повернутися до профілю</a>
+            <a href="/user/profile" class="ui button">← Повернутися до профілю</a>
         </div>
     </div>
 {% endblock %}
