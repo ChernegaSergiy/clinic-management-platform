@@ -171,7 +171,7 @@ class MfaController
                 $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
             }
 
-            View::render('@modules/User/templates/mfa_required.html.twig', [
+            View::render('@modules/User/templates/totp_required.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
