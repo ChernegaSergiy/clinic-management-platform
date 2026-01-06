@@ -1,0 +1,130 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Обов'язкове налаштування HOTP 2FA - Клініка{% endblock %}
+
+{% block body %}
+    <div class="ui segments">
+        <div class="ui segment">
+            <h1 class="ui header">Обов'язкове налаштування двофакторної автентифікації (HOTP)</h1>
+        </div>
+        <div class="ui secondary segment">
+            {% if session.error_message %}
+                <div class="ui warning message" data-flash="error">
+                    <i class="close icon"></i>
+                    <div class="header">Повідомлення</div>
+                    <p>{{ session.error_message }}</p>
+                </div>
+                {% set _ = session.error_message is null %}
+            {% else %}
+                <div class="ui warning message">
+                    <div class="header">Вимога безпеки</div>
+                    <p>Двофакторна автентифікація обов'язкова для вашої ролі. Ви повинні налаштувати 2FA для продовження роботи з системою.</p>
+                </div>
+            {% endif %}
+
+            <div class="ui stackable two column grid">
+                <div class="column">
+                    <h3 class="ui header">1. Встановіть додаток</h3>
+                    <p>Завантажте Google Authenticator або інший HOTP-сумісний додаток:</p>
+                    <div class="ui list">
+                        <div class="item"><i class="android icon"></i> Google Authenticator (Android, iOS)</div>
+                        <div class="item"><i class="apple icon"></i> Authy (Android, iOS)</div>
+                        <div class="item"><i class="desktop icon"></i> 1Password</div>
+                    </div>
+                    <p style="color: #e67e22; margin-top: 10px;">
+                        <strong>Увага:</strong> При додаванні оберіть тип "HMAC-based" або "Counter-based", не Time-based (TOTP).
+                    </p>
+                </div>
+                <div class="column">
+                    <h3 class="ui header">2. Відскануйте QR-код</h3>
+                    <div class="ui card" style="margin: 0 auto;">
+                        <div class="image" style="padding: 20px; text-align: center; background: #fff;">
+                            <img src="{{ qrCode }}" alt="QR Code" style="max-width: 180px; width: 100%; height: auto; display: block; margin: 0 auto;">
+                        </div>
+                        <div class="content">
+                            <div class="header">Або введіть вручну:</div>
+                            <code style="word-break: break-all; font-size: 12px;">{{ secret }}</code>
+                            <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                                Лічильник: {{ counter }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">3. Підтвердьте налаштування</h3>
+            <p>Введіть код з вашого додатку автентифікатора:</p>
+
+            <form action="/user/mfa/hotp/required" method="POST" class="ui form">
+                <div class="field">
+                    <label for="code">Код HOTP</label>
+                    <input type="text" id="code" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 18px; letter-spacing: 3px; max-width: 200px;">
+                </div>
+                <button type="submit" class="ui primary button">Підтвердити</button>
+            </form>
+
+            <div class="ui divider"></div>
+
+            <h3 class="ui header">Коди відновлення</h3>
+            <p>Збережіть ці коди в безпечному місці. Ви можете використати їх для входу, якщо втратите доступ до додатку:</p>
+
+            <div class="ui segment" style="background-color: #f8f9fa;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for code in backupCodes %}
+                        <code style="padding: 8px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ code }}</code>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                $('.message .close').on('click', function() {
+                    $(this).closest('.message').transition({
+                        animation: 'fade',
+                        duration: 300,
+                        onComplete: function() {
+                            $(this).remove();
+                        }
+                    });
+                    fetch('/user/clear-messages', {method: 'POST'});
+                });
+
+                var flashMessages = document.querySelectorAll('[data-flash]');
+                if (flashMessages.length > 0) {
+                    setTimeout(function() {
+                        flashMessages.forEach(function(el) {
+                            $(el).transition({
+                                animation: 'fade',
+                                duration: 300,
+                                onComplete: function() {
+                                    $(el).remove();
+                                }
+                            });
+                        });
+                        fetch('/user/clear-messages', {method: 'POST'});
+                    }, 5000);
+                }
+
+                document.getElementById('code').focus();
+
+                document.getElementById('code').addEventListener('input', function(e) {
+                    var value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 6) {
+                        value = value.substring(0, 6);
+                    }
+                    e.target.value = value;
+                });
+            });
+        </script>
+    {% endblock %}
