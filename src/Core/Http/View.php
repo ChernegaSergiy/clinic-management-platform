@@ -51,7 +51,7 @@ class View
 
     public static function render(string $template, array $data = []): void
     {
-        if (MfaGuard::isRequired() && strpos($template, 'mfa_required') === false && strpos($template, 'hotp_required') === false && strpos($template, 'mfa_verify') === false) {
+        if (MfaGuard::isRequired() && strpos($template, 'mfa_required') === false && strpos($template, 'hotp_required') === false && strpos($template, 'mfa_setup') === false && strpos($template, 'mfa_verify') === false) {
             header('Location: /user/mfa/required');
             exit();
         }
