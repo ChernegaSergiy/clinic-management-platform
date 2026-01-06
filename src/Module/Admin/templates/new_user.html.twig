@@ -21,9 +21,11 @@
             {{ forms.input('password', 'Пароль', null, 'password', 'Пароль', errors.password ?? null, {'required': 'required'})
  }}
             {{ forms.select('role_id', 'Роль', roles, old.role_id ?? null, errors.role_id ?? null, {'required': 'required'})
- }}
+  }}
 
-            {{ ui.button('Зберегти користувача', 'primary', 'large', 'save') }}
+            <div class="ui divider"></div>
+
+            {{ ui.button('Зберегти користувача', 'primary', '', 'save') }}
             <a href="/admin/users" class="ui button">Скасувати</a>
         </form>
     </div>
