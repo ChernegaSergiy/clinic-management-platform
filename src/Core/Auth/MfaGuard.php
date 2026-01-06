@@ -6,9 +6,10 @@ use App\Module\User\MfaService;
 
 class MfaGuard
 {
-    public static function check(?string $currentTemplate = null): void
+    public static function check(): void
     {
         $step = AuthStep::current();
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
         if ($step->requiresMfaVerify()) {
             $userId = $_SESSION['mfa_pending_user_id'] ?? null;
@@ -21,14 +22,8 @@ class MfaGuard
                 self::clearPending();
             }
         } elseif ($step->requiresMfaSetup()) {
-            if (self::isRequired()) {
-                $template = $currentTemplate ?? '';
-                if (strpos($template, 'mfa_required') === false) {
-                    header('Location: /user/mfa/required');
-                    exit();
-                }
-            } else {
-                header('Location: /user/mfa/setup');
+            if (self::isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
+                header('Location: /user/mfa/required');
                 exit();
             }
         }

@@ -26,8 +26,6 @@ class MfaController
 
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
-        } else {
-            AuthGuard::requireMfaSetup();
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
@@ -91,8 +89,6 @@ class MfaController
 
     public function showMfaRequiredChoice(): void
     {
-        AuthGuard::requireMfaSetup();
-
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
@@ -119,8 +115,6 @@ class MfaController
             header('Location: /user/mfa/required');
             exit();
         }
-
-        AuthGuard::requireMfaSetup();
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
@@ -194,8 +188,6 @@ class MfaController
 
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
-        } else {
-            AuthGuard::requireMfaSetup();
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
@@ -325,8 +317,6 @@ class MfaController
             header('Location: /user/mfa/required');
             exit();
         }
-
-        AuthGuard::requireMfaSetup();
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
