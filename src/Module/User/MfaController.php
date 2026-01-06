@@ -60,6 +60,47 @@ class MfaController
         ]);
     }
 
+    public function showMfaRequired(): void
+    {
+        AuthGuard::requireMfaSetup();
+
+        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $user = $this->userRepository->findById($userId);
+
+        if (!$user) {
+            session_destroy();
+            header('Location: /login');
+            exit();
+        }
+
+        $secret = $_SESSION['mfa_setup_secret'] ?? null;
+        $backupCodes = $_SESSION['mfa_setup_backup_codes'] ?? [];
+
+        if (!$secret || !$backupCodes) {
+            $secret = $this->mfaService->generateSecret();
+            $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
+            $backupCodes = $this->mfaService->generateBackupCodes();
+
+            $_SESSION['mfa_setup_secret'] = $secret;
+            $_SESSION['mfa_setup_backup_codes'] = $backupCodes;
+        } else {
+            $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
+        }
+
+        View::render('@modules/User/templates/mfa_required.html.twig', [
+            'user' => $user,
+            'secret' => $secret,
+            'qrCode' => $qrCode,
+            'backupCodes' => $backupCodes,
+        ]);
+    }
+
     public function verifyMfaSetup(): void
     {
         AuthGuard::requireMfaSetup();
@@ -99,6 +140,65 @@ class MfaController
         } else {
             $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
             header('Location: /user/mfa/setup');
+            exit();
+        }
+    }
+
+    public function verifyMfaRequired(): void
+    {
+        AuthGuard::requireMfaSetup();
+
+        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $secret = $_SESSION['mfa_setup_secret'] ?? null;
+        $backupCodes = $_SESSION['mfa_setup_backup_codes'] ?? [];
+
+        if (!$secret) {
+            $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
+            header('Location: /user/mfa/required');
+            exit();
+        }
+
+        $code = $_POST['code'] ?? '';
+
+        if (empty($code)) {
+            $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
+            header('Location: /user/mfa/required');
+            exit();
+        }
+
+        if ($this->mfaService->verifyCode($secret, $code)) {
+            $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes);
+
+            unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
+            MfaGuard::clearRequired();
+
+            $user = $this->userRepository->findById($userId);
+            $roleRepository = new \App\Module\User\Repository\RoleRepository();
+            $role = $roleRepository->findById((int)$user['role_id']);
+
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'email' => $user['email'],
+                'role_id' => $user['role_id'],
+                'role_name' => $role['name'] ?? null,
+            ];
+
+            $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+            unset($_SESSION['intended_url']);
+
+            header('Location: ' . $redirect);
+            exit();
+        } else {
+            $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
+            header('Location: /user/mfa/required');
             exit();
         }
     }
