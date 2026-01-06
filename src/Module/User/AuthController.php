@@ -70,6 +70,7 @@ class AuthController
 
             if ($roleRequiresMfa && !$mfaService->isMfaEnabled($user['id'])) {
                 $_SESSION['mfa_required'] = true;
+                $_SESSION['mfa_required_type'] = 'totp';
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
                 $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
