@@ -368,4 +368,84 @@ class MfaController
         header('Location: /user/profile');
         exit();
     }
+
+    public function showHotpSetup(): void
+    {
+        AuthGuard::check();
+
+        $userId = $_SESSION['user']['id'];
+        $user = $this->userRepository->findById($userId);
+
+        if (!$user) {
+            session_destroy();
+            header('Location: /login');
+            exit();
+        }
+
+        if ($this->mfaService->isMfaEnabled($userId) && ($user['mfa_type'] ?? 'totp') !== 'hotp') {
+            header('Location: /user/profile');
+            exit();
+        }
+
+        $secret = $_SESSION['hotp_setup_secret'] ?? $this->mfaService->generateHotpSecret();
+        $counter = $_SESSION['hotp_setup_counter'] ?? 0;
+        $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
+        $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? $this->mfaService->generateBackupCodes();
+
+        $_SESSION['hotp_setup_secret'] = $secret;
+        $_SESSION['hotp_setup_counter'] = $counter;
+        $_SESSION['hotp_setup_backup_codes'] = $backupCodes;
+
+        View::render('@modules/User/templates/hotp_setup.html.twig', [
+            'user' => $user,
+            'secret' => $secret,
+            'qrCode' => $qrCode,
+            'backupCodes' => $backupCodes,
+            'counter' => $counter,
+        ]);
+    }
+
+    public function verifyHotpSetup(): void
+    {
+        AuthGuard::check();
+
+        $userId = $_SESSION['user']['id'];
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $secret = $_SESSION['hotp_setup_secret'] ?? null;
+        $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? [];
+        $counter = $_SESSION['hotp_setup_counter'] ?? 0;
+
+        if (!$secret) {
+            $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
+            header('Location: /user/mfa/hotp/setup');
+            exit();
+        }
+
+        $code = $_POST['code'] ?? '';
+
+        if (empty($code)) {
+            $_SESSION['error_message'] = 'Будь ласка, введіть код.';
+            header('Location: /user/mfa/hotp/setup');
+            exit();
+        }
+
+        if ($this->mfaService->verifyHotpCode($secret, $code, $counter)) {
+            $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $counter);
+
+            unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter']);
+
+            $_SESSION['success_message'] = 'Двофакторну автентифікацію HOTP успішно увімкнено!';
+            header('Location: /user/profile');
+            exit();
+        } else {
+            $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
+            header('Location: /user/mfa/hotp/setup');
+            exit();
+        }
+    }
 }
