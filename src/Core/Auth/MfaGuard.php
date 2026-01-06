@@ -8,19 +8,21 @@ class MfaGuard
 {
     public static function check(): void
     {
-        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+        $step = AuthStep::current();
 
-        if ($userId === null) {
-            return;
-        }
+        if ($step->requiresMfaVerify()) {
+            $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+            $mfaService = new MfaService();
 
-        $mfaService = new MfaService();
-
-        if ($mfaService->isMfaEnabled($userId)) {
-            header('Location: /user/mfa/verify');
+            if ($mfaService->isMfaEnabled($userId)) {
+                header('Location: /user/mfa/verify');
+                exit();
+            } else {
+                self::clearPending();
+            }
+        } elseif ($step->requiresMfaSetup()) {
+            header('Location: /user/mfa/setup');
             exit();
-        } else {
-            unset($_SESSION['mfa_pending_user_id']);
         }
     }
 
