@@ -14,7 +14,7 @@
             {{ forms.textarea('description', 'Опис словника', old.description ?? '', 'Детальний опис словника', errors.description ?? null) }}
             {{ forms.input('type', 'Тип словника (необов\'язково)', old.type ?? '', 'text', 'Наприклад, appointment_status', errors.type ?? null) }}
 
-            {{ ui.button('Зберегти словник', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти словник', 'primary', '', 'save') }}
             <a href="/admin/dictionaries" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

@@ -13,7 +13,7 @@
             {{ forms.input('name', 'Назва категорії', old.name ?? null, 'text', 'Назва категорії', errors.name ?? null, {'required': 'required'}) }}
             {{ forms.textarea('description', 'Опис', old.description ?? null, 'Опис категорії', errors.description ?? null) }}
             
-            {{ ui.button('Зберегти категорію', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти категорію', 'primary', '', 'save') }}
             <a href="/admin/service-categories" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

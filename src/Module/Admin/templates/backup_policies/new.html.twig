@@ -22,8 +22,9 @@
                     <option value="inactive" {% if old.status is not defined or old.status == 'inactive' %}selected{% endif %}>Неактивна</option>
                 </select>
             </div>
+            <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти політику', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти політику', 'primary', '', 'save') }}
             <a href="/admin/backup_policies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>
