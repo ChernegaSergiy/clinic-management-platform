@@ -8,53 +8,125 @@
             <h1 class="ui header">Обов'язкове налаштування двофакторної автентифікації</h1>
         </div>
         <div class="ui secondary segment">
-            <div class="ui warning message">
-                <div class="header">Вимога безпеки</div>
-                <p>Двофакторна автентифікація обов'язкова для вашої ролі. Оберіть метод 2FA для налаштування:</p>
+            <div class="ui warning message" style="margin-bottom: 2rem;">
+                <i class="shield alternate icon"></i>
+                <div class="content">
+                    <div class="header">Вимога безпеки</div>
+                    <p>Двофакторна автентифікація обов'язкова для вашої ролі. Оберіть метод 2FA для налаштування:</p>
+                </div>
             </div>
 
-            <div class="ui cards" style="margin-top: 1rem;">
-                <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
-                    <div class="content">
-                        <div class="header"><i class="clock icon"></i> TOTP</div>
-                        <div class="meta">Time-based (на основі часу)</div>
-                        <div class="description">
-                            <p>Код змінюється кожні 30 секунд.</p>
-                            <ul>
-                                <li><strong>Найпоширеніший варіант</strong></li>
-                                <li>Сумісний з Google Authenticator, Authy, 1Password</li>
-                                <li>Автоматична синхронізація часу</li>
-                            </ul>
+            <div class="ui two column stackable grid">
+                <div class="column">
+                    <div class="ui fluid card" style="border-top: 4px solid #2185d0; transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div class="content">
+                            <div class="header" style="color: #2185d0;">
+                                <i class="clock icon"></i> TOTP
+                                <span style="float: right; font-size: 0.8em; color: #666; font-weight: normal;">
+                                    Time-based
+                                </span>
+                            </div>
+                            <div class="meta">
+                                <span class="ui blue tag">Рекомендовано</span>
+                            </div>
+                            <div class="description">
+                                <p style="margin-bottom: 1rem;">Код змінюється кожні 30 секунд на основі часу.</p>
+                                <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; border-left: 3px solid #2185d0;">
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1em;">Переваги:</h4>
+                                    <ul style="margin: 0; padding-left: 1.2rem;">
+                                        <li style="margin-bottom: 0.3rem;"><strong>Найпоширеніший</strong> стандарт</li>
+                                        <li style="margin-bottom: 0.3rem;">Сумісний з Google Authenticator, Authy, 1Password</li>
+                                        <li style="margin-bottom: 0.3rem;">Автоматична синхронізація часу</li>
+                                        <li>Зручний для щоденного використання</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="extra content">
-                        <a href="/user/mfa/totp/required" class="ui primary fluid button">
-                            <i class="shield icon"></i>
-                            Обрати TOTP
-                        </a>
+                        <div class="extra content">
+                            <a href="/user/mfa/required/totp" class="ui primary fluid button" style="background: #2185d0;">
+                                <i class="shield icon"></i>
+                                Обрати TOTP
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card" style="width: 48%; display: inline-block; vertical-align: top;">
-                    <div class="content">
-                        <div class="header"><i class="hashtag icon"></i> HOTP</div>
-                        <div class="meta">Counter-based (на основі лічильника)</div>
-                        <div class="description">
-                            <p>Новий код генерується при кожному запиті.</p>
-                            <ul>
-                                <li><strong>Спеціальний варіант</strong></li>
-                                <li>Не залежить від синхронізації часу</li>
-                                <li>Підходить для офлайн сценаріїв</li>
-                            </ul>
+                <div class="column">
+                    <div class="ui fluid card" style="border-top: 4px solid #f2711c; transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div class="content">
+                            <div class="header" style="color: #f2711c;">
+                                <i class="hashtag icon"></i> HOTP
+                                <span style="float: right; font-size: 0.8em; color: #666; font-weight: normal;">
+                                    Counter-based
+                                </span>
+                            </div>
+                            <div class="meta">
+                                <span class="ui orange tag">Спеціальний</span>
+                            </div>
+                            <div class="description">
+                                <p style="margin-bottom: 1rem;">Код генерується на основі лічильника при кожному запиті.</p>
+                                <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; border-left: 3px solid #f2711c;">
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1em;">Переваги:</h4>
+                                    <ul style="margin: 0; padding-left: 1.2rem;">
+                                        <li style="margin-bottom: 0.3rem;"><strong>Не залежить</strong> від часу</li>
+                                        <li style="margin-bottom: 0.3rem;">Працює при розсинхронізації годинника</li>
+                                        <li style="margin-bottom: 0.3rem;">Ідеальний для офлайн сценаріїв</li>
+                                        <li>Менша ймовірність помилок синхронізації</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <a href="/user/mfa/required/hotp" class="ui primary fluid button" style="background: #f2711c;">
+                                <i class="shield icon"></i>
+                                Обрати HOTP
+                            </a>
                         </div>
                     </div>
-                    <div class="extra content">
-                        <a href="/user/mfa/hotp/required" class="ui primary fluid button">
-                            <i class="shield icon"></i>
-                            Обрати HOTP
-                        </a>
-                    </div>
                 </div>
+            </div>
+
+            <div class="ui segment" style="margin-top: 2rem; background: #f8f9fa;">
+                <h3 class="ui header" style="margin-bottom: 1rem;">
+                    <i class="info circle icon"></i>
+                    Порівняння методів
+                </h3>
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>Характеристика</th>
+                            <th style="text-align: center;">TOTP</th>
+                            <th style="text-align: center;">HOTP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Залежність від часу</td>
+                            <td style="text-align: center;">Так</td>
+                            <td style="text-align: center;">Ні</td>
+                        </tr>
+                        <tr>
+                            <td>Частота зміни коду</td>
+                            <td style="text-align: center;">Кожні 30 секунд</td>
+                            <td style="text-align: center;">При кожному запиті</td>
+                        </tr>
+                        <tr>
+                            <td>Сумісність з додатками</td>
+                            <td style="text-align: center;"><i class="check green icon"></i> Повна</td>
+                            <td style="text-align: center;"><i class="minus yellow icon"></i> Обмежена</td>
+                        </tr>
+                        <tr>
+                            <td>Офлайн робота</td>
+                            <td style="text-align: center;"><i class="minus yellow icon"></i> Синхронізація часу</td>
+                            <td style="text-align: center;"><i class="check green icon"></i> Незалежно</td>
+                        </tr>
+                        <tr>
+                            <td>Складність налаштування</td>
+                            <td style="text-align: center;">Проста</td>
+                            <td style="text-align: center;">Середня</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -62,6 +134,14 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <style>
+        .ui.card {
+            cursor: pointer;
+        }
+        .ui.card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
 {% endblock %}
 
 {% block javascripts %}
