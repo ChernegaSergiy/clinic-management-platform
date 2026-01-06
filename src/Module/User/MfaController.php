@@ -126,7 +126,7 @@ class MfaController
         $isReset = $_SESSION['mfa_setup_is_reset'] ?? false;
 
         if (!$secret) {
-            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            $redirectUrl = $isReset ? '/user/mfa/totp/setup?reset=1' : '/user/mfa/totp/setup';
             header('Location: ' . $redirectUrl);
             exit();
         }
@@ -135,7 +135,7 @@ class MfaController
 
         if (empty($code)) {
             $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
-            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            $redirectUrl = $isReset ? '/user/mfa/totp/setup?reset=1' : '/user/mfa/totp/setup';
             header('Location: ' . $redirectUrl);
             exit();
         }
@@ -171,7 +171,7 @@ class MfaController
             exit();
         } else {
             $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
-            $redirectUrl = $isReset ? '/user/mfa/setup?reset=1' : '/user/mfa/setup';
+            $redirectUrl = $isReset ? '/user/mfa/totp/setup?reset=1' : '/user/mfa/totp/setup';
             header('Location: ' . $redirectUrl);
             exit();
         }
@@ -193,7 +193,7 @@ class MfaController
 
         if (!$secret) {
             $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
-            header('Location: /user/mfa/required');
+            header('Location: /user/mfa/totp/required');
             exit();
         }
 
@@ -201,12 +201,12 @@ class MfaController
 
         if (empty($code)) {
             $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
-            header('Location: /user/mfa/required');
+            header('Location: /user/mfa/totp/required');
             exit();
         }
 
         if ($this->mfaService->verifyCode($secret, $code)) {
-            $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes);
+            $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes, 'totp');
 
             unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
             MfaGuard::clearRequired();
@@ -231,7 +231,7 @@ class MfaController
             exit();
         } else {
             $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
-            header('Location: /user/mfa/required');
+            header('Location: /user/mfa/totp/required');
             exit();
         }
     }
@@ -285,6 +285,111 @@ class MfaController
             'errorMessage' => $errorMessage,
             'mfaType' => $mfaType,
         ]);
+    }
+
+    public function showHotpRequired(): void
+    {
+        AuthGuard::requireMfaSetup();
+
+        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $user = $this->userRepository->findById($userId);
+
+        if (!$user) {
+            session_destroy();
+            header('Location: /login');
+            exit();
+        }
+
+        $secret = $_SESSION['hotp_setup_secret'] ?? null;
+        $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? [];
+
+        if (!$secret || !$backupCodes) {
+            $secret = $this->mfaService->generateHotpSecret();
+            $counter = 0;
+            $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
+            $backupCodes = $this->mfaService->generateBackupCodes();
+
+            $_SESSION['hotp_setup_secret'] = $secret;
+            $_SESSION['hotp_setup_counter'] = $counter;
+            $_SESSION['hotp_setup_backup_codes'] = $backupCodes;
+        } else {
+            $counter = $_SESSION['hotp_setup_counter'] ?? 0;
+            $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
+        }
+
+        View::render('@modules/User/templates/hotp_required.html.twig', [
+            'user' => $user,
+            'secret' => $secret,
+            'qrCode' => $qrCode,
+            'backupCodes' => $backupCodes,
+            'counter' => $counter,
+        ]);
+    }
+
+    public function verifyHotpRequired(): void
+    {
+        AuthGuard::requireMfaSetup();
+
+        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $secret = $_SESSION['hotp_setup_secret'] ?? null;
+        $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? [];
+        $counter = $_SESSION['hotp_setup_counter'] ?? 0;
+
+        if (!$secret) {
+            $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
+            header('Location: /user/mfa/hotp/required');
+            exit();
+        }
+
+        $code = $_POST['code'] ?? '';
+
+        if (empty($code)) {
+            $_SESSION['error_message'] = 'Будь ласка, введіть код.';
+            header('Location: /user/mfa/hotp/required');
+            exit();
+        }
+
+        if ($this->mfaService->verifyHotpCode($secret, $code, $counter)) {
+            $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $counter);
+
+            unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter']);
+            MfaGuard::clearRequired();
+
+            $user = $this->userRepository->findById($userId);
+            $roleRepository = new \App\Module\User\Repository\RoleRepository();
+            $role = $roleRepository->findById((int)$user['role_id']);
+
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'email' => $user['email'],
+                'role_id' => $user['role_id'],
+                'role_name' => $role['name'] ?? null,
+            ];
+
+            $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+            unset($_SESSION['intended_url']);
+
+            header('Location: ' . $redirect);
+            exit();
+        } else {
+            $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
+            header('Location: /user/mfa/hotp/required');
+            exit();
+        }
     }
 
     public function verifyMfa(): void
