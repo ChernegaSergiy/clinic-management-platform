@@ -79,6 +79,7 @@ class AuthController
 
             if ($mfaService->isMfaEnabled($user['id'])) {
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
+                $_SESSION['mfa_type'] = $mfaService->getUserMfaStatus($user['id'])['type'];
                 $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
                 header('Location: /user/mfa/verify');
