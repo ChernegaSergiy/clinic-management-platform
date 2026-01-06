@@ -53,7 +53,7 @@
 
             {{ forms.textarea('notes', 'Примітки (необов\'язково)', old.notes ?? '', 'Додаткові примітки до рецепта') }}
 
-            {{ ui.button('Зберегти рецепт', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти рецепт', 'primary', '', 'save') }}
             <a href="/patients/show?id={{ patient.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

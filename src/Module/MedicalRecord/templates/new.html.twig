@@ -42,7 +42,7 @@
             {{ forms.textarea('treatment', 'Лікування', '', 'Опишіть призначене лікування') }}
             {{ forms.textarea('notes', 'Примітки', '', 'Додаткові примітки') }}
 
-            {{ ui.button('Зберегти запис', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти запис', 'primary', '', 'save') }}
             <a href="/appointments/show?id={{ appointment.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

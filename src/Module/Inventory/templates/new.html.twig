@@ -30,7 +30,7 @@
             </div>
             {{ forms.input('location', 'Місце зберігання', old.location ?? null, 'text', 'Наприклад, Склад 1, полиця А', errors.location ?? null) }}
 
-            {{ ui.button('Зберегти позицію', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти позицію', 'primary', '', 'save') }}
             <a href="/inventory" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

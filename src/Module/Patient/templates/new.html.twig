@@ -30,7 +30,7 @@
                 {{ forms.select('marital_status', 'Сімейний стан', {'single': 'Неодружений/Незаміжня', 'married': 'Одружений/Заміжня', 'divorced': 'Розлучений/Розлучена', 'widowed': 'Вдівець/Вдова'}, '', errors.marital_status ?? null) }}
             </div>
 
-            {{ ui.button('Зберегти пацієнта', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти пацієнта', 'primary', '', 'save') }}
             <a href="/patients" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>

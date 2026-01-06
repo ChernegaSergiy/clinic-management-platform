@@ -23,7 +23,7 @@
             </div>
             {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до рахунку', errors.notes ?? null) }}
 
-            {{ ui.button('Зберегти рахунок', 'primary', 'large', 'save') }}
+            {{ ui.button('Зберегти рахунок', 'primary', '', 'save') }}
             <a href="/billing" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
     </div>
