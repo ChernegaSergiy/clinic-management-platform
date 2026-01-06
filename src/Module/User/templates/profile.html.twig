@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="ui buttons">
-                    <a href="/user/mfa/setup?reset=1" class="ui button">Переналаштувати 2FA</a>
+                    <a href="/user/mfa/setup/{{ mfaStatus.type|lower }}?reset=1" class="ui button">Переналаштувати 2FA</a>
                     <div class="or" data-text="або"></div>
                     <button type="button" class="ui red button" onclick="showDisableMfaModal()">Вимкнути 2FA</button>
                 </div>
@@ -173,7 +173,7 @@
                             </div>
                         </div>
                         <div class="extra content">
-                            <a href="/user/mfa/setup" class="ui primary fluid button">
+                            <a href="/user/mfa/setup/totp" class="ui primary fluid button">
                                 <i class="shield icon"></i>
                                 Увімкнути TOTP
                             </a>
@@ -189,7 +189,7 @@
                             </div>
                         </div>
                         <div class="extra content">
-                            <a href="/user/mfa/hotp/setup" class="ui primary fluid button">
+                            <a href="/user/mfa/setup/hotp" class="ui primary fluid button">
                                 <i class="shield icon"></i>
                                 Увімкнути HOTP
                             </a>
