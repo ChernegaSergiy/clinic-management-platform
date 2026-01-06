@@ -9,7 +9,11 @@
                 <header class="section__header" style="text-align: center; margin-bottom: 1.5rem;">
                     <div class="section__eyebrow">Безпека</div>
                     <h1 class="section__title section__title--compact" style="margin-bottom: 0.5rem;">Двофакторна автентифікація</h1>
-                    <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть код з додатку автентифікатора</p>
+                    {% if mfaType == 'hotp' %}
+                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть наступний код з додатку автентифікатора (HOTP)</p>
+                    {% else %}
+                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть код з додатку автентифікатора (TOTP)</p>
+                    {% endif %}
                 </header>
 
                 {% if errorMessage %}
