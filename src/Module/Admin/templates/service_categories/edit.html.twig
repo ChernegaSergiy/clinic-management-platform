@@ -12,7 +12,9 @@
         <form class="ui form" method="POST" action="/admin/service-categories/edit?id={{ category.id }}">
             {{ forms.input('name', 'Назва категорії', old.name ?? category.name, 'text', 'Назва категорії', errors.name ?? null, {'required': 'required'}) }}
             {{ forms.textarea('description', 'Опис', old.description ?? category.description, 'Опис категорії', errors.description ?? null) }}
-            
+
+            <div class="ui divider"></div>
+
             {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
             <a href="/admin/service-categories" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
         </form>
