@@ -51,7 +51,9 @@ class View
 
     public static function render(string $template, array $data = []): void
     {
-        if (MfaGuard::isRequired() && strpos($template, 'mfa_required') === false) {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+
+        if (MfaGuard::isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
             header('Location: /user/mfa/required');
             exit();
         }
