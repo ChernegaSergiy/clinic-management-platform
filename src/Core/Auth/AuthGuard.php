@@ -31,14 +31,27 @@ class AuthGuard
 
     public static function check(): void
     {
-        if (!isset($_SESSION['user'])) {
-            $_SESSION['intended_url'] = $_SERVER['REQUEST_URI'] ?? '/dashboard';
+        $step = AuthStep::current();
+
+        if ($step->isAuthorized()) {
+            MfaGuard::check();
+            self::hydrateRoleName();
+            return;
+        }
+
+        $_SESSION['intended_url'] = $_SERVER['REQUEST_URI'] ?? '/dashboard';
+        header('Location: /login');
+        exit();
+    }
+
+    public static function requireMfaSetup(): void
+    {
+        $step = AuthStep::current();
+
+        if (!$step->requiresMfaSetup() && !$step->requiresMfaVerify()) {
             header('Location: /login');
             exit();
         }
-
-        MfaGuard::check();
-        self::hydrateRoleName();
     }
 
     public static function isAdmin(): void
