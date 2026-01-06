@@ -31,6 +31,7 @@ class UserModule extends BaseModule
             $router->add('GET', '/oauth/callback/{provider}', [OAuthController::class, 'callback']);
         }
 
+        $router->add('GET', '/user/mfa/required', [MfaController::class, 'showMfaRequiredChoice']);
         $router->add('GET', '/user/mfa/totp/setup', [MfaController::class, 'showMfaSetup']);
         $router->add('POST', '/user/mfa/totp/setup', [MfaController::class, 'verifyMfaSetup']);
         $router->add('GET', '/user/mfa/totp/required', [MfaController::class, 'showMfaRequired']);

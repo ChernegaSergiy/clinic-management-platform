@@ -65,6 +65,30 @@ class MfaController
         ]);
     }
 
+    public function showMfaRequiredChoice(): void
+    {
+        AuthGuard::requireMfaSetup();
+
+        $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+
+        if (!$userId) {
+            header('Location: /login');
+            exit();
+        }
+
+        $user = $this->userRepository->findById($userId);
+
+        if (!$user) {
+            session_destroy();
+            header('Location: /login');
+            exit();
+        }
+
+        View::render('@modules/User/templates/mfa_required_choice.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
     public function showMfaRequired(): void
     {
         AuthGuard::requireMfaSetup();
@@ -193,7 +217,7 @@ class MfaController
 
         if (!$secret) {
             $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
-            header('Location: /user/mfa/totp/required');
+            header('Location: /user/mfa/required');
             exit();
         }
 
