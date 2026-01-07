@@ -19,7 +19,7 @@
                     <div class="content">
                         <div class="header">Інформація про відділ</div>
                         <div class="description">
-                            <table class="ui very basic table">
+                            <table class="ui unstackable definition table">
                                 <tr>
                                     <td><strong>Назва:</strong></td>
                                     <td>{{ department.name }}</td>
@@ -76,16 +76,30 @@
                         </div>
                         <div class="description">
                             {% if employees is not empty %}
-                                <div class="ui relaxed divided list">
-                                    {% for employee in employees %}
-                                        <div class="item">
-                                            <div class="content">
-                                                <div class="header">{{ employee.first_name }} {{ employee.last_name }}</div>
-                                                <div class="description">{{ employee.position }}</div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                                <table class="ui celled unstackable table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ім'я</th>
+                                            <th>Посада</th>
+                                            <th>Email</th>
+                                            <th>Дії</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for employee in employees %}
+                                            <tr>
+                                                <td>{{ employee.last_name }} {{ employee.first_name }}</td>
+                                                <td>{{ employee.position }}</td>
+                                                <td>{{ employee.user_email|default('—') }}</td>
+                                                <td>
+                                                    <a href="/hrm/show?id={{ employee.id }}" class="ui icon button">
+                                                        <i class="eye icon"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             {% else %}
                                 <p class="ui info message">У цьому відділі немає співробітників</p>
                             {% endif %}

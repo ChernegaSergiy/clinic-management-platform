@@ -108,10 +108,15 @@ class HrmRepository implements HrmRepositoryInterface
     public function findByDepartment(int $departmentId): array
     {
         $sql = "
-            SELECT e.*, d.name as department_name, dp.name as parent_name 
+            SELECT 
+                e.*, 
+                d.name as department_name, 
+                dp.name as parent_name,
+                u.email as user_email
             FROM employees e 
             LEFT JOIN departments d ON e.department_id = d.id 
             LEFT JOIN departments dp ON d.parent_id = dp.id 
+            LEFT JOIN users u ON e.user_id = u.id
             WHERE e.department_id = :department_id 
             ORDER BY e.last_name, e.first_name
         ";
