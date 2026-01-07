@@ -31,7 +31,7 @@
                 </tr>
                 <tr>
                     <td>Термін придатності</td>
-                    <td>{{ item.expiry_date|default('—') }}</td>
+                    <td>{{ item.expiry_date }}</td>
                 </tr>
                 <tr>
                     <td>Постачальник</td>
@@ -59,11 +59,11 @@
                 </tr>
                 <tr>
                     <td>Створено</td>
-                    <td>{{ item.created_at|date('Y-m-d H:i')|default('—') }}</td>
+                    <td>{{ item.created_at|date('Y-m-d H:i') }}</td>
                 </tr>
                 <tr>
                     <td>Оновлено</td>
-                    <td>{{ item.updated_at|date('Y-m-d H:i')|default('—') }}</td>
+                    <td>{{ item.updated_at|date('Y-m-d H:i') }}</td>
                 </tr>
             </tbody>
         </table>

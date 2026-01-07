@@ -25,11 +25,11 @@
                 </tr>
                 <tr>
                     <td><strong>Client ID</strong></td>
-                    <td>{{ config.client_id ?: 'Не вказано' }}</td>
+                    <td>{{ config.client_id|default('—') }}</td>
                 </tr>
                 <tr>
                     <td><strong>Client Secret</strong></td>
-                    <td>{{ config.client_secret ? '********' : 'Не вказано' }}</td>
+                    <td>{{ config.client_secret ? '********' : '—' }}</td>
                 </tr>
                 <tr>
                     <td><strong>Активна</strong></td>
@@ -43,7 +43,7 @@
                 </tr>
                 <tr>
                     <td><strong>Додаткова конфігурація</strong></td>
-                    <td><pre>{{ config.config ? config.config|json_encode(constant('JSON_PRETTY_PRINT')) : 'Немає' }}</pre></td>
+                    <td><pre>{{ config.config ? config.config|json_encode(constant('JSON_PRETTY_PRINT')) : '—' }}</pre></td>
                 </tr>
                 <tr>
                     <td><strong>Створено</strong></td>

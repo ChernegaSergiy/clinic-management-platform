@@ -19,19 +19,19 @@
                 </tr>
                 <tr>
                     <td>Контактна особа</td>
-                    <td>{{ company.contact_person|default('Не вказано') }}</td>
+                    <td>{{ company.contact_person|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Телефон</td>
-                    <td>{{ company.phone|default('Не вказано') }}</td>
+                    <td>{{ company.phone|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td>{{ company.email|default('Не вказано') }}</td>
+                    <td>{{ company.email|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ company.notes|nl2br|default('Немає') }}</td>
+                    <td>{{ company.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
         </table>
