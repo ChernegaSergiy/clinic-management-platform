@@ -16,7 +16,10 @@ class HrmRepository implements HrmRepositoryInterface
 
     public function findAll(): array
     {
-        $sql = "SELECT * FROM employees ORDER BY last_name, first_name";
+        $sql = "SELECT e.*, d.name as department_name 
+                FROM employees e
+                LEFT JOIN departments d ON e.department_id = d.id
+                ORDER BY e.last_name, e.first_name";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -24,8 +27,8 @@ class HrmRepository implements HrmRepositoryInterface
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO employees (first_name, last_name, middle_name, position, department, hire_date, salary, contact_phone, status, user_id) 
-                VALUES (:first_name, :last_name, :middle_name, :position, :department, :hire_date, :salary, :contact_phone, :status, :user_id)";
+        $sql = "INSERT INTO employees (first_name, last_name, middle_name, position, department_id, hire_date, salary, contact_phone, status, user_id) 
+                VALUES (:first_name, :last_name, :middle_name, :position, :department_id, :hire_date, :salary, :contact_phone, :status, :user_id)";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -34,7 +37,7 @@ class HrmRepository implements HrmRepositoryInterface
             ':last_name' => $data['last_name'],
             ':middle_name' => $data['middle_name'] ?? null,
             ':position' => $data['position'],
-            ':department' => $data['department'] ?? null,
+            ':department_id' => $data['department_id'] ?? null,
             ':hire_date' => $data['hire_date'],
             ':salary' => $data['salary'] ?: null,
             ':contact_phone' => $data['contact_phone'] ?? null,
@@ -45,7 +48,10 @@ class HrmRepository implements HrmRepositoryInterface
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM employees WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT e.*, d.name as department_name 
+                                       FROM employees e 
+                                       LEFT JOIN departments d ON e.department_id = d.id 
+                                       WHERE e.id = :id");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         return $result === false ? null : $result;
@@ -58,7 +64,7 @@ class HrmRepository implements HrmRepositoryInterface
                     last_name = :last_name,
                     middle_name = :middle_name,
                     position = :position,
-                    department = :department,
+                    department_id = :department_id,
                     hire_date = :hire_date,
                     fire_date = :fire_date,
                     salary = :salary,
@@ -75,7 +81,7 @@ class HrmRepository implements HrmRepositoryInterface
             ':last_name' => $data['last_name'],
             ':middle_name' => $data['middle_name'] ?? null,
             ':position' => $data['position'],
-            ':department' => $data['department'] ?? null,
+            ':department_id' => $data['department_id'] ?? null,
             ':hire_date' => $data['hire_date'],
             ':fire_date' => empty($data['fire_date']) ? null : $data['fire_date'],
             ':salary' => $data['salary'] ?: null,
