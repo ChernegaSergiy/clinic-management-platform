@@ -13,101 +13,78 @@
 
         <div class="ui divider"></div>
 
-        <div class="ui grid">
-            <div class="ten wide column">
-                <div class="ui card">
-                    <div class="content">
-                        <div class="header">Інформація про відділ</div>
-                        <div class="description">
-                            <table class="ui unstackable definition table">
-                                <tr>
-                                    <td><strong>Назва:</strong></td>
-                                    <td>{{ department.name }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Батьківський відділ:</strong></td>
-                                    <td>{{ department.parent_name|default('—') }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Статус:</strong></td>
-                                    <td>
-                                        {% if department.is_active %}
-                                            <span class="ui green label">Активний</span>
-                                        {% else %}
-                                            <span class="ui red label">Неактивний</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Порядок сортування:</strong></td>
-                                    <td>{{ department.sort_order }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Створено:</strong></td>
-                                    <td>{{ department.created_at|date('d.m.Y H:i') }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Оновлено:</strong></td>
-                                    <td>{{ department.updated_at|date('d.m.Y H:i')|default('—') }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+        <h3>Інформація про відділ</h3>
+        <table class="ui unstackable definition table">
+            <tbody>
+                <tr>
+                    <td><strong>Назва:</strong></td>
+                    <td>{{ department.name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Батьківський відділ:</strong></td>
+                    <td>{{ department.parent_name|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Статус:</strong></td>
+                    <td>
+                        {% if department.is_active %}
+                            <span class="ui green label">Активний</span>
+                        {% else %}
+                            <span class="ui red label">Неактивний</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Порядок сортування:</strong></td>
+                    <td>{{ department.sort_order }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Створено:</strong></td>
+                    <td>{{ department.created_at|date('d.m.Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Оновлено:</strong></td>
+                    <td>{{ department.updated_at|date('d.m.Y H:i')|default('—') }}</td>
+                </tr>
+            </tbody>
+        </table>
 
-                {% if department.description %}
-                <div class="ui card">
-                    <div class="content">
-                        <div class="header">Опис відділу</div>
-                        <div class="description">
-                            <p>{{ department.description }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+        {% if department.description %}
+        <div class="ui divider"></div>
+        <h3>Опис відділу</h3>
+        <p>{{ department.description }}</p>
+        {% endif %}
 
-            <div class="six wide column">
-                <div class="ui card">
-                    <div class="content">
-                        <div class="header">
-                            Співробітники відділу 
-                            <span class="ui blue label">{{ employees|length }}</span>
-                        </div>
-                        <div class="description">
-                            {% if employees is not empty %}
-                                <table class="ui celled unstackable table">
-                                    <thead>
-                                        <tr>
-                                            <th>Ім'я</th>
-                                            <th>Посада</th>
-                                            <th>Email</th>
-                                            <th>Дії</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for employee in employees %}
-                                            <tr>
-                                                <td>{{ employee.last_name }} {{ employee.first_name }}</td>
-                                                <td>{{ employee.position }}</td>
-                                                <td>{{ employee.user_email|default('—') }}</td>
-                                                <td>
-                                                    <a href="/hrm/show?id={{ employee.id }}" class="ui icon button">
-                                                        <i class="eye icon"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p class="ui info message">У цьому відділі немає співробітників</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="ui divider"></div>
+        <h3>Співробітники відділу <span class="ui blue label">{{ employees|length }}</span></h3>
+        {% if employees is not empty %}
+            <table class="ui celled unstackable table">
+                <thead>
+                    <tr>
+                        <th>Ім'я</th>
+                        <th>Посада</th>
+                        <th>Email</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.last_name }} {{ employee.first_name }}</td>
+                            <td>{{ employee.position }}</td>
+                            <td>{{ employee.user_email|default('—') }}</td>
+                            <td>
+                                <a href="/hrm/show?id={{ employee.id }}" class="ui icon button">
+                                    <i class="eye icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="ui info message">У цьому відділі немає співробітників</p>
+        {% endif %}
 
         <div class="ui divider"></div>
 
