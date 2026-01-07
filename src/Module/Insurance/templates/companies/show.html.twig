@@ -5,13 +5,8 @@
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
                 <h2 class="ui header">Деталі компанії #{{ company.id }}</h2>
-            </div>
-            <div class="eight wide column right aligned">
-                <a href="/insurance/companies/edit?id={{ company.id }}" class="ui primary button">
-                    <i class="edit icon"></i> Редагувати
-                </a>
             </div>
         </div>
         <div class="ui divider"></div>
@@ -43,6 +38,9 @@
 
         <div class="ui divider"></div>
 
+        <a href="/insurance/companies/edit?id={{ company.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
         <a href="/insurance/companies" class="ui button">Повернутися до списку</a>
     </div>
 {% endblock %}

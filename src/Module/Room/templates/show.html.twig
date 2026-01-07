@@ -6,16 +6,8 @@
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
                 <h2 class="ui header">{{ room.name }}</h2>
-            </div>
-            <div class="eight wide column right aligned">
-                <a href="/admin/rooms/edit?id={{ room.id }}" class="ui primary button">
-                    <i class="edit icon"></i> Редагувати
-                </a>
-                <a href="/admin/rooms" class="ui button">
-                    <i class="arrow left icon"></i> Повернутись
-                </a>
             </div>
         </div>
 
@@ -63,5 +55,14 @@
                 </div>
             </div>
         </div>
+
+        <div class="ui divider"></div>
+        
+        <a href="/admin/rooms/edit?id={{ room.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
+        <a href="/admin/rooms" class="ui button">
+            <i class="arrow left icon"></i> Повернутись
+        </a>
     </div>
 {% endblock %}

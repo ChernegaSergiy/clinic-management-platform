@@ -5,23 +5,8 @@
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
                 <h2 class="ui header">Профіль: {{ employee.first_name }} {{ employee.last_name }}</h2>
-            </div>
-            <div class="eight wide column right aligned">
-                <form action="/hrm/toggle-status" method="POST" style="display: inline-block;">
-                    <input type="hidden" name="id" value="{{ employee.id }}">
-                    <button class="ui {{ employee.status == 'active' ? 'negative' : 'positive' }} button" type="submit">
-                        <i class="user {{ employee.status == 'active' ? 'times' : 'check' }} icon"></i>
-                        {{ employee.status == 'active' ? 'Деактивувати' : 'Активувати' }}
-                    </button>
-                </form>
-                <a href="/hrm/edit?id={{ employee.id }}" class="ui primary button">
-                    <i class="edit icon"></i> Редагувати
-                </a>
-                <a href="/hrm" class="ui button">
-                    <i class="arrow left icon"></i> До списку
-                </a>
             </div>
         </div>
 
@@ -91,5 +76,21 @@
                 </div>
             </div>
         </div>
+
+        <div class="ui divider"></div>
+        
+        <form action="/hrm/toggle-status" method="POST" style="display: inline-block;">
+            <input type="hidden" name="id" value="{{ employee.id }}">
+            <button class="ui {{ employee.status == 'active' ? 'negative' : 'positive' }} button" type="submit">
+                <i class="user {{ employee.status == 'active' ? 'times' : 'check' }} icon"></i>
+                {{ employee.status == 'active' ? 'Деактивувати' : 'Активувати' }}
+            </button>
+        </form>
+        <a href="/hrm/edit?id={{ employee.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
+        <a href="/hrm" class="ui button">
+            <i class="arrow left icon"></i> До списку
+        </a>
     </div>
 {% endblock %}
