@@ -57,8 +57,12 @@
                                 <td>{{ appt.start_time|date('Y-m-d H:i') }}</td>
                                 <td>{{ appt.status }}</td>
                                 <td>
-                                    <a class="ui tiny button" href="/appointments/show?id={{ appt.id }}">Переглянути</a>
-                                    <a class="ui tiny primary button" href="/appointments/edit?id={{ appt.id }}">Редагувати</a>
+                                    <a class="ui icon button" href="/appointments/show?id={{ appt.id }}">
+                                        <i class="eye icon"></i>
+                                    </a>
+                                    <a class="ui icon primary button" href="/appointments/edit?id={{ appt.id }}">
+                                        <i class="edit icon"></i>
+                                    </a>
                                 </td>
                             </tr>
                         {% else %}
