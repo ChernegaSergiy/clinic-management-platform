@@ -12,70 +12,50 @@
 
         <div class="ui divider"></div>
 
-        <div class="ui relaxed divided list">
-            <div class="item">
-                <div class="content">
-                    <div class="header">ID</div>
-                    {{ employee.id }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Повне ім'я</div>
-                    {{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Посада</div>
-                    {{ employee.position }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Департамент</div>
-                    {{ employee.department_name|default('N/A') }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Дата найму</div>
-                    {{ employee.hire_date }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Контактний телефон</div>
-                    {{ employee.contact_phone|default('N/A') }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Зарплата</div>
-                    {{ employee.salary ? employee.salary|number_format(2, ',', ' ') : 'N/A' }}
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Статус</div>
-                    {{ employee.status }}
-                </div>
-            </div>
-            {% if employee.fire_date %}
-            <div class="item">
-                <div class="content">
-                    <div class="header">Дата звільнення</div>
-                    {{ employee.fire_date }}
-                </div>
-            </div>
-            {% endif %}
-            <div class="item">
-                <div class="content">
-                    <div class="header">ID користувача в системі</div>
-                    {{ employee.user_id|default('Не прив\'язано') }}
-                </div>
-            </div>
-        </div>
+        <table class="ui unstackable definition table">
+            <tbody>
+                <tr>
+                    <td><strong>ID</strong></td>
+                    <td>{{ employee.id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Повне ім'я</strong></td>
+                    <td>{{ employee.last_name }} {{ employee.first_name }} {{ employee.middle_name|default('') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Посада</strong></td>
+                    <td>{{ employee.position }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Департамент</strong></td>
+                    <td>{{ employee.department_name|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Дата найму</strong></td>
+                    <td>{{ employee.hire_date }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Контактний телефон</strong></td>
+                    <td>{{ employee.contact_phone|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Зарплата</strong></td>
+                    <td>{{ employee.salary ? employee.salary|number_format(2, ',', ' ') : '—' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Статус</strong></td>
+                    <td>{{ employee.status }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Дата звільнення</strong></td>
+                    <td>{{ employee.fire_date|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Прив'язаний користувач системи</strong></td>
+                    <td>{{ employee.user_id|default('—') }}</td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="ui divider"></div>
         

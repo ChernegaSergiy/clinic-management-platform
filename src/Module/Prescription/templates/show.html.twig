@@ -37,7 +37,7 @@
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ prescription.notes|nl2br }}</td>
+                    <td>{{ prescription.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
         </table>

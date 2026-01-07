@@ -35,15 +35,15 @@
                 </tr>
                 <tr>
                     <td>Хеш QR-коду</td>
-                    <td>{{ order.qr_code_hash }}</td>
+                    <td>{{ order.qr_code_hash|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Результати</td>
-                    <td>{{ order.results|nl2br }}</td>
+                    <td>{{ order.results|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ order.notes|nl2br }}</td>
+                    <td>{{ order.notes|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Створено</td>

@@ -35,7 +35,7 @@
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ appointment.notes|nl2br }}</td>
+                    <td>{{ appointment.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
         </table>

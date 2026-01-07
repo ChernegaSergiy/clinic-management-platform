@@ -43,7 +43,7 @@
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ invoice.notes|nl2br }}</td>
+                    <td>{{ invoice.notes|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Створено</td>
@@ -51,7 +51,7 @@
                 </tr>
                 <tr>
                     <td>Оновлено</td>
-                    <td>{{ invoice.updated_at|date('Y-m-d H:i') }}</td>
+                    <td>{{ invoice.updated_at|date('Y-m-d H:i')|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Всього оплачено</td>

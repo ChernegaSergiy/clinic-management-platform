@@ -27,7 +27,7 @@
                 </tr>
                 <tr>
                     <td>Код діагнозу (ICD-10)</td>
-                    <td>{{ record.diagnosis_code }}</td>
+                    <td>{{ record.diagnosis_code|default('—') }}</td>
                 </tr>
                 {% if record.icd_codes is not empty %}
                 <tr>
@@ -55,15 +55,15 @@
                 {% endif %}
                 <tr>
                     <td>Діагноз</td>
-                    <td>{{ record.diagnosis_text|nl2br }}</td>
+                    <td>{{ record.diagnosis_text|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Лікування</td>
-                    <td>{{ record.treatment|nl2br }}</td>
+                    <td>{{ record.treatment|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Примітки</td>
-                    <td>{{ record.notes|nl2br }}</td>
+                    <td>{{ record.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
         </table>

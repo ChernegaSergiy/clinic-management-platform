@@ -18,23 +18,23 @@
                         </tr>
                         <tr>
                             <td>Дата народження</td>
-                            <td>{{ patient.birth_date }}</td>
+                            <td>{{ patient.birth_date|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Стать</td>
-                            <td>{{ patient.gender }}</td>
+                            <td>{{ patient.gender|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Телефон</td>
-                            <td>{{ patient.phone }}</td>
+                            <td>{{ patient.phone|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Email</td>
-                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.email|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Адреса</td>
-                            <td>{{ patient.address }}</td>
+                            <td>{{ patient.address|default('—') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -45,15 +45,15 @@
                     <tbody>
                         <tr>
                             <td>РНОКПП</td>
-                            <td>{{ patient.tax_id }}</td>
+                            <td>{{ patient.tax_id|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>ID-картка/паспорт</td>
-                            <td>{{ patient.document_id }}</td>
+                            <td>{{ patient.document_id|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Сімейний стан</td>
-                            <td>{{ patient.marital_status }}</td>
+                            <td>{{ patient.marital_status|default('—') }}</td>
                         </tr>
                         <tr>
                             <td>Статус</td>

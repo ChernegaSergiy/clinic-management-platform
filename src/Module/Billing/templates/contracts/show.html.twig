@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <td>Опис</td>
-                    <td>{{ contract.description|nl2br }}</td>
+                    <td>{{ contract.description|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Дата початку</td>
@@ -31,11 +31,11 @@
                 </tr>
                 <tr>
                     <td>Сторона А</td>
-                    <td>{{ contract.party_a }}</td>
+                    <td>{{ contract.party_a|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Сторона Б</td>
-                    <td>{{ contract.party_b }}</td>
+                    <td>{{ contract.party_b|default('—') }}</td>
                 </tr>
                 <tr>
                     <td>Статус</td>
@@ -59,7 +59,7 @@
                 </tr>
                 <tr>
                     <td>Оновлено</td>
-                    <td>{{ contract.updated_at|date('Y-m-d H:i') }}</td>
+                    <td>{{ contract.updated_at|date('Y-m-d H:i')|default('—') }}</td>
                 </tr>
             </tbody>
         </table>

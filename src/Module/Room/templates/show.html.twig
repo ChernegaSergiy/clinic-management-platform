@@ -23,18 +23,14 @@
                     <td><strong>Місткість</strong></td>
                     <td>{{ room.capacity }} осіб</td>
                 </tr>
-                {% if room.location %}
                 <tr>
                     <td><strong>Розташування</strong></td>
-                    <td>{{ room.location }}</td>
+                    <td>{{ room.location|default('—') }}</td>
                 </tr>
-                {% endif %}
-                {% if room.equipment %}
                 <tr>
                     <td><strong>Обладнання</strong></td>
-                    <td>{{ room.equipment|nl2br }}</td>
+                    <td>{{ room.equipment|nl2br|default('—') }}</td>
                 </tr>
-                {% endif %}
                 <tr>
                     <td><strong>Статус</strong></td>
                     <td>
