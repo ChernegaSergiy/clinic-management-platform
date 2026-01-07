@@ -70,7 +70,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         return $stmt->execute([
             ':name' => $data['name'],
             ':description' => $data['description'] ?? null,
-            ':parent_id' => $data['parent_id'] ?? null,
+            ':parent_id' => empty($data['parent_id']) ? null : $data['parent_id'],
             ':is_active' => $data['is_active'] ?? true,
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
@@ -94,7 +94,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             ':id' => $id,
             ':name' => $data['name'],
             ':description' => $data['description'] ?? null,
-            ':parent_id' => $data['parent_id'] ?? null,
+            ':parent_id' => empty($data['parent_id']) ? null : $data['parent_id'],
             ':is_active' => $data['is_active'] ?? true,
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
