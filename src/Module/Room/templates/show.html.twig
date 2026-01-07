@@ -13,48 +13,40 @@
 
         <div class="ui divider"></div>
 
-        <div class="ui items">
-            <div class="item">
-                <div class="content">
-                    <div class="header">Тип кімнати</div>
-                    <div class="description">{{ room.type }}</div>
-                </div>
-            </div>
-            <div class="item">
-                <div class="content">
-                    <div class="header">Місткість</div>
-                    <div class="description">{{ room.capacity }} осіб</div>
-                </div>
-            </div>
-            {% if room.location %}
-            <div class="item">
-                <div class="content">
-                    <div class="header">Розташування</div>
-                    <div class="description">{{ room.location }}</div>
-                </div>
-            </div>
-            {% endif %}
-            {% if room.equipment %}
-            <div class="item">
-                <div class="content">
-                    <div class="header">Обладнання</div>
-                    <div class="description">{{ room.equipment|nl2br }}</div>
-                </div>
-            </div>
-            {% endif %}
-            <div class="item">
-                <div class="content">
-                    <div class="header">Статус</div>
-                    <div class="description">
+        <table class="ui unstackable definition table">
+            <tbody>
+                <tr>
+                    <td><strong>Тип кімнати</strong></td>
+                    <td>{{ room.type }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Місткість</strong></td>
+                    <td>{{ room.capacity }} осіб</td>
+                </tr>
+                {% if room.location %}
+                <tr>
+                    <td><strong>Розташування</strong></td>
+                    <td>{{ room.location }}</td>
+                </tr>
+                {% endif %}
+                {% if room.equipment %}
+                <tr>
+                    <td><strong>Обладнання</strong></td>
+                    <td>{{ room.equipment|nl2br }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><strong>Статус</strong></td>
+                    <td>
                         {% if room.is_available %}
                             <span class="ui green label">Доступна</span>
                         {% else %}
                             <span class="ui red label">Недоступна</span>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="ui divider"></div>
         
