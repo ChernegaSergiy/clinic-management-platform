@@ -16,7 +16,7 @@
             {{ forms.input('order_num', 'Порядковий номер', old.order_num ?? value.order_num, 'number', '0', errors.order_num ?? null) }}
             
             <div class="field">
-                <div class="ui checkbox">
+                <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {% if (old.is_active is defined and old.is_active) or (old.is_active is not defined and value.is_active) %}checked{% endif %} value="1">
                     <label>Активне значення</label>
                 </div>

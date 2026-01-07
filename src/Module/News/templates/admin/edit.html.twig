@@ -18,7 +18,7 @@
                 {{ forms.select('author_id', 'Автор', authors, old.author_id ?? newsArticle.author_id, errors.author_id, {'required': 'required'}) }}
             </div>
             <div class="field">
-                <div class="ui checkbox">
+                <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_published" tabindex="0" class="hidden" {% if (old.is_published is defined and old.is_published) or (newsArticle.is_published is defined and newsArticle.is_published and old.is_published is not defined) %}checked{% endif %}>
                     <label>Опубліковано</label>
                 </div>

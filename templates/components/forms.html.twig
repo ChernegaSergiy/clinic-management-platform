@@ -28,7 +28,7 @@
 
 {% macro checkbox(name, label, checked = false, attributes = {}) %}
     <div class="field">
-        <div class="ui checkbox">
+        <div class="ui toggle checkbox">
             <input type="checkbox" id="{{ name }}" name="{{ name }}" {% if checked %}checked{% endif %} {{ _self.html_attributes(attributes) }}>
             <label for="{{ name }}">{{ label }}</label>
         </div>
