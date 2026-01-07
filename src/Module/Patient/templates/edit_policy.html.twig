@@ -42,7 +42,9 @@
             </div>
 
             <button class="ui primary button" type="submit">Оновити</button>
-            <a href="/patients/show?id={{ patient.id }}" class="ui button">Скасувати</a>
+            <a href="/patients/show?id={{ patient.id }}" class="ui button">
+                <i class="arrow left icon"></i> Скасувати
+            </a>
         </form>
 
         <form action="/patients/{{ patient.id }}/policies/delete" method="POST" style="margin-top: 1em;">

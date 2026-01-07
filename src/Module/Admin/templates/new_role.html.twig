@@ -14,7 +14,9 @@
             {{ forms.textarea('description', 'Опис ролі', old.description ?? '', 'Детальний опис прав та обов'язків', errors.description ?? null) }}
 
             {{ ui.button('Зберегти роль', 'primary', 'large', 'save') }}
-            <a href="/admin/roles" class="ui button">Скасувати</a>
+            <a href="/admin/roles" class="ui button">
+                <i class="arrow left icon"></i> Скасувати
+            </a>
         </form>
     </div>
 {% endblock %}
