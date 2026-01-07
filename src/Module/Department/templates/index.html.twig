@@ -64,22 +64,22 @@
                             </td>
                             <td>{{ department.sort_order }}</td>
                             <td>
-                                <a href="/admin/departments/show?id={{ department.id }}" class="ui mini blue button">
+                                <a href="/admin/departments/show?id={{ department.id }}" class="ui icon button">
                                     <i class="eye icon"></i>
                                 </a>
-                                <a href="/admin/departments/edit?id={{ department.id }}" class="ui mini yellow button">
+                                <a href="/admin/departments/edit?id={{ department.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
                                 <form method="POST" action="/admin/departments/toggle-status" style="display: inline-block;">
                                     <input type="hidden" name="id" value="{{ department.id }}">
-                                    <button type="submit" class="ui mini {% if department.is_active %}orange{% else %}green{% endif %} button">
+                                    <button type="submit" class="ui icon button {% if department.is_active %}orange{% else %}green{% endif %}">
                                         <i class="power off icon"></i>
                                     </button>
                                 </form>
                                 <form method="POST" action="/admin/departments/delete" style="display: inline-block;" 
                                       onsubmit="return confirm('Видалити відділ?');">
                                     <input type="hidden" name="id" value="{{ department.id }}">
-                                    <button type="submit" class="ui mini red button">
+                                    <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>
                                     </button>
                                 </form>
