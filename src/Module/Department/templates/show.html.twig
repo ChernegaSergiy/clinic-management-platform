@@ -46,14 +46,12 @@
                     <td><strong>Оновлено:</strong></td>
                     <td>{{ department.updated_at|date('d.m.Y H:i')|default('—') }}</td>
                 </tr>
+                <tr>
+                    <td><strong>Опис:</strong></td>
+                    <td>{{ department.description|nl2br|default('—') }}</td>
+                </tr>
             </tbody>
         </table>
-
-        {% if department.description %}
-        <div class="ui divider"></div>
-        <h3>Опис відділу</h3>
-        <p>{{ department.description }}</p>
-        {% endif %}
 
         <div class="ui divider"></div>
         <h3>Співробітники відділу <span class="ui blue label">{{ employees|length }}</span></h3>
