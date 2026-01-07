@@ -1,8 +1,7 @@
 {% extends "layouts/base.html.twig" %}
+
 {% import "components/ui.html.twig" as ui %}
-
 {% block title %}Відділ #{{ department.id }} - Клініка{% endblock %}
-
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
@@ -13,7 +12,6 @@
 
         <div class="ui divider"></div>
 
-        <h3>Інформація про відділ</h3>
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
@@ -54,18 +52,28 @@
         </table>
 
         <div class="ui divider"></div>
-        <h3>Співробітники відділу <span class="ui blue label">{{ employees|length }}</span></h3>
-        {% if employees is not empty %}
-            <table class="ui celled unstackable table">
-                <thead>
-                    <tr>
-                        <th>Ім'я</th>
-                        <th>Посада</th>
-                        <th>Email</th>
-                        <th>Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
+
+        <a href="/admin/departments/edit?id={{ department.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
+        <a href="/admin/departments" class="ui button">
+            <i class="arrow left icon"></i> Повернутися до списку
+        </a>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">Співробітники відділу <span class="ui blue label">{{ employees|length }}</span></h3>
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>Ім'я</th>
+                    <th>Посада</th>
+                    <th>Email</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if employees is not empty %}
                     {% for employee in employees %}
                         <tr>
                             <td>{{ employee.last_name }} {{ employee.first_name }}</td>
@@ -78,19 +86,12 @@
                             </td>
                         </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="ui info message">У цьому відділі немає співробітників</p>
-        {% endif %}
-
-        <div class="ui divider"></div>
-
-        <a href="/admin/departments/edit?id={{ department.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
-        </a>
-        <a href="/admin/departments" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
-        </a>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="center aligned">Немає співробітників для відображення.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
