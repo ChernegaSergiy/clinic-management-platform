@@ -66,7 +66,9 @@
 
         <div class="ui divider"></div>
 
-        <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">Редагувати</a>
+        <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
         <a href="/prescriptions/new?patient_id={{ patient.id }}" class="ui teal button">Створити рецепт</a>
         {% if patient.status == 'active' %}
             <form action="/patients/toggle-status" method="POST" style="display: inline;">

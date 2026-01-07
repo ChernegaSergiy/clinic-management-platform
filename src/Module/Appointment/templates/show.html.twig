@@ -42,7 +42,9 @@
 
         <div class="ui divider"></div>
 
-        <a href="/appointments/edit?id={{ appointment.id }}" class="ui primary button">Редагувати</a>
+        <a href="/appointments/edit?id={{ appointment.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
         {% if appointment.status == 'scheduled' %}
             <a href="/medical-records/new?appointment_id={{ appointment.id }}" class="ui green button">Створити медичний запис</a>
             <form action="/appointments/cancel" method="POST" style="display: inline;">

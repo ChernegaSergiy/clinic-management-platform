@@ -64,7 +64,9 @@
 
         <div class="ui divider"></div>
 
-        <a href="/lab-orders/edit?id={{ order.id }}" class="ui primary button">Редагувати</a>
+        <a href="/lab-orders/edit?id={{ order.id }}" class="ui primary button">
+            <i class="edit icon"></i> Редагувати
+        </a>
         <a href="/medical-records/show?id={{ order.medical_record_id }}" class="ui button">Повернутися до медичного запису</a>
     </div>
 {% endblock %}
