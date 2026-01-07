@@ -6,7 +6,7 @@
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати новину: {{ newsArticle.title }}</h2>
+        <h2 class="ui header">Редагування новини #{{ newsArticle.id }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/news/edit/{{ newsArticle.id }}">

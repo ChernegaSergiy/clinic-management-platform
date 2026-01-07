@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати страхову компанію: {{ company.name }}</h2>
+        <h2 class="ui header">Редагування компанії #{{ company.id }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" action="/insurance/companies/edit?id={{ company.id }}" method="POST">

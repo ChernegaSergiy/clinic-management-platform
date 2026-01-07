@@ -6,7 +6,7 @@
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати кімнату</h2>
+        <h2 class="ui header">Редагування кімнати #{{ room.id }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/rooms/edit?id={{ room.id }}">
