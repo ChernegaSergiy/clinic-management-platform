@@ -3,6 +3,7 @@
 ![PHPStan](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpstan.yml/badge.svg)
 ![PHPCS](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpcs.yml/badge.svg)
 ![PHPUnit](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml/badge.svg)
+[![Test Coverage](https://img.shields.io/codecov/c/github/ChernegaSergiy/clinic-management-platform?label=Test%20Coverage&logo=codecov)](https://app.codecov.io/gh/ChernegaSergiy/clinic-management-platform)
 
 Це навчальний курсовий проєкт, метою якого є розробка трирівневої веб-системи для автоматизації ключових процесів сучасної клініки. Система розробляється з урахуванням українських реалій та нормативних вимог.
 
