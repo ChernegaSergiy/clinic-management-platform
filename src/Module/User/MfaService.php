@@ -66,6 +66,23 @@ class MfaService
         return $hotp->verify($code, $counter, $window);
     }
 
+    public function verifyHotpCodeWithCounter(string $secret, string $code, int $currentCounter, int $lastCounter = 0, int $window = 10): ?int
+    {
+        $hotp = HOTP::create($secret);
+
+        for ($i = $currentCounter; $i < $currentCounter + $window; $i++) {
+            if ($i <= $lastCounter) {
+                continue;
+            }
+
+            if ($hotp->verify($code, $i, 0)) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
     public function generateBackupCodes(int $count = 10): array
     {
         $codes = [];
@@ -121,6 +138,7 @@ class MfaService
                 mfa_secret = :secret,
                 mfa_backup_codes = :backup_codes,
                 mfa_counter = :counter,
+                mfa_last_counter = :last_counter,
                 mfa_verified_at = NOW(),
                 mfa_pending = 0,
                 updated_at = NOW()
@@ -132,6 +150,7 @@ class MfaService
             'secret' => $secret,
             'backup_codes' => json_encode($backupCodes),
             'counter' => $counter,
+            'last_counter' => $counter > 0 ? $counter - 1 : 0,
         ]);
     }
 
@@ -155,7 +174,7 @@ class MfaService
 
     public function verifyUserMfa(int $userId, string $code): bool
     {
-        $stmt = $this->db->prepare("SELECT mfa_secret, mfa_type, mfa_counter, mfa_backup_codes FROM users WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT mfa_secret, mfa_type, mfa_counter, mfa_last_counter, mfa_backup_codes FROM users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch();
 
@@ -166,10 +185,13 @@ class MfaService
         $mfaType = $user['mfa_type'] ?? 'totp';
         $secret = $user['mfa_secret'];
         $counter = $user['mfa_counter'] ?? 0;
+        $lastCounter = $user['mfa_last_counter'] ?? 0;
 
         if ($mfaType === 'hotp') {
-            if ($this->verifyHotpCode($secret, $code, $counter)) {
-                $this->incrementHotpCounter($userId, $counter);
+            $verifiedCounter = $this->verifyHotpCodeWithCounter($secret, $code, $counter, $lastCounter);
+
+            if ($verifiedCounter !== null) {
+                $this->updateHotpCounter($userId, $verifiedCounter);
                 return true;
             }
         } else {
@@ -187,10 +209,10 @@ class MfaService
         return false;
     }
 
-    private function incrementHotpCounter(int $userId, int $currentCounter): void
+    private function updateHotpCounter(int $userId, int $counter): void
     {
-        $stmt = $this->db->prepare("UPDATE users SET mfa_counter = :counter WHERE id = :id");
-        $stmt->execute(['id' => $userId, 'counter' => $currentCounter + 1]);
+        $stmt = $this->db->prepare("UPDATE users SET mfa_counter = :next_counter, mfa_last_counter = :last_counter WHERE id = :id");
+        $stmt->execute(['id' => $userId, 'next_counter' => $counter + 1, 'last_counter' => $counter]);
     }
 
     private function removeUsedBackupCode(int $userId, string $code): void

@@ -18,6 +18,31 @@ class MfaController
         $this->userRepository = new UserRepository();
     }
 
+    private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode): void
+    {
+        $secret = $_SESSION['hotp_setup_secret'] ?? $this->mfaService->generateHotpSecret();
+        $counter = $_SESSION['hotp_setup_counter'] ?? 0;
+        $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? $this->mfaService->generateBackupCodes();
+
+        $user = $this->userRepository->findById($userId);
+        $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
+
+        $_SESSION['hotp_setup_secret'] = $secret;
+        $_SESSION['hotp_setup_counter'] = $counter;
+        $_SESSION['hotp_setup_backup_codes'] = $backupCodes;
+    }
+
+    private function prepareTotpSetup(int $userId, string &$secret, array &$backupCodes, string &$qrCode): void
+    {
+        $secret = $this->mfaService->generateSecret();
+        $user = $this->userRepository->findById($userId);
+        $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
+        $backupCodes = $this->mfaService->generateBackupCodes();
+
+        $_SESSION['mfa_setup_secret'] = $secret;
+        $_SESSION['mfa_setup_backup_codes'] = $backupCodes;
+    }
+
     public function showMfaSetup(string $type = 'totp'): void
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
@@ -60,14 +85,11 @@ class MfaController
         }
 
         if ($type === 'hotp') {
-            $secret = $_SESSION['hotp_setup_secret'] ?? $this->mfaService->generateHotpSecret();
-            $counter = $_SESSION['hotp_setup_counter'] ?? 0;
-            $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
-            $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? $this->mfaService->generateBackupCodes();
-
-            $_SESSION['hotp_setup_secret'] = $secret;
-            $_SESSION['hotp_setup_counter'] = $counter;
-            $_SESSION['hotp_setup_backup_codes'] = $backupCodes;
+            $secret = [];
+            $backupCodes = [];
+            $counter = 0;
+            $qrCode = '';
+            $this->prepareHotpSetup($userId, $secret, $backupCodes, $counter, $qrCode);
 
             View::render('@modules/User/templates/hotp_setup.html.twig', [
                 'user' => $user,
@@ -78,12 +100,10 @@ class MfaController
                 'isReset' => $isReset,
             ]);
         } else {
-            $secret = $this->mfaService->generateSecret();
-            $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
-            $backupCodes = $this->mfaService->generateBackupCodes();
-
-            $_SESSION['mfa_setup_secret'] = $secret;
-            $_SESSION['mfa_setup_backup_codes'] = $backupCodes;
+            $secret = '';
+            $backupCodes = [];
+            $qrCode = '';
+            $this->prepareTotpSetup($userId, $secret, $backupCodes, $qrCode);
             $_SESSION['mfa_setup_is_reset'] = $isReset;
 
             View::render('@modules/User/templates/mfa_setup.html.twig', [
@@ -145,14 +165,10 @@ class MfaController
             $backupCodes = $_SESSION['hotp_setup_backup_codes'] ?? [];
 
             if (!$secret || !$backupCodes) {
-                $secret = $this->mfaService->generateHotpSecret();
+                $secret = [];
                 $counter = 0;
-                $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
-                $backupCodes = $this->mfaService->generateBackupCodes();
-
-                $_SESSION['hotp_setup_secret'] = $secret;
-                $_SESSION['hotp_setup_counter'] = $counter;
-                $_SESSION['hotp_setup_backup_codes'] = $backupCodes;
+                $qrCode = '';
+                $this->prepareHotpSetup($userId, $secret, $backupCodes, $counter, $qrCode);
             } else {
                 $counter = $_SESSION['hotp_setup_counter'] ?? 0;
                 $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
@@ -170,12 +186,9 @@ class MfaController
             $backupCodes = $_SESSION['mfa_setup_backup_codes'] ?? [];
 
             if (!$secret || !$backupCodes) {
-                $secret = $this->mfaService->generateSecret();
-                $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
-                $backupCodes = $this->mfaService->generateBackupCodes();
-
-                $_SESSION['mfa_setup_secret'] = $secret;
-                $_SESSION['mfa_setup_backup_codes'] = $backupCodes;
+                $secret = '';
+                $qrCode = '';
+                $this->prepareTotpSetup($userId, $secret, $backupCodes, $qrCode);
             } else {
                 $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
             }
@@ -237,10 +250,14 @@ class MfaController
                 exit();
             }
 
-            if ($this->mfaService->verifyHotpCode($secret, $code, $counter)) {
-                $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $counter);
+            $lastCounter = $_SESSION['hotp_setup_last_counter'] ?? 0;
+            $verifiedCounter = $this->mfaService->verifyHotpCodeWithCounter($secret, $code, $counter, $lastCounter);
 
-                unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter']);
+            if ($verifiedCounter !== null) {
+                $_SESSION['hotp_setup_last_counter'] = $verifiedCounter;
+                $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $verifiedCounter + 1);
+
+                unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter'], $_SESSION['hotp_setup_last_counter']);
 
                 if (isset($_SESSION['user'])) {
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію HOTP успішно увімкнено!';
@@ -362,10 +379,14 @@ class MfaController
                 exit();
             }
 
-            if ($this->mfaService->verifyHotpCode($secret, $code, $counter)) {
-                $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $counter);
+            $lastCounter = $_SESSION['hotp_setup_last_counter'] ?? 0;
+            $verifiedCounter = $this->mfaService->verifyHotpCodeWithCounter($secret, $code, $counter, $lastCounter);
 
-                unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter']);
+            if ($verifiedCounter !== null) {
+                $_SESSION['hotp_setup_last_counter'] = $verifiedCounter;
+                $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $verifiedCounter + 1);
+
+                unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter'], $_SESSION['hotp_setup_last_counter']);
                 MfaGuard::clearRequired();
 
                 $user = $this->userRepository->findById($userId);
