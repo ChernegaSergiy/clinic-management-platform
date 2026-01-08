@@ -2,6 +2,8 @@
 
 namespace App\Core\Auth;
 
+use App\Core\Exception\RedirectException;
+use App\Module\User\Repository\RoleRepository;
 use PHPUnit\Framework\TestCase;
 
 class AuthGuardTest extends TestCase
@@ -9,38 +11,36 @@ class AuthGuardTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
+
+        $mockRoleRepo = $this->createMock(RoleRepository::class);
+        $mockRoleRepo->method('findById')->willReturn(['name' => 'Admin']);
+        AuthGuard::setRoleRepository($mockRoleRepo);
     }
 
     protected function tearDown(): void
     {
         $_SESSION = [];
+        AuthGuard::resetRoleRepository();
     }
 
     public function testCheckRedirectsWhenNoSession(): void
     {
         $_SESSION = [];
 
-        ob_start();
+        $this->expectException(RedirectException::class);
+        $this->expectExceptionMessage('Redirect to: /login');
+
         AuthGuard::check();
-        $output = ob_get_clean();
 
         $this->assertArrayHasKey('intended_url', $_SESSION);
-        $headers = headers_list();
-        $this->assertTrue(
-            in_array('Location: /login', $headers),
-            'Should redirect to /login when no session'
-        );
     }
 
     public function testCheckDoesNotRedirectWhenSessionExists(): void
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 2];
 
-        ob_start();
         AuthGuard::check();
-        $output = ob_get_clean();
 
-        $this->assertEmpty($output);
         $this->assertArrayHasKey('user', $_SESSION);
     }
 
@@ -57,9 +57,9 @@ class AuthGuardTest extends TestCase
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 2];
 
-        ob_start();
-        $this->expectException(\Exception::class);
+        $this->expectException(\App\Core\Exception\ExitException::class);
         $this->expectExceptionMessage('Доступ заборонено');
+
         AuthGuard::isAdmin();
     }
 

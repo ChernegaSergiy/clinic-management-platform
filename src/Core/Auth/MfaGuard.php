@@ -2,6 +2,7 @@
 
 namespace App\Core\Auth;
 
+use App\Core\Exception\RedirectException;
 use App\Module\User\MfaService;
 
 class MfaGuard
@@ -16,15 +17,13 @@ class MfaGuard
             $mfaService = new MfaService();
 
             if ($mfaService->isMfaEnabled($userId)) {
-                header('Location: /user/mfa/verify');
-                exit();
+                throw new RedirectException('/user/mfa/verify');
             } else {
                 self::clearPending();
             }
         } elseif ($step->requiresMfaSetup()) {
             if (self::isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
-                header('Location: /user/mfa/required');
-                exit();
+                throw new RedirectException('/user/mfa/required');
             }
         }
     }

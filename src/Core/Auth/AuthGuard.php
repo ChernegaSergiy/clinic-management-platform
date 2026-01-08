@@ -2,11 +2,23 @@
 
 namespace App\Core\Auth;
 
+use App\Core\Exception\ExitException;
+use App\Core\Exception\RedirectException;
 use App\Module\User\Repository\RoleRepository;
 
 class AuthGuard
 {
     private static ?RoleRepository $roleRepository = null;
+
+    public static function setRoleRepository(RoleRepository $repository): void
+    {
+        self::$roleRepository = $repository;
+    }
+
+    public static function resetRoleRepository(): void
+    {
+        self::$roleRepository = null;
+    }
 
     private static function roles(): RoleRepository
     {
@@ -40,8 +52,7 @@ class AuthGuard
         }
 
         $_SESSION['intended_url'] = $_SERVER['REQUEST_URI'] ?? '/dashboard';
-        header('Location: /login');
-        exit();
+        throw new RedirectException('/login');
     }
 
     public static function requireMfaSetup(): void
@@ -49,8 +60,7 @@ class AuthGuard
         $step = AuthStep::current();
 
         if (!$step->requiresMfaSetup() && !$step->requiresMfaVerify()) {
-            header('Location: /login');
-            exit();
+            throw new RedirectException('/login');
         }
     }
 
@@ -58,9 +68,7 @@ class AuthGuard
     {
         self::check();
         if ($_SESSION['user']['role_id'] !== 1) {
-            http_response_code(403);
-            echo "Доступ заборонено";
-            exit();
+            throw new ExitException("Доступ заборонено", 403);
         }
     }
 }

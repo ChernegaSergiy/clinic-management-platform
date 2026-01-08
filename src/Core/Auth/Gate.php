@@ -4,6 +4,7 @@ namespace App\Core\Auth;
 
 use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
+use App\Core\Exception\ExitException;
 use App\Core\Model\User;
 
 class Gate
@@ -25,18 +26,14 @@ class Gate
         $user = self::getUser();
 
         if (!$user) {
-            http_response_code(403);
-            echo "Доступ заборонено (не автентифіковано)";
-            exit();
+            throw new ExitException("Доступ заборонено (не автентифіковано)", 403);
         }
 
         if (self::allows($ability, $context)) {
             return;
         }
 
-        http_response_code(403);
-        echo "Доступ заборонено";
-        exit();
+        throw new ExitException("Доступ заборонено", 403);
     }
 
     public static function allows(string $ability, $context = []): bool

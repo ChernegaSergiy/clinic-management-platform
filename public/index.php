@@ -4,6 +4,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controller\InstallController;
 use App\Controller\PageController;
+use App\Core\Exception\ExitException;
+use App\Core\Exception\RedirectException;
 use App\Core\Http\Router;
 use App\Core\Http\View;
 use App\Core\Module\ModuleLoader;
@@ -91,6 +93,15 @@ if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/instal
 
 try {
     $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+} catch (RedirectException $e) {
+    header('Location: ' . $e->getUrl());
+    exit;
+} catch (ExitException $e) {
+    http_response_code($e->getStatusCode());
+    if ($e->getExitMessage() !== '') {
+        echo $e->getExitMessage();
+    }
+    exit;
 } catch (\Throwable $e) {
     http_response_code(500);
     $isDebug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';

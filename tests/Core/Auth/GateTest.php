@@ -2,6 +2,7 @@
 
 namespace App\Core\Auth;
 
+use App\Core\Exception\ExitException;
 use App\Core\Model\User;
 use PHPUnit\Framework\TestCase;
 
@@ -97,7 +98,7 @@ class GateTest extends TestCase
     {
         $_SESSION = [];
 
-        $this->expectException(\Exception::class);
+        $this->expectException(ExitException::class);
         $this->expectExceptionMessage('Доступ заборонено (не автентифіковано)');
 
         Gate::authorize('patient.view');
@@ -112,7 +113,7 @@ class GateTest extends TestCase
             'permissions' => []
         ];
 
-        $this->expectException(\Exception::class);
+        $this->expectException(ExitException::class);
         $this->expectExceptionMessage('Доступ заборонено');
 
         Gate::authorize('patient.delete');
