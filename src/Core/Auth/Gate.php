@@ -17,7 +17,7 @@ class Gate
         if (!isset($_SESSION['user'])) {
             return null;
         }
-        $permissions = self::$permissionRegistry->getRolePermissions($_SESSION['user']['role_name']);
+        $permissions = $_SESSION['user']['permissions'] ?? self::$permissionRegistry->getRolePermissions($_SESSION['user']['role_name']);
         return new User($_SESSION['user'], $permissions);
     }
 
