@@ -1,4 +1,75 @@
-# This is a placeholder for CODEOWNERS file.
-# You can specify default owners for parts of the codebase.
-# For example:
-# *       @username
+# Code Owners
+#
+# Format: <path-to-file> @github-username
+# Wildcards (*) are supported
+#
+# For more information about CODEOWNERS:
+# https://help.github.com/articles/about-codeowners/
+
+# Core functionality
+src/Core/ @ChernegaSergiy
+src/Controller/ @ChernegaSergiy
+
+# Modules by owner
+
+# Serhii Cherneha
+src/Module/Dashboard/ @ChernegaSergiy
+src/Module/Patient/ @ChernegaSergiy
+src/Module/MedicalRecord/ @ChernegaSergiy
+src/Module/Prescription/ @ChernegaSergiy
+src/Module/LabOrder/ @ChernegaSergiy
+src/Module/Inventory/ @ChernegaSergiy
+src/Module/Admin/ @ChernegaSergiy
+src/Module/Billing/ @ChernegaSergiy
+src/Module/Kpi/ @ChernegaSergiy
+src/Module/Insurance/ @ChernegaSergiy
+src/Module/News/ @ChernegaSergiy
+src/Module/Notification/ @ChernegaSergiy
+src/Module/Department/ @ChernegaSergiy
+src/Module/Hrm/ @ChernegaSergiy
+src/Module/ClinicalReference/ @ChernegaSergiy
+src/Module/User/ @ChernegaSergiy
+src/Module/Profile/ @ChernegaSergiy
+src/Module/Mfa/ @ChernegaSergiy
+src/Controller/PageController.php @ChernegaSergiy
+
+# Andrii Hevko
+src/Module/Appointment/ @Andriihev
+src/Module/Room/ @Andriihev
+src/Module/Schedule/ @Andriihev
+templates/ @Andriihev
+
+# Frontend assets
+public/scss/ @Andriihev
+public/css/ @Andriihev
+public/images/ @Andriihev
+
+# Testing
+
+# Maksym Reminskyi
+tests/Core/Http/FrontControllerTest.php @makztezerest
+tests/Database/DatabaseTest.php @makztezerest
+
+# Serhii Cherneha - remaining tests
+tests/ @ChernegaSergiy
+
+# CI/CD
+
+# Maksym Reminskyi - workflow improvements
+.github/workflows/ @makztezerest @ChernegaSergiy
+
+# Configuration files
+phpunit.xml @makztezerest @ChernegaSergiy
+.gitignore @makztezerest @ChernegaSergiy
+
+# Dependencies
+composer.json @ChernegaSergiy
+package.json @ChernegaSergiy
+composer.lock @ChernegaSergiy
+
+# Database migrations
+database/migrations_phinx/ @ChernegaSergiy @Andriihev
+
+# Documentation
+README.md @ChernegaSergiy @Andriihev @makztezerest
+docs/ @ChernegaSergiy @Andriihev @makztezerest
