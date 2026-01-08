@@ -25,4 +25,9 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run PHPUnit tests
-      run: composer test
+      run: vendor/bin/phpunit --coverage-clover clover.xml --display-warnings
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
