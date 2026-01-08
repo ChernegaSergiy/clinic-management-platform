@@ -5,8 +5,16 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Serhii",
-            "email": "serhii@example.com"
+            "name": "Serhii Cherneha",
+            "email": "chernegasergiy3@gmail.com"
+        },
+        {
+            "name": "Andrii Hevko",
+            "email": "gevkoandrij24@gmail.com"
+        },
+        {
+            "name": "Maksym Reminskyi",
+            "email": "makztezerest@gmail.com"
         }
     ],
     "require": {
@@ -38,7 +46,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "App\\Tests\\": "tests/"
         }
     },
     "scripts": {
