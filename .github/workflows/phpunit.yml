@@ -19,6 +19,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
+        coverage: xdebug
         extensions: mbstring, pdo_mysql, dom, filter, gd, iconv, json, mysql, openssl, session, simplexml, xml, zip
 
     - name: Install Composer dependencies
