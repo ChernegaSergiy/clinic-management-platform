@@ -9,20 +9,18 @@ class DatabaseTest extends TestCase
 {
     public function testGetInstanceDoesNotConnectToDatabase(): void
     {
-        $reflection = new \ReflectionClass(Database::class);
-        $instanceProperty = $reflection->getProperty('instance');
+        $instanceProperty = new \ReflectionProperty(Database::class, 'instance');
         $instanceProperty->setAccessible(true);
-        $instanceProperty->setValue(null);
+        $instanceProperty->setValue(null, null);
 
-        $this->assertNull($instanceProperty->getValue());
+        $this->assertNull($instanceProperty->getValue(null));
     }
 
     public function testSingletonPattern(): void
     {
         $mockPdo = $this->createMock(PDO::class);
 
-        $reflection = new \ReflectionClass(Database::class);
-        $instanceProperty = $reflection->getProperty('instance');
+        $instanceProperty = new \ReflectionProperty(Database::class, 'instance');
         $instanceProperty->setAccessible(true);
         $instanceProperty->setValue(null, $mockPdo);
 
