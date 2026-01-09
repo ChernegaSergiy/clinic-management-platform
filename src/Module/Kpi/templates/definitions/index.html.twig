@@ -54,7 +54,7 @@
                                 <a href="/kpi/definitions/edit?id={{ definition.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/kpi/definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити це визначення KPI?');">
+                                <form action="/kpi/definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'kpi.definitions.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ definition.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

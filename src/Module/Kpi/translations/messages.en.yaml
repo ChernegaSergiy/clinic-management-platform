@@ -73,3 +73,4 @@ kpi:
       is_active: "Active Definition"
       save: "Save Definition"
       cancel: "Cancel"
+    delete_confirm: "Are you sure you want to delete this KPI definition?"
