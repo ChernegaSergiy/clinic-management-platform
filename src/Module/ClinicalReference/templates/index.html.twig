@@ -1,31 +1,31 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Клінічні довідники - Клініка{% endblock %}
+{% block title %}{{ 'clinical_reference.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Клінічні довідники</h2>
+        <h2 class="ui header">{{ 'clinical_reference.title_full'|trans }}</h2>
         <div class="ui divider"></div>
 
         <div class="ui two column very relaxed grid">
             <div class="column">
-                <h3 class="ui header">НК 025:2021 (МКХ-10)</h3>
-                <p>Класифікатор хвороб та споріднених проблем охорони здоров'я.</p>
-                <p>Кількість записів: <strong>{{ icdCount }}</strong></p>
-                <a href="/admin/clinical/icd-import" class="ui primary button">Керувати імпортом МКХ-10</a>
+                <h3 class="ui header">{{ 'clinical_reference.icd_title'|trans }}</h3>
+                <p>{{ 'clinical_reference.icd_description'|trans }}</p>
+                <p>{{ 'clinical_reference.icd_records_count'|trans }}: <strong>{{ icdCount }}</strong></p>
+                <a href="/admin/clinical/icd-import" class="ui primary button">{{ 'clinical_reference.icd_manage_import'|trans }}</a>
             </div>
             <div class="column">
-                <h3 class="ui header">НК 026:2021</h3>
-                <p>Класифікатор медичних інтервенцій.</p>
-                <p>Кількість записів: <strong>{{ interventionCount }}</strong></p>
-                <a href="/admin/clinical/intervention-import" class="ui primary button">Керувати імпортом інтервенцій</a>
+                <h3 class="ui header">{{ 'clinical_reference.intervention_title'|trans }}</h3>
+                <p>{{ 'clinical_reference.intervention_description'|trans }}</p>
+                <p>{{ 'clinical_reference.icd_records_count'|trans }}: <strong>{{ interventionCount }}</strong></p>
+                <a href="/admin/clinical/intervention-import" class="ui primary button">{{ 'clinical_reference.intervention_manage_import'|trans }}</a>
             </div>
         </div>
 
         {% if success_message %}
             <div class="ui success message">
                 <i class="close icon"></i>
-                <div class="header">Успіх!</div>
+                <div class="header">{{ 'clinical_reference.success'|trans }}</div>
                 <p>{{ success_message }}</p>
             </div>
         {% endif %}
