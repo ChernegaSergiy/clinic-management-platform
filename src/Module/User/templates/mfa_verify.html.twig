@@ -1,56 +1,56 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Підтвердження 2FA — {{ clinic_name }}{% endblock %}
+{% block title %}{{ 'user.mfa.mfa_verify.title'|trans }} — {{ clinic_name }}{% endblock %}
 
 {% block body %}
     <section class="section">
         <div class="container" style="max-width: 400px; padding: 2rem 0;">
             <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
                 <header class="section__header" style="text-align: center; margin-bottom: 1.5rem;">
-                    <div class="section__eyebrow">Безпека</div>
-                    <h1 class="section__title section__title--compact" style="margin-bottom: 0.5rem;">Двофакторна автентифікація</h1>
+                    <div class="section__eyebrow">{{ 'user.mfa.mfa_verify.security_eyebrow'|trans }}</div>
+                    <h1 class="section__title section__title--compact" style="margin-bottom: 0.5rem;">{{ 'user.mfa.mfa_verify.header'|trans }}</h1>
                     {% if mfaType == 'hotp' %}
-                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть наступний код з додатку автентифікатора (HOTP)</p>
+                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">{{ 'user.mfa.mfa_verify.hotp_instructions'|trans }}</p>
                     {% else %}
-                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">Введіть код з додатку автентифікатора (TOTP)</p>
+                        <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">{{ 'user.mfa.mfa_verify.totp_instructions'|trans }}</p>
                     {% endif %}
                 </header>
 
                 {% if errorMessage %}
                     <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem; text-align: center;">
-                        <strong>Помилка:</strong> {{ errorMessage }}
+                        <strong>{{ 'user.mfa.mfa_verify.error_prefix'|trans }}</strong> {{ errorMessage }}
                     </div>
                 {% endif %}
 
                 <form method="POST" action="/user/mfa/verify" style="display: grid; gap: 1rem;" autocomplete="off">
                     <div>
-                        <label class="booking-label">Код 2FA</label>
-                        <input class="booking-input" type="text" name="code" placeholder="000000" required autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 700;" autofocus>
+                        <label class="booking-label">{{ 'user.mfa.mfa_verify.code_label'|trans }}</label>
+                        <input class="booking-input" type="text" name="code" placeholder="{{ 'user.mfa.mfa_verify.code_placeholder'|trans }}" required autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 700;" autofocus>
                     </div>
                     <div style="margin-top: 1rem;">
-                        <button type="submit" class="btn btn--primary" style="width: 100%;">Підтвердити</button>
+                        <button type="submit" class="btn btn--primary" style="width: 100%;">{{ 'user.mfa.mfa_verify.confirm_button'|trans }}</button>
                     </div>
                 </form>
 
                 <div style="text-align: center; margin: 1.5rem 0; font-size: 0.75rem; text-transform: uppercase; border-top: var(--border-thin); padding-top: 1.5rem; position: relative;">
-                    <span style="background: var(--color-bg-alt); padding: 0 0.5rem; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);">або</span>
+                    <span style="background: var(--color-bg-alt); padding: 0 0.5rem; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);">{{ 'user.mfa.mfa_verify.or_separator'|trans }}</span>
                 </div>
 
                 <form method="GET" action="/logout" style="display: grid; gap: 0.8rem;">
-                    <button type="submit" class="btn btn--ghost" style="width: 100%;">Вийти з системи</button>
+                    <button type="submit" class="btn btn--ghost" style="width: 100%;">{{ 'user.mfa.mfa_verify.logout_button'|trans }}</button>
                 </form>
 
                 <p style="text-align: center; font-size: 0.75rem; margin-top: 1.5rem;">
-                    Немає доступу до додатку? <a href="#" onclick="toggleBackupCodeField(); return false;" style="color: var(--color-accent);">Введіть код відновлення</a>
+                    {{ 'user.mfa.mfa_verify.no_access_prompt'|trans }} <a href="#" onclick="toggleBackupCodeField(); return false;" style="color: var(--color-accent);">{{ 'user.mfa.mfa_verify.enter_backup_code_link'|trans }}</a>
                 </p>
 
                 <div id="backup-code-field" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: var(--border-thin);">
-                    <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">Введіть один з ваших кодів відновлення:</p>
+                    <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">{{ 'user.mfa.mfa_verify.backup_code_instructions'|trans }}</p>
                     <form method="POST" action="/user/mfa/verify" style="display: grid; gap: 0.8rem;">
                         <div>
-                            <input class="booking-input" type="text" name="code" placeholder="XXXX-XXXX" required autocomplete="off">
+                            <input class="booking-input" type="text" name="code" placeholder="{{ 'user.mfa.mfa_verify.backup_code_placeholder'|trans }}" required autocomplete="off">
                         </div>
-                        <button type="submit" class="btn" style="width: 100%;">Використати код відновлення</button>
+                        <button type="submit" class="btn" style="width: 100%;">{{ 'user.mfa.mfa_verify.use_backup_code_button'|trans }}</button>
                     </form>
                 </div>
             </div>
