@@ -1,0 +1,20 @@
+lab_order:
+  show:
+    title: "Лабораторне замовлення #%id% - Клініка"
+    title_full: "Деталі лабораторного замовлення #%id%"
+    table:
+      id: "ID"
+      patient: "Пацієнт"
+      doctor: "Лікар"
+      medical_record_id: "Медичний запис ID"
+      order_code: "Код замовлення"
+      status: "Статус"
+      qr_code_hash: "Хеш QR-коду"
+      results: "Результати"
+      notes: "Примітки"
+      created_at: "Створено"
+    qr_code_title: "QR-код замовлення"
+    qr_code_alt: "QR-код для замовлення #%id%"
+    qr_code_unavailable: "Неможливо згенерувати QR-код."
+    edit: "Редагувати"
+    back: "Повернутися до медичного запису"

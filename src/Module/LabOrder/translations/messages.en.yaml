@@ -1,0 +1,20 @@
+lab_order:
+  show:
+    title: "Lab Order #%id% - Clinic"
+    title_full: "Lab Order Details #%id%"
+    table:
+      id: "ID"
+      patient: "Patient"
+      doctor: "Doctor"
+      medical_record_id: "Medical Record ID"
+      order_code: "Order Code"
+      status: "Status"
+      qr_code_hash: "QR Code Hash"
+      results: "Results"
+      notes: "Notes"
+      created_at: "Created"
+    qr_code_title: "Order QR Code"
+    qr_code_alt: "QR Code for order #%id%"
+    qr_code_unavailable: "Unable to generate QR code."
+    edit: "Edit"
+    back: "Back to Medical Record"
