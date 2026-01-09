@@ -9,3 +9,11 @@ clinical_reference:
   intervention_description: "Класифікатор медичних інтервенцій."
   intervention_manage_import: "Керувати імпортом інтервенцій"
   success: "Успіх!"
+  icd_import:
+    title: "Імпорт ICD-10 (NK-025-2021)"
+    header: "Імпорт ICD-10 (NK-025-2021)"
+    current_count: "Поточна кількість кодів у базі:"
+    data_source: "Дані беруться з офіційного JSON"
+    package: "через пакет"
+    update_button: "Оновити довідник"
+    back: "До клінічних довідників"

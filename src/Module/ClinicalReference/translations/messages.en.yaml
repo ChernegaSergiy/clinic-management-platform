@@ -9,3 +9,11 @@ clinical_reference:
   intervention_description: "Medical Interventions Classifier."
   intervention_manage_import: "Manage Interventions Import"
   success: "Success!"
+  icd_import:
+    title: "Import ICD-10 (NK-025-2021)"
+    header: "Import ICD-10 (NK-025-2021)"
+    current_count: "Current number of codes in database:"
+    data_source: "Data is taken from official JSON"
+    package: "via package"
+    update_button: "Update Reference"
+    back: "Back to Clinical References"
