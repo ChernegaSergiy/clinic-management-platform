@@ -69,6 +69,21 @@ billing:
       is_active_label: "Active Bundle"
       save_button: "Save Bundle"
       cancel_button: "Cancel"
+  contracts:
+    title: "Contracts - Clinic"
+    list_title: "Contract Management"
+    add_contract: "Add Contract"
+    no_contracts: "No contracts to display."
+    table:
+      id: "ID"
+      title: "Title"
+      party_a: "Party A"
+      party_b: "Party B"
+      start_date: "Start Date"
+      end_date: "End Date"
+      status: "Status"
+      actions: "Actions"
+    not_specified: "Not Specified"
   show:
     title: "Invoice #%id% - Clinic"
     title_full: "Invoice Details #%id%"

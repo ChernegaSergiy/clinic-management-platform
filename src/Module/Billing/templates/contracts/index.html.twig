@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Контракти - Клініка{% endblock %}
+{% block title %}{{ 'billing.contracts.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Керування контрактами</h2>
+                <h2 class="ui header">{{ 'billing.contracts.list_title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/billing/contracts/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати контракт
+                    <i class="plus icon"></i> {{ 'billing.contracts.add_contract'|trans }}
                 </a>
             </div>
         </div>
@@ -19,19 +19,19 @@
         <div class="ui divider"></div>
 
         {% if contracts is empty %}
-            <p>Немає контрактів для відображення.</p>
+            <p>{{ 'billing.contracts.no_contracts'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Назва</th>
-                        <th>Сторона А</th>
-                        <th>Сторона Б</th>
-                        <th>Дата початку</th>
-                        <th>Дата закінчення</th>
-                        <th>Статус</th>
-                        <th>Дії</th>
+                        <th>{{ 'billing.contracts.table.id'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.title'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.party_a'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.party_b'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.start_date'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.end_date'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.status'|trans }}</th>
+                        <th>{{ 'billing.contracts.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +42,7 @@
                             <td>{{ contract.party_a }}</td>
                             <td>{{ contract.party_b }}</td>
                             <td>{{ contract.start_date|date('Y-m-d') }}</td>
-                            <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'Не вказано' }}</td>
+                            <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'billing.contracts.not_specified'|trans }}</td>
                             <td>{{ contract.status }}</td>
                             <td>
                                 <a href="/billing/contracts/show?id={{ contract.id }}" class="ui icon button">

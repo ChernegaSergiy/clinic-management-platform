@@ -69,6 +69,21 @@ billing:
       is_active_label: "Активний пакет"
       save_button: "Зберегти пакет"
       cancel_button: "Скасувати"
+  contracts:
+    title: "Контракти - Клініка"
+    list_title: "Керування контрактами"
+    add_contract: "Додати контракт"
+    no_contracts: "Немає контрактів для відображення."
+    table:
+      id: "ID"
+      title: "Назва"
+      party_a: "Сторона А"
+      party_b: "Сторона Б"
+      start_date: "Дата початку"
+      end_date: "Дата закінчення"
+      status: "Статус"
+      actions: "Дії"
+    not_specified: "Не вказано"
   show:
     title: "Рахунок #%id% - Клініка"
     title_full: "Деталі рахунку #%id%"
