@@ -302,3 +302,47 @@ admin:
       disabled: Disabled
       disabled_desc: 2FA is unavailable
     save: Save
+    interface_language: "Interface Language"
+    language_ukrainian: "Ukrainian"
+    language_english: "English"
+  backup_policies:
+    index:
+      title: "Backup Policies - Admin Panel"
+      header: "Manage Backup Policies"
+      add_policy: "Add Policy"
+      no_policies: "No backup policies to display."
+      table:
+        id: "ID"
+        name: "Name"
+        description: "Description"
+        frequency: "Frequency"
+        retention_days: "Retention Days"
+        last_run: "Last Run"
+        status: "Status"
+        actions: "Actions"
+      not_specified: "Not specified"
+      never: "Never"
+      active: "Active"
+      inactive: "Inactive"
+      delete_confirm: "Are you sure you want to delete this backup policy?"
+    new:
+      title: "Add New Backup Policy - Admin Panel"
+      header: "Add New Backup Policy"
+      name: "Name"
+      name_placeholder: "For example, Daily Backup"
+      description: "Description"
+      description_placeholder: "Detailed policy description"
+      frequency: "Frequency"
+      frequency_placeholder: "For example, daily, weekly, monthly"
+      retention_days: "Retention Days"
+      retention_days_placeholder: "Number of days to retain backups"
+      status_label: "Status"
+      status_active: "Active"
+      status_inactive: "Inactive"
+      save_button: "Save Policy"
+      cancel_button: "Cancel"
+    edit:
+      title: "Edit Backup Policy #%id% - Admin Panel"
+      header: "Edit Backup Policy #%id%"
+      save_button: "Save Changes"
+      cancel_button: "Cancel"
