@@ -38,6 +38,12 @@ hrm:
     user_placeholder: "Не прив'язано"
     save_button: "Зберегти"
     cancel_button: "Скасувати"
+  edit:
+    title: "Редагування співробітника #%id% - Клініка"
+    header: "Редагування співробітника #%id%"
+    fire_date_label: "Дата звільнення"
+    save_button: "Оновити"
+    cancel_button: "Скасувати"
   show:
     title: "Профіль співробітника - Клініка"
     title_full: "Профіль: %first_name% %last_name%"

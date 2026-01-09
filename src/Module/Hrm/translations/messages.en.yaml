@@ -38,6 +38,12 @@ hrm:
     user_placeholder: "Not linked"
     save_button: "Save"
     cancel_button: "Cancel"
+  edit:
+    title: "Edit Employee #%id% - Clinic"
+    header: "Edit Employee #%id%"
+    fire_date_label: "Fire Date"
+    save_button: "Update"
+    cancel_button: "Cancel"
   show:
     title: "Employee Profile - Clinic"
     title_full: "Profile: %first_name% %last_name%"

@@ -1,10 +1,10 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Редагування співробітника #{{ employee.id }} - Клініка{% endblock %}
+{% block title %}{{ 'hrm.edit.title'|trans({'%id%': employee.id}) }}{% endblock %}
 
 {% block body %}
 <div class="ui segment">
-    <h2 class="ui header">Редагування співробітника #{{ employee.id }}</h2>
+    <h2 class="ui header">{{ 'hrm.edit.header'|trans({'%id%': employee.id}) }}</h2>
 
     <div class="ui divider"></div>
 
@@ -79,7 +79,7 @@
         </div>
         
         <div class="field">
-            <label>Дата звільнення</label>
+            <label>{{ 'hrm.edit.fire_date_label'|trans }}</label>
             <input type="date" name="fire_date" value="{{ employee.fire_date ?? '' }}">
         </div>
 
@@ -97,8 +97,8 @@
 
         <div class="ui divider"></div>
 
-        <button class="ui primary button" type="submit"><i class="save icon"></i> Оновити</button>
-        <a href="/hrm/show?id={{ employee.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+        <button class="ui primary button" type="submit"><i class="save icon"></i> {{ 'hrm.edit.save_button'|trans }}</button>
+        <a href="/hrm/show?id={{ employee.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'hrm.edit.cancel_button'|trans }}</a>
     </form>
 </div>
 {% endblock %}
