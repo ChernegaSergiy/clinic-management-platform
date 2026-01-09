@@ -40,8 +40,8 @@ admin:
       title: "Dictionary #%id% - Admin Panel"
       title_full: "Dictionary #%id%"
       back: "Back to List"
-      edit: "Edit"
-   auth_configs:
+     edit: "Edit"
+  auth_configs:
      list:
        title: Authentication Configurations - Admin Panel
        header: Manage Authentication Configurations

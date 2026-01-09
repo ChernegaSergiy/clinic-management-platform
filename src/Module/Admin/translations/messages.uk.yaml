@@ -24,40 +24,40 @@ admin:
       title: "Редагувати роль #%id%"
       page_title: "Редагувати роль #%id% - Адмін-панель"
       save: Зберегти зміни
-  dictionaries:
-    title: Керування словниками
-    page_title: Словники - Адмін-панель
-    add: Додати словник
-    no_dictionaries: Немає словників для відображення.
-    table:
-      id: ID
-      name: Назва
-      description: Опис
-      type: Тип
-      actions: Дії
-    delete_confirm: Ви впевнені, що хочете видалити цей словник?
-    show:
-      title: "Словник #%id% - Адмін-панель"
-      title_full: "Словник #%id%"
-      back: Повернутися до списку
-      edit: Редагувати
-   auth_configs:
-     list:
-       title: Конфігурації аутентифікації - Адмін-панель
-       header: Керування конфігураціями аутентифікації
-       add: Додати конфігурацію
-       no_configs: Немає конфігурацій для відображення.
-       table:
-         id: ID
-         provider: Провайдер
-         client_id: Client ID
-         active: Активна
-         actions: Дії
-       not_specified: Не вказано
-       yes: Так
-       no: Ні
-       delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
+   dictionaries:
+     title: Керування словниками
+     page_title: Словники - Адмін-панель
+     add: Додати словник
+     no_dictionaries: Немає словників для відображення.
+     table:
+       id: ID
+       name: Назва
+       description: Опис
+       type: Тип
+       actions: Дії
+     delete_confirm: Ви впевнені, що хочете видалити цей словник?
      show:
+       title: "Словник #%id% - Адмін-панель"
+       title_full: "Словник #%id%"
+       back: Повернутися до списку
+     edit: Редагувати
+  auth_configs:
+    list:
+      title: Конфігурації аутентифікації - Адмін-панель
+      header: Керування конфігураціями аутентифікації
+      add: Додати конфігурацію
+      no_configs: Немає конфігурацій для відображення.
+      table:
+        id: ID
+        provider: Провайдер
+        client_id: Client ID
+        active: Активна
+        actions: Дії
+      not_specified: Не вказано
+      yes: Так
+      no: Ні
+      delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
+    show:
        title: "Перегляд конфігурації #%id%"
        title_full: "Перегляд конфігурації аутентифікації #%id%"
        redirect_uri_title: "URL зворотного виклику (Redirect URI)"
