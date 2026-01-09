@@ -1,0 +1,19 @@
+hrm:
+  show:
+    title: "Профіль співробітника - Клініка"
+    title_full: "Профіль: %first_name% %last_name%"
+    table:
+      id: "ID"
+      full_name: "Повне ім'я"
+      position: "Посада"
+      department: "Департамент"
+      hire_date: "Дата найму"
+      contact_phone: "Контактний телефон"
+      salary: "Зарплата"
+      status: "Статус"
+      fire_date: "Дата звільнення"
+      linked_user: "Прив'язаний користувач системи"
+    deactivate: "Деактивувати"
+    activate: "Активувати"
+    edit: "Редагувати"
+    back: "До списку"

@@ -1,0 +1,19 @@
+hrm:
+  show:
+    title: "Employee Profile - Clinic"
+    title_full: "Profile: %first_name% %last_name%"
+    table:
+      id: "ID"
+      full_name: "Full Name"
+      position: "Position"
+      department: "Department"
+      hire_date: "Hire Date"
+      contact_phone: "Contact Phone"
+      salary: "Salary"
+      status: "Status"
+      fire_date: "Fire Date"
+      linked_user: "Linked System User"
+    deactivate: "Deactivate"
+    activate: "Activate"
+    edit: "Edit"
+    back: "Back to List"
