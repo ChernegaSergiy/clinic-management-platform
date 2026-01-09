@@ -35,6 +35,28 @@ class View
         }
     }
 
+    private static function detectBrowserLanguage(): ?string
+    {
+        $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+        if (empty($acceptLang)) {
+            return null;
+        }
+
+        // Parse Accept-Language header
+        $languages = explode(',', $acceptLang);
+        foreach ($languages as $lang) {
+            $lang = trim(explode(';', $lang)[0]);
+            $lang = explode('-', $lang)[0]; // Get primary language code
+
+            // Check if we support this language
+            if (in_array($lang, ['uk', 'en'])) {
+                return $lang;
+            }
+        }
+
+        return null;
+    }
+
     private static function getTwig(): Environment
     {
         if (self::$twig === null) {
@@ -44,8 +66,8 @@ class View
             if (self::$translationService === null) {
                 self::$translationService = new TranslationService();
 
-                // Set locale from session or default
-                $locale = $_SESSION['locale'] ?? 'uk';
+                // Set locale from session, browser, or default
+                $locale = $_SESSION['locale'] ?? self::detectBrowserLanguage() ?? 'uk';
                 self::$translationService->setLocale($locale);
             }
 
