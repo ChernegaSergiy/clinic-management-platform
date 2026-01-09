@@ -1,4 +1,10 @@
 news:
+  public:
+    title: "News and Announcements — %clinic_name%"
+    eyebrow: "Operational Information"
+    section_title: "News and Official Announcements"
+    section_description: "Important announcements about work schedules, changes in reception, government programs, procurement, and internal changes in department operations. Chronological feed without images."
+    no_news: "No news available at the moment."
   admin:
     edit:
       title: "Edit News #%id% - Clinic"

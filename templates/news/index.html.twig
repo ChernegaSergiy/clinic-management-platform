@@ -1,14 +1,14 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Новини та Оголошення — {{ clinic_name }}{% endblock %}
+{% block title %}{{ 'news.public.title'|trans({'%clinic_name%': clinic_name}) }}{% endblock %}
 
 {% block body %}
     <section id="news" class="section">
         <div class="container">
             <header class="section__header">
-                <div class="section__eyebrow">Оперативна інформація</div>
-                <h1 class="section__title">Новини та Офіційні Оголошення</h1>
-                <p class="section__description">Важливі повідомлення про графік роботи, зміни в прийомі, державні програми, закупівлі та внутрішні зміни в роботі відділень. Хронологічна стрічка без зображень.</p>
+                <div class="section__eyebrow">{{ 'news.public.eyebrow'|trans }}</div>
+                <h1 class="section__title">{{ 'news.public.section_title'|trans }}</h1>
+                <p class="section__description">{{ 'news.public.section_description'|trans }}</p>
             </header>
 
             <div id="news-container">
@@ -24,7 +24,7 @@
                     {% else %}
                         <li class="news-item">
                             <div class="news-item__header">
-                                <div class="news-item__title">Наразі новин немає.</div>
+                                <div class="news-item__title">{{ 'news.public.no_news'|trans }}</div>
                             </div>
                         </li>
                     {% endfor %}
