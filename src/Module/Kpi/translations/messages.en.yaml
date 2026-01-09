@@ -1,4 +1,18 @@
 kpi:
+  results:
+    title: "KPI Results - Admin Panel"
+    header: "KPI Results"
+    no_results: "No KPI results to display."
+    table:
+      id: "ID"
+      kpi: "KPI"
+      period: "Period"
+      value: "Value"
+      unit: "Unit"
+      notes: "Notes"
+      calculated_at: "Calculation Date"
+    no_notes: "None"
+    n_a: "N/A"
   definitions:
     title: "KPI Definitions - Admin Panel"
     list_title: "KPI Definitions Management"
@@ -58,4 +72,4 @@ kpi:
        unit_placeholder: "For example, minutes, %, patients"
        is_active: "Active Definition"
        save: "Save Definition"
-       cancel: "Cancel"
+      cancel: "Cancel"
