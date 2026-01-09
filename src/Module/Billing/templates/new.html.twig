@@ -2,31 +2,31 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Створити новий рахунок - Клініка{% endblock %}
+{% block title %}{{ 'billing.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Створити новий рахунок</h2>
+        <h2 class="ui header">{{ 'billing.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/billing/new">
             <div class="two fields">
-                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
-                {{ forms.input('amount', 'Сума', old.amount ?? null, 'number', '0.00', errors.amount ?? null, {'step': '0.01', 'required': 'required'}) }}
+                {{ forms.select('patient_id', 'billing.new.patient'|trans, patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.input('amount', 'billing.new.amount'|trans, old.amount ?? null, 'number', 'billing.new.amount_placeholder'|trans, errors.amount ?? null, {'step': '0.01', 'required': 'required'}) }}
             </div>
             <div class="two fields">
-                {{ forms.select('appointment_id', 'Запис на прийом (необов\'язково)', appointments, old.appointment_id ?? null, errors.appointment_id ?? null) }}
-                {{ forms.select('medical_record_id', 'Медичний запис (необов\'язково)', medical_records, old.medical_record_id ?? null, errors.medical_record_id ?? null) }}
+                {{ forms.select('appointment_id', 'billing.new.appointment'|trans, appointments, old.appointment_id ?? null, errors.appointment_id ?? null) }}
+                {{ forms.select('medical_record_id', 'billing.new.medical_record'|trans, medical_records, old.medical_record_id ?? null, errors.medical_record_id ?? null) }}
             </div>
             <div class="field">
-                {{ forms.select('status', 'Статус', {'pending': 'Очікує оплати', 'paid': 'Оплачено', 'cancelled': 'Скасовано'}, old.status ?? 'pending', errors.status ?? null, {'required': 'required'}) }}
+                {{ forms.select('status', 'billing.new.status'|trans, {'pending': 'billing.new.statuses.pending'|trans, 'paid': 'billing.new.statuses.paid'|trans, 'cancelled': 'billing.new.statuses.cancelled'|trans}, old.status ?? 'pending', errors.status ?? null, {'required': 'required'}) }}
             </div>
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до рахунку', errors.notes ?? null) }}
+            {{ forms.textarea('notes', 'billing.new.notes'|trans, old.notes ?? null, 'billing.new.notes_placeholder'|trans, errors.notes ?? null) }}
 
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти рахунок', 'primary', '', 'save') }}
-            <a href="/billing" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('billing.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/billing" class="ui button"><i class="arrow left icon"></i> {{ 'billing.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

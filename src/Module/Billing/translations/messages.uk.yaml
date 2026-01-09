@@ -1,5 +1,22 @@
 billing:
   title: "Рахунки - Клініка"
+  new:
+    title: "Створити новий рахунок - Клініка"
+    header: "Створити новий рахунок"
+    patient: "Пацієнт"
+    amount: "Сума"
+    amount_placeholder: "0.00"
+    appointment: "Запис на прийом (необов'язково)"
+    medical_record: "Медичний запис (необов'язково)"
+    status: "Статус"
+    statuses:
+      pending: "Очікує оплати"
+      paid: "Оплачено"
+      cancelled: "Скасовано"
+    notes: "Примітки"
+    notes_placeholder: "Додаткові примітки до рахунку"
+    save_button: "Зберегти рахунок"
+    cancel_button: "Скасувати"
   edit:
     title: "Редагувати рахунок #%id% - Клініка"
     header: "Редагувати рахунок #%id%"

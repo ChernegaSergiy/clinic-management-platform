@@ -1,5 +1,22 @@
 billing:
   title: "Invoices - Clinic"
+  new:
+    title: "Create New Invoice - Clinic"
+    header: "Create New Invoice"
+    patient: "Patient"
+    amount: "Amount"
+    amount_placeholder: "0.00"
+    appointment: "Appointment (optional)"
+    medical_record: "Medical Record (optional)"
+    status: "Status"
+    statuses:
+      pending: "Pending Payment"
+      paid: "Paid"
+      cancelled: "Cancelled"
+    notes: "Notes"
+    notes_placeholder: "Additional notes for the invoice"
+    save_button: "Save Invoice"
+    cancel_button: "Cancel"
   edit:
     title: "Edit Invoice #%id% - Clinic"
     header: "Edit Invoice #%id%"
