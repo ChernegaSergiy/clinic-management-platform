@@ -1,0 +1,16 @@
+news:
+  admin:
+    edit:
+      title: "Редагування новини #%id% - Клініка"
+      title_full: "Редагування новини #%id%"
+      title_field: "Заголовок"
+      title_placeholder: "Введіть заголовок"
+      meta: "Мета-опис (короткий опис)"
+      meta_placeholder: "Короткий опис або підсумок"
+      content: "Вміст (HTML)"
+      content_placeholder: "Повний текст новини (дозволяється HTML)"
+      published_at: "Дата публікації"
+      author: "Автор"
+      is_published: "Опубліковано"
+      update: "Оновити новину"
+      cancel: "Скасувати"

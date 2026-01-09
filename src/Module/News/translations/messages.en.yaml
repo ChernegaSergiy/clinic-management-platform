@@ -1,0 +1,16 @@
+news:
+  admin:
+    edit:
+      title: "Edit News #%id% - Clinic"
+      title_full: "Edit News #%id%"
+      title_field: "Title"
+      title_placeholder: "Enter title"
+      meta: "Meta Description (short summary)"
+      meta_placeholder: "Short description or summary"
+      content: "Content (HTML)"
+      content_placeholder: "Full news text (HTML allowed)"
+      published_at: "Publication Date"
+      author: "Author"
+      is_published: "Published"
+      update: "Update News"
+      cancel: "Cancel"
