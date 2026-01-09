@@ -23,7 +23,7 @@ admin:
     edit:
       title: "Edit Role #%id%"
       page_title: "Edit Role #%id% - Admin Panel"
-    save: Save Changes
+      save: Save Changes
   dictionaries:
     title: Dictionary Management
     page_title: Dictionaries - Admin Panel
