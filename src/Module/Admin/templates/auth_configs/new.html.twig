@@ -2,18 +2,18 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нову конфігурацію аутентифікації - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.auth_configs.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нову конфігурацію аутентифікації</h2>
+        <h2 class="ui header">{{ 'admin.auth_configs.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/auth_configs/new">
             <div class="field {% if errors.provider %}error{% endif %}">
-                <label>Провайдер</label>
+                <label>{{ 'admin.auth_configs.new.provider'|trans }}</label>
                 <select name="provider" class="ui fluid dropdown" required>
-                    <option value="">Оберіть провайдера</option>
+                    <option value="">{{ 'admin.auth_configs.new.select_provider'|trans }}</option>
                     {% for providerOption in supportedProviders %}
                         <option value="{{ providerOption }}" {% if old.provider == providerOption %}selected{% endif %}>
                             {{ providerOption|capitalize }}
@@ -22,20 +22,20 @@
                 </select>
                 {% if errors.provider %}<div class="ui basic red pointing prompt label">{{ errors.provider[0] }}</div>{% endif %}
             </div>
-            {{ forms.input('client_id', 'Client ID (необов\'язково)', old.client_id ?? '', 'text', 'Client ID для OAuth2', errors.client_id ?? null) }}
-            {{ forms.input('client_secret', 'Client Secret (необов\'язково)', old.client_secret ?? '', 'text', 'Client Secret для OAuth2', errors.client_secret ?? null) }}
-            {{ forms.textarea('config', 'Додаткова конфігурація (JSON, необов\'язково)', old.config ?? '', '{\"key\": \"value\"}', errors.config ?? null) }}
+            {{ forms.input('client_id', 'admin.auth_configs.new.client_id'|trans, old.client_id ?? '', 'text', 'admin.auth_configs.new.client_id_placeholder'|trans, errors.client_id ?? null) }}
+            {{ forms.input('client_secret', 'admin.auth_configs.new.client_secret'|trans, old.client_secret ?? '', 'text', 'admin.auth_configs.new.client_secret_placeholder'|trans, errors.client_secret ?? null) }}
+            {{ forms.textarea('config', 'admin.auth_configs.new.config'|trans, old.config ?? '', 'admin.auth_configs.new.config_placeholder'|trans, errors.config ?? null) }}
 
             <div class="field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
-                    <label>Активна конфігурація</label>
+                    <label>{{ 'admin.auth_configs.new.is_active'|trans }}</label>
                 </div>
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти конфігурацію', 'primary', '', 'save') }}
-            <a href="/admin/auth_configs" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('admin.auth_configs.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/admin/auth_configs" class="ui button"><i class="arrow left icon"></i> {{ 'admin.auth_configs.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

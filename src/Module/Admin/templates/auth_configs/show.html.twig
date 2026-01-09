@@ -16,41 +16,41 @@
         <table class="ui celled unstackable table">
             <tbody>
                 <tr>
-                    <td><strong>ID</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.id'|trans }}</strong></td>
                     <td>{{ config.id }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Провайдер</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.provider'|trans }}</strong></td>
                     <td>{{ config.provider }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Client ID</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.client_id'|trans }}</strong></td>
                     <td>{{ config.client_id|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Client Secret</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.client_secret'|trans }}</strong></td>
                     <td>{{ config.client_secret ? '********' : '—' }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Активна</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.active'|trans }}</strong></td>
                     <td>
                         {% if config.is_active %}
-                            <i class="check circle icon green"></i> Так
+                            <i class="check circle icon green"></i> {{ 'admin.auth_configs.show.table.yes'|trans }}
                         {% else %}
-                            <i class="times circle icon red"></i> Ні
+                            <i class="times circle icon red"></i> {{ 'admin.auth_configs.show.table.no'|trans }}
                         {% endif %}
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>Додаткова конфігурація</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.config'|trans }}</strong></td>
                     <td><pre>{{ config.config ? config.config|json_encode(constant('JSON_PRETTY_PRINT')) : '—' }}</pre></td>
                 </tr>
                 <tr>
-                    <td><strong>Створено</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.created_at'|trans }}</strong></td>
                     <td>{{ config.created_at }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Оновлено</strong></td>
+                    <td><strong>{{ 'admin.auth_configs.show.table.updated_at'|trans }}</strong></td>
                     <td>{{ config.updated_at }}</td>
                 </tr>
             </tbody>
@@ -59,10 +59,10 @@
         <div class="ui divider"></div>
 
         <a href="/admin/auth_configs/edit?id={{ config.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'admin.auth_configs.show.edit_button'|trans }}
         </a>
         <a href="/admin/auth_configs" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'admin.auth_configs.show.back_button'|trans }}
         </a>
     </div>
 {% endblock %}
