@@ -1,5 +1,20 @@
 billing:
   title: "Invoices - Clinic"
+  edit:
+    title: "Edit Invoice #%id% - Clinic"
+    header: "Edit Invoice #%id%"
+    patient_label: "Patient"
+    amount_label: "Amount"
+    appointment_label: "Appointment (optional)"
+    medical_record_label: "Medical Record (optional)"
+    status_label: "Status"
+    status_pending: "Pending Payment"
+    status_paid: "Paid"
+    status_cancelled: "Cancelled"
+    notes_label: "Notes"
+    notes_placeholder: "Additional notes for the invoice"
+    save_button: "Save Changes"
+    cancel_button: "Cancel"
   list:
     title: "Invoices"
     export_csv: "Export to CSV"

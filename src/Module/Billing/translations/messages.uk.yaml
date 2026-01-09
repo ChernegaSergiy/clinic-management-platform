@@ -1,5 +1,20 @@
 billing:
   title: "Рахунки - Клініка"
+  edit:
+    title: "Редагувати рахунок #%id% - Клініка"
+    header: "Редагувати рахунок #%id%"
+    patient_label: "Пацієнт"
+    amount_label: "Сума"
+    appointment_label: "Запис на прийом (необов'язково)"
+    medical_record_label: "Медичний запис (необов'язково)"
+    status_label: "Статус"
+    status_pending: "Очікує оплати"
+    status_paid: "Оплачено"
+    status_cancelled: "Скасовано"
+    notes_label: "Примітки"
+    notes_placeholder: "Додаткові примітки до рахунку"
+    save_button: "Зберегти зміни"
+    cancel_button: "Скасувати"
   list:
     title: "Рахунки"
     export_csv: "Експорт в CSV"
