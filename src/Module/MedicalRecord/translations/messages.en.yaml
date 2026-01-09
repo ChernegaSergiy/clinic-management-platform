@@ -85,3 +85,6 @@ medical_record:
     notes: "Notes"
     save: "Create Record"
     cancel: "Cancel"
+    diagnosis_text_placeholder: "Describe the diagnosis"
+    treatment_placeholder: "Describe the prescribed treatment"
+    notes_placeholder: "Additional notes"

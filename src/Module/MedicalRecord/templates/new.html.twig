@@ -34,9 +34,9 @@
                     <div class="default text">{{ 'medical_record.new.select_intervention_codes'|trans }}</div>
                 </div>
             </div>
-            {{ forms.textarea('diagnosis_text', 'medical_record.new.diagnosis_text'|trans, '', 'Опишіть діагноз') }}
-            {{ forms.textarea('treatment', 'medical_record.new.treatment'|trans, '', 'Опишіть призначене лікування') }}
-            {{ forms.textarea('notes', 'medical_record.new.notes'|trans, '', 'Додаткові примітки') }}
+            {{ forms.textarea('diagnosis_text', 'medical_record.new.diagnosis_text'|trans, '', 'medical_record.new.diagnosis_text_placeholder'|trans) }}
+            {{ forms.textarea('treatment', 'medical_record.new.treatment'|trans, '', 'medical_record.new.treatment_placeholder'|trans) }}
+            {{ forms.textarea('notes', 'medical_record.new.notes'|trans, '', 'medical_record.new.notes_placeholder'|trans) }}
 
             <div class="ui divider"></div>
 

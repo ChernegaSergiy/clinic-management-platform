@@ -40,9 +40,9 @@
                     <div class="default text">{{ 'medical_record.edit.select_intervention_codes'|trans }}</div>
                 </div>
             </div>
-            {{ forms.textarea('diagnosis_text', 'medical_record.edit.diagnosis_text'|trans, old.diagnosis_text ?? record.diagnosis_text, 'Опишіть діагноз') }}
-            {{ forms.textarea('treatment', 'medical_record.edit.treatment'|trans, old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
-            {{ forms.textarea('notes', 'medical_record.edit.notes'|trans, old.notes ?? record.notes, 'Додаткові примітки') }}
+            {{ forms.textarea('diagnosis_text', 'medical_record.edit.diagnosis_text'|trans, old.diagnosis_text ?? record.diagnosis_text, 'medical_record.new.diagnosis_text_placeholder'|trans) }}
+            {{ forms.textarea('treatment', 'medical_record.edit.treatment'|trans, old.treatment ?? record.treatment, 'medical_record.new.treatment_placeholder'|trans) }}
+            {{ forms.textarea('notes', 'medical_record.edit.notes'|trans, old.notes ?? record.notes, 'medical_record.new.notes_placeholder'|trans) }}
 
             <div class="ui divider"></div>
 

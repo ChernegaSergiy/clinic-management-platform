@@ -85,3 +85,6 @@ medical_record:
     notes: "Примітки"
     save: "Створити запис"
     cancel: "Скасувати"
+    diagnosis_text_placeholder: "Опишіть діагноз"
+    treatment_placeholder: "Опишіть призначене лікування"
+    notes_placeholder: "Додаткові примітки"

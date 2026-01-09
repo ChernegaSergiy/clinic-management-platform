@@ -172,7 +172,7 @@
             if (fileInput && displayInput) {
                 fileInput.addEventListener('change', function() {
                     if (fileInput.files.length === 0) {
-                        displayInput.value = 'Файл не обрано';
+                        displayInput.value = '{{ 'medical_record.show.attachments.no_file_selected'|trans }}';
                         return;
                     }
                     const names = Array.from(fileInput.files).map(f => f.name).join(', ');
