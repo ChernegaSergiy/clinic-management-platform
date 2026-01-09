@@ -1,5 +1,17 @@
 insurance:
   companies:
+    list:
+      title: "Insurance Companies - Clinic"
+      header: "Insurance Companies"
+      add_company: "Add Company"
+      table:
+        id: "ID"
+        name: "Name"
+        contact_person: "Contact Person"
+        phone: "Phone"
+        email: "Email"
+        actions: "Actions"
+      no_companies: "No insurance companies to display."
     show:
       title: "Insurance Company #%id% - Clinic"
       title_full: "Company Details #%id%"

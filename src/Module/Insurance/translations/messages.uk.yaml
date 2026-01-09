@@ -1,5 +1,17 @@
 insurance:
   companies:
+    list:
+      title: "Страхові компанії - Клініка"
+      header: "Страхові компанії"
+      add_company: "Додати компанію"
+      table:
+        id: "ID"
+        name: "Назва"
+        contact_person: "Контактна особа"
+        phone: "Телефон"
+        email: "Email"
+        actions: "Дії"
+      no_companies: "Немає страхових компаній для відображення."
     show:
       title: "Страхова компанія #%id% - Клініка"
       title_full: "Деталі компанії #%id%"
