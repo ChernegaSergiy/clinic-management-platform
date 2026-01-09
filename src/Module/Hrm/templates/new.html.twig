@@ -1,17 +1,17 @@
 {% extends 'layouts/base.html.twig' %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати співробітника - Клініка{% endblock %}
+{% block title %}{{ 'hrm.new.title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="ui segment">
-    <h2 class="ui header">Додати нового співробітника</h2>
+    <h2 class="ui header">{{ 'hrm.new.header'|trans }}</h2>
 
     <div class="ui divider"></div>
 
     {% if errors is defined and errors is not empty %}
     <div class="ui error message">
-        <div class="header">Помилка валідації</div>
+        <div class="header">{{ 'hrm.new.validation_error'|trans }}</div>
         <ul class="list">
             {% for field, messages in errors %}
                 {% for message in messages %}
@@ -25,29 +25,29 @@
     <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/hrm/new">
         <div class="two fields">
             <div class="field">
-                <label>Ім'я</label>
-                <input type="text" name="first_name" placeholder="Ім'я" value="{{ old.first_name ?? '' }}" required>
+                <label>{{ 'hrm.new.first_name_label'|trans }}</label>
+                <input type="text" name="first_name" placeholder="{{ 'hrm.new.first_name_placeholder'|trans }}" value="{{ old.first_name ?? '' }}" required>
             </div>
             <div class="field">
-                <label>Прізвище</label>
-                <input type="text" name="last_name" placeholder="Прізвище" value="{{ old.last_name ?? '' }}" required>
-            </div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <label>По-батькові</label>
-                <input type="text" name="middle_name" placeholder="По-батькові" value="{{ old.middle_name ?? '' }}">
-            </div>
-            <div class="field">
-                <label>Посада</label>
-                <input type="text" name="position" placeholder="Напр. Лікар, Медсестра" value="{{ old.position ?? '' }}" required>
+                <label>{{ 'hrm.new.last_name_label'|trans }}</label>
+                <input type="text" name="last_name" placeholder="{{ 'hrm.new.last_name_placeholder'|trans }}" value="{{ old.last_name ?? '' }}" required>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
-                <label>Департамент</label>
+                <label>{{ 'hrm.new.middle_name_label'|trans }}</label>
+                <input type="text" name="middle_name" placeholder="{{ 'hrm.new.middle_name_placeholder'|trans }}" value="{{ old.middle_name ?? '' }}">
+            </div>
+            <div class="field">
+                <label>{{ 'hrm.new.position_label'|trans }}</label>
+                <input type="text" name="position" placeholder="{{ 'hrm.new.position_placeholder'|trans }}" value="{{ old.position ?? '' }}" required>
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>{{ 'hrm.new.department_label'|trans }}</label>
                 <select name="department_id" class="ui dropdown">
-                    <option value="">Не обрано</option>
+                    <option value="">{{ 'hrm.new.department_placeholder'|trans }}</option>
                     {% for department in departments %}
                         <option value="{{ department.id }}" {{ (old.department_id ?? '') == department.id ? 'selected' : '' }}>
                             {{ department.name }}
@@ -56,33 +56,33 @@
                 </select>
             </div>
              <div class="field">
-                <label>Дата найму</label>
+                <label>{{ 'hrm.new.hire_date_label'|trans }}</label>
                 <input type="date" name="hire_date" value="{{ old.hire_date ?? '' }}" required>
             </div>
         </div>
         <div class="three fields">
             <div class="field">
-                <label>Зарплата</label>
+                <label>{{ 'hrm.new.salary_label'|trans }}</label>
                 <input type="number" name="salary" step="0.01" placeholder="0.00" value="{{ old.salary ?? '' }}">
             </div>
             <div class="field">
-                <label>Контактний телефон</label>
-                <input type="text" name="contact_phone" placeholder="+380" value="{{ old.contact_phone ?? '' }}">
+                <label>{{ 'hrm.new.contact_phone_label'|trans }}</label>
+                <input type="text" name="contact_phone" placeholder="{{ 'hrm.new.contact_phone_placeholder'|trans }}" value="{{ old.contact_phone ?? '' }}">
             </div>
             <div class="field">
-                <label>Статус</label>
+                <label>{{ 'hrm.new.status_label'|trans }}</label>
                 <select name="status" class="ui dropdown">
-                    <option value="active" {{ (old.status ?? 'active') == 'active' ? 'selected' : '' }}>Активний</option>
-                    <option value="on_leave" {{ (old.status ?? '') == 'on_leave' ? 'selected' : '' }}>У відпустці</option>
-                    <option value="terminated" {{ (old.status ?? '') == 'terminated' ? 'selected' : '' }}>Звільнений</option>
+                    <option value="active" {{ (old.status ?? 'active') == 'active' ? 'selected' : '' }}>{{ 'hrm.new.status_active'|trans }}</option>
+                    <option value="on_leave" {{ (old.status ?? '') == 'on_leave' ? 'selected' : '' }}>{{ 'hrm.new.status_on_leave'|trans }}</option>
+                    <option value="terminated" {{ (old.status ?? '') == 'terminated' ? 'selected' : '' }}>{{ 'hrm.new.status_terminated'|trans }}</option>
                 </select>
             </div>
         </div>
         
         <div class="field">
-            <label>Прив'язаний користувач системи</label>
+            <label>{{ 'hrm.new.user_label'|trans }}</label>
             <select name="user_id" class="ui dropdown">
-                <option value="">Не прив'язано</option>
+                <option value="">{{ 'hrm.new.user_placeholder'|trans }}</option>
                 {% for user in users %}
                     <option value="{{ user.id }}" {{ (old.user_id ?? '') == user.id ? 'selected' : '' }}>
                         {{ user.last_name }} {{ user.first_name }} ({{ user.email }})
@@ -93,8 +93,8 @@
 
         <div class="ui divider"></div>
 
-        <button class="ui primary button" type="submit"><i class="save icon"></i> Зберегти</button>
-        <a href="/hrm" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+        <button class="ui primary button" type="submit"><i class="save icon"></i> {{ 'hrm.new.save_button'|trans }}</button>
+        <a href="/hrm" class="ui button"><i class="arrow left icon"></i> {{ 'hrm.new.cancel_button'|trans }}</a>
     </form>
 </div>
 {% endblock %}
