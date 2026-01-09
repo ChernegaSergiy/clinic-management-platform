@@ -17,3 +17,11 @@ clinical_reference:
     package: "via package"
     update_button: "Update Reference"
     back: "Back to Clinical References"
+  intervention_import:
+    title: "Import NK 026:2021 (Medical Interventions Classifier)"
+    header: "Import NK 026:2021 (Medical Interventions Classifier)"
+    current_count: "Current number of codes in database:"
+    data_source: "Data is taken from official JSON"
+    package: "via package"
+    update_button: "Update Reference"
+    back: "Back to Clinical References"
