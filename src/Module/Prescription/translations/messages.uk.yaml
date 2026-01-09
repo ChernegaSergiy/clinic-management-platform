@@ -58,4 +58,3 @@ prescription:
     medication_name_label: "Назва медикаменту"
     dosage_label: "Дозування"
     frequency_label: "Частота"
-    remove_item_button: "Видалити"

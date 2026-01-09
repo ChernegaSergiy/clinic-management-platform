@@ -55,4 +55,3 @@ prescription:
     frequency_placeholder: "Frequency"
     save: "Create Prescription"
     cancel: "Cancel"
-    remove_item_button: "Delete"
