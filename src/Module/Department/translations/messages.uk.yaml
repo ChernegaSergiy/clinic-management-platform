@@ -1,4 +1,20 @@
 department:
+  list:
+    title: "Відділення - Клініка"
+    header: "Відділення клініки"
+    add_department: "Додати відділ"
+    table:
+      name: "Назва"
+      description: "Опис"
+      parent_department: "Батьківський відділ"
+      status: "Статус"
+      sort_order: "Порядок"
+      actions: "Дії"
+    parent_label: "Батьківський"
+    active: "Активний"
+    inactive: "Неактивний"
+    no_departments: "Немає відділень для відображення."
+    confirm_delete: "Видалити відділ?"
   show:
     title: "Відділ #%id% - Клініка"
     title_full: "Відділ #%id%"

@@ -1,4 +1,20 @@
 department:
+  list:
+    title: "Departments - Clinic"
+    header: "Clinic Departments"
+    add_department: "Add Department"
+    table:
+      name: "Name"
+      description: "Description"
+      parent_department: "Parent Department"
+      status: "Status"
+      sort_order: "Order"
+      actions: "Actions"
+    parent_label: "Parent"
+    active: "Active"
+    inactive: "Inactive"
+    no_departments: "No departments to display."
+    confirm_delete: "Delete department?"
   show:
     title: "Department #%id% - Clinic"
     title_full: "Department #%id%"
