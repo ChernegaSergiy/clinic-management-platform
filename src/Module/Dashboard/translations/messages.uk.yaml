@@ -1,0 +1,36 @@
+dashboard:
+  title: Панель клініки
+  panel: Панель
+  updated_now: Оновлено зараз
+  notifications: Сповіщення
+  lab_pending: лаб
+  low_stock: склад
+  export:
+    csv: CSV
+    pdf: PDF
+    excel: Excel
+  quick_stats:
+    title: Оперативні показники
+    patients: Пацієнтів
+    appointments_today: Прийомів сьогодні
+    revenue_7d: Дохід 7д
+    lab_in_progress: Лаб. в роботі
+    low_stock: Low stock
+  kpi:
+    title: KPI / фінансові картки
+    no_kpis: Немає активних KPI для відображення. Додайте визначення в адмінці.
+    target: Ціль
+    revenue_7d_title: Щоденний дохід за 7 днів
+    summary_table_title: Зведена таблиця KPI
+    table:
+      indicator: Показник
+      current_value: Поточне значення
+      change: Зміна
+      comment: Коментар
+    no_data: Немає доступних даних KPI.
+    no_description: Немає опису
+    na: N/A
+    daily_revenue_label: Щоденний дохід (₴)
+    daily_revenue_title: Щоденний дохід за останні 7 днів
+    date: Дата
+    revenue: Дохід (₴)

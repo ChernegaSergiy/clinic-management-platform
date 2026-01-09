@@ -1,0 +1,36 @@
+dashboard:
+  title: Clinic Panel
+  panel: Panel
+  updated_now: Updated now
+  notifications: Notifications
+  lab_pending: lab
+  low_stock: stock
+  export:
+    csv: CSV
+    pdf: PDF
+    excel: Excel
+  quick_stats:
+    title: Operational Indicators
+    patients: Patients
+    appointments_today: Appointments today
+    revenue_7d: Revenue 7d
+    lab_in_progress: Lab in progress
+    low_stock: Low stock
+  kpi:
+    title: KPI / Financial Cards
+    no_kpis: No active KPIs to display. Add definitions in admin.
+    target: Target
+    revenue_7d_title: Daily revenue for 7 days
+    summary_table_title: KPI Summary Table
+    table:
+      indicator: Indicator
+      current_value: Current Value
+      change: Change
+      comment: Comment
+    no_data: No KPI data available.
+    no_description: No description
+    na: N/A
+    daily_revenue_label: Daily Revenue (₴)
+    daily_revenue_title: Daily revenue for the last 7 days
+    date: Date
+    revenue: Revenue (₴)
