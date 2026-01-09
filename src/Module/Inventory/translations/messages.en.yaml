@@ -77,3 +77,8 @@ inventory:
     location_placeholder: "e.g., Warehouse 1, Shelf A"
     save_button: "Save Item"
     cancel_button: "Cancel"
+  edit:
+    title: "Edit Inventory Item #%id% - Clinic"
+    header: "Edit Inventory Item #%id%"
+    save_button: "Save Changes"
+    cancel_button: "Cancel"

@@ -77,3 +77,8 @@ inventory:
     location_placeholder: "Наприклад, Склад 1, полиця А"
     save_button: "Зберегти позицію"
     cancel_button: "Скасувати"
+  edit:
+    title: "Редагувати позицію складу #%id% - Клініка"
+    header: "Редагувати позицію складу #%id%"
+    save_button: "Зберегти зміни"
+    cancel_button: "Скасувати"
