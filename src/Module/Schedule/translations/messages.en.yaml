@@ -58,5 +58,6 @@ schedule:
         end_time: "End Time"
         type: "Type"
         notes: "Notes"
-        actions: "Actions"
-      no_exceptions: "No exceptions."
+         actions: "Actions"
+       no_exceptions: "No upcoming exceptions found."
+       delete: "Delete"

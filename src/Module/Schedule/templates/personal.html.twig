@@ -99,15 +99,15 @@
                             <td>{{ exception.start_time|date("H:i") }}</td>
                             <td>{{ exception.end_time|date("H:i") }}</td>
                             <td>
-                                <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">
-                                    {{ exception.is_available ? 'Доступно' : 'Недоступно' }}
-                                </span>
+                                 <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">
+                                     {{ exception.is_available ? 'schedule.exceptions.available'|trans : 'schedule.exceptions.unavailable'|trans }}
+                                 </span>
                             </td>
                             <td>{{ exception.notes ?? '-' }}</td>
                             <td>
                                 <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
                                     <input type="hidden" name="exception_id" value="{{ exception.id }}">
-                                    <button class="ui mini red button" type="submit">Видалити</button>
+                                    <button class="ui mini red button" type="submit">{{ 'schedule.exceptions.delete'|trans }}</button>
                                 </form>
                             </td>
                         </tr>
