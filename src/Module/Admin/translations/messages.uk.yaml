@@ -41,27 +41,57 @@ admin:
       title_full: "Словник #%id%"
       back: Повернутися до списку
       edit: Редагувати
-  auth_configs:
-    show:
-      title: "Перегляд конфігурації #%id%"
-      title_full: "Перегляд конфігурації аутентифікації #%id%"
-      redirect_uri_title: "URL зворотного виклику (Redirect URI)"
-      redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
-    edit:
-      title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
-      title_full: "Редагувати конфігурацію аутентифікації #%id%"
-      provider: Провайдер
-      select_provider: Оберіть провайдера
-      client_id: "Client ID (необов'язково)"
-      client_id_placeholder: Client ID для OAuth2
-      client_secret: "Client Secret (необов'язково)"
-      client_secret_placeholder: Client Secret для OAuth2
-      config: "Додаткова конфігурація (JSON, необов'язково)"
-      config_placeholder: "{\"key\": \"value\"}"
-      is_active: Активна конфігурація
-      save: Зберегти зміни
-      cancel: Скасувати
-  dictionary_values:
+   auth_configs:
+     list:
+       title: Конфігурації аутентифікації - Адмін-панель
+       header: Керування конфігураціями аутентифікації
+       add: Додати конфігурацію
+       no_configs: Немає конфігурацій для відображення.
+       table:
+         id: ID
+         provider: Провайдер
+         client_id: Client ID
+         active: Активна
+         actions: Дії
+       not_specified: Не вказано
+       yes: Так
+       no: Ні
+       delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
+     show:
+       title: "Перегляд конфігурації #%id%"
+       title_full: "Перегляд конфігурації аутентифікації #%id%"
+       redirect_uri_title: "URL зворотного виклику (Redirect URI)"
+       redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
+     edit:
+       title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
+       title_full: "Редагувати конфігурацію аутентифікації #%id%"
+       provider: Провайдер
+       select_provider: Оберіть провайдера
+       client_id: "Client ID (необов'язково)"
+       client_id_placeholder: Client ID для OAuth2
+       client_secret: "Client Secret (необов'язково)"
+       client_secret_placeholder: Client Secret для OAuth2
+       config: "Додаткова конфігурація (JSON, необов'язково)"
+       config_placeholder: "{\"key\": \"value\"}"
+       is_active: Активна конфігурація
+       save: Зберегти зміни
+       cancel: Скасувати
+     list:
+       title: Конфігурації аутентифікації - Адмін-панель
+       header: Керування конфігураціями аутентифікації
+       add: Додати конфігурацію
+       no_configs: Немає конфігурацій для відображення.
+       table:
+         id: ID
+         provider: Провайдер
+         client_id: Client ID
+         active: Активна
+         actions: Дії
+       not_specified: Не вказано
+       yes: Так
+       no: Ні
+       delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
+   dictionary_values:
     edit:
       title: "Редагувати значення словника #%id% - Адмін-панель"
       title_full: "Редагувати значення словника #%id%"

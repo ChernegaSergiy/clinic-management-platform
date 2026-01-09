@@ -41,8 +41,23 @@ admin:
       title_full: "Dictionary #%id%"
       back: "Back to List"
       edit: "Edit"
-  auth_configs:
-    show:
+   auth_configs:
+     list:
+       title: Authentication Configurations - Admin Panel
+       header: Manage Authentication Configurations
+       add: Add Configuration
+       no_configs: No configurations to display.
+       table:
+         id: ID
+         provider: Provider
+         client_id: Client ID
+         active: Active
+         actions: Actions
+       not_specified: Not specified
+       yes: Yes
+       no: No
+       delete_confirm: Are you sure you want to delete this authentication configuration?
+     show:
       title: "View Configuration #%id%"
       title_full: "View Authentication Configuration #%id%"
       redirect_uri_title: "Redirect URI"
