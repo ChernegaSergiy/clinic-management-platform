@@ -2,20 +2,20 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати визначення KPI #{{ definition.id }} - Адмін-панель{% endblock %}
+{% block title %}{{ 'kpi.definitions.edit.title'|trans({'%id%': definition.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати визначення KPI #{{ definition.id }}</h2>
+        <h2 class="ui header">{{ 'kpi.definitions.edit.title_full'|trans({'%id%': definition.id}) }}</h2>
         <div class="ui divider"></div>
 
         {% set kpi_options = {
-            'revenue_generated': 'Дохід (revenue_generated)',
-            'appointments_count': 'Кількість прийомів (appointments_count)',
-            'doctor_utilization': 'Завантаженість лікарів (doctor_utilization)',
-            'readmission_rate': 'Повторні звернення (readmission_rate)',
-            'patient_satisfaction': 'Задоволеність пацієнтів (patient_satisfaction)',
-            'custom': 'Інше (manual)'
+            'revenue_generated': 'kpi.definitions.edit.kpi_types.revenue_generated'|trans,
+            'appointments_count': 'kpi.definitions.edit.kpi_types.appointments_count'|trans,
+            'doctor_utilization': 'kpi.definitions.edit.kpi_types.doctor_utilization'|trans,
+            'readmission_rate': 'kpi.definitions.edit.kpi_types.readmission_rate'|trans,
+            'patient_satisfaction': 'kpi.definitions.edit.kpi_types.patient_satisfaction'|trans,
+            'custom': 'kpi.definitions.edit.kpi_types.custom'|trans
         } %}
         {% set selected_type = old.kpi_type ?? definition.kpi_type %}
         {% if selected_type is not empty and (selected_type not in kpi_options|keys) %}
@@ -23,9 +23,9 @@
         {% endif %}
 
         {% set period_options = {
-            'day': 'Щодня',
-            'week': 'Щотижня',
-            'month': 'Щомісяця'
+            'day': 'kpi.definitions.edit.periods.day'|trans,
+            'week': 'kpi.definitions.edit.periods.week'|trans,
+            'month': 'kpi.definitions.edit.periods.month'|trans
         } %}
         {% set selected_period = old.period ?? definition.period ?? 'day' %}
 
