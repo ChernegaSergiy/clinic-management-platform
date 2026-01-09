@@ -302,3 +302,47 @@ admin:
       disabled: Вимкнено
       disabled_desc: 2FA недоступний
     save: Зберегти
+    interface_language: "Мова інтерфейсу"
+    language_ukrainian: "Українська"
+    language_english: "English"
+  backup_policies:
+    index:
+      title: "Політики резервного копіювання - Адмін-панель"
+      header: "Керування політиками резервного копіювання"
+      add_policy: "Додати політику"
+      no_policies: "Немає політик резервного копіювання для відображення."
+      table:
+        id: "ID"
+        name: "Назва"
+        description: "Опис"
+        frequency: "Частота"
+        retention_days: "Днів зберігання"
+        last_run: "Останній запуск"
+        status: "Статус"
+        actions: "Дії"
+      not_specified: "Не вказано"
+      never: "Ніколи"
+      active: "Активна"
+      inactive: "Неактивна"
+      delete_confirm: "Ви впевнені, що хочете видалити цю політику резервного копіювання?"
+    new:
+      title: "Додати нову політику резервного копіювання - Адмін-панель"
+      header: "Додати нову політику резервного копіювання"
+      name: "Назва"
+      name_placeholder: "Наприклад, Daily Backup"
+      description: "Опис"
+      description_placeholder: "Детальний опис політики"
+      frequency: "Частота"
+      frequency_placeholder: "Наприклад, daily, weekly, monthly"
+      retention_days: "Днів зберігання"
+      retention_days_placeholder: "Кількість днів для зберігання резервних копій"
+      status_label: "Статус"
+      status_active: "Активна"
+      status_inactive: "Неактивна"
+      save_button: "Зберегти політику"
+      cancel_button: "Скасувати"
+    edit:
+      title: "Редагувати політику резервного копіювання #%id% - Адмін-панель"
+      header: "Редагувати політику резервного копіювання #%id%"
+      save_button: "Зберегти зміни"
+      cancel_button: "Скасувати"
