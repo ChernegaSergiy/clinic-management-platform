@@ -1,26 +1,26 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Рахунки - Клініка{% endblock %}
+{% block title %}{{ 'billing.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Рахунки</h2>
+                <h2 class="ui header">{{ 'billing.list.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/billing/export-csv" class="ui secondary button">
-                    <i class="file alternate outline icon"></i> Експорт в CSV
+                    <i class="file alternate outline icon"></i> {{ 'billing.list.export_csv'|trans }}
                 </a>
                 <a href="/billing/export-excel" class="ui secondary button">
-                    <i class="file excel icon"></i> Експорт в Excel
+                    <i class="file excel icon"></i> {{ 'billing.list.export_excel'|trans }}
                 </a>
                 <a href="/billing/export-pdf" class="ui secondary button">
-                    <i class="file pdf icon"></i> Експорт в PDF
+                    <i class="file pdf icon"></i> {{ 'billing.list.export_pdf'|trans }}
                 </a>
                 <a href="/billing/new" class="ui primary button">
-                    <i class="plus icon"></i> Створити рахунок
+                    <i class="plus icon"></i> {{ 'billing.list.create_invoice'|trans }}
                 </a>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <form class="ui form" method="get" action="/billing">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="Пошук рахунків...">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'billing.list.search_placeholder'|trans }}">
                     <i class="search icon"></i>
                 </div>
             </div>
@@ -39,12 +39,12 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Пацієнт</th>
-                    <th>Сума</th>
-                    <th>Статус</th>
-                    <th>Дата виставлення</th>
-                    <th>Дії</th>
+                    <th>{{ 'billing.list.table.id'|trans }}</th>
+                    <th>{{ 'billing.list.table.patient'|trans }}</th>
+                    <th>{{ 'billing.list.table.amount'|trans }}</th>
+                    <th>{{ 'billing.list.table.status'|trans }}</th>
+                    <th>{{ 'billing.list.table.issued_date'|trans }}</th>
+                    <th>{{ 'billing.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,7 +66,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="center aligned">Немає рахунків для відображення.</td>
+                        <td colspan="6" class="center aligned">{{ 'billing.list.no_invoices'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
