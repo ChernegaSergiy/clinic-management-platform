@@ -1,0 +1,24 @@
+department:
+  show:
+    title: "Відділ #%id% - Клініка"
+    title_full: "Відділ #%id%"
+    table:
+      name: "Назва:"
+      parent_department: "Батьківський відділ:"
+      status: "Статус:"
+      active: "Активний"
+      inactive: "Неактивний"
+      sort_order: "Порядок сортування:"
+      created_at: "Створено:"
+      updated_at: "Оновлено:"
+      description: "Опис:"
+    edit: "Редагувати"
+    back: "Повернутися до списку"
+    employees_title: "Співробітники відділу"
+    employees_count: "Співробітники відділу"
+    employees_table:
+      name: "Ім'я"
+      position: "Посада"
+      email: "Email"
+      actions: "Дії"
+    no_employees: "Немає співробітників для відображення."

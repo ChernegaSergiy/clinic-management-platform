@@ -1,12 +1,12 @@
 {% extends "layouts/base.html.twig" %}
 
 {% import "components/ui.html.twig" as ui %}
-{% block title %}Відділ #{{ department.id }} - Клініка{% endblock %}
+{% block title %}{{ 'department.show.title'|trans({'%id%': department.id}) }}{% endblock %}
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="sixteen wide column">
-                <h2 class="ui header">Відділ #{{ department.id }}</h2>
+                <h2 class="ui header">{{ 'department.show.title_full'|trans({'%id%': department.id}) }}</h2>
             </div>
         </div>
 
@@ -15,37 +15,37 @@
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td><strong>Назва:</strong></td>
+                    <td><strong>{{ 'department.show.table.name'|trans }}</strong></td>
                     <td>{{ department.name }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Батьківський відділ:</strong></td>
+                    <td><strong>{{ 'department.show.table.parent_department'|trans }}</strong></td>
                     <td>{{ department.parent_name|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Статус:</strong></td>
+                    <td><strong>{{ 'department.show.table.status'|trans }}</strong></td>
                     <td>
                         {% if department.is_active %}
-                            <span class="ui green label">Активний</span>
+                            <span class="ui green label">{{ 'department.show.table.active'|trans }}</span>
                         {% else %}
-                            <span class="ui red label">Неактивний</span>
+                            <span class="ui red label">{{ 'department.show.table.inactive'|trans }}</span>
                         {% endif %}
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>Порядок сортування:</strong></td>
+                    <td><strong>{{ 'department.show.table.sort_order'|trans }}</strong></td>
                     <td>{{ department.sort_order }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Створено:</strong></td>
+                    <td><strong>{{ 'department.show.table.created_at'|trans }}</strong></td>
                     <td>{{ department.created_at|date('d.m.Y H:i') }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Оновлено:</strong></td>
+                    <td><strong>{{ 'department.show.table.updated_at'|trans }}</strong></td>
                     <td>{{ department.updated_at|date('d.m.Y H:i')|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Опис:</strong></td>
+                    <td><strong>{{ 'department.show.table.description'|trans }}</strong></td>
                     <td>{{ department.description|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
@@ -54,22 +54,22 @@
         <div class="ui divider"></div>
 
         <a href="/admin/departments/edit?id={{ department.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'department.show.edit'|trans }}
         </a>
         <a href="/admin/departments" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'department.show.back'|trans }}
         </a>
     </div>
 
     <div class="ui segment">
-        <h3 class="ui header">Співробітники відділу <span class="ui blue label">{{ employees|length }}</span></h3>
+        <h3 class="ui header">{{ 'department.show.employees_title'|trans }} <span class="ui blue label">{{ employees|length }}</span></h3>
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>Ім'я</th>
-                    <th>Посада</th>
-                    <th>Email</th>
-                    <th>Дії</th>
+                    <th>{{ 'department.show.employees_table.name'|trans }}</th>
+                    <th>{{ 'department.show.employees_table.position'|trans }}</th>
+                    <th>{{ 'department.show.employees_table.email'|trans }}</th>
+                    <th>{{ 'department.show.employees_table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,7 +88,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="center aligned">Немає співробітників для відображення.</td>
+                        <td colspan="4" class="center aligned">{{ 'department.show.no_employees'|trans }}</td>
                     </tr>
                 {% endif %}
             </tbody>

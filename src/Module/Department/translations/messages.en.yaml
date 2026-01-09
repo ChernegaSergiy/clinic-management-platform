@@ -1,0 +1,24 @@
+department:
+  show:
+    title: "Department #%id% - Clinic"
+    title_full: "Department #%id%"
+    table:
+      name: "Name:"
+      parent_department: "Parent Department:"
+      status: "Status:"
+      active: "Active"
+      inactive: "Inactive"
+      sort_order: "Sort Order:"
+      created_at: "Created:"
+      updated_at: "Updated:"
+      description: "Description:"
+    edit: "Edit"
+    back: "Back to List"
+    employees_title: "Department Employees"
+    employees_count: "Department Employees"
+    employees_table:
+      name: "Name"
+      position: "Position"
+      email: "Email"
+      actions: "Actions"
+    no_employees: "No employees to display."
