@@ -1,75 +1,75 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Відділення — {{ clinic_name }}{% endblock %}
+{% block title %}{{ 'department.public.title'|trans }} — {{ clinic_name }}{% endblock %}
 
 {% block body %}
     <section id="departments" class="section">
         <div class="container">
             <header class="section__header">
-                <div class="section__eyebrow">Структура закладу</div>
-                <h1 class="section__title">Основні відділення та їхні функції</h1>
-                <p class="section__description">Детальний перелік усіх стаціонарних та діагностичних відділень із зазначенням їхніх ключових функцій та графіку роботи. Відповідальні лікарі вказані в розділі «Лікарі».</p>
+                <div class="section__eyebrow">{{ 'department.public.section_eyebrow'|trans }}</div>
+                <h1 class="section__title">{{ 'department.public.section_title'|trans }}</h1>
+                <p class="section__description">{{ 'department.public.section_description'|trans }}</p>
             </header>
 
             <div class="departments-grid">
                 <div class="dept-info-block">
-                    <h3>Інформація для госпіталізації</h3>
-                    <p><strong>Планова госпіталізація:</strong> здійснюється з 08:00 до 16:00 (ПН-ПТ) за наявності електронного направлення та при попередній домовленості з відділенням.</p>
-                    <p><strong>Невідкладна (ургентна) допомога:</strong> Приймальне відділення працює <strong>24/7</strong>. Звернення здійснюється самостійно або через виклик бригади 103.</p>
-                    <p style="font-weight: 700;">Перед візитом у відділення рекомендуємо уточнити його статус за телефоном довідкової служби: +380 (000) 000 00 03.</p>
+                    <h3>{{ 'department.public.info_block_title'|trans }}</h3>
+                    <p>{{ 'department.public.planned_hospitalization'|trans|raw }}</p>
+                    <p>{{ 'department.public.emergency_care'|trans|raw }}</p>
+                    <p style="font-weight: 700;">{{ 'department.public.phone_info'|trans }}</p>
                 </div>
 
                 <div class="departments-list">
-                    <div class="dept-category">Клінічні відділення (Стаціонар)</div>
+                    <div class="dept-category">{{ 'department.public.category_clinical'|trans }}</div>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Приймальне відділення</div>
-                        <div class="department-item__meta">24/7 · первинний огляд, сортування (Тріаж), оформлення госпіталізації, ургентні маніпуляції.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПРАЦЮЄ БЕЗПЕРЕРВНО</div>
+                        <div class="department-item__name">{{ 'department.public.departments.reception.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.reception.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.reception.status'|trans }}</div>
                     </article>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Терапевтичне відділення №1</div>
-                        <div class="department-item__meta">Лікування внутрішніх хвороб, пульмонологія, гастроентерологія. Планова та ургентна госпіталізація.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПЛАНОВИЙ ПРИЙОМ</div>
+                        <div class="department-item__name">{{ 'department.public.departments.therapy.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.therapy.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.therapy.status'|trans }}</div>
                     </article>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Хірургічне відділення</div>
-                        <div class="department-item__meta">Загальна та абдомінальна хірургія. Планові та екстрені оперативні втручання.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПЛАНОВИЙ ПРИЙОМ</div>
+                        <div class="department-item__name">{{ 'department.public.departments.surgery.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.surgery.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.surgery.status'|trans }}</div>
                     </article>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Травматологічне відділення</div>
-                        <div class="department-item__meta">Лікування травм опорно-рухового апарату, ортопедія, реабілітація.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПЛАНОВИЙ ПРИЙОМ</div>
+                        <div class="department-item__name">{{ 'department.public.departments.traumatology.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.traumatology.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.traumatology.status'|trans }}</div>
                     </article>
 
                     <article class="department-item">
-                        <div class="department-item__name">Відділення анестезіології та інтенсивної терапії (ВАІТ)</div>
-                        <div class="department-item__meta">Цілодобове спостереження за пацієнтами у критичному стані, післяопераційна підтримка.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: 24/7 ДОСТУП</div>
+                        <div class.="department-item__name">{{ 'department.public.departments.anesthesiology.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.anesthesiology.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.anesthesiology.status'|trans }}</div>
                     </article>
                     
-                    <div class="dept-category" style="border-top: var(--border-thin); margin-top: 0.4rem;">Діагностика та Амбулаторія</div>
+                    <div class="dept-category" style="border-top: var(--border-thin); margin-top: 0.4rem;">{{ 'department.public.category_diagnostic'|trans }}</div>
 
                     <article class="department-item">
-                        <div class="department-item__name">Поліклінічне відділення</div>
-                        <div class="department-item__meta">ПН–ПТ 08:00–19:00 · прийом вузьких спеціалістів, консультації за направленням.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ВІДКРИТО</div>
+                        <div class="department-item__name">{{ 'department.public.departments.polyclinic.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.polyclinic.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.polyclinic.status'|trans }}</div>
                     </article>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Кабінет Ультразвукової Діагностики (УЗД)</div>
-                        <div class="department-item__meta">Планові обстеження, ургентна діагностика. Запис через реєстратуру.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПРАЦЮЄ</div>
+                        <div class="department-item__name">{{ 'department.public.departments.ultrasound.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.ultrasound.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.ultrasound.status'|trans }}</div>
                     </article>
                     
                     <article class="department-item">
-                        <div class="department-item__name">Клініко-діагностична лабораторія</div>
-                        <div class="department-item__meta">Збір та аналіз біоматеріалів для стаціонару та поліклініки.</div>
-                        <div class="department-item__status" style="color: var(--color-ok);">СТАТУС: ПРАЦЮЄ</div>
+                        <div class="department-item__name">{{ 'department.public.departments.laboratory.name'|trans }}</div>
+                        <div class="department-item__meta">{{ 'department.public.departments.laboratory.meta'|trans }}</div>
+                        <div class="department-item__status" style="color: var(--color-ok);">{{ 'department.public.departments.laboratory.status'|trans }}</div>
                     </article>
                     
                 </div>
