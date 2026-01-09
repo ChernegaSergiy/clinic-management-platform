@@ -43,6 +43,19 @@ billing:
       is_active_label: "Active Service"
       save_button: "Save Service"
       cancel_button: "Cancel"
+  bundles:
+    title: "Service Bundles - Clinic"
+    list_title: "Bundle Management"
+    add_bundle: "Add Bundle"
+    no_bundles: "No bundles to display."
+    table:
+      id: "ID"
+      name: "Name"
+      price: "Price"
+      active: "Active"
+      services: "Services in Bundle"
+      actions: "Actions"
+    no_services_in_bundle: "No services"
   show:
     title: "Invoice #%id% - Clinic"
     title_full: "Invoice Details #%id%"

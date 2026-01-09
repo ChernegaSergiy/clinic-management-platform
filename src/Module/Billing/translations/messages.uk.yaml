@@ -43,6 +43,19 @@ billing:
       is_active_label: "Активна послуга"
       save_button: "Зберегти послугу"
       cancel_button: "Скасувати"
+  bundles:
+    title: "Пакети послуг - Клініка"
+    list_title: "Керування пакетами послуг"
+    add_bundle: "Додати пакет послуг"
+    no_bundles: "Немає пакетів послуг для відображення."
+    table:
+      id: "ID"
+      name: "Назва"
+      price: "Ціна"
+      active: "Активний"
+      services: "Послуги в пакеті"
+      actions: "Дії"
+    no_services_in_bundle: "Немає послуг"
   show:
     title: "Рахунок #%id% - Клініка"
     title_full: "Деталі рахунку #%id%"
