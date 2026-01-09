@@ -27,20 +27,20 @@
             <div class="ui grid">
                 <div class="four wide column">
                     {% if user.profile_photo_path %}
-                        <img class="ui medium circular image" src="{{ user.profile_photo_path }}" style="object-fit: cover; aspect-ratio: 1 / 1;" alt="Профільне фото">
+                        <img class="ui medium circular image" src="{{ user.profile_photo_path }}" style="object-fit: cover; aspect-ratio: 1 / 1;" alt="{{ 'user.profile.profile_photo_alt'|trans }}">
                     {% else %}
-                        <img class="ui medium circular image" src="/assets/images/default_user.png" alt="Профільне фото">
+                        <img class="ui medium circular image" src="/assets/images/default_user.png" alt="{{ 'user.profile.profile_photo_alt'|trans }}">
                     {% endif %}
                     <form action="/user/profile/upload-photo" method="POST" enctype="multipart/form-data" class="ui form" style="margin-top: 15px;">
                         <div class="field">
-                            <label>Змінити фото</label>
+                            <label>{{ 'user.profile.change_photo'|trans }}</label>
                             <div class="ui action input">
-                                <input type="text" id="photo-display" readonly placeholder="Файл не обрано">
+                                <input type="text" id="photo-display" readonly placeholder="{{ 'user.profile.no_file_selected'|trans }}">
                                 <label for="photo-upload" class="ui icon button"><i class="upload icon"></i></label>
                             </div>
                             <input type="file" id="photo-upload" name="profile_photo" style="display: none;" accept="image/*">
                         </div>
-                        <button type="submit" class="ui primary button">Завантажити</button>
+                        <button type="submit" class="ui primary button">{{ 'user.profile.upload_button'|trans }}</button>
                     </form>
                 </div>
                 <div class="twelve wide column">
@@ -48,13 +48,13 @@
                         <div class="item">
                             <i class="user icon"></i>
                             <div class="content">
-                                <strong>Ім'я:</strong> {{ user.first_name }} {{ user.last_name }}
+                                <strong>{{ 'user.profile.first_name_label'|trans }}</strong> {{ user.first_name }} {{ user.last_name }}
                             </div>
                         </div>
                         <div class="item">
                             <i class="envelope icon"></i>
                             <div class="content">
-                                <strong>Email:</strong> {{ user.email }}
+                                <strong>{{ 'user.profile.email_label'|trans }}</strong> {{ user.email }}
                             </div>
                         </div>
                     </div>
@@ -63,30 +63,30 @@
 
             {% if employee %}
                 <div class="ui divider"></div>
-                <h2 class="ui header">Інформація про співробітника</h2>
+                <h2 class="ui header">{{ 'user.profile.employee_info_header'|trans }}</h2>
                 <div class="ui list">
                     <div class="item">
                         <i class="briefcase icon"></i>
                         <div class="content">
-                            <strong>Посада:</strong> {{ employee.position }}
+                            <strong>{{ 'user.profile.position_label'|trans }}</strong> {{ employee.position }}
                         </div>
                     </div>
                     <div class="item">
                         <i class="building icon"></i>
                         <div class="content">
-                            <strong>Департамент:</strong> {{ employee.department|default('N/A') }}
+                            <strong>{{ 'user.profile.department_label'|trans }}</strong> {{ employee.department|default('N/A') }}
                         </div>
                     </div>
                     <div class="item">
                         <i class="calendar alternate outline icon"></i>
                         <div class="content">
-                            <strong>Дата найму:</strong> {{ employee.hire_date }}
+                            <strong>{{ 'user.profile.hire_date_label'|trans }}</strong> {{ employee.hire_date }}
                         </div>
                     </div>
                     <div class="item">
                         <i class="info circle icon"></i>
                         <div class="content">
-                            <strong>Статус:</strong> {{ employee.status }}
+                            <strong>{{ 'user.profile.status_label'|trans }}</strong> {{ employee.status }}
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
             <div class="ui divider"></div>
 
             {% if mfaPolicy != 'disabled' %}
-                <h2 class="ui header">Двофакторна автентифікація (2FA)</h2>
+                <h2 class="ui header">{{ 'user.profile.mfa_header'|trans }}</h2>
 
                 {% set mfaStatus = {
                     enabled: user.mfa_enabled,
@@ -107,27 +107,27 @@
                     <div class="ui success message">
                         <i class="check circle icon"></i>
                         <div class="content">
-                            <div class="header">2FA увімкнено</div>
-                            <p>Тип: {{ mfaStatus.type|upper }} | Увімкнено: {{ user.mfa_verified_at|date('d.m.Y H:i') }}</p>
+                            <div class="header">{{ 'user.profile.mfa_enabled'|trans }}</div>
+                            <p>{{ 'user.profile.mfa_type_label'|trans }}: {{ mfaStatus.type|upper }} | {{ 'user.profile.mfa_enabled_date_label'|trans }}: {{ user.mfa_verified_at|date('d.m.Y H:i') }}</p>
                         </div>
                     </div>
 
                     <div class="ui buttons">
-                        <a href="/user/mfa/setup/{{ mfaStatus.type|lower }}?reset=1" class="ui button">Переналаштувати 2FA</a>
-                        <div class="or" data-text="або"></div>
-                        <button type="button" class="ui red button" onclick="showDisableMfaModal()">Вимкнути 2FA</button>
+                        <a href="/user/mfa/setup/{{ mfaStatus.type|lower }}?reset=1" class="ui button">{{ 'user.profile.mfa_reconfigure_button'|trans }}</a>
+                        <div class="or" data-text="{{ 'user.profile.or_separator'|trans }}"></div>
+                        <button type="button" class="ui red button" onclick="showDisableMfaModal()">{{ 'user.profile.mfa_disable_button'|trans }}</button>
                     </div>
 
                     <div class="ui divider"></div>
 
-                    <h3 class="ui header">Коди відновлення</h3>
-                    <p style="margin-bottom: 1rem;">Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора.</p>
+                    <h3 class="ui header">{{ 'user.profile.backup_codes_header'|trans }}</h3>
+                    <p style="margin-bottom: 1rem;">{{ 'user.profile.backup_codes_description'|trans }}</p>
 
                     {% if session.new_backup_codes %}
                         <div class="ui success message">
                             <i class="check circle icon"></i>
-                            <div class="header">Коди оновлено!</div>
-                            <p>Збережіть нові коди. Старі коди більше не діють.</p>
+                            <div class="header">{{ 'user.profile.backup_codes_updated_header'|trans }}</div>
+                            <p>{{ 'user.profile.backup_codes_updated_message'|trans }}</p>
                         </div>
 
                         <div class="ui segment" style="background-color: #f8f9fa; margin-bottom: 1rem;">
@@ -138,20 +138,20 @@
                             </div>
                         </div>
 
-                        <a href="/user/mfa/clear-backup-codes" class="ui primary button">Зрозуміло</a>
+                        <a href="/user/mfa/clear-backup-codes" class="ui primary button">{{ 'user.profile.understood_button'|trans }}</a>
 
                         <div class="ui divider"></div>
                     {% endif %}
 
-                    <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати.');">
+                    <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('{{ 'user.profile.regenerate_backup_codes_confirm'|trans }}');">
                         <div class="ui form">
                             <div class="required field">
-                                <label for="mfa-password">Введіть пароль для підтвердження</label>
-                                <input type="password" id="mfa-password" name="password" placeholder="Ваш пароль" required>
+                                <label for="mfa-password">{{ 'user.profile.password_confirmation_label'|trans }}</label>
+                                <input type="password" id="mfa-password" name="password" placeholder="{{ 'user.profile.password_placeholder'|trans }}" required>
                             </div>
                             <button type="submit" class="ui yellow button">
                                 <i class="refresh icon"></i>
-                                Оновити коди
+                                {{ 'user.profile.regenerate_codes_button'|trans }}
                             </button>
                         </div>
                     </form>
@@ -161,40 +161,40 @@
                     <div class="ui warning message">
                         <i class="exclamation triangle icon"></i>
                         <div class="content">
-                            <div class="header">2FA не увімкнено</div>
-                            <p>Рекомендуємо увімкнути двофакторну автентифікацію для захисту вашого акаунту.</p>
+                            <div class="header">{{ 'user.profile.mfa_disabled'|trans }}</div>
+                            <p>{{ 'user.profile.mfa_disabled_recommendation'|trans }}</p>
                         </div>
                     </div>
 
                     <div class="ui two stackable cards">
                         <div class="card">
                             <div class="content">
-                                <div class="header"><i class="clock icon"></i> TOTP</div>
+                                <div class="header"><i class="clock icon"></i> {{ 'user.profile.totp_header'|trans }}</div>
                                 <div class="description">
-                                    <p>На основі часу. Код змінюється кожні 30 секунд.</p>
-                                    <p><strong>Найпоширеніший варіант</strong> - сумісний з Google Authenticator, Authy, 1Password.</p>
+                                    <p>{{ 'user.profile.totp_description'|trans }}</p>
+                                    <p><strong>{{ 'user.profile.totp_most_common'|trans }}</strong> {{ 'user.profile.totp_compatible'|trans }}</p>
                                 </div>
                             </div>
                             <div class="extra content">
                                 <a href="/user/mfa/setup/totp" class="ui primary fluid button">
                                     <i class="shield icon"></i>
-                                    Увімкнути TOTP
+                                    {{ 'user.profile.enable_totp_button'|trans }}
                                 </a>
                             </div>
                         </div>
 
                         <div class="card">
                             <div class="content">
-                                <div class="header"><i class="hashtag icon"></i> HOTP</div>
+                                <div class="header"><i class="hashtag icon"></i> {{ 'user.profile.hotp_header'|trans }}</div>
                                 <div class="description">
-                                    <p>На основі лічильника. Новий код генерується при кожному запиті.</p>
-                                    <p><strong>Спеціальний варіант</strong> - не залежить від часу, підходить для офлайн сценаріїв.</p>
+                                    <p>{{ 'user.profile.hotp_description'|trans }}</p>
+                                    <p><strong>{{ 'user.profile.hotp_special_option'|trans }}</strong> {{ 'user.profile.hotp_compatible'|trans }}</p>
                                 </div>
                             </div>
                             <div class="extra content">
                                 <a href="/user/mfa/setup/hotp" class="ui primary fluid button">
                                     <i class="shield icon"></i>
-                                    Увімкнути HOTP
+                                    {{ 'user.profile.enable_hotp_button'|trans }}
                                 </a>
                             </div>
                         </div>
@@ -204,20 +204,20 @@
                 <div class="ui divider"></div>
             {% endif %}
 
-            <h2 class="ui header">Зв'язані акаунти</h2>
+            <h2 class="ui header">{{ 'user.profile.linked_accounts_header'|trans }}</h2>
             <div class="ui relaxed divided list">
                 {% for config in authConfigs %}
                     <div class="item">
                         <div class="right floated content">
                             {% if config.provider in linkedProviders %}
-                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('Ви впевнені, що хочете відв\'язати свій {{ config.provider|capitalize }} акаунт?');">
-                                    <button type="submit" class="ui small red button">Відв'язати</button>
+                                <form action="/user/profile/unlink-provider/{{ config.provider }}" method="POST" onsubmit="return confirm('{{ 'user.profile.unlink_confirm'|trans({'%provider%': config.provider|capitalize}) }}');">
+                                    <button type="submit" class="ui small red button">{{ 'user.profile.unlink_button'|trans }}</button>
                                 </form>
                             {% endif %}
                             {% if config.provider not in linkedProviders %}
                                 <a href="/oauth/redirect/{{ config.provider }}" class="ui button {{ config.provider }}">
                                     <i class="{{ config.provider }} icon"></i>
-                                    Прив'язати {{ config.provider|capitalize }}
+                                    {{ 'user.profile.link_button'|trans({'%provider%': config.provider|capitalize}) }}
                                 </a>
                             {% endif %}
                         </div>
@@ -226,16 +226,16 @@
                             <div class="header">{{ config.provider|capitalize }}</div>
                             <div class="description">
                                 {% if config.provider in linkedProviders %}
-                                    Акаунт прив'язано
+                                    {{ 'user.profile.account_linked'|trans }}
                                 {% endif %}
                                 {% if config.provider not in linkedProviders %}
-                                    Не прив'язано
+                                    {{ 'user.profile.account_not_linked'|trans }}
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <p>Немає доступних провайдерів для прив'язки.</p>
+                    <p>{{ 'user.profile.no_providers_available'|trans }}</p>
                 {% endfor %}
             </div>
         </div>
@@ -245,29 +245,29 @@
     <div class="ui small modal" id="disable-mfa-modal">
         <div class="header">
             <i class="shield alternate red icon"></i>
-            Вимкнути двофакторну автентифікацію
+            {{ 'user.profile.disable_mfa_modal_title'|trans }}
         </div>
         <div class="content">
             <div class="ui warning message">
-                <div class="header">Увага!</div>
-                <p>Після вимкнення 2FA ваш акаунт буде менш захищений.</p>
+                <div class="header">{{ 'user.profile.warning_header'|trans }}</div>
+                <p>{{ 'user.profile.disable_mfa_warning'|trans }}</p>
             </div>
             <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
                 <div class="ui form">
                     <div class="required field">
-                        <label>Введіть ваш пароль для підтвердження</label>
+                        <label>{{ 'user.profile.modal_password_label'|trans }}</label>
                         <div class="ui input">
-                            <input type="password" name="password" placeholder="Ваш пароль" required autofocus>
+                            <input type="password" name="password" placeholder="{{ 'user.profile.modal_password_placeholder'|trans }}" required autofocus>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="actions">
-            <div class="ui black deny button">Скасувати</div>
+            <div class="ui black deny button">{{ 'user.profile.cancel_button'|trans }}</div>
             <div class="ui red button" onclick="document.getElementById('disable-mfa-form').submit()">
                 <i class="shield icon"></i>
-                Вимкнути 2FA
+                {{ 'user.profile.modal_disable_button'|trans }}
             </div>
         </div>
     </div>
@@ -291,7 +291,7 @@
                     if (fileInput.files.length > 0) {
                         displayInput.value = fileInput.files[0].name;
                     } else {
-                        displayInput.value = 'Файл не обрано';
+                        displayInput.value = '{{ 'user.profile.no_file_selected'|trans }}';
                     }
                 });
             }

@@ -19,23 +19,75 @@ user:
     success: "Успіх!"
     error: "Помилка!"
     profile_photo_alt: "Профільне фото"
-    no_photo: "Фото відсутнє"
-    basic_info: "Основна інформація"
-    name: "Ім'я"
-    email: "Email"
-    phone: "Телефон"
-    role: "Роль"
-    department: "Відділ"
-    hire_date: "Дата найму"
-    account_settings: "Налаштування облікового запису"
-    current_password: "Поточний пароль"
-    current_password_placeholder: "Введіть поточний пароль"
-    new_password: "Новий пароль"
-    new_password_placeholder: "Введіть новий пароль"
-    confirm_password: "Підтвердити пароль"
-    confirm_password_placeholder: "Повторіть новий пароль"
-    update_profile: "Оновити профіль"
-    update_password: "Змінити пароль"
+    no_photo: "Фото відсутнє" # Kept from original, not strictly used in template as hardcoded string
+    basic_info: "Основна інформація" # Kept from original
+    name: "Ім'я" # Kept from original
+    email: "Email" # Kept from original
+    phone: "Телефон" # Kept from original
+    role: "Роль" # Kept from original
+    department: "Відділ" # Kept from original
+    hire_date: "Дата найму" # Kept from original
+    account_settings: "Налаштування облікового запису" # Kept from original
+    current_password: "Поточний пароль" # Kept from original
+    current_password_placeholder: "Введіть поточний пароль" # Kept from original
+    new_password: "Новий пароль" # Kept from original
+    new_password_placeholder: "Введіть новий пароль" # Kept from original
+    confirm_password: "Підтвердити пароль" # Kept from original
+    confirm_password_placeholder: "Повторіть новий пароль" # Kept from original
+    update_profile: "Оновити профіль" # Kept from original
+    update_password: "Змінити пароль" # Kept from original
+    change_photo: "Змінити фото"
+    no_file_selected: "Файл не обрано"
+    upload_button: "Завантажити"
+    first_name_label: "Ім'я:"
+    email_label: "Email:"
+    employee_info_header: "Інформація про співробітника"
+    position_label: "Посада:"
+    department_label: "Департамент:"
+    hire_date_label: "Дата найму:"
+    status_label: "Статус:"
+    mfa_header: "Двофакторна автентифікація (2FA)"
+    mfa_enabled: "2FA увімкнено"
+    mfa_type_label: "Тип:"
+    mfa_enabled_date_label: "Увімкнено:"
+    mfa_reconfigure_button: "Переналаштувати 2FA"
+    or_separator: "або"
+    mfa_disable_button: "Вимкнути 2FA"
+    backup_codes_header: "Коди відновлення"
+    backup_codes_description: "Коди відновлення використовуються для входу, якщо ви втратите доступ до додатку автентифікатора."
+    backup_codes_updated_header: "Коди оновлено!"
+    backup_codes_updated_message: "Збережіть нові коди. Старі коди більше не діють."
+    understood_button: "Зрозуміло"
+    regenerate_backup_codes_confirm: "Ви впевнені, що хочете згенерувати нові коди відновлення? Старі коди перестануть працювати."
+    password_confirmation_label: "Введіть пароль для підтвердження"
+    password_placeholder: "Ваш пароль"
+    regenerate_codes_button: "Оновити коди"
+    mfa_disabled: "2FA не увімкнено"
+    mfa_disabled_recommendation: "Рекомендуємо увімкнути двофакторну автентифікацію для захисту вашого акаунту."
+    totp_header: "TOTP"
+    totp_description: "На основі часу. Код змінюється кожні 30 секунд."
+    totp_most_common: "Найпоширеніший варіант"
+    totp_compatible: "- сумісний з Google Authenticator, Authy, 1Password."
+    enable_totp_button: "Увімкнути TOTP"
+    hotp_header: "HOTP"
+    hotp_description: "На основі лічильника. Новий код генерується при кожному запиті."
+    hotp_special_option: "Спеціальний варіант"
+    hotp_compatible: "- не залежить від часу, підходить для офлайн сценаріїв."
+    enable_hotp_button: "Увімкнути HOTP"
+    linked_accounts_header: "Зв'язані акаунти"
+    unlink_button: "Відв'язати"
+    unlink_confirm: "Ви впевнені, що хочете відв'язати свій %provider% акаунт?"
+    link_button: "Прив'язати %provider%"
+    account_linked: "Акаунт прив'язано"
+    account_not_linked: "Не прив'язано"
+    no_providers_available: "Немає доступних провайдерів для прив'язки."
+    disable_mfa_modal_title: "Вимкнути двофакторну автентифікацію"
+    warning_header: "Увага!"
+    disable_mfa_warning: "Після вимкнення 2FA ваш акаунт буде менш захищений."
+    modal_password_label: "Введіть ваш пароль для підтвердження"
+    modal_password_placeholder: "Ваш пароль"
+    cancel_button: "Скасувати"
+    modal_disable_button: "Вимкнути 2FA"
   mfa:
     hotp_setup:
       title: "Налаштування HOTP 2FA - Клініка"
