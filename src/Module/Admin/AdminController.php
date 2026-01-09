@@ -63,6 +63,7 @@ class AdminController
         $clinicName = $_POST['clinic_name'] ?? '';
         $mfaPolicy = $_POST['mfa_policy'] ?? 'optional';
         $mfaForceRolesRaw = $_POST['mfa_force_roles'] ?? '';
+        $locale = $_POST['locale'] ?? 'uk';
 
         $mfaForceRoles = [];
         if (!empty($mfaForceRolesRaw)) {
@@ -72,6 +73,9 @@ class AdminController
         $this->settingsRepository->set('clinic_name', $clinicName);
         $this->settingsRepository->setMfaPolicy($mfaPolicy);
         $this->settingsRepository->setMfaForceRoles($mfaForceRoles);
+
+        // Set locale in session
+        $_SESSION['locale'] = $locale;
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
         header('Location: /admin/settings');
