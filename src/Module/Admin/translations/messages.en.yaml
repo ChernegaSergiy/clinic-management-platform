@@ -1,5 +1,5 @@
 admin:
-  title: Admin Panel
+  title: "Admin Panel"
   roles:
     title: User Roles
     page_title: User Roles - Admin Panel
@@ -23,7 +23,7 @@ admin:
     edit:
       title: "Edit Role #%id%"
       page_title: "Edit Role #%id% - Admin Panel"
-      save: Save Changes
+    save: Save Changes
   dictionaries:
     title: Dictionary Management
     page_title: Dictionaries - Admin Panel
@@ -40,7 +40,7 @@ admin:
       title: "Dictionary #%id% - Admin Panel"
       title_full: "Dictionary #%id%"
       back: "Back to List"
-     edit: "Edit"
+    edit: "Edit"
   auth_configs:
      list:
        title: Authentication Configurations - Admin Panel
@@ -58,24 +58,24 @@ admin:
        no: No
        delete_confirm: Are you sure you want to delete this authentication configuration?
      show:
-      title: "View Configuration #%id%"
-      title_full: "View Authentication Configuration #%id%"
-      redirect_uri_title: "Redirect URI"
-      redirect_uri_desc: "Make sure the following URL is specified in your OAuth provider settings:"
-    edit:
-      title: "Edit Authentication Configuration #%id% - Admin Panel"
-      title_full: "Edit Authentication Configuration #%id%"
-      provider: "Provider"
-      select_provider: "Select provider"
-      client_id: "Client ID (optional)"
-      client_id_placeholder: "Client ID for OAuth2"
-      client_secret: "Client Secret (optional)"
-      client_secret_placeholder: "Client Secret for OAuth2"
-      config: "Additional configuration (JSON, optional)"
-      config_placeholder: "{\"key\": \"value\"}"
-      is_active: "Active Configuration"
-      save: "Save Changes"
-      cancel: "Cancel"
+       title: "View Configuration #%id%"
+       title_full: "View Authentication Configuration #%id%"
+       redirect_uri_title: "Redirect URI"
+       redirect_uri_desc: "Make sure the following URL is specified in your OAuth provider settings:"
+     edit:
+       title: "Edit Authentication Configuration #%id% - Admin Panel"
+       title_full: "Edit Authentication Configuration #%id%"
+       provider: "Provider"
+       select_provider: "Select provider"
+       client_id: "Client ID (optional)"
+       client_id_placeholder: "Client ID for OAuth2"
+       client_secret: "Client Secret (optional)"
+       client_secret_placeholder: "Client Secret for OAuth2"
+       config: "Additional configuration (JSON, optional)"
+       config_placeholder: "{\"key\": \"value\"}"
+       is_active: "Active Configuration"
+       save: "Save Changes"
+       cancel: "Cancel"
   dictionary_values:
     edit:
       title: "Edit Dictionary Value #%id% - Admin Panel"

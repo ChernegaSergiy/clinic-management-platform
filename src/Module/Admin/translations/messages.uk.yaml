@@ -1,46 +1,46 @@
 admin:
-  title: Адмін-панель
+  title: "Адмін-панель"
   roles:
-    title: Ролі користувачів
-    page_title: Ролі користувачів - Адмін-панель
-    add: Додати роль
-    no_roles: Немає ролей для відображення.
+    title: "Ролі користувачів"
+    page_title: "Ролі користувачів - Адмін-панель"
+    add: "Додати роль"
+    no_roles: "Немає ролей для відображення."
+    table:
+      id: "ID"
+      name: "Назва"
+      description: "Опис"
+      actions: "Дії"
+    delete_confirm: "Ви впевнені, що хочете видалити цю роль?"
+    new:
+      title: "Створити нову роль"
+      page_title: "Створити нову роль - Адмін-панель"
+      name: "Назва ролі"
+      name_placeholder: "Наприклад, Адміністратор, Лікар"
+      description: "Опис ролі"
+      description_placeholder: "Детальний опис прав та обов'язків"
+      save: "Зберегти роль"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати роль #%id%"
+      page_title: "Редагувати роль #%id% - Адмін-панель"
+      save: "Зберегти зміни"
+  dictionaries:
+    title: Керування словниками
+    page_title: Словники - Адмін-панель
+    add: Додати словник
+    no_dictionaries: Немає словників для відображення.
     table:
       id: ID
       name: Назва
       description: Опис
+      type: Тип
       actions: Дії
-    delete_confirm: Ви впевнені, що хочете видалити цю роль?
-    new:
-      title: Створити нову роль
-      page_title: Створити нову роль - Адмін-панель
-      name: Назва ролі
-      name_placeholder: Наприклад, Адміністратор, Лікар
-      description: Опис ролі
-      description_placeholder: Детальний опис прав та обов'язків
-      save: Зберегти роль
-      cancel: Скасувати
-    edit:
-      title: "Редагувати роль #%id%"
-      page_title: "Редагувати роль #%id% - Адмін-панель"
-      save: Зберегти зміни
-   dictionaries:
-     title: Керування словниками
-     page_title: Словники - Адмін-панель
-     add: Додати словник
-     no_dictionaries: Немає словників для відображення.
-     table:
-       id: ID
-       name: Назва
-       description: Опис
-       type: Тип
-       actions: Дії
-     delete_confirm: Ви впевнені, що хочете видалити цей словник?
-     show:
-       title: "Словник #%id% - Адмін-панель"
-       title_full: "Словник #%id%"
-       back: Повернутися до списку
-     edit: Редагувати
+    delete_confirm: Ви впевнені, що хочете видалити цей словник?
+    show:
+      title: "Словник #%id% - Адмін-панель"
+      title_full: "Словник #%id%"
+      back: Повернутися до списку
+    edit: Редагувати
   auth_configs:
     list:
       title: Конфігурації аутентифікації - Адмін-панель
@@ -58,40 +58,25 @@ admin:
       no: Ні
       delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
     show:
-       title: "Перегляд конфігурації #%id%"
-       title_full: "Перегляд конфігурації аутентифікації #%id%"
-       redirect_uri_title: "URL зворотного виклику (Redirect URI)"
-       redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
-     edit:
-       title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
-       title_full: "Редагувати конфігурацію аутентифікації #%id%"
-       provider: Провайдер
-       select_provider: Оберіть провайдера
-       client_id: "Client ID (необов'язково)"
-       client_id_placeholder: Client ID для OAuth2
-       client_secret: "Client Secret (необов'язково)"
-       client_secret_placeholder: Client Secret для OAuth2
-       config: "Додаткова конфігурація (JSON, необов'язково)"
-       config_placeholder: "{\"key\": \"value\"}"
-       is_active: Активна конфігурація
-       save: Зберегти зміни
-       cancel: Скасувати
-     list:
-       title: Конфігурації аутентифікації - Адмін-панель
-       header: Керування конфігураціями аутентифікації
-       add: Додати конфігурацію
-       no_configs: Немає конфігурацій для відображення.
-       table:
-         id: ID
-         provider: Провайдер
-         client_id: Client ID
-         active: Активна
-         actions: Дії
-       not_specified: Не вказано
-       yes: Так
-       no: Ні
-       delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
-   dictionary_values:
+      title: "Перегляд конфігурації #%id%"
+      title_full: "Перегляд конфігурації аутентифікації #%id%"
+      redirect_uri_title: "URL зворотного виклику (Redirect URI)"
+      redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
+    edit:
+      title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
+      title_full: "Редагувати конфігурацію аутентифікації #%id%"
+      provider: Провайдер
+      select_provider: Оберіть провайдера
+      client_id: "Client ID (необов'язково)"
+      client_id_placeholder: Client ID для OAuth2
+      client_secret: "Client Secret (необов'язково)"
+      client_secret_placeholder: Client Secret для OAuth2
+      config: "Додаткова конфігурація (JSON, необов'язково)"
+      config_placeholder: "{\"key\": \"value\"}"
+      is_active: Активна конфігурація
+      save: Зберегти зміни
+      cancel: Скасувати
+  dictionary_values:
     edit:
       title: "Редагувати значення словника #%id% - Адмін-панель"
       title_full: "Редагувати значення словника #%id%"
