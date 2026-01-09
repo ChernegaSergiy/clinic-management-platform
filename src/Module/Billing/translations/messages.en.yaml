@@ -15,6 +15,21 @@ billing:
       issued_date: "Issued Date"
       actions: "Actions"
     no_invoices: "No invoices to display."
+  services:
+    title: "Services - Clinic"
+    list_title: "Service Management"
+    add_service: "Add Service"
+    no_services: "No services to display."
+    table:
+      id: "ID"
+      name: "Name"
+      category: "Category"
+      price: "Price"
+      active: "Active"
+      actions: "Actions"
+    no_category: "No Category"
+    yes: "Yes"
+    no: "No"
   show:
     title: "Invoice #%id% - Clinic"
     title_full: "Invoice Details #%id%"

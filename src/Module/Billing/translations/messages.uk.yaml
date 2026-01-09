@@ -15,6 +15,21 @@ billing:
       issued_date: "Дата виставлення"
       actions: "Дії"
     no_invoices: "Немає рахунків для відображення."
+  services:
+    title: "Послуги - Клініка"
+    list_title: "Керування послугами"
+    add_service: "Додати послугу"
+    no_services: "Немає послуг для відображення."
+    table:
+      id: "ID"
+      name: "Назва"
+      category: "Категорія"
+      price: "Ціна"
+      active: "Активна"
+      actions: "Дії"
+    no_category: "Без категорії"
+    yes: "Так"
+    no: "Ні"
   show:
     title: "Рахунок #%id% - Клініка"
     title_full: "Деталі рахунку #%id%"
