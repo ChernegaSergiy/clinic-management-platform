@@ -1,0 +1,15 @@
+room:
+  show:
+    title: "Кімната #%id% - Клініка"
+    title_full: "Кімната #%id%"
+    table:
+      type: "Тип кімнати"
+      capacity: "Місткість"
+      capacity_suffix: "осіб"
+      location: "Розташування"
+      equipment: "Обладнання"
+      status: "Статус"
+      available: "Доступна"
+      unavailable: "Недоступна"
+    edit: "Редагувати"
+    back: "Повернутись"

@@ -1,0 +1,15 @@
+room:
+  show:
+    title: "Room #%id% - Clinic"
+    title_full: "Room #%id%"
+    table:
+      type: "Room Type"
+      capacity: "Capacity"
+      capacity_suffix: "persons"
+      location: "Location"
+      equipment: "Equipment"
+      status: "Status"
+      available: "Available"
+      unavailable: "Unavailable"
+    edit: "Edit"
+    back: "Back"
