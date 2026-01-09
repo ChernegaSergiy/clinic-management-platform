@@ -11,6 +11,20 @@ news:
       not_found_title: "Новина не знайдена."
       not_found_description: "Можливо, ця новина була видалена або її не існує."
   admin:
+    list:
+      title: "Керування новинами - Клініка"
+      header: "Керування новинами"
+      add_news: "Створити новину"
+      table:
+        id: "ID"
+        title: "Заголовок"
+        published_at: "Дата створення"
+        status: "Статус"
+        actions: "Дії"
+      status_published: "Опубліковано"
+      status_draft: "Чернетка"
+      confirm_delete: "Ви впевнені, що хочете видалити цю новину?"
+      no_news: "Новин не знайдено."
     edit:
       title: "Редагування новини #%id% - Клініка"
       title_full: "Редагування новини #%id%"
