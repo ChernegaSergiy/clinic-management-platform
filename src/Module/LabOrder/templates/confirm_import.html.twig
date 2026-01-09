@@ -1,11 +1,11 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Підтвердження імпорту лабораторних замовлень - Клініка{% endblock %}
+{% block title %}{{ 'lab_order.confirm_import.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Підтвердження імпорту лабораторних замовлень (HL7/DICOM)</h2>
+        <h2 class="ui header">{{ 'lab_order.confirm_import.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         {% if errors is not empty %}
@@ -19,28 +19,28 @@
         {% endif %}
 
         {% if parsedData is empty %}
-            <p>Немає даних для підтвердження імпорту.</p>
+            <p>{{ 'lab_order.confirm_import.no_data'|trans }}</p>
         {% else %}
-            <h3 class="ui header">Перегляньте імпортовані дані</h3>
+            <h3 class="ui header">{{ 'lab_order.confirm_import.review_header'|trans }}</h3>
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>Поле</th>
-                        <th>Значення</th>
+                        <th>{{ 'lab_order.confirm_import.table.field'|trans }}</th>
+                        <th>{{ 'lab_order.confirm_import.table.value'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Тип файлу</td>
+                        <td>{{ 'lab_order.confirm_import.table.file_type'|trans }}</td>
                         <td>{{ parsedData.type }}</td>
                     </tr>
                     <tr>
-                        <td>Код замовлення</td>
+                        <td>{{ 'lab_order.confirm_import.table.order_code'|trans }}</td>
                         <td>{{ parsedData.parsed_data.order_code }}</td>
                     </tr>
                     {# Additional fields from parsedData can be displayed here #}
                     <tr>
-                        <td>Зміст файлу (фрагмент)</td>
+                        <td>{{ 'lab_order.confirm_import.table.file_content'|trans }}</td>
                         <td><pre>{{ parsedData.content|slice(0, 500) }}...</pre></td>
                     </tr>
                 </tbody>
@@ -49,9 +49,9 @@
             <div class="ui divider"></div>
 
             <form class="ui form" action="/lab-orders/import/finalize" method="POST">
-                <button class="ui green button" type="submit">Підтвердити та імпортувати</button>
+                <button class="ui green button" type="submit">{{ 'lab_order.confirm_import.confirm_button'|trans }}</button>
                 <a href="/lab-orders/import" class="ui button">
-                    <i class="arrow left icon"></i> Скасувати
+                    <i class="arrow left icon"></i> {{ 'lab_order.confirm_import.cancel_button'|trans }}
                 </a>
             </form>
         {% endif %}

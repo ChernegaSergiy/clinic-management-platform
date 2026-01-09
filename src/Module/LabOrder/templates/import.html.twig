@@ -1,11 +1,11 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Імпорт лабораторних замовлень - Клініка{% endblock %}
+{% block title %}{{ 'lab_order.import.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Імпорт лабораторних замовлень (HL7/DICOM)</h2>
+        <h2 class="ui header">{{ 'lab_order.import.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         {% if errors is not empty %}
@@ -20,21 +20,21 @@
 
         {% if success_message %}
             <div class="ui success message">
-                <div class="header">Успіх!</div>
+                <div class="header">{{ 'lab_order.import.success_header'|trans }}</div>
                 <p>{{ success_message }}</p>
             </div>
         {% endif %}
 
         <form class="ui form" action="/lab-orders/import/process" method="POST" enctype="multipart/form-data">
             <div class="field">
-                <label>Виберіть HL7/DICOM файл</label>
+                <label>{{ 'lab_order.import.file_label'|trans }}</label>
                 <div class="ui action input">
-                    <input type="text" id="hl7-file-display" readonly placeholder="Файл не обрано">
-                    <label for="hl7-file-input" class="ui button">Обрати файл</label>
+                    <input type="text" id="hl7-file-display" readonly placeholder="{{ 'lab_order.import.file_placeholder'|trans }}">
+                    <label for="hl7-file-input" class="ui button">{{ 'lab_order.import.choose_file_button'|trans }}</label>
                 </div>
                 <input type="file" id="hl7-file-input" name="hl7_dicom_file" accept=".hl7,.dcm,.txt,.xml" style="display: none;">
             </div>
-            <button class="ui primary button" type="submit">Завантажити та обробити</button>
+            <button class="ui primary button" type="submit">{{ 'lab_order.import.submit_button'|trans }}</button>
         </form>
     </div>
 {% endblock %}
@@ -48,7 +48,7 @@
 
             if (fileInput && display) {
                 fileInput.addEventListener('change', function() {
-                    display.value = fileInput.files.length ? fileInput.files[0].name : 'Файл не обрано';
+                    display.value = fileInput.files.length ? fileInput.files[0].name : '{{ 'lab_order.import.file_placeholder'|trans }}';
                 });
             }
         });
