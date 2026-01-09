@@ -1,24 +1,24 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Мій профіль - Клініка{% endblock %}
+{% block title %}{{ 'user.profile.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segments">
         <div class="ui segment">
-            <h1 class="ui header">Мій профіль</h1>
+            <h1 class="ui header">{{ 'user.profile.title_full'|trans }}</h1>
         </div>
         <div class="ui secondary segment">
             {% if successMessage %}
                 <div class="ui success message" data-flash="success">
                     <i class="close icon"></i>
-                    <div class="header">Успіх!</div>
+                    <div class="header">{{ 'user.profile.success'|trans }}</div>
                     <p>{{ successMessage }}</p>
                 </div>
             {% endif %}
             {% if session.error_message %}
                 <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
-                    <div class="header">Помилка!</div>
+                    <div class="header">{{ 'user.profile.error'|trans }}</div>
                     <p>{{ session.error_message }}</p>
                 </div>
                 {% set _ = session.error_message is null %}
