@@ -43,7 +43,7 @@ patient:
       female: Жіноча
       other: Інша
     marital_statuses:
-      single: Неодружений/Незаміжня
+      single: Неодружений/Незамужня
       married: Одружений/Заміжня
       divorced: Розлучений/Розлучена
       widowed: Вдівець/Вдова
@@ -86,3 +86,33 @@ patient:
       inactive: "Неактивний"
       actions: "Дії"
     no_policies: "Немає страхових полісів для відображення."
+  add_policy:
+    title: "Додати страховий поліс - Клініка"
+    header: "Додати страховий поліс для пацієнта: %last_name% %first_name%"
+    company_label: "Страхова компанія"
+    policy_number_label: "Номер полісу"
+    policy_number_placeholder: "Номер полісу"
+    group_number_label: "Номер групи"
+    group_number_placeholder: "Номер групи"
+    valid_from_label: "Дійсний з"
+    valid_to_label: "Дійсний до"
+    is_active_label: "Активний"
+    save_button: "Зберегти"
+    cancel_button: "Скасувати"
+  edit_policy:
+    title: "Редагувати страховий поліс - Клініка"
+    header: "Редагувати страховий поліс для пацієнта: %last_name% %first_name%"
+    save_button: "Оновити"
+    delete_button: "Видалити"
+    delete_confirm: "Ви впевнені, що хочете видалити цей поліс?"
+    cancel_button: "Скасувати"
+  import_json:
+    title: "Імпорт пацієнтів з JSON - Клініка"
+    header: "Імпорт пацієнтів з JSON"
+    success_header: "Успіх!"
+    error_header: "Помилка імпорту"
+    file_label: "Оберіть JSON файл"
+    file_placeholder: "Файл не обрано"
+    choose_file_button: "Обрати файл"
+    import_button: "Імпортувати"
+    cancel_button: "Скасувати"
