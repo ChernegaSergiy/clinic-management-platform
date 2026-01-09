@@ -60,3 +60,4 @@ schedule:
       notes: "Примітки"
       actions: "Дії"
     no_exceptions: "Майбутніх винятків не знайдено."
+    delete: "Видалити"
