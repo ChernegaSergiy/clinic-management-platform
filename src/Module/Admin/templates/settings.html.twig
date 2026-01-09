@@ -1,61 +1,69 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Налаштування - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.settings.page_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Налаштування системи</h2>
+        <h2 class="ui header">{{ 'admin.settings.title'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form action="/admin/settings" method="POST" class="ui form">
-            <h3 class="ui header">Загальна інформація</h3>
+            <h3 class="ui header">{{ 'admin.settings.general_info'|trans }}</h3>
             <div class="field">
-                <label for="clinic_name">Назва клініки</label>
-                <input type="text" id="clinic_name" name="clinic_name" value="{{ settings.clinic_name }}" placeholder="Міська клінічна лікарня №1">
+                <label for="clinic_name">{{ 'admin.settings.clinic_name'|trans }}</label>
+                <input type="text" id="clinic_name" name="clinic_name" value="{{ settings.clinic_name }}" placeholder="{{ 'admin.settings.clinic_name_placeholder'|trans }}">
+            </div>
+
+            <div class="field">
+                <label for="locale">Мова інтерфейсу</label>
+                <select name="locale" id="locale" class="ui dropdown">
+                    <option value="uk" {% if session.locale == 'uk' or not session.locale %}selected{% endif %}>Українська</option>
+                    <option value="en" {% if session.locale == 'en' %}selected{% endif %}>English</option>
+                </select>
             </div>
 
             <div class="ui divider"></div>
 
-            <h3 class="ui header">Політика двофакторної автентифікації (2FA)</h3>
+            <h3 class="ui header">{{ 'admin.settings.mfa_policy'|trans }}</h3>
 
             <div class="field">
-                <label>Режим MFA</label>
+                <label>{{ 'admin.settings.mfa_mode'|trans }}</label>
                 <div class="ui selection dropdown">
                     <input type="hidden" name="mfa_policy" value="{{ settings.mfa_policy }}">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Виберіть режим</div>
+                    <div class="default text">{{ 'admin.settings.select_mode'|trans }}</div>
                     <div class="menu">
                         <div class="item" data-value="optional">
                             <i class="grey shield icon"></i>
-                            Вибірково
-                            <div class="description">Користувач сам вирішує увімкнути 2FA</div>
+                            {{ 'admin.settings.modes.optional'|trans }}
+                            <div class="description">{{ 'admin.settings.modes.optional_desc'|trans }}</div>
                         </div>
                         <div class="item" data-value="admin_required">
                             <i class="orange shield icon"></i>
-                            Обов'язково для адмінів
-                            <div class="description">Всі користувачі з роллю admin повинні мати 2FA</div>
+                            {{ 'admin.settings.modes.admin_required'|trans }}
+                            <div class="description">{{ 'admin.settings.modes.admin_required_desc'|trans }}</div>
                         </div>
                         <div class="item" data-value="all_required">
                             <i class="red shield icon"></i>
-                            Обов'язково для всіх
-                            <div class="description">Всі користувачі повинні мати 2FA</div>
+                            {{ 'admin.settings.modes.all_required'|trans }}
+                            <div class="description">{{ 'admin.settings.modes.all_required_desc'|trans }}</div>
                         </div>
                         <div class="item" data-value="disabled">
                             <i class="disabled shield icon"></i>
-                            Вимкнено
-                            <div class="description">2FA недоступний</div>
+                            {{ 'admin.settings.modes.disabled'|trans }}
+                            <div class="description">{{ 'admin.settings.modes.disabled_desc'|trans }}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="field">
-                <label>Вимагати MFA для ролей (якщо вибрано "Обов'язково для всіх")</label>
+                <label>{{ 'admin.settings.mfa_force_roles'|trans }}</label>
                 <div class="ui multiple selection dropdown">
                     <input type="hidden" name="mfa_force_roles" value="{{ settings.mfa_force_roles|join(',') }}">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Виберіть ролі</div>
+                    <div class="default text">{{ 'admin.settings.select_roles'|trans }}</div>
                     <div class="menu">
                         {% for role in roles %}
                             <div class="item" data-value="{{ role.id }}">{{ role.name }}</div>
@@ -68,7 +76,7 @@
 
             <button type="submit" class="ui primary button">
                 <i class="save icon"></i>
-                Зберегти
+                {{ 'admin.settings.save'|trans }}
             </button>
         </form>
     </div>

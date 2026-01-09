@@ -1,19 +1,19 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Словник #{{ dictionary.id }} - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.dictionaries.show.title'|trans({'%id%': dictionary.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Словник #{{ dictionary.id }}</h2>
+        <h2 class="ui header">{{ 'admin.dictionaries.show.title_full'|trans({'%id%': dictionary.id}) }}</h2>
         <p>{{ dictionary.description|default('—') }}</p>
         <p><strong>Тип:</strong> {{ dictionary.type }}</p>
         <div class="ui divider"></div>
         <a href="/admin/dictionaries" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'admin.dictionaries.show.back'|trans }}
         </a>
         <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати словник
+            <i class="edit icon"></i> {{ 'admin.dictionaries.show.edit'|trans }}
         </a>
     </div>
 

@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Користувачі - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.users.page_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Користувачі</h2>
+                <h2 class="ui header">{{ 'admin.users.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/admin/users/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати користувача
+                    <i class="plus icon"></i> {{ 'admin.users.add'|trans }}
                 </a>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <form class="ui form" method="get" action="/admin/users">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="Пошук користувачів...">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'admin.users.search_placeholder'|trans }}">
                     <i class="search icon"></i>
                 </div>
             </div>
@@ -30,13 +30,13 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Ім'я</th>
-                    <th>Прізвище</th>
-                    <th>Email</th>
-                    <th>Роль</th>
-                    <th>2FA</th>
-                    <th>Дії</th>
+                    <th>{{ 'admin.users.table.id'|trans }}</th>
+                    <th>{{ 'admin.users.table.first_name'|trans }}</th>
+                    <th>{{ 'admin.users.table.last_name'|trans }}</th>
+                    <th>{{ 'admin.users.table.email'|trans }}</th>
+                    <th>{{ 'admin.users.table.role'|trans }}</th>
+                    <th>{{ 'admin.users.table.mfa'|trans }}</th>
+                    <th>{{ 'admin.users.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,9 +49,9 @@
                         <td>{{ user.role_name }}</td>
                         <td>
                             {% if user.mfa_enabled %}
-                                <span class="ui green label">Увімкнено</span>
+                                <span class="ui green label">{{ 'admin.users.mfa.enabled'|trans }}</span>
                             {% else %}
-                                <span class="ui grey label">Вимкнено</span>
+                                <span class="ui grey label">{{ 'admin.users.mfa.disabled'|trans }}</span>
                             {% endif %}
                         </td>
                         <td>
@@ -62,14 +62,14 @@
                                 <i class="edit icon"></i>
                             </a>
                             {% if user.mfa_enabled %}
-                                <form action="/admin/users/disable-mfa" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете вимкнути 2FA для цього користувача?');">
+                                <form action="/admin/users/disable-mfa" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.mfa.disable_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ user.id }}">
-                                    <button type="submit" class="ui icon button orange" title="Вимкнути 2FA">
+                                    <button type="submit" class="ui icon button orange" title="{{ 'admin.users.mfa.disable_title'|trans }}">
                                         <i class="shield icon"></i>
                                     </button>
                                 </form>
                             {% endif %}
-                            <form action="/admin/users/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цього користувача?');">
+                            <form action="/admin/users/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.delete_confirm'|trans }}');">
                                 <input type="hidden" name="id" value="{{ user.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>
@@ -79,7 +79,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="center aligned">Немає користувачів для відображення.</td>
+                        <td colspan="7" class="center aligned">{{ 'admin.users.no_users'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,15 +1,15 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Перегляд конфігурації #{{ config.id }}{% endblock %}
+{% block title %}{{ 'admin.auth_configs.show.title'|trans({'%id%': config.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Перегляд конфігурації аутентифікації #{{ config.id }}</h2>
+        <h2 class="ui header">{{ 'admin.auth_configs.show.title_full'|trans({'%id%': config.id}) }}</h2>
         <div class="ui divider"></div>
 
         <div class="ui info message">
-            <div class="header">URL зворотного виклику (Redirect URI)</div>
-            <p>Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:</p>
+            <div class="header">{{ 'admin.auth_configs.show.redirect_uri_title'|trans }}</div>
+            <p>{{ 'admin.auth_configs.show.redirect_uri_desc'|trans }}</p>
             <code>{{ redirectUri }}</code>
         </div>
 

@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Ролі користувачів - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.roles.page_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Ролі користувачів</h2>
+                <h2 class="ui header">{{ 'admin.roles.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/admin/roles/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати роль
+                    <i class="plus icon"></i> {{ 'admin.roles.add'|trans }}
                 </a>
             </div>
         </div>
@@ -19,15 +19,15 @@
         <div class="ui divider"></div>
 
         {% if roles is empty %}
-            <p>Немає ролей для відображення.</p>
+            <p>{{ 'admin.roles.no_roles'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Назва</th>
-                        <th>Опис</th>
-                        <th>Дії</th>
+                        <th>{{ 'admin.roles.table.id'|trans }}</th>
+                        <th>{{ 'admin.roles.table.name'|trans }}</th>
+                        <th>{{ 'admin.roles.table.description'|trans }}</th>
+                        <th>{{ 'admin.roles.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                                 <a href="/admin/roles/edit?id={{ role.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/roles/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю роль?');">
+                                <form action="/admin/roles/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.roles.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ role.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>
