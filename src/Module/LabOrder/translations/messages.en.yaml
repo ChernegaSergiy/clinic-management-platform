@@ -1,4 +1,16 @@
 lab_order:
+  new:
+    title: "Create Lab Order - Clinic"
+    header: "Create New Lab Order"
+    patient: "Patient:"
+    doctor: "Doctor:"
+    medical_record_id: "Medical Record ID:"
+    order_code: "Order Code"
+    order_code_placeholder: "E.g., Complete Blood Count"
+    notes: "Notes"
+    notes_placeholder: "Additional notes for the order"
+    save: "Save Order"
+    cancel: "Cancel"
   show:
     title: "Lab Order #%id% - Clinic"
     title_full: "Lab Order Details #%id%"
