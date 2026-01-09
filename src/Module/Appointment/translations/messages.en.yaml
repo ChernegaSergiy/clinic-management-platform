@@ -101,3 +101,14 @@ appointment:
     notes_placeholder: "Additional notes for the appointment"
     save: "Save Appointment"
     cancel: "Cancel"
+  analytics:
+    title: "Doctor Load Analytics - Clinic"
+    header: "Doctor Load Analytics"
+    date_label: "Date"
+    show_button: "Show"
+    subheader: "Doctor Load on %date%"
+    no_data: "No load data available for this date."
+    table:
+      doctor: "Doctor"
+      total_appointments: "Total Appointments"
+      total_hours_booked: "Total Hours Booked"

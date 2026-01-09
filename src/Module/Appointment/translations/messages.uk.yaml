@@ -101,3 +101,14 @@ appointment:
     notes_placeholder: "Додаткові примітки до запису"
     save: "Зберегти запис"
     cancel: "Скасувати"
+  analytics:
+    title: "Аналітика завантаження лікарів - Клініка"
+    header: "Аналітика завантаження лікарів"
+    date_label: "Дата"
+    show_button: "Показати"
+    subheader: "Завантаження лікарів на %date%"
+    no_data: "Немає даних про завантаження на цю дату."
+    table:
+      doctor: "Лікар"
+      total_appointments: "Кількість записів"
+      total_hours_booked: "Загальні години заброньовано"
