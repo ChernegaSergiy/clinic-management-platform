@@ -189,3 +189,11 @@ billing:
     transaction_id: "ID транзакції (необов'язково)"
     payment_notes: "Примітки (необов'язково)"
     add_payment_button: "Додати оплату"
+  export_pdf:
+    title: "Рахунки"
+    table:
+      id: "ID"
+      patient: "Пацієнт"
+      amount: "Сума"
+      status: "Статус"
+      issued_date: "Дата виставлення"

@@ -189,3 +189,11 @@ billing:
     transaction_id: "Transaction ID (optional)"
     payment_notes: "Notes (optional)"
     add_payment_button: "Add Payment"
+  export_pdf:
+    title: "Invoices"
+    table:
+      id: "ID"
+      patient: "Patient"
+      amount: "Amount"
+      status: "Status"
+      issued_date: "Issued Date"
