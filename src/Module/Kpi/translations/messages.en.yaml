@@ -52,7 +52,7 @@ kpi:
         doctor_utilization: "Doctor Utilization (doctor_utilization)"
         readmission_rate: "Readmission Rate (readmission_rate)"
         patient_satisfaction: "Patient Satisfaction (patient_satisfaction)"
-      custom: "Other (manual)"
+        custom: "Custom (manual)"
       periods:
         day: "Daily"
         week: "Weekly"
