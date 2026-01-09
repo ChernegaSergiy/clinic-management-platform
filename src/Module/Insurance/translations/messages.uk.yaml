@@ -1,0 +1,13 @@
+insurance:
+  companies:
+    show:
+      title: "Страхова компанія #%id% - Клініка"
+      title_full: "Деталі компанії #%id%"
+      table:
+        name: "Назва"
+        contact_person: "Контактна особа"
+        phone: "Телефон"
+        email: "Email"
+        notes: "Примітки"
+      edit: "Редагувати"
+      back: "Повернутися до списку"

@@ -1,0 +1,13 @@
+insurance:
+  companies:
+    show:
+      title: "Insurance Company #%id% - Clinic"
+      title_full: "Company Details #%id%"
+      table:
+        name: "Name"
+        contact_person: "Contact Person"
+        phone: "Phone"
+        email: "Email"
+        notes: "Notes"
+      edit: "Edit"
+      back: "Back to List"
