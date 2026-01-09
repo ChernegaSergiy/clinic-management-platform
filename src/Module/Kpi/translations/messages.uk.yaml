@@ -58,7 +58,7 @@ kpi:
       unit_placeholder: "Наприклад, minutes, %, patients"
       is_active: "Активне визначення"
       save: "Зберегти визначення"
-       cancel: "Скасувати"
+      cancel: "Скасувати"
   results:
     title: "Результати KPI - Адмін-панель"
     header: "Результати KPI"
