@@ -48,6 +48,7 @@ appointment:
     start_time: "Час початку"
     end_time: "Час закінчення"
     notes: "Примітки"
+    notes_placeholder: "Додаткові примітки до запису"
     status: "Статус"
     save: "Зберегти зміни"
     cancel: "Скасувати"

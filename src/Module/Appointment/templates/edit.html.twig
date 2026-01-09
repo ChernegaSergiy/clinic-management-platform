@@ -27,7 +27,7 @@
                 {{ forms.select('room_id', 'appointment.edit.room'|trans, rooms, old.room_id ?? appointment.room_id, errors.room_id ?? null, {}) }}
                 {{ forms.select('status', 'appointment.edit.status'|trans, {'scheduled': 'appointment.edit.statuses.scheduled'|trans, 'completed': 'appointment.edit.statuses.completed'|trans, 'cancelled': 'appointment.edit.statuses.cancelled'|trans, 'no-show': 'appointment.edit.statuses.no_show'|trans}, old.status ?? appointment.status, errors.status ?? null, {'required': 'required'}) }}
             </div>
-            {{ forms.textarea('notes', 'appointment.edit.notes'|trans, old.notes ?? appointment.notes, 'Додаткові примітки до запису') }}
+            {{ forms.textarea('notes', 'appointment.edit.notes'|trans, old.notes ?? appointment.notes, 'appointment.edit.notes_placeholder'|trans) }}
 
             <div class="ui divider"></div>
 

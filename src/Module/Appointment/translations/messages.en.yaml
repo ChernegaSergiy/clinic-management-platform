@@ -48,6 +48,7 @@ appointment:
     start_time: "Start Time"
     end_time: "End Time"
     notes: "Notes"
+    notes_placeholder: "Additional notes for the appointment"
     status: "Status"
     save: "Save Changes"
     cancel: "Cancel"
