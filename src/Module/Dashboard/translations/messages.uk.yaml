@@ -34,3 +34,33 @@ dashboard:
     daily_revenue_title: Щоденний дохід за останні 7 днів
     date: Дата
     revenue: Дохід (₴)
+  simple:
+    title: Панель - Клініка
+    panel: Панель
+    patients: Пацієнти
+    active: Активних
+    appointments: Записи
+    upcoming: Майбутніх
+    inventory: Склад
+    low_stock: Низький запас
+    profile: Профіль
+    update_profile_data: Оновіть дані профілю
+    upcoming_appointments_and_stock: Найближчі записи та склад
+    upcoming_appointments: Найближчі записи
+    no_upcoming_appointments: Немає майбутніх записів.
+    patient: Пацієєнт
+    doctor: Лікар
+    time: Час
+    low_stock_items: Позиції з низьким запасом
+    no_low_stock_items: Наразі немає позицій з низьким запасом.
+    name: Назва
+    quantity: Кількість
+    min_level: Мін. рівень
+  pdf_report:
+    title: Звіт по ключовим показникам
+    report_generation_date: 'Дата створення звіту:'
+    indicator: Показник
+    value: Значення
+    trend: Тренд
+    description: Опис
+    no_data_available: Дані відсутні.

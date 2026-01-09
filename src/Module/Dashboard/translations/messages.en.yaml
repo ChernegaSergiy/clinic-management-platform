@@ -34,3 +34,33 @@ dashboard:
     daily_revenue_title: Daily revenue for the last 7 days
     date: Date
     revenue: Revenue (₴)
+  simple:
+    title: Panel - Clinic
+    panel: Panel
+    patients: Patients
+    active: Active
+    appointments: Appointments
+    upcoming: Upcoming
+    inventory: Inventory
+    low_stock: Low stock
+    profile: Profile
+    update_profile_data: Update profile data
+    upcoming_appointments_and_stock: Upcoming Appointments and Stock
+    upcoming_appointments: Upcoming Appointments
+    no_upcoming_appointments: No upcoming appointments.
+    patient: Patient
+    doctor: Doctor
+    time: Time
+    low_stock_items: Low Stock Items
+    no_low_stock_items: No low stock items currently.
+    name: Name
+    quantity: Quantity
+    min_level: Min. Level
+  pdf_report:
+    title: KPI Report
+    report_generation_date: 'Report Generation Date:'
+    indicator: Indicator
+    value: Value
+    trend: Trend
+    description: Description
+    no_data_available: No data available.
