@@ -45,3 +45,8 @@ room:
     is_available_label: "Доступна для бронювання"
     save_button: "Оновити кімнату"
     cancel_button: "Скасувати"
+  new:
+    title: "Додати нову кімнату - Клініка"
+    header: "Додати нову кімнату"
+    save_button: "Зберегти кімнату"
+    cancel_button: "Скасувати"

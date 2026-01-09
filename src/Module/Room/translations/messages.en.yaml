@@ -45,3 +45,8 @@ room:
     is_available_label: "Available for booking"
     save_button: "Update Room"
     cancel_button: "Cancel"
+  new:
+    title: "Add New Room - Clinic"
+    header: "Add New Room"
+    save_button: "Save Room"
+    cancel_button: "Cancel"

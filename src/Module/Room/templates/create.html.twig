@@ -2,11 +2,11 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нову кімнату - Клініка{% endblock %}
+{% block title %}{{ 'room.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нову кімнату</h2>
+        <h2 class="ui header">{{ 'room.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/rooms/new">
@@ -25,8 +25,8 @@
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти кімнату', 'primary', '', 'save') }}
-            <a href="/admin/rooms" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('room.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/admin/rooms" class="ui button"><i class="arrow left icon"></i> {{ 'room.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}
