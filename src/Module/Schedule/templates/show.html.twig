@@ -1,25 +1,25 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Графік роботи: {{ doctor.full_name }}{% endblock %}
+{% block title %}{{ 'schedule.show.title'|trans({'%full_name%': doctor.full_name}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Графік роботи: {{ doctor.full_name }}</h2>
+        <h2 class="ui header">{{ 'schedule.show.title_full'|trans({'%full_name%': doctor.full_name}) }}</h2>
 
         <a href="/admin/schedules/edit?id={{ doctor.id }}" class="ui primary button">
             <i class="edit icon"></i>
-            Редагувати графік
+            {{ 'schedule.show.edit_schedule'|trans }}
         </a>
         <a href="/admin/schedules" class="ui button">
             <i class="arrow left icon"></i>
-            Повернутися до списку
+            {{ 'schedule.show.back_to_list'|trans }}
         </a>
 
         <div class="ui divider"></div>
-        
+
         <div class="ui stackable seven column grid">
-            {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+            {% for day_num, day_name in {1: 'schedule.show.days.1'|trans, 2: 'schedule.show.days.2'|trans, 3: 'schedule.show.days.3'|trans, 4: 'schedule.show.days.4'|trans, 5: 'schedule.show.days.5'|trans, 6: 'schedule.show.days.6'|trans, 0: 'schedule.show.days.0'|trans} %}
                 {% set schedule_entry = scheduleByDay[day_num] ?? null %}
                 
                 {% set card_color = 'grey' %}
