@@ -1,11 +1,11 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагування відділу #{{ department.id }} - Клініка{% endblock %}
+{% block title %}{{ 'department.edit.title'|trans({'%id%': department.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагування відділу #{{ department.id }}</h2>
+        <h2 class="ui header">{{ 'department.edit.header'|trans({'%id%': department.id}) }}</h2>
         
         <div class="ui divider"></div>
         
@@ -67,13 +67,13 @@
             <div class="ui divider"></div>
 
             <button type="submit" class="ui primary button">
-                <i class="save icon"></i> Зберегти зміни
+                <i class="save icon"></i> {{ 'department.edit.save_button'|trans }}
             </button>
             <a href="/admin/departments/show?id={{ department.id }}" class="ui button">
-                <i class="arrow left icon"></i> Скасувати
+                <i class="arrow left icon"></i> {{ 'department.edit.cancel_button'|trans }}
             </a>
             <a href="/admin/departments" class="ui button">
-                <i class="list icon"></i> До списку
+                <i class="list icon"></i> {{ 'department.edit.back_to_list'|trans }}
             </a>
         </form>
     </div>

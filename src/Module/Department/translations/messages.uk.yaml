@@ -54,3 +54,9 @@ department:
     sort_order_label: "Порядок сортування"
     save_button: "Створити відділ"
     cancel_button: "Скасувати"
+  edit:
+    title: "Редагування відділу #%id% - Клініка"
+    header: "Редагування відділу #%id%"
+    save_button: "Зберегти зміни"
+    cancel_button: "Скасувати"
+    back_to_list: "До списку"

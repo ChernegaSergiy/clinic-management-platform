@@ -54,3 +54,9 @@ department:
     sort_order_label: "Sort Order"
     save_button: "Create Department"
     cancel_button: "Cancel"
+  edit:
+    title: "Edit Department #%id% - Clinic"
+    header: "Edit Department #%id%"
+    save_button: "Save Changes"
+    cancel_button: "Cancel"
+    back_to_list: "Back to List"
