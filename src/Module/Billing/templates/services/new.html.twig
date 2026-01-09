@@ -2,22 +2,22 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нову послугу - Клініка{% endblock %}
+{% block title %}{{ 'billing.services.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нову послугу</h2>
+        <h2 class="ui header">{{ 'billing.services.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/billing/services/new">
-            {{ forms.input('name', 'Назва послуги', old.name ?? '', 'text', 'Назва послуги', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('description', 'Опис послуги', old.description ?? '', 'Детальний опис послуги', errors.description ?? null) }}
-            {{ forms.input('price', 'Ціна', old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
+            {{ forms.input('name', 'billing.services.new.name_label'|trans, old.name ?? '', 'text', 'billing.services.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'billing.services.new.description_label'|trans, old.description ?? '', 'billing.services.new.description_placeholder'|trans, errors.description ?? null) }}
+            {{ forms.input('price', 'billing.services.new.price_label'|trans, old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
             
             <div class="field {% if errors.category_id %}error{% endif %}">
-                <label>Категорія</label>
+                <label>{{ 'billing.services.new.category_label'|trans }}</label>
                 <select class="ui dropdown" name="category_id">
-                    <option value="">Виберіть категорію</option>
+                    <option value="">{{ 'billing.services.new.category_placeholder'|trans }}</option>
                     {% for category in categories %}
                         <option value="{{ category.id }}" {% if old.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
                     {% endfor %}
@@ -28,13 +28,13 @@
             <div class="field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
-                    <label>Активна послуга</label>
+                    <label>{{ 'billing.services.new.is_active_label'|trans }}</label>
                 </div>
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти послугу', 'primary', '', 'save') }}
-            <a href="/billing/services" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('billing.services.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/billing/services" class="ui button"><i class="arrow left icon"></i> {{ 'billing.services.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}
