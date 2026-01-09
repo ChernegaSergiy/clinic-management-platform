@@ -84,3 +84,4 @@ medical_record:
     treatment: "Treatment"
     notes: "Notes"
     save: "Create Record"
+    cancel: "Cancel"

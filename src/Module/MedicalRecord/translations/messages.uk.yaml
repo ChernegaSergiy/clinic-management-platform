@@ -84,3 +84,4 @@ medical_record:
     treatment: "Лікування"
     notes: "Примітки"
     save: "Створити запис"
+    cancel: "Скасувати"
