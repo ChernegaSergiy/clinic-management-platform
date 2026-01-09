@@ -2,29 +2,29 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати медичний запис #{{ record.id }} - Клініка{% endblock %}
+{% block title %}{{ 'medical_record.edit.title'|trans({'%id%': record.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати медичний запис #{{ record.id }}</h2>
-        <p><strong>Пацієнт:</strong> {{ record.patient_name ?? '' }}</p>
-        <p><strong>Лікар:</strong> {{ record.doctor_name ?? '' }}</p>
-        <p><strong>Час прийому:</strong> {{ record.start_time|date('Y-m-d H:i') }}</p>
+        <h2 class="ui header">{{ 'medical_record.edit.title_full'|trans({'%id%': record.id}) }}</h2>
+        <p><strong>{{ 'medical_record.edit.patient'|trans }}</strong> {{ record.patient_name ?? '' }}</p>
+        <p><strong>{{ 'medical_record.edit.doctor'|trans }}</strong> {{ record.doctor_name ?? '' }}</p>
+        <p><strong>{{ 'medical_record.edit.appointment_time'|trans }}</strong> {{ record.start_time|date('Y-m-d H:i') }}</p>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/medical-records/edit?id={{ record.id }}">
             <input type="hidden" name="id" value="{{ record.id }}">
             <div class="two fields">
-                {{ forms.input('diagnosis_code', 'Код діагнозу (ICD-10)', old.diagnosis_code ?? record.diagnosis_code, 'text', 'Наприклад, J03.9', errors.diagnosis_code ?? null, {'required': 'required'}) }}
-                {{ forms.input('visit_date', 'Дата візиту', old.visit_date ?? record.visit_date|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
+                {{ forms.input('diagnosis_code', 'medical_record.edit.diagnosis_code'|trans, old.diagnosis_code ?? record.diagnosis_code, 'text', 'medical_record.edit.diagnosis_code_placeholder'|trans, errors.diagnosis_code ?? null, {'required': 'required'}) }}
+                {{ forms.input('visit_date', 'medical_record.edit.visit_date'|trans, old.visit_date ?? record.visit_date|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
  }}
             </div>
             <div class="field">
-                <label>Коди ICD-10</label>
+                <label>{{ 'medical_record.edit.icd_codes'|trans }}</label>
                 <div class="ui fluid search multiple selection dropdown" id="icd-codes-dropdown">
                     <input type="hidden" name="icd_codes[]" value="{{ record.icd_codes|map(c => c.id)|join(',') }}">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Виберіть коди ICD-10</div>
+                    <div class="default text">{{ 'medical_record.edit.select_icd_codes'|trans }}</div>
                     <div class="menu">
                         {% for icd in record.icd_codes %}
                             <div class="item" data-value="{{ icd.id }}">{{ icd.code }} - {{ icd.description }}</div>
@@ -33,26 +33,21 @@
                 </div>
             </div>
             <div class="field">
-                <label>Коди медичних інтервенцій (НК 026:2021)</label>
+                <label>{{ 'medical_record.edit.intervention_codes'|trans }}</label>
                 <div class="ui fluid search multiple selection dropdown" id="intervention-codes-dropdown">
                     <input type="hidden" name="intervention_codes[]" value="{{ record.intervention_codes|map(c => c.id)|join(',') }}">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Виберіть коди інтервенцій</div>
-                    <div class="menu">
-                        {% for intervention in record.intervention_codes %}
-                            <div class="item" data-value="{{ intervention.id }}">{{ intervention.code }} - {{ intervention.description }}</div>
-                        {% endfor %}
-                    </div>
+                    <div class="default text">{{ 'medical_record.edit.select_intervention_codes'|trans }}</div>
                 </div>
             </div>
-            {{ forms.textarea('diagnosis_text', 'Діагноз', old.diagnosis_text ?? record.diagnosis_text, 'Опишіть діагноз') }}
-            {{ forms.textarea('treatment', 'Лікування', old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? record.notes, 'Додаткові примітки') }}
+            {{ forms.textarea('diagnosis_text', 'medical_record.edit.diagnosis_text'|trans, old.diagnosis_text ?? record.diagnosis_text, 'Опишіть діагноз') }}
+            {{ forms.textarea('treatment', 'medical_record.edit.treatment'|trans, old.treatment ?? record.treatment, 'Опишіть призначене лікування') }}
+            {{ forms.textarea('notes', 'medical_record.edit.notes'|trans, old.notes ?? record.notes, 'Додаткові примітки') }}
 
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
-            <a href="/medical-records/show?id={{ record.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('medical_record.edit.save'|trans, 'primary', '', 'save') }}
+            <a href="/medical-records/show?id={{ record.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'medical_record.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

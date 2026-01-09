@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Медичні записи - Клініка{% endblock %}
+{% block title %}{{ 'medical_record.list.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Медичні записи</h2>
+        <h2 class="ui header">{{ 'medical_record.list.title_full'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="GET" action="/medical-records">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" name="search" placeholder="Пошук за пацієнтом, лікарем, діагнозом..." value="{{ searchTerm ?? '' }}">
+                    <input type="text" name="search" placeholder="{{ 'medical_record.list.search_placeholder'|trans }}" value="{{ searchTerm ?? '' }}">
                     <i class="search icon"></i>
                 </div>
             </div>
@@ -20,12 +20,12 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Дата візиту</th>
-                    <th>Діагноз</th>
-                    <th>Пацієнт</th>
-                    <th>Лікар</th>
-                    <th>Дії</th>
+                    <th>{{ 'medical_record.list.table.id'|trans }}</th>
+                    <th>{{ 'medical_record.list.table.visit_date'|trans }}</th>
+                    <th>{{ 'medical_record.list.table.diagnosis'|trans }}</th>
+                    <th>{{ 'medical_record.list.table.patient'|trans }}</th>
+                    <th>{{ 'medical_record.list.table.doctor'|trans }}</th>
+                    <th>{{ 'medical_record.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="center aligned">Наразі в системі немає медичних записів для відображення.</td>
+                        <td colspan="6" class="center aligned">{{ 'medical_record.list.no_records'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
