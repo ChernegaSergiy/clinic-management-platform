@@ -2,11 +2,11 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати контракт #{{ contract.id }} - Клініка{% endblock %}
+{% block title %}{{ 'billing.contracts.edit.title'|trans({'%id%': contract.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати контракт #{{ contract.id }}</h2>
+        <h2 class="ui header">{{ 'billing.contracts.edit.header'|trans({'%id%': contract.id}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/billing/contracts/edit?id={{ contract.id }}" enctype="multipart/form-data">
@@ -25,8 +25,8 @@
             <div class="field {% if errors.contract_file %}error{% endif %}">
                 <label>Файл контракту</label>
                 {% if contract.file_path %}
-                    <p>Поточний файл: <a href="/billing/contracts/{{ contract.id }}/download">{{ contract.file_path | split('/') | last }}</a></p>
-                    <p>Завантажити новий файл (замінить існуючий):</p>
+                    <p>{{ 'billing.contracts.edit.current_file'|trans }} <a href="/billing/contracts/{{ contract.id }}/download">{{ contract.file_path | split('/') | last }}</a></p>
+                    <p>{{ 'billing.contracts.edit.upload_new'|trans }}</p>
                 {% endif %}
                 <div class="ui action input">
                     <input type="text" id="contract-file-display" readonly placeholder="Файл не обрано">
@@ -48,8 +48,8 @@
 
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
-            <a href="/billing/contracts/show?id={{ contract.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('billing.contracts.edit.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/billing/contracts/show?id={{ contract.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'billing.contracts.edit.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

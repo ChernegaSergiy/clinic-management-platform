@@ -121,6 +121,13 @@ billing:
       status_terminated: "Розірваний"
       save_button: "Зберегти контракт"
       cancel_button: "Скасувати"
+    edit:
+      title: "Редагувати контракт #%id% - Клініка"
+      header: "Редагувати контракт #%id%"
+      current_file: "Поточний файл:"
+      upload_new: "Завантажити новий файл (замінить існуючий):"
+      save_button: "Зберегти зміни"
+      cancel_button: "Скасувати"
     show:
       title: "Контракт #%id% - Клініка"
       header: "Деталі контракту #%id%"

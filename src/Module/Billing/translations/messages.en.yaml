@@ -121,6 +121,13 @@ billing:
       status_terminated: "Terminated"
       save_button: "Save Contract"
       cancel_button: "Cancel"
+    edit:
+      title: "Edit Contract #%id% - Clinic"
+      header: "Edit Contract #%id%"
+      current_file: "Current file:"
+      upload_new: "Upload new file (will replace existing):"
+      save_button: "Save Changes"
+      cancel_button: "Cancel"
     show:
       title: "Contract #%id% - Clinic"
       header: "Contract Details #%id%"
