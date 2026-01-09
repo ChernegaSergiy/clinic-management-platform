@@ -3,13 +3,16 @@
 namespace App\Core\Http;
 
 use App\Core\Auth\MfaGuard;
+use App\Core\Service\TranslationService;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 
 class View
 {
     private static ?Environment $twig = null;
     private static array $twigGlobals = [];
+    private static ?TranslationService $translationService = null;
 
     private static function loadTwigGlobals(): void
     {
@@ -37,10 +40,22 @@ class View
         if (self::$twig === null) {
             self::loadTwigGlobals();
 
+            // Initialize translation service
+            if (self::$translationService === null) {
+                self::$translationService = new TranslationService();
+
+                // Set locale from session or default
+                $locale = $_SESSION['locale'] ?? 'uk';
+                self::$translationService->setLocale($locale);
+            }
+
             $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
             $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
             self::$twig = new Environment($loader, []);
             self::$twig->addGlobal('session', $_SESSION);
+
+            // Add translation extension
+            self::$twig->addExtension(new TranslationExtension(self::$translationService->getTranslator()));
 
             foreach (self::$twigGlobals as $key => $value) {
                 self::$twig->addGlobal($key, $value);
