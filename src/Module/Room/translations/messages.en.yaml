@@ -1,4 +1,20 @@
 room:
+  list:
+    title: "Rooms - Clinic"
+    header: "Room List"
+    add_room: "Add Room"
+    table:
+      id: "ID"
+      name: "Name"
+      type: "Type"
+      capacity: "Capacity"
+      location: "Location"
+      available: "Available"
+      actions: "Actions"
+    yes: "Yes"
+    no: "No"
+    confirm_delete: "Are you sure you want to delete this room?"
+    no_rooms: "No rooms to display."
   show:
     title: "Room #%id% - Clinic"
     title_full: "Room #%id%"

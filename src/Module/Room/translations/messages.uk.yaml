@@ -1,4 +1,20 @@
 room:
+  list:
+    title: "Кімнати - Клініка"
+    header: "Список кімнат"
+    add_room: "Додати кімнату"
+    table:
+      id: "ID"
+      name: "Назва"
+      type: "Тип"
+      capacity: "Місткість"
+      location: "Розташування"
+      available: "Доступна"
+      actions: "Дії"
+    yes: "Так"
+    no: "Ні"
+    confirm_delete: "Ви впевнені, що хочете видалити цю кімнату?"
+    no_rooms: "Немає кімнат для відображення."
   show:
     title: "Кімната #%id% - Клініка"
     title_full: "Кімната #%id%"
