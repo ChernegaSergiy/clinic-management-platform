@@ -1,0 +1,165 @@
+admin:
+  title: Адмін-панель
+  roles:
+    title: Ролі користувачів
+    page_title: Ролі користувачів - Адмін-панель
+    add: Додати роль
+    no_roles: Немає ролей для відображення.
+    table:
+      id: ID
+      name: Назва
+      description: Опис
+      actions: Дії
+    delete_confirm: Ви впевнені, що хочете видалити цю роль?
+    new:
+      title: Створити нову роль
+      page_title: Створити нову роль - Адмін-панель
+      name: Назва ролі
+      name_placeholder: Наприклад, Адміністратор, Лікар
+      description: Опис ролі
+      description_placeholder: Детальний опис прав та обов'язків
+      save: Зберегти роль
+      cancel: Скасувати
+    edit:
+      title: "Редагувати роль #%id%"
+      page_title: "Редагувати роль #%id% - Адмін-панель"
+      save: Зберегти зміни
+  dictionaries:
+    title: Керування словниками
+    page_title: Словники - Адмін-панель
+    add: Додати словник
+    no_dictionaries: Немає словників для відображення.
+    table:
+      id: ID
+      name: Назва
+      description: Опис
+      type: Тип
+      actions: Дії
+    delete_confirm: Ви впевнені, що хочете видалити цей словник?
+    show:
+      title: "Словник #%id% - Адмін-панель"
+      title_full: "Словник #%id%"
+      back: Повернутися до списку
+      edit: Редагувати
+  auth_configs:
+    show:
+      title: "Перегляд конфігурації #%id%"
+      title_full: "Перегляд конфігурації аутентифікації #%id%"
+      redirect_uri_title: "URL зворотного виклику (Redirect URI)"
+      redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
+    edit:
+      title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
+      title_full: "Редагувати конфігурацію аутентифікації #%id%"
+      provider: Провайдер
+      select_provider: Оберіть провайдера
+      client_id: "Client ID (необов'язково)"
+      client_id_placeholder: Client ID для OAuth2
+      client_secret: "Client Secret (необов'язково)"
+      client_secret_placeholder: Client Secret для OAuth2
+      config: "Додаткова конфігурація (JSON, необов'язково)"
+      config_placeholder: "{\"key\": \"value\"}"
+      is_active: Активна конфігурація
+      save: Зберегти зміни
+      cancel: Скасувати
+  dictionary_values:
+    edit:
+      title: "Редагувати значення словника #%id% - Адмін-панель"
+      title_full: "Редагувати значення словника #%id%"
+      label: Мітка
+      label_placeholder: Наприклад, Заплановано
+      value: Значення
+      value_placeholder: Наприклад, scheduled
+      order_num: Порядковий номер
+      order_num_placeholder: "0"
+      is_active: Активне значення
+      save: Зберегти зміни
+      cancel: Скасувати
+  services:
+    title: Список послуг
+    page_title: Послуги - Адмін-панель
+    add: Додати послугу
+    table:
+      id: ID
+      name: Назва
+      price: Ціна
+      duration: Тривалість (хв)
+      category: Категорія
+      active: Активна
+      actions: Дії
+    yes: Так
+    no: Ні
+  users:
+    title: Користувачі
+    page_title: Користувачі - Адмін-панель
+    add: Додати користувача
+    search_placeholder: Пошук користувачів...
+    table:
+      id: ID
+      first_name: Ім'я
+      last_name: Прізвище
+      email: Email
+      role: Роль
+      mfa: 2FA
+      actions: Дії
+    no_users: Немає користувачів для відображення.
+    new:
+      title: Додати нового користувача
+      page_title: Додати нового користувача - Адмін-панель
+      first_name: Ім'я
+      first_name_placeholder: Ім'я користувача
+      last_name: Прізвище
+      last_name_placeholder: Прізвище користувача
+      email: Email
+      email_placeholder: Email користувача
+      password: Пароль
+      password_placeholder: Пароль
+      role: Роль
+      save: Зберегти користувача
+      cancel: Скасувати
+    show:
+      title: "Деталі користувача #%id%"
+      page_title: "Користувач #%id% - Адмін-панель"
+      table:
+        id: ID
+        first_name: Ім'я
+        last_name: Прізвище
+        email: Email
+        role: Роль
+        created_at: Створено
+        updated_at: Оновлено
+      edit: Редагувати
+      back: Повернутися до списку
+    edit:
+      title: "Редагувати користувача #%id%"
+      page_title: "Редагувати користувача #%id% - Адмін-панель"
+      new_password: Новий пароль (залиште пустим, щоб не змінювати)
+      new_password_placeholder: Новий пароль
+      save: Зберегти зміни
+      cancel: Скасувати
+    mfa:
+      enabled: Увімкнено
+      disabled: Вимкнено
+      disable_confirm: Ви впевнені, що хочете вимкнути 2FA для цього користувача?
+      disable_title: Вимкнути 2FA
+    delete_confirm: Ви впевнені, що хочете видалити цього користувача?
+  settings:
+    title: Налаштування системи
+    page_title: Налаштування - Адмін-панель
+    general_info: Загальна інформація
+    clinic_name: Назва клініки
+    clinic_name_placeholder: Міська клінічна лікарня №1
+    mfa_policy: Політика двофакторної автентифікації (2FA)
+    mfa_mode: Режим MFA
+    select_mode: Виберіть режим
+    mfa_force_roles: Вимагати MFA для ролей (якщо вибрано "Обов'язково для всіх")
+    select_roles: Виберіть ролі
+    modes:
+      optional: Вибірково
+      optional_desc: Користувач сам вирішує увімкнути 2FA
+      admin_required: Обов'язково для адмінів
+      admin_required_desc: Всі користувачі з роллю admin повинні мати 2FA
+      all_required: Обов'язково для всіх
+      all_required_desc: Всі користувачі повинні мати 2FA
+      disabled: Вимкнено
+      disabled_desc: 2FA недоступний
+    save: Зберегти

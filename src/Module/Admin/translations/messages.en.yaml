@@ -1,0 +1,165 @@
+admin:
+  title: Admin Panel
+  roles:
+    title: User Roles
+    page_title: User Roles - Admin Panel
+    add: Add Role
+    no_roles: No roles to display.
+    table:
+      id: ID
+      name: Name
+      description: Description
+      actions: Actions
+    delete_confirm: Are you sure you want to delete this role?
+    new:
+      title: Create New Role
+      page_title: Create New Role - Admin Panel
+      name: Role Name
+      name_placeholder: For example, Administrator, Doctor
+      description: Role Description
+      description_placeholder: Detailed description of rights and duties
+      save: Save Role
+      cancel: Cancel
+    edit:
+      title: "Edit Role #%id%"
+      page_title: "Edit Role #%id% - Admin Panel"
+      save: Save Changes
+  dictionaries:
+    title: Dictionary Management
+    page_title: Dictionaries - Admin Panel
+    add: Add Dictionary
+    no_dictionaries: No dictionaries to display.
+    table:
+      id: ID
+      name: Name
+      description: Description
+      type: Type
+      actions: Actions
+    delete_confirm: Are you sure you want to delete this dictionary?
+    show:
+      title: "Dictionary #%id% - Admin Panel"
+      title_full: "Dictionary #%id%"
+      back: "Back to List"
+      edit: "Edit"
+  auth_configs:
+    show:
+      title: "View Configuration #%id%"
+      title_full: "View Authentication Configuration #%id%"
+      redirect_uri_title: "Redirect URI"
+      redirect_uri_desc: "Make sure the following URL is specified in your OAuth provider settings:"
+    edit:
+      title: "Edit Authentication Configuration #%id% - Admin Panel"
+      title_full: "Edit Authentication Configuration #%id%"
+      provider: "Provider"
+      select_provider: "Select provider"
+      client_id: "Client ID (optional)"
+      client_id_placeholder: "Client ID for OAuth2"
+      client_secret: "Client Secret (optional)"
+      client_secret_placeholder: "Client Secret for OAuth2"
+      config: "Additional configuration (JSON, optional)"
+      config_placeholder: "{\"key\": \"value\"}"
+      is_active: "Active Configuration"
+      save: "Save Changes"
+      cancel: "Cancel"
+  dictionary_values:
+    edit:
+      title: "Edit Dictionary Value #%id% - Admin Panel"
+      title_full: "Edit Dictionary Value #%id%"
+      label: "Label"
+      label_placeholder: "For example, Scheduled"
+      value: "Value"
+      value_placeholder: "For example, scheduled"
+      order_num: "Order Number"
+      order_num_placeholder: "0"
+      is_active: "Active Value"
+      save: "Save Changes"
+      cancel: "Cancel"
+  services:
+    title: Services List
+    page_title: Services - Admin Panel
+    add: Add Service
+    table:
+      id: ID
+      name: Name
+      price: Price
+      duration: Duration (min)
+      category: Category
+      active: Active
+      actions: Actions
+    yes: Yes
+    no: No
+  users:
+    title: Users
+    page_title: Users - Admin Panel
+    add: Add User
+    search_placeholder: Search users...
+    table:
+      id: ID
+      first_name: First Name
+      last_name: Last Name
+      email: Email
+      role: Role
+      mfa: 2FA
+      actions: Actions
+    no_users: No users to display.
+    new:
+      title: Add New User
+      page_title: Add New User - Admin Panel
+      first_name: First Name
+      first_name_placeholder: User's first name
+      last_name: Last Name
+      last_name_placeholder: User's last name
+      email: Email
+      email_placeholder: User's email
+      password: Password
+      password_placeholder: Password
+      role: Role
+      save: Save User
+      cancel: Cancel
+    show:
+      title: "User Details #%id%"
+      page_title: "User #%id% - Admin Panel"
+      table:
+        id: ID
+        first_name: First Name
+        last_name: Last Name
+        email: Email
+        role: Role
+        created_at: Created
+        updated_at: Updated
+      edit: Edit
+      back: Back to List
+    edit:
+      title: "Edit User #%id%"
+      page_title: "Edit User #%id% - Admin Panel"
+      new_password: New password (leave empty to not change)
+      new_password_placeholder: New password
+      save: Save Changes
+      cancel: Cancel
+    mfa:
+      enabled: Enabled
+      disabled: Disabled
+      disable_confirm: Are you sure you want to disable 2FA for this user?
+      disable_title: Disable 2FA
+    delete_confirm: Are you sure you want to delete this user?
+  settings:
+    title: System Settings
+    page_title: Settings - Admin Panel
+    general_info: General Information
+    clinic_name: Clinic Name
+    clinic_name_placeholder: City Clinical Hospital №1
+    mfa_policy: Two-Factor Authentication (2FA) Policy
+    mfa_mode: MFA Mode
+    select_mode: Select mode
+    mfa_force_roles: Require MFA for roles (if "Required for all" is selected)
+    select_roles: Select roles
+    modes:
+      optional: Optional
+      optional_desc: User decides whether to enable 2FA
+      admin_required: Required for admins
+      admin_required_desc: All users with admin role must have 2FA
+      all_required: Required for all
+      all_required_desc: All users must have 2FA
+      disabled: Disabled
+      disabled_desc: 2FA is unavailable
+    save: Save
