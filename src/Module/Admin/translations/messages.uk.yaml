@@ -165,6 +165,68 @@ admin:
       actions: Дії
     yes: Так
     no: Ні
+    new:
+      title: "Додати нову послугу - Адмін-панель"
+      header: "Додати нову послугу"
+      name: "Назва послуги"
+      name_placeholder: "Наприклад, Консультація терапевта"
+      category: "Категорія послуги"
+      select_category: "Виберіть категорію"
+      price: "Ціна"
+      price_placeholder: "0.00"
+      duration: "Тривалість (хв)"
+      duration_placeholder: "60"
+      description: "Опис"
+      description_placeholder: "Детальний опис послуги"
+      is_active: "Активна послуга"
+      save: "Зберегти послугу"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати послугу #%id% - Адмін-панель"
+      header: "Редагувати послугу #%id%"
+      name: "Назва послуги"
+      name_placeholder: "Наприклад, Консультація терапевта"
+      category: "Категорія послуги"
+      select_category: "Виберіть категорію"
+      price: "Ціна"
+      price_placeholder: "0.00"
+      duration: "Тривалість (хв)"
+      duration_placeholder: "60"
+      description: "Опис"
+      description_placeholder: "Детальний опис послуги"
+      is_active: "Активна послуга"
+      save: "Зберегти зміни"
+      cancel: "Скасувати"
+  service_categories:
+    list:
+      title: "Категорії послуг - Адмін-панель"
+      header: "Категорії послуг"
+      add_category: "Додати категорію"
+      table:
+        id: "ID"
+        name: "Назва"
+        description: "Опис"
+        actions: "Дії"
+      no_categories: "Немає категорій для відображення."
+      confirm_delete: "Ви впевнені, що хочете видалити цю категорію послуг?"
+    new:
+      title: "Додати нову категорію послуг - Адмін-панель"
+      header: "Додати нову категорію послуг"
+      name: "Назва"
+      name_placeholder: "Наприклад, Діагностика"
+      description: "Опис"
+      description_placeholder: "Детальний опис категорії"
+      save: "Зберегти категорію"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати категорію послуг #%id% - Адмін-панель"
+      header: "Редагувати категорію послуг #%id%"
+      name: "Назва"
+      name_placeholder: "Наприклад, Діагностика"
+      description: "Опис"
+      description_placeholder: "Детальний опис категорії"
+      save: "Зберегти зміни"
+      cancel: "Скасувати"
   users:
     title: Користувачі
     page_title: Користувачі - Адмін-панель

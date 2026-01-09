@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Категорії послуг - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.service_categories.list.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Список категорій послуг</h2>
+                <h2 class="ui header">{{ 'admin.service_categories.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/admin/service-categories/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати категорію
+                    <i class="plus icon"></i> {{ 'admin.service_categories.list.add_category'|trans }}
                 </a>
             </div>
         </div>
@@ -21,10 +21,10 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Назва</th>
-                    <th>Опис</th>
-                    <th>Дії</th>
+                    <th>{{ 'admin.service_categories.list.table.id'|trans }}</th>
+                    <th>{{ 'admin.service_categories.list.table.name'|trans }}</th>
+                    <th>{{ 'admin.service_categories.list.table.description'|trans }}</th>
+                    <th>{{ 'admin.service_categories.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,7 +37,7 @@
                             <a href="/admin/service-categories/edit?id={{ category.id }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
-                            <form action="/admin/service-categories/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю категорію послуг?');">
+                            <form action="/admin/service-categories/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.service_categories.list.confirm_delete'|trans }}');">
                                 <input type="hidden" name="id" value="{{ category.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>
@@ -47,7 +47,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="4" class="center aligned">Немає категорій послуг для відображення.</td>
+                        <td colspan="4" class="center aligned">{{ 'admin.service_categories.list.no_categories'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
