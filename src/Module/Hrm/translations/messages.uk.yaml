@@ -1,4 +1,17 @@
 hrm:
+  list:
+    title: "Співробітники - Клініка"
+    header: "Список співробітників"
+    add_employee: "Додати співробітника"
+    table:
+      id: "ID"
+      name: "Ім'я"
+      position: "Посада"
+      department: "Департамент"
+      hire_date: "Дата найму"
+      status: "Статус"
+      actions: "Дії"
+    no_employees: "Немає співробітників для відображення."
   show:
     title: "Профіль співробітника - Клініка"
     title_full: "Профіль: %first_name% %last_name%"

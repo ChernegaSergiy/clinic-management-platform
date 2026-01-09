@@ -1,16 +1,16 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Співробітники - Клініка{% endblock %}
+{% block title %}{{ 'hrm.list.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Список співробітників</h2>
+                <h2 class="ui header">{{ 'hrm.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/hrm/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати співробітника
+                    <i class="plus icon"></i> {{ 'hrm.list.add_employee'|trans }}
                 </a>
             </div>
         </div>
@@ -20,13 +20,13 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Ім'я</th>
-                    <th>Посада</th>
-                    <th>Департамент</th>
-                    <th>Дата найму</th>
-                    <th>Статус</th>
-                    <th>Дії</th>
+                    <th>{{ 'hrm.list.table.id'|trans }}</th>
+                    <th>{{ 'hrm.list.table.name'|trans }}</th>
+                    <th>{{ 'hrm.list.table.position'|trans }}</th>
+                    <th>{{ 'hrm.list.table.department'|trans }}</th>
+                    <th>{{ 'hrm.list.table.hire_date'|trans }}</th>
+                    <th>{{ 'hrm.list.table.status'|trans }}</th>
+                    <th>{{ 'hrm.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,7 +49,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="center aligned">Немає співробітників для відображення.</td>
+                        <td colspan="7" class="center aligned">{{ 'hrm.list.no_employees'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,4 +1,17 @@
 hrm:
+  list:
+    title: "Employees - Clinic"
+    header: "Employee List"
+    add_employee: "Add Employee"
+    table:
+      id: "ID"
+      name: "Name"
+      position: "Position"
+      department: "Department"
+      hire_date: "Hire Date"
+      status: "Status"
+      actions: "Actions"
+    no_employees: "No employees to display."
   show:
     title: "Employee Profile - Clinic"
     title_full: "Profile: %first_name% %last_name%"
