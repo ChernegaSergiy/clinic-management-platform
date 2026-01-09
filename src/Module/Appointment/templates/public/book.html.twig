@@ -1,14 +1,14 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}Записатися на прийом — {{ clinic_name }}{% endblock %}
+{% block title %}{{ 'appointment.public.book.title'|trans({'%clinic_name%': clinic_name}) }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container" style="max-width: 700px; padding: 2rem 0;">
         <header class="section__header" style="text-align: center;">
-            <div class="section__eyebrow">Онлайн-запис</div>
-            <h1 class="section__title section__title--large" style="margin-bottom: 0.75rem;">Запишіться на прийом</h1>
-            <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">Оберіть лікаря, послугу, дату та час, щоб миттєво забронювати ваш візит.</p>
+            <div class="section__eyebrow">{{ 'appointment.public.book.eyebrow'|trans }}</div>
+            <h1 class="section__title section__title--large" style="margin-bottom: 0.75rem;">{{ 'appointment.public.book.title_full'|trans }}</h1>
+            <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">{{ 'appointment.public.book.description'|trans }}</p>
         </header>
 
         {% if success_message %}
@@ -36,22 +36,22 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label class="booking-label">Ваше ім'я</label>
+                        <label class="booking-label">{{ 'appointment.public.book.first_name'|trans }}</label>
                         <input class="booking-input" type="text" name="first_name" value="{{ old.first_name ?? '' }}" required>
                     </div>
                     <div>
-                        <label class="booking-label">Ваше прізвище</label>
+                        <label class="booking-label">{{ 'appointment.public.book.last_name'|trans }}</label>
                         <input class="booking-input" type="text" name="last_name" value="{{ old.last_name ?? '' }}" required>
                     </div>
                 </div>
                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label class="booking-label">Телефон</label>
+                        <label class="booking-label">{{ 'appointment.public.book.phone'|trans }}</label>
                         <input class="booking-input" type="tel" name="phone_number" value="{{ old.phone_number ?? '' }}" required>
                     </div>
                     <div>
-                        <label class="booking-label">Email</label>
-                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}" required>
+                        <label class="booking-label">{{ 'appointment.public.book.email'|trans }}</label>
+                        <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="{{ 'appointment.public.book.email_placeholder'|trans }}" required>
                     </div>
                 </div>
 
@@ -59,18 +59,18 @@
                 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                     <div>
-                        <label class="booking-label">Лікар</label>
+                        <label class="booking-label">{{ 'appointment.public.book.doctor'|trans }}</label>
                         <select class="booking-select" name="doctor_id" id="doctor_selector">
-                            <option value="">Оберіть лікаря</option>
+                            <option value="">{{ 'appointment.public.book.select_doctor'|trans }}</option>
                             {% for doctor in doctors %}
                                 <option value="{{ doctor.id }}" {% if old.doctor_id is defined and old.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.full_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label class="booking-label">Послуга</label>
+                        <label class="booking-label">{{ 'appointment.public.book.service'|trans }}</label>
                          <select class="booking-select" name="service_id" id="service_selector">
-                            <option value="">Оберіть послугу</option>
+                            <option value="">{{ 'appointment.public.book.select_service'|trans }}</option>
                             {% for service in services %}
                                 <option value="{{ service.id }}" data-duration="{{ service.duration_minutes }}" {% if old.service_id is defined and old.service_id == service.id %}selected{% endif %}>{{ service.name }} ({{ service.duration_minutes }} хв)</option>
                             {% endfor %}

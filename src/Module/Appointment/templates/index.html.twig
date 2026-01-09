@@ -1,20 +1,20 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Календар записів - Клініка{% endblock %}
+{% block title %}{{ 'appointment.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Календар записів</h2>
+                <h2 class="ui header">{{ 'appointment.calendar.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/appointments/waitlist" class="ui orange button" style="margin-right: 0.5rem;">
-                    <i class="list icon"></i> Заявки ({{ waitlist|length }})
+                    <i class="list icon"></i> {{ 'appointment.calendar.waitlist'|trans }} ({{ waitlist|length }})
                 </a>
                 <a href="/appointments/new" class="ui primary button">
-                    <i class="plus icon"></i> Створити запис
+                    <i class="plus icon"></i> {{ 'appointment.calendar.create'|trans }}
                 </a>
             </div>
         </div>
@@ -24,28 +24,28 @@
         <div id='calendar'></div>
 
         <div class="ui divider"></div>
-        <h3 class="ui header">Легенда</h3>
+        <h3 class="ui header">{{ 'appointment.calendar.legend'|trans }}</h3>
         <div class="ui labels">
-            <div class="ui header">Статуси записів:</div>
-            <a class="ui label blue">Заплановано</a>
-            <a class="ui label green">Виконано</a>
-            <a class="ui label red">Скасовано</a>
-            <a class="ui label yellow">Не з'явився</a>
-            <a class="ui label grey">Інше</a>
+            <div class="ui header">{{ 'appointment.calendar.status_legend'|trans }}</div>
+            <a class="ui label blue">{{ 'appointment.statuses.scheduled'|trans }}</a>
+            <a class="ui label green">{{ 'appointment.statuses.completed'|trans }}</a>
+            <a class="ui label red">{{ 'appointment.statuses.cancelled'|trans }}</a>
+            <a class="ui label yellow">{{ 'appointment.statuses.no_show'|trans }}</a>
+            <a class="ui label grey">{{ 'appointment.statuses.other'|trans }}</a>
         </div>
 
 
         <div class="ui segment">
-            <h3 class="ui header">Список записів</h3>
+            <h3 class="ui header">{{ 'appointment.list.title'|trans }}</h3>
                 <table class="ui celled unstackable table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Пацієнт</th>
-                            <th>Лікар</th>
-                            <th>Початок</th>
-                            <th>Статус</th>
-                            <th>Дії</th>
+                            <th>{{ 'appointment.table.id'|trans }}</th>
+                            <th>{{ 'appointment.table.patient'|trans }}</th>
+                            <th>{{ 'appointment.table.doctor'|trans }}</th>
+                            <th>{{ 'appointment.table.start'|trans }}</th>
+                            <th>{{ 'appointment.table.status'|trans }}</th>
+                            <th>{{ 'appointment.table.actions'|trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +66,7 @@
                                 </td>
                             </tr>
                         {% else %}
-                            <tr><td colspan="6" class="center aligned">Немає записів.</td></tr>
+                            <tr><td colspan="6" class="center aligned">{{ 'appointment.no_appointments'|trans }}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -98,7 +98,7 @@
                             center: 'title',
                             right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
                         },
-                        resourceAreaHeaderContent: 'Ресурси',
+                        resourceAreaHeaderContent: '{{ 'appointment.resources'|trans }}',
                         resources: allResources,
                         events: '/api/appointments',
 
