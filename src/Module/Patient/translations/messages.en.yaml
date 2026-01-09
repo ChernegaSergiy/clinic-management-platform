@@ -1,0 +1,88 @@
+patient:
+  title: Patients - Clinic
+  list:
+    title: Patient List
+    export_csv: Export to CSV
+    export_json: Export to JSON
+    import_json: Import from JSON
+    add: Add Patient
+    search_placeholder: Search patients...
+    table:
+      id: ID
+      name: Name
+      birth_date: Date of Birth
+      phone: Phone
+      actions: Actions
+    no_patients: No patients to display.
+  new:
+    title: Add New Patient
+    page_title: Add New Patient - Clinic
+    last_name: Last Name
+    last_name_placeholder: Last Name
+    first_name: First Name
+    first_name_placeholder: First Name
+    middle_name: Middle Name
+    middle_name_placeholder: Middle Name
+    birth_date: Date of Birth
+    gender: Gender
+    phone: Phone
+    phone_placeholder: +380 XX XXX XX XX
+    email: Email
+    email_placeholder: example@email.com
+    address: Address
+    address_placeholder: Kyiv, Khreshchatyk St., 1
+    tax_id: Tax ID
+    tax_id_placeholder: 1234567890
+    document_id: ID Card/Passport
+    document_id_placeholder: 001234567
+    marital_status: Marital Status
+    save: Save Patient
+    cancel: Cancel
+    genders:
+      male: Male
+      female: Female
+      other: Other
+    marital_statuses:
+      single: Single
+      married: Married
+      divorced: Divorced
+      widowed: Widowed
+  edit:
+    title: "Edit Patient"
+    page_title: "Edit Patient - Clinic"
+    title_full: "Edit Patient: %first_name% %last_name%"
+    save: "Save Changes"
+    cancel: "Cancel"
+  show:
+    title: "Patient Card"
+    page_title: "Patient %first_name% %last_name% - Clinic"
+    title_full: "Patient Card: %first_name% %last_name%"
+    basic_info: "Basic Information"
+    additional_info: "Additional Information"
+    status: "Status"
+    active: "Active"
+    archived: "Archived"
+    edit: "Edit"
+    create_prescription: "Create Prescription"
+    archive: "Archive"
+    activate: "Activate"
+    back: "Back to List"
+    medical_records: "Medical Records"
+    medical_records_table:
+      visit_date: "Visit Date"
+      doctor: "Doctor"
+      diagnosis: "Diagnosis"
+      actions: "Actions"
+    no_medical_records: "No medical records to display."
+    insurance_policies: "Insurance Policies"
+    add_policy: "Add Policy"
+    policies_table:
+      policy_number: "Policy Number"
+      company: "Company"
+      valid_from: "Valid From"
+      valid_to: "Valid To"
+      status: "Status"
+      active: "Active"
+      inactive: "Inactive"
+      actions: "Actions"
+    no_policies: "No insurance policies to display."
