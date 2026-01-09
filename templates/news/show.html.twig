@@ -1,11 +1,11 @@
 {% extends "layouts/public.html.twig" %}
 
-{% block title %}{{ newsArticle.title }} — Новини — {{ clinic_name }}{% endblock %}
+{% block title %}{{ 'news.public.show.title'|trans({'%title%': newsArticle.title, '%clinic_name%': clinic_name}) }}{% endblock %}
 
 {% block body %}
     <section class="section">
         <div class="container" style="max-width: 800px; padding: 2rem 0;">
-            <a href="/news" class="btn btn--ghost" style="margin-bottom: 1.5rem;">← НАЗАД ДО СПИСКУ НОВИН</a>
+            <a href="/news" class="btn btn--ghost" style="margin-bottom: 1.5rem;">{{ 'news.public.show.back'|trans }}</a>
 
             {% if newsArticle %}
                 <div class="news-detail" style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
@@ -19,8 +19,8 @@
                 </div>
             {% else %}
                 <div class="news-detail" style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem; text-align: center;">
-                    <h1 class="news-item__title">Новина не знайдена.</h1>
-                    <p class="section__description">Можливо, ця новина була видалена або її не існує.</p>
+                    <h1 class="news-item__title">{{ 'news.public.show.not_found_title'|trans }}</h1>
+                    <p class="section__description">{{ 'news.public.show.not_found_description'|trans }}</p>
                 </div>
             {% endif %}
         </div>

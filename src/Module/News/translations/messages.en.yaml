@@ -5,6 +5,11 @@ news:
     section_title: "News and Official Announcements"
     section_description: "Important announcements about work schedules, changes in reception, government programs, procurement, and internal changes in department operations. Chronological feed without images."
     no_news: "No news available at the moment."
+    show:
+      title: "%title% — News — %clinic_name%"
+      back: "← BACK TO NEWS LIST"
+      not_found_title: "News not found."
+      not_found_description: "This news may have been deleted or does not exist."
   admin:
     edit:
       title: "Edit News #%id% - Clinic"
