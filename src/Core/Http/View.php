@@ -22,9 +22,22 @@ class View
             // Ensure globals are loaded to get system_locale
             self::loadTwigGlobals();
 
-            // Set locale from system settings, browser, or default
-            $locale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
-            self::$translationService->setLocale($locale);
+            // Determine initial locale preference
+            $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
+
+            // Get actual available locales from the TranslationService instance
+            // Note: Calling getAvailableLocales() here on the instance is safe
+            // as the TranslationService is already initialized above.
+            $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
+
+            // Validate preferredLocale against truly available locales
+            $finalLocale = 'uk'; // Default fallback
+            if (in_array($preferredLocale, $rawAvailableLocales)) {
+                $finalLocale = $preferredLocale;
+            }
+            // If preferredLocale is not available, $finalLocale remains 'uk'
+
+            self::$translationService->setLocale($finalLocale);
         }
         return self::$translationService;
     }
