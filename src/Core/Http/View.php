@@ -14,6 +14,21 @@ class View
     private static array $twigGlobals = [];
     private static ?TranslationService $translationService = null;
 
+    public static function getTranslationService(): TranslationService
+    {
+        if (self::$translationService === null) {
+            self::$translationService = new TranslationService();
+
+            // Ensure globals are loaded to get system_locale
+            self::loadTwigGlobals();
+
+            // Set locale from system settings, browser, or default
+            $locale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
+            self::$translationService->setLocale($locale);
+        }
+        return self::$translationService;
+    }
+
     private static function loadTwigGlobals(): void
     {
         if (!empty(self::$twigGlobals)) {
@@ -42,6 +57,8 @@ class View
             return null;
         }
 
+        $supportedLocales = array_keys(self::getTranslationService()->getAvailableLocales());
+
         // Parse Accept-Language header
         $languages = explode(',', $acceptLang);
         foreach ($languages as $lang) {
@@ -49,7 +66,7 @@ class View
             $lang = explode('-', $lang)[0]; // Get primary language code
 
             // Check if we support this language
-            if (in_array($lang, ['uk', 'en'])) {
+            if (in_array($lang, $supportedLocales)) {
                 return $lang;
             }
         }
@@ -63,13 +80,7 @@ class View
             self::loadTwigGlobals();
 
             // Initialize translation service
-            if (self::$translationService === null) {
-                self::$translationService = new TranslationService();
-
-                // Set locale from session, browser, or default
-                $locale = $_SESSION['locale'] ?? self::detectBrowserLanguage() ?? 'uk';
-                self::$translationService->setLocale($locale);
-            }
+            $translationService = self::getTranslationService();
 
             $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
             $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
@@ -107,5 +118,6 @@ class View
     {
         self::$twig = null;
         self::$twigGlobals = [];
+        self::$translationService = null;
     }
 }
