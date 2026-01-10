@@ -18,8 +18,9 @@
             <div class="field">
                 <label for="locale">{{ 'admin.settings.interface_language'|trans }}</label>
                 <select name="locale" id="locale" class="ui dropdown">
-                    <option value="uk" {% if session.locale == 'uk' or not session.locale %}selected{% endif %}>{{ 'admin.settings.language_ukrainian'|trans }}</option>
-                    <option value="en" {% if session.locale == 'en' %}selected{% endif %}>{{ 'admin.settings.language_english'|trans }}</option>
+                    {% for localeCode, localeName in availableLocales %}
+                        <option value="{{ localeCode }}" {% if session.locale == localeCode or (not session.locale and localeCode == 'uk') %}selected{% endif %}>{{ localeName }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
