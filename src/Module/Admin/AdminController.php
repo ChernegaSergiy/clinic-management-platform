@@ -48,6 +48,7 @@ class AdminController
             'clinic_name' => $this->settingsRepository->get('clinic_name', ''),
             'mfa_policy' => $this->settingsRepository->getMfaPolicy(),
             'mfa_force_roles' => $this->settingsRepository->getMfaForceRoles(),
+            'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
 
         $availableLocales = View::getTranslationService()->getAvailableLocales();
