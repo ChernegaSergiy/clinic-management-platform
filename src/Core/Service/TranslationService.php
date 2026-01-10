@@ -5,11 +5,13 @@ namespace App\Core\Service;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Intl\Locales;
 
 class TranslationService
 {
     private TranslatorInterface $translator;
     private string $currentLocale = 'uk';
+    private array $availableLocales = []; // Cache for available locales
 
     public function __construct()
     {
@@ -17,6 +19,7 @@ class TranslationService
         $this->translator->addLoader('yaml', new YamlFileLoader());
 
         $this->loadTranslations();
+        $this->availableLocales = $this->scanTranslationDirectoriesForLocales();
     }
 
     private function loadTranslations(): void
@@ -58,6 +61,61 @@ class TranslationService
                 }
             }
         }
+    }
+
+    private function scanTranslationDirectoriesForLocales(): array
+    {
+        $foundLocales = [];
+        $baseDir = __DIR__ . '/../../';
+
+        // Scan global translations directory
+        $globalTranslationsDir = $baseDir . 'translations';
+        if (is_dir($globalTranslationsDir)) {
+            $files = scandir($globalTranslationsDir);
+            foreach ($files as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) === 'yaml') {
+                    if (strpos($file, 'messages.') === 0) {
+                        $foundLocales[] = substr(pathinfo($file, PATHINFO_FILENAME), 9);
+                    }
+                }
+            }
+        }
+
+        // Scan module translations directories
+        $modulesDir = $baseDir . 'Module';
+        if (is_dir($modulesDir)) {
+            $modules = scandir($modulesDir);
+            foreach ($modules as $module) {
+                if ($module === '.' || $module === '..') {
+                    continue;
+                }
+                $moduleTranslationsDir = $modulesDir . '/' . $module . '/translations';
+                if (is_dir($moduleTranslationsDir)) {
+                    $files = scandir($moduleTranslationsDir);
+                    foreach ($files as $file) {
+                        if (pathinfo($file, PATHINFO_EXTENSION) === 'yaml') {
+                            if (strpos($file, 'messages.') === 0) {
+                                $foundLocales[] = substr(pathinfo($file, PATHINFO_FILENAME), 9);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return array_unique($foundLocales);
+    }
+
+    public function getAvailableLocales(): array
+    {
+        $displayLocales = [];
+        foreach ($this->availableLocales as $locale) {
+            // Get the name of the locale in the current language
+            $displayName = Locales::getName($locale, $this->currentLocale);
+            $displayLocales[$locale] = $displayName;
+        }
+        // Sort by display name for better UX
+        asort($displayLocales);
+        return $displayLocales;
     }
 
     public function getTranslator(): TranslatorInterface
