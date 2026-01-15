@@ -129,7 +129,7 @@ class KpiRepository
         return $row ? (int)$row['id'] : null;
     }
 
-    public function findKpiResultsForUser(int $userId, string $periodStart = null, string $periodEnd = null): array
+    public function findKpiResultsForUser(int $userId, ?string $periodStart = null, ?string $periodEnd = null): array
     {
         $sql = "
             SELECT 

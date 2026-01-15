@@ -268,7 +268,7 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function decreaseQuantity(int $itemId, int $quantity, int $userId = null, string $reason = 'Виконання рецепту'): bool
+    public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту'): bool
     {
         $this->pdo->beginTransaction();
         try {
