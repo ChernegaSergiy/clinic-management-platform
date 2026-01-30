@@ -67,11 +67,11 @@ Labels are assigned based on the type and intent of work:
 
 ## Commit Style
 
-We follow the Conventional Commits format.
+We use a Conventional-Commits-inspired style with project-specific rules.
 
-**Format:** `scope(type): message`
+**Format:** `type: Message` or `scope(type): Message`
 
--   **scope:** The context of the change (`patients`, `auth`, `infra`, etc.).
+-   **scope:** Optional context (`patients`, `auth`, `infra`, etc.).
 -   **type:** The type of change:
     -   `feat`: A new feature.
     -   `fix`: A bug fix.
@@ -79,13 +79,16 @@ We follow the Conventional Commits format.
     -   `test`: Adding or fixing tests.
     -   `docs`: Documentation changes.
     -   `chore`: Routine tasks (dependency updates, CI setup).
+-   **Message** starts with a capital letter and is a short sentence that may include an action verb.
+-   **One line only.** We do not use commit bodies.
+-   **Atomic commits.** Each commit should represent a single logical change.
 
 **Examples:**
 
 ```
-patients(feat): add patient intake form
-auth(fix): resolve session regeneration bug
-docs(update): add instructions for local setup
+feat: Add patient intake form
+auth(fix): Resolve session regeneration bug
+docs: Add instructions for local setup
 ```
 
 ## Pull Requests (PR)
