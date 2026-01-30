@@ -1,39 +1,39 @@
-# Правила участі у проєкті
+# Contributing Guidelines
 
-Цей документ описує ключові правила та рекомендації для розробників, що працюють над проєктом.
+This document describes the key rules and recommendations for developers working on the project.
 
-## Робочий процес з Git
+## Git Workflow
 
-Ми використовуємо спрощений GitFlow.
+We use a simplified GitFlow.
 
--   `main` - стабільна гілка, що містить робочий код.
--   `develop` - гілка для інтеграції нових функцій. Усі розробники зливають свої зміни сюди.
--   `feature/<scope>-<short-desc>` - гілки для розробки нового функціоналу.
--   `bugfix/<scope>-<issue-id>` - гілки для виправлення помилок.
+-   `main` - the stable branch that contains production-ready code.
+-   `develop` - the integration branch for new features. All developers merge their changes here.
+-   `feature/<scope>-<short-desc>` - branches for developing new functionality.
+-   `bugfix/<scope>-<issue-id>` - branches for fixing bugs.
 
-### Іменування гілок
+### Branch Naming
 
--   **Scope (контекст):** `patients`, `auth`, `infra`, `docs` і т.д.
--   **Short description:** Короткий опис у форматі `kebab-case`.
+-   **Scope (context):** `patients`, `auth`, `infra`, `docs`, etc.
+-   **Short description:** A short description in `kebab-case`.
 
-Приклад: `feature/patients-add-search-form`
+Example: `feature/patients-add-search-form`
 
-## Стиль комітів
+## Commit Style
 
-Ми дотримуємося формату Conventional Commits.
+We follow the Conventional Commits format.
 
-**Формат:** `scope(type): message`
+**Format:** `scope(type): message`
 
--   **scope:** Контекст зміни (`patients`, `auth`, `infra` і т.д.).
--   **type:** Тип зміни:
-    -   `feat`: Нова функція.
-    -   `fix`: Виправлення помилки.
-    -   `refactor`: Рефакторинг коду без зміни функціоналу.
-    -   `test`: Додавання або виправлення тестів.
-    -   `docs`: Зміни в документації.
-    -   `chore`: Рутинні завдання (оновлення залежностей, налаштування CI).
+-   **scope:** The context of the change (`patients`, `auth`, `infra`, etc.).
+-   **type:** The type of change:
+    -   `feat`: A new feature.
+    -   `fix`: A bug fix.
+    -   `refactor`: Code refactoring without changing behavior.
+    -   `test`: Adding or fixing tests.
+    -   `docs`: Documentation changes.
+    -   `chore`: Routine tasks (dependency updates, CI setup).
 
-**Приклади:**
+**Examples:**
 
 ```
 patients(feat): add patient intake form
@@ -43,7 +43,7 @@ docs(update): add instructions for local setup
 
 ## Pull Requests (PR)
 
-1.  **Створюйте PR** для злиття вашої `feature` або `bugfix` гілки в `develop`.
-2.  **Опис PR** повинен містити посилання на відповідне завдання (issue) та короткий опис змін.
-3.  **Code Review:** Кожен PR повинен бути перевірений щонайменше одним іншим розробником.
-4.  **Злиття:** Після успішного рев'ю та проходження всіх перевірок, PR може бути злитий в `develop`.
+1.  **Create a PR** to merge your `feature` or `bugfix` branch into `develop`.
+2.  The **PR description** should include a link to the related issue and a short summary of changes.
+3.  **Code Review:** Every PR must be reviewed by at least one other developer.
+4.  **Merging:** After a successful review and all checks pass, the PR can be merged into `develop`.
