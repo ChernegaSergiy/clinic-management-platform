@@ -18,6 +18,53 @@ We use a simplified GitFlow.
 
 Example: `feature/patients-add-search-form`
 
+## Issues
+
+We use issues primarily for project work planning (not only for bug reports).
+
+### Issue Naming
+
+The issue title follows this pattern:
+
+`PREFIX-ID Short Title`
+
+-   **PREFIX** maps to a domain/module (e.g., `CM`, `PAT`, `APT`, `EMR`, `LAB`, `INV`, `BIL`, `REP`, `ADM`, `SEC`, `QA`, `LOC`).
+-   **ID** is a numeric identifier within the domain (e.g., `001`, `120`, `260`).
+-   **Short Title** is the high-level scope shown in the issue list.
+
+Examples:
+
+-   `CM-005 Public Landing Page`
+-   `APT-120 Unified Scheduling & Waitlist`
+-   `SEC-260 Security Guardrails Package`
+
+### Issue Body Structure
+
+The issue body uses a more detailed heading that is not the same as the issue title.
+
+Recommended template:
+
+```
+# Detailed Execution Heading
+
+## User Story
+As a <role>, I want <capability> so <benefit>.
+
+## Acceptance Criteria
+1. ...
+2. ...
+3. ...
+```
+
+### Labels
+
+Labels are assigned based on the type and intent of work:
+
+-   `documentation` for docs, content, or guidelines work.
+-   `enhancement` for new features or improvements.
+-   `help wanted` for work that benefits from extra contributors.
+-   `good first issue` only for starter-friendly tasks.
+
 ## Commit Style
 
 We follow the Conventional Commits format.
