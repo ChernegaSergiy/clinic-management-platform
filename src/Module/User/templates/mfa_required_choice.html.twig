@@ -1,42 +1,42 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Обов'язкове налаштування 2FA - Клініка{% endblock %}
+{% block title %}{{ 'user.mfa.mfa_required_choice.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segments">
         <div class="ui segment">
-            <h1 class="ui header">Обов'язкове налаштування двофакторної автентифікації</h1>
+            <h1 class="ui header">{{ 'user.mfa.mfa_required_choice.header'|trans }}</h1>
         </div>
         <div class="ui segment">
             <div class="ui warning message">
-                <div class="header">Вимога безпеки</div>
-                <p>Двофакторна автентифікація обов'язкова для вашої ролі. Оберіть метод 2FA для налаштування:</p>
+                <div class="header">{{ 'user.mfa.mfa_required_choice.security_requirement_header'|trans }}</div>
+                <p>{{ 'user.mfa.mfa_required_choice.security_requirement_message'|trans }}</p>
             </div>
 
             <div class="ui two stackable cards">
                 <div class="card">
                     <div class="content">
-                        <div class="header"><i class="clock icon"></i> TOTP</div>
+                        <div class="header"><i class="clock icon"></i> {{ 'user.mfa.mfa_required_choice.totp_header'|trans }}</div>
                         <div class="description">
-                            <p>На основі часу - код змінюється кожні 30 секунд</p>
-                            <p style="color: #666;">Сумісний з Google Authenticator, Authy, 1Password</p>
+                            <p>{{ 'user.mfa.mfa_required_choice.totp_description'|trans }}</p>
+                            <p style="color: #666;">{{ 'user.mfa.mfa_required_choice.totp_compatible'|trans }}</p>
                         </div>
                     </div>
                     <div class="extra content">
-                        <a href="/user/mfa/required/totp" class="ui primary fluid button">Обрати TOTP</a>
+                        <a href="/user/mfa/required/totp" class="ui primary fluid button">{{ 'user.mfa.mfa_required_choice.totp_button'|trans }}</a>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="content">
-                        <div class="header"><i class="hashtag icon"></i> HOTP</div>
+                        <div class="header"><i class="hashtag icon"></i> {{ 'user.mfa.mfa_required_choice.hotp_header'|trans }}</div>
                         <div class="description">
-                            <p>На основі лічильника - новий код при кожному запиті</p>
-                            <p style="color: #666;">Не залежить від часу, для офлайн сценаріїв</p>
+                            <p>{{ 'user.mfa.mfa_required_choice.hotp_description'|trans }}</p>
+                            <p style="color: #666;">{{ 'user.mfa.mfa_required_choice.hotp_compatible'|trans }}</p>
                         </div>
                     </div>
                     <div class="extra content">
-                        <a href="/user/mfa/required/hotp" class="ui primary fluid button">Обрати HOTP</a>
+                        <a href="/user/mfa/required/hotp" class="ui primary fluid button">{{ 'user.mfa.mfa_required_choice.hotp_button'|trans }}</a>
                     </div>
                 </div>
             </div>

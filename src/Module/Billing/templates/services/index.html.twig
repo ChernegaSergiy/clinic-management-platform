@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Послуги - Клініка{% endblock %}
+{% block title %}{{ 'billing.services.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Керування послугами</h2>
+                <h2 class="ui header">{{ 'billing.services.list_title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/billing/services/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати послугу
+                    <i class="plus icon"></i> {{ 'billing.services.add_service'|trans }}
                 </a>
             </div>
         </div>
@@ -19,17 +19,17 @@
         <div class="ui divider"></div>
 
         {% if services is empty %}
-            <p>Немає послуг для відображення.</p>
+            <p>{{ 'billing.services.no_services'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Назва</th>
-                        <th>Категорія</th>
-                        <th>Ціна</th>
-                        <th>Активна</th>
-                        <th>Дії</th>
+                        <th>{{ 'billing.services.table.id'|trans }}</th>
+                        <th>{{ 'billing.services.table.name'|trans }}</th>
+                        <th>{{ 'billing.services.table.category'|trans }}</th>
+                        <th>{{ 'billing.services.table.price'|trans }}</th>
+                        <th>{{ 'billing.services.table.active'|trans }}</th>
+                        <th>{{ 'billing.services.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,13 +37,13 @@
                         <tr>
                             <td>{{ service.id }}</td>
                             <td>{{ service.name }}</td>
-                            <td>{{ service.category_name ?: 'Без категорії' }}</td>
+                            <td>{{ service.category_name ?: ('billing.services.no_category'|trans) }}</td>
                             <td>{{ service.price | number_format(2) }}</td>
                             <td>
                                 {% if service.is_active %}
-                                    <i class="check circle icon green"></i> Так
+                                    <i class="check circle icon green"></i> {{ 'billing.services.yes'|trans }}
                                 {% else %}
-                                    <i class="times circle icon red"></i> Ні
+                                    <i class="times circle icon red"></i> {{ 'billing.services.no'|trans }}
                                 {% endif %}
                             </td>
                             <td>

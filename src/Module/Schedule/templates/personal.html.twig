@@ -1,95 +1,95 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Мій графік - Клініка{% endblock %}
+{% block title %}{{ 'schedule.personal.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Мій графік</h2>
+        <h2 class="ui header">{{ 'schedule.personal.title_full'|trans }}</h2>
         <div class="ui divider"></div>
-        
-        <h3 class="ui header">Тижневий розклад</h3>
-        <p>Встановіть стандартні робочі години для кожного дня тижня.</p>
-        
+
+        <h3 class="ui header">{{ 'schedule.personal.weekly_schedule'|trans }}</h3>
+        <p>{{ 'schedule.personal.schedule_description'|trans }}</p>
+
         <form class="ui form" method="POST" action="/doctor/schedule/update">
             <div class="ui divided list">
-                {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                {% for day_num, day_name in {1: 'schedule.show.days.1'|trans, 2: 'schedule.show.days.2'|trans, 3: 'schedule.show.days.3'|trans, 4: 'schedule.show.days.4'|trans, 5: 'schedule.show.days.5'|trans, 6: 'schedule.show.days.6'|trans, 0: 'schedule.show.days.0'|trans} %}
                     {% set schedule_entry = scheduleByDay[day_num] ?? null %}
                     <div class="item">
                         <div class="content">
                             <div class="header">{{ day_name }}</div>
                             <div class="description">
                                 <div class="three fields">
-                                    <div class="field">
-                                        <label>Доступно</label>
-                                        <div class="ui toggle checkbox">
-                                            <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
-                                            <label></label>
-                                        </div>
-                                    </div>
-                                    <div class="field">
-                                        <label>Час початку</label>
-                                        <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
-                                    </div>
-                                    <div class="field">
-                                        <label>Час закінчення</label>
-                                        <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
-                                    </div>
+                                     <div class="field">
+                                         <label>{{ 'schedule.personal.available'|trans }}</label>
+                                         <div class="ui toggle checkbox">
+                                             <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                             <label></label>
+                                         </div>
+                                     </div>
+                                     <div class="field">
+                                         <label>{{ 'schedule.personal.start_time'|trans }}</label>
+                                         <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}">
+                                     </div>
+                                     <div class="field">
+                                         <label>{{ 'schedule.personal.end_time'|trans }}</label>
+                                         <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '17:00' }}">
+                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
-            <button class="ui primary button" type="submit">Зберегти тижневий розклад</button>
+            <button class="ui primary button" type="submit">{{ 'schedule.personal.save'|trans }}</button>
         </form>
 
         <div class="ui segment" style="margin-top: 2rem;">
-            <h3 class="ui header">Винятки з розкладу</h3>
-            <p>Додайте або видаліть недоступний час, наприклад, відпустки або особливі події.</p>
-            
-            <h4 class="ui header">Додати новий виняток</h4>
+            <h3 class="ui header">{{ 'schedule.exceptions.title'|trans }}</h3>
+            <p>{{ 'schedule.exceptions.description'|trans }}</p>
+
+            <h4 class="ui header">{{ 'schedule.exceptions.add_title'|trans }}</h4>
             <form class="ui form" method="POST" action="/doctor/schedule/exceptions/add">
                 <div class="four fields">
                     <div class="field">
-                        <label>Дата</label>
+                        <label>{{ 'schedule.exceptions.date'|trans }}</label>
                         <input type="date" name="exception_date" required>
                     </div>
                     <div class="field">
-                        <label>Час початку</label>
+                        <label>{{ 'schedule.exceptions.start_time'|trans }}</label>
                         <input type="time" name="start_time" required>
                     </div>
                     <div class="field">
-                        <label>Час закінчення</label>
+                        <label>{{ 'schedule.exceptions.end_time'|trans }}</label>
                         <input type="time" name="end_time" required>
                     </div>
                     <div class="field">
-                        <label>Тип</label>
+                        <label>{{ 'schedule.exceptions.type'|trans }}</label>
                          <select name="is_available" class="ui dropdown">
-                            <option value="0">Недоступно</option>
-                            <option value="1">Доступно</option>
+                            <option value="0">{{ 'schedule.exceptions.unavailable'|trans }}</option>
+                            <option value="1">{{ 'schedule.exceptions.available'|trans }}</option>
                         </select>
                     </div>
                 </div>
                  <div class="field">
-                    <label>Примітки</label>
+                    <label>{{ 'schedule.exceptions.notes'|trans }}</label>
                     <textarea name="notes" rows="2"></textarea>
                 </div>
-                <button class="ui primary button" type="submit">Додати виняток</button>
+                <button class="ui primary button" type="submit">{{ 'schedule.exceptions.add_button'|trans }}</button>
             </form>
 
             <div class="ui divider"></div>
 
-            <h4 class="ui header">Майбутні винятки</h4>
+            <h4 class="ui header">{{ 'schedule.exceptions.upcoming_title'|trans }}</h4>
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>Дата</th>
-                        <th>Час початку</th>
-                        <th>Час закінчення</th>
-                        <th>Тип</th>
-                        <th>Примітки</th>
-                        <th>Дії</th>
+                        <th>{{ 'schedule.exceptions.table.date'|trans }}</th>
+                        <th>{{ 'schedule.exceptions.table.start_time'|trans }}</th>
+                        <th>{{ 'schedule.exceptions.table.end_time'|trans }}</th>
+                        <th>{{ 'schedule.exceptions.table.type'|trans }}</th>
+                        <th>{{ 'schedule.exceptions.table.notes'|trans }}</th>
+                        <th>{{ 'schedule.exceptions.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,21 +99,21 @@
                             <td>{{ exception.start_time|date("H:i") }}</td>
                             <td>{{ exception.end_time|date("H:i") }}</td>
                             <td>
-                                <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">
-                                    {{ exception.is_available ? 'Доступно' : 'Недоступно' }}
-                                </span>
+                                 <span class="ui {{ exception.is_available ? 'green' : 'red' }} label">
+                                     {{ exception.is_available ? 'schedule.exceptions.available'|trans : 'schedule.exceptions.unavailable'|trans }}
+                                 </span>
                             </td>
                             <td>{{ exception.notes ?? '-' }}</td>
                             <td>
                                 <form method="POST" action="/doctor/schedule/exceptions/delete" style="display:inline;">
                                     <input type="hidden" name="exception_id" value="{{ exception.id }}">
-                                    <button class="ui mini red button" type="submit">Видалити</button>
+                                    <button class="ui mini red button" type="submit">{{ 'schedule.exceptions.delete'|trans }}</button>
                                 </form>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="center aligned">Майбутніх винятків не знайдено.</td>
+                            <td colspan="6" class="center aligned">{{ 'schedule.exceptions.no_exceptions'|trans }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

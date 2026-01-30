@@ -2,20 +2,20 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Створити рецепт для {{ patient.first_name }} {{ patient.last_name }} - Клініка{% endblock %}
+{% block title %}{{ 'prescription.new.title'|trans({'%first_name%': patient.first_name, '%last_name%': patient.last_name}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Створити рецепт для <a href="/patients/show?id={{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</a></h2>
+        <h2 class="ui header">{{ 'prescription.new.title_full'|trans({'%first_name%': patient.first_name, '%last_name%': patient.last_name}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/prescriptions/new">
             <input type="hidden" name="patient_id" value="{{ patient.id }}">
             <div class="two fields">
                 <div class="field {% if errors.doctor_id %}error{% endif %}">
-                    <label>Лікар</label>
+                    <label>{{ 'prescription.new.doctor'|trans }}</label>
                     <select class="ui search dropdown" name="doctor_id">
-                        <option value="">Виберіть лікаря</option>
+                        <option value="">{{ 'prescription.new.select_doctor'|trans }}</option>
                         {% for id, name in doctors %}
                             <option value="{{ id }}" {% if (old.doctor_id is defined and old.doctor_id == id) or (old.doctor_id is not defined and currentDoctorId == id) %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
@@ -23,23 +23,23 @@
                     {% if errors.doctor_id %}<div class="ui red basic pointing label">{{ errors.doctor_id | first }}</div>{% endif %}
                 </div>
                 <div class="field {% if errors.medical_record_id %}error{% endif %}">
-                    <label>Медичний запис (необов'язково)</label>
+                    <label>{{ 'prescription.new.medical_record'|trans }}</label>
                     <select class="ui search dropdown" name="medical_record_id">
-                        <option value="">Не пов'язувати</option>
+                        <option value="">{{ 'prescription.new.no_link'|trans }}</option>
                         {% for record in medicalRecords %}
-                            <option value="{{ record.id }}" {% if old.medical_record_id == record.id %}selected{% endif %}>Запис №{{ record.id }} ({{ record.visit_date|date('Y-m-d') }})</option>
+                            <option value="{{ record.id }}" {% if old.medical_record_id == record.id %}selected{% endif %}>{{ 'prescription.new.record_option'|trans({'%id%': record.id, '%date%': record.visit_date|date('Y-m-d')}) }}</option>
                         {% endfor %}
                     </select>
                     {% if errors.medical_record_id %}<div class="ui red basic pointing label">{{ errors.medical_record_id | first }}</div>{% endif %}
                 </div>
             </div>
             <div class="two fields">
-                {{ forms.input('issue_date', 'Дата виписки', old.issue_date ?? "now"|date('Y-m-d'), 'date', '', {}, {'required': 'required'})
-                }}
-                {{ forms.input('expiry_date', 'Дата закінчення (необов\'язково)', old.expiry_date ?? '', 'date') }}
+                {{ forms.input('issue_date', 'prescription.new.issue_date'|trans, old.issue_date ?? "now"|date('Y-m-d'), 'date', '', {}, {'required': 'required'})
+                 }}
+                {{ forms.input('expiry_date', 'prescription.new.expiry_date'|trans, old.expiry_date ?? '', 'date') }}
             </div>
 
-            <h3 class="ui header">Пункти рецепта</h3>
+            <h3 class="ui header">{{ 'prescription.new.items_title'|trans }}</h3>
             <div id="prescription-items">
                 {% if old.items is defined and old.items is not empty %}
                     {% for key, item in old.items %}
@@ -49,14 +49,14 @@
                     {{ forms.prescription_item(0, {}, {}) }}
                 {% endif %}
             </div>
-            <button type="button" class="ui basic button add-item">Додати пункт</button>
+            <button type="button" class="ui basic button add-item">{{ 'prescription.new.add_item'|trans }}</button>
 
-            {{ forms.textarea('notes', 'Примітки (необов\'язково)', old.notes ?? '', 'Додаткові примітки до рецепта') }}
+            {{ forms.textarea('notes', 'prescription.new.notes'|trans, old.notes ?? '', 'prescription.new.notes_placeholder'|trans) }}
 
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти рецепт', 'primary', '', 'save') }}
-            <a href="/patients/show?id={{ patient.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('prescription.new.save'|trans, 'primary', '', 'save') }}
+            <a href="/patients/show?id={{ patient.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'prescription.new.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}
@@ -73,16 +73,16 @@
                 var newItemHtml = `
                     <div class="fields" data-item-index="${itemIndex}">
                         <div class="eight wide field">
-                            <label>Назва медикаменту</label>
-                            <input type="text" name="items[${itemIndex}][medication_name]" placeholder="Назва медикаменту" required>
+                            <label>{{ 'prescription.new.medication_name'|trans }}</label>
+                            <input type="text" name="items[${itemIndex}][medication_name]" placeholder="{{ 'prescription.new.medication_placeholder'|trans }}" required>
                         </div>
                         <div class="three wide field">
-                            <label>Дозування</label>
-                            <input type="text" name="items[${itemIndex}][dosage]" placeholder="Дозування" required>
+                            <label>{{ 'prescription.new.dosage'|trans }}</label>
+                            <input type="text" name="items[${itemIndex}][dosage]" placeholder="{{ 'prescription.new.dosage_placeholder'|trans }}" required>
                         </div>
                         <div class="three wide field">
-                            <label>Частота</label>
-                            <input type="text" name="items[${itemIndex}][frequency]" placeholder="Частота" required>
+                            <label>{{ 'prescription.new.frequency'|trans }}</label>
+                            <input type="text" name="items[${itemIndex}][frequency]" placeholder="{{ 'prescription.new.frequency_placeholder'|trans }}" required>
                         </div>
                         <div class="one wide field">
                             <label>&nbsp;</label>

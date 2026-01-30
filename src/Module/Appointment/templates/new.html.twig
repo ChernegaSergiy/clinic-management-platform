@@ -2,11 +2,11 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Створити новий запис - Клініка{% endblock %}
+{% block title %}{{ 'appointment.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Створити новий запис</h2>
+        <h2 class="ui header">{{ 'appointment.new.title_full'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/appointments/new">
@@ -22,50 +22,50 @@
             {% endif %}
 
             {# Filters for finding slots #}
-            <h4 class="ui dividing header">1. Оберіть параметри для пошуку</h4>
+            <h4 class="ui dividing header">{{ 'appointment.new.step1'|trans }}</h4>
             <div class="three fields">
                 {% set doctor_select_attrs = {'id': 'doctor_selector', 'required': 'required'} %}
                 {% if session.user.role_name == 'doctor' %}
                     {% set doctor_select_attrs = doctor_select_attrs|merge({'disabled': 'disabled'}) %}
                 {% endif %}
-                {{ forms.select('doctor_id', 'Лікар', doctors, old.doctor_id ?? null, errors.doctor_id ?? null, doctor_select_attrs) }}
-                {{ forms.select('service_id', 'Послуга', services, old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
-                {{ forms.input('date', 'Дата', old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
+                {{ forms.select('doctor_id', 'appointment.new.doctor'|trans, doctors, old.doctor_id ?? null, errors.doctor_id ?? null, doctor_select_attrs) }}
+                {{ forms.select('service_id', 'appointment.new.service'|trans, services, old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
+                {{ forms.input('date', 'appointment.new.date'|trans, old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
             </div>
-            
+
             <div id="slot-loader" class="ui active inverted dimmer" style="display: none;">
-                <div class="ui text loader">Завантаження...</div>
+                <div class="ui text loader">{{ 'appointment.new.loading'|trans }}</div>
             </div>
-            
+
             <div id="slots-container" class="field" style="margin-top: 2rem;">
                 {# Slots will be loaded here via AJAX #}
             </div>
-            
+
             <div class="ui hidden divider"></div>
 
             {# Patient and notes #}
-            <h4 class="ui dividing header">2. Оберіть пацієнта та час</h4>
+            <h4 class="ui dividing header">{{ 'appointment.new.step2'|trans }}</h4>
 
             {# Hidden fields for selected slot times #}
             <input type="hidden" name="start_time" id="start_time_hidden" value="{{ old.start_time ?? '' }}">
             <input type="hidden" name="end_time" id="end_time_hidden" value="{{ old.end_time ?? '' }}">
 
             <div class="three fields">
-                {{ forms.select('patient_id', 'Пацієнт', patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
-                {{ forms.select('room_id', 'Кімната', rooms, old.room_id ?? null, errors.room_id ?? null, {}) }}
+                {{ forms.select('patient_id', 'appointment.new.patient'|trans, patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.select('room_id', 'appointment.new.room'|trans, rooms, old.room_id ?? null, errors.room_id ?? null, {}) }}
                 <div class="field">
-                    <label>Обраний час</label>
-                    <input type="text" id="selected_slot_display" readonly placeholder="Оберіть годину зі списку вище">
+                    <label>{{ 'appointment.new.selected_time'|trans }}</label>
+                    <input type="text" id="selected_slot_display" readonly placeholder="{{ 'appointment.new.select_time_placeholder'|trans }}">
                  </div>
             </div>
-            
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до запису') }}
+
+            {{ forms.textarea('notes', 'appointment.new.notes'|trans, old.notes ?? null, 'appointment.new.notes_placeholder'|trans) }}
 
             <div class="ui divider"></div>
 
             <div style="margin-top: 2rem;">
-                {{ ui.button('Зберегти запис', 'primary', '', 'save', { 'type': 'submit', 'id': 'save-button', 'class': 'disabled' }) }}
-                <a href="/appointments" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+                {{ ui.button('appointment.new.save'|trans, 'primary', '', 'save', { 'type': 'submit', 'id': 'save-button', 'class': 'disabled' }) }}
+                <a href="/appointments" class="ui button"><i class="arrow left icon"></i> {{ 'appointment.new.cancel'|trans }}</a>
             </div>
 
         </form>
@@ -102,7 +102,7 @@
                 
 
                 if (!doctorId || !serviceId || !date) {
-                    slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря, послугу та дату для пошуку вільних годин.</p></div>');
+                    slotsContainer.html('<div class="ui message"><p>{{ "appointment.new.select_all_parameters"|trans }}</p></div>');
                     return;
                 }
 
@@ -121,7 +121,7 @@
                         slotLoader.hide();
                         if (slots.length > 0) {
                             let content = '<div class="ui segment">';
-                            content += '<h3 class="ui header dividing"><i class="calendar alternate outline icon"></i>Доступні години на ' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h3>';
+                            content += '<h3 class="ui header dividing"><i class="calendar alternate outline icon"></i>{{ "appointment.new.available_slots_on"|trans }}' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h3>';
                             
                             // Group slots by time periods
                             const morningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) < 12);
@@ -136,7 +136,7 @@
                                 html += '<i class="' + icon + ' ' + color + ' icon"></i>';
                                 html += '<div class="content">';
                                 html += title;
-                                html += '<div class="sub header">Доступно: ' + slots.filter(s => s.available).length + ' з ' + slots.length + '</div>';
+                                html += '<div class="sub header">{{ "appointment.new.available_slots_count"|trans }} ' + slots.filter(s => s.available).length + ' {{ "appointment.new.from_total"|trans }} ' + slots.length + '</div>';
                                 html += '</div>';
                                 html += '</div>';
                                 
@@ -159,19 +159,19 @@
                                 return html;
                             }
                             
-                            content += renderSlotGroup('Ранок', morningSlots, 'sun', 'yellow');
-                            content += renderSlotGroup('День', afternoonSlots, 'sun', 'orange');
-                            content += renderSlotGroup('Вечір', eveningSlots, 'moon', 'blue');
+                            content += renderSlotGroup('{{ "appointment.new.morning"|trans }}', morningSlots, 'sun', 'yellow');
+                            content += renderSlotGroup('{{ "appointment.new.afternoon"|trans }}', afternoonSlots, 'sun', 'orange');
+                            content += renderSlotGroup('{{ "appointment.new.evening"|trans }}', eveningSlots, 'moon', 'blue');
                             
                             content += '</div>';
                             slotsContainer.html(content);
                         } else {
-                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i><div class="content">На жаль, на обрану дату немає вільних годин. Спробуйте обрати інший день, лікаря або послугу.</div></div>');
+                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i><div class="content">{{ "appointment.new.no_slots_available"|trans }}</div></div>');
                         }
                     },
                     error: function() {
                         slotLoader.hide();
-                        slotsContainer.html('<div class="ui negative message"><p>Помилка при завантаженні годин. Спробуйте оновити сторінку.</p></div>');
+                        slotsContainer.html('<div class="ui negative message"><p>{{ "appointment.new.error_loading_slots"|trans }}</p></div>');
                     }
                 });
             }
@@ -207,7 +207,7 @@
                 const serviceId = serviceField.val();
 
                 if (!serviceId || !servicesData[serviceId]) {
-                    alert('Please select a service first.');
+                    alert('{{ "appointment.new.select_service_first"|trans }}');
                     return;
                 }
                 const duration = servicesData[serviceId].duration;
@@ -234,7 +234,7 @@
             if ($('#doctor_id').dropdown('get value') && $('#service_id').dropdown('get value') && dateField.val()) {
                 fetchAvailableSlots();
             } else {
-                slotsContainer.html('<div class="ui message"><p>Будь ласка, оберіть лікаря для пошуку вільних годин.</p></div>');
+                slotsContainer.html('<div class="ui message"><p>{{ "appointment.new.select_doctor_first"|trans }}</p></div>');
             }
         });
     </script>

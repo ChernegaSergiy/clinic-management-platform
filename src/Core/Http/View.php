@@ -3,13 +3,44 @@
 namespace App\Core\Http;
 
 use App\Core\Auth\MfaGuard;
+use App\Core\Service\TranslationService;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 
 class View
 {
     private static ?Environment $twig = null;
     private static array $twigGlobals = [];
+    private static ?TranslationService $translationService = null;
+
+    public static function getTranslationService(): TranslationService
+    {
+        if (self::$translationService === null) {
+            self::$translationService = new TranslationService();
+
+            // Ensure globals are loaded to get system_locale
+            self::loadTwigGlobals();
+
+            // Determine initial locale preference
+            $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
+
+            // Get actual available locales from the TranslationService instance
+            // Note: Calling getAvailableLocales() here on the instance is safe
+            // as the TranslationService is already initialized above.
+            $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
+
+            // Validate preferredLocale against truly available locales
+            $finalLocale = 'uk'; // Default fallback
+            if (in_array($preferredLocale, $rawAvailableLocales)) {
+                $finalLocale = $preferredLocale;
+            }
+            // If preferredLocale is not available, $finalLocale remains 'uk'
+
+            self::$translationService->setLocale($finalLocale);
+        }
+        return self::$translationService;
+    }
 
     private static function loadTwigGlobals(): void
     {
@@ -32,15 +63,45 @@ class View
         }
     }
 
+    private static function detectBrowserLanguage(): ?string
+    {
+        $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+        if (empty($acceptLang)) {
+            return null;
+        }
+
+        $supportedLocales = array_keys(self::getTranslationService()->getAvailableLocales());
+
+        // Parse Accept-Language header
+        $languages = explode(',', $acceptLang);
+        foreach ($languages as $lang) {
+            $lang = trim(explode(';', $lang)[0]);
+            $lang = explode('-', $lang)[0]; // Get primary language code
+
+            // Check if we support this language
+            if (in_array($lang, $supportedLocales)) {
+                return $lang;
+            }
+        }
+
+        return null;
+    }
+
     private static function getTwig(): Environment
     {
         if (self::$twig === null) {
             self::loadTwigGlobals();
 
+            // Initialize translation service
+            $translationService = self::getTranslationService();
+
             $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
             $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
             self::$twig = new Environment($loader, []);
             self::$twig->addGlobal('session', $_SESSION);
+
+            // Add translation extension
+            self::$twig->addExtension(new TranslationExtension(self::$translationService->getTranslator()));
 
             foreach (self::$twigGlobals as $key => $value) {
                 self::$twig->addGlobal($key, $value);
@@ -70,5 +131,6 @@ class View
     {
         self::$twig = null;
         self::$twigGlobals = [];
+        self::$translationService = null;
     }
 }

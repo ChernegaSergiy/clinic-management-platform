@@ -2,20 +2,20 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нову роль - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.roles.new.page_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нову роль</h2>
+        <h2 class="ui header">{{ 'admin.roles.new.title'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/roles/new">
-            {{ forms.input('name', 'Назва ролі', old.name ?? '', 'text', 'Наприклад, Адміністратор, Лікар', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('description', 'Опис ролі', old.description ?? '', 'Детальний опис прав та обов'язків', errors.description ?? null) }}
+            {{ forms.input('name', 'admin.roles.new.name'|trans, old.name ?? '', 'text', 'admin.roles.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'admin.roles.new.description'|trans, old.description ?? '', 'admin.roles.new.description_placeholder'|trans, errors.description ?? null) }}
 
-            {{ ui.button('Зберегти роль', 'primary', 'large', 'save') }}
+            {{ ui.button('admin.roles.new.save'|trans, 'primary', 'large', 'save') }}
             <a href="/admin/roles" class="ui button">
-                <i class="arrow left icon"></i> Скасувати
+                <i class="arrow left icon"></i> {{ 'admin.roles.new.cancel'|trans }}
             </a>
         </form>
     </div>

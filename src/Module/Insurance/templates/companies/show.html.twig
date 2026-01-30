@@ -1,12 +1,12 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Страхова компанія #{{ company.id }} - Клініка{% endblock %}
+{% block title %}{{ 'insurance.companies.show.title'|trans({'%id%': company.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="sixteen wide column">
-                <h2 class="ui header">Деталі компанії #{{ company.id }}</h2>
+                <h2 class="ui header">{{ 'insurance.companies.show.title_full'|trans({'%id%': company.id}) }}</h2>
             </div>
         </div>
         <div class="ui divider"></div>
@@ -14,23 +14,23 @@
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td class="three wide">Назва</td>
+                    <td class="three wide">{{ 'insurance.companies.show.table.name'|trans }}</td>
                     <td>{{ company.name }}</td>
                 </tr>
                 <tr>
-                    <td>Контактна особа</td>
+                    <td>{{ 'insurance.companies.show.table.contact_person'|trans }}</td>
                     <td>{{ company.contact_person|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Телефон</td>
+                    <td>{{ 'insurance.companies.show.table.phone'|trans }}</td>
                     <td>{{ company.phone|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Email</td>
+                    <td>{{ 'insurance.companies.show.table.email'|trans }}</td>
                     <td>{{ company.email|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Примітки</td>
+                    <td>{{ 'insurance.companies.show.table.notes'|trans }}</td>
                     <td>{{ company.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
@@ -39,10 +39,10 @@
         <div class="ui divider"></div>
 
         <a href="/insurance/companies/edit?id={{ company.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'insurance.companies.show.edit'|trans }}
         </a>
         <a href="/insurance/companies" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'insurance.companies.show.back'|trans }}
         </a>
     </div>
 {% endblock %}

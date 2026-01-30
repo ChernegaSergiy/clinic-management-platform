@@ -1,41 +1,41 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Редагування компанії #{{ company.id }} - Клініка{% endblock %}
+{% block title %}{{ 'insurance.companies.edit.title'|trans({'%id%': company.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагування компанії #{{ company.id }}</h2>
+        <h2 class="ui header">{{ 'insurance.companies.edit.header'|trans({'%id%': company.id}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" action="/insurance/companies/edit?id={{ company.id }}" method="POST">
             <div class="field">
-                <label>Назва</label>
-                <input type="text" name="name" placeholder="Назва компанії" value="{{ company.name }}" required>
+                <label>{{ 'insurance.companies.new.name_label'|trans }}</label>
+                <input type="text" name="name" placeholder="{{ 'insurance.companies.new.name_placeholder'|trans }}" value="{{ company.name }}" required>
             </div>
             <div class="field">
-                <label>Контактна особа</label>
-                <input type="text" name="contact_person" placeholder="ПІБ контактної особи" value="{{ company.contact_person }}">
+                <label>{{ 'insurance.companies.new.contact_person_label'|trans }}</label>
+                <input type="text" name="contact_person" placeholder="{{ 'insurance.companies.new.contact_person_placeholder'|trans }}" value="{{ company.contact_person }}">
             </div>
             <div class="field">
-                <label>Телефон</label>
-                <input type="text" name="phone" placeholder="Телефон" value="{{ company.phone }}">
+                <label>{{ 'insurance.companies.new.phone_label'|trans }}</label>
+                <input type="text" name="phone" placeholder="{{ 'insurance.companies.new.phone_placeholder'|trans }}" value="{{ company.phone }}">
             </div>
             <div class="field">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="Email" value="{{ company.email }}">
+                <label>{{ 'insurance.companies.new.email_label'|trans }}</label>
+                <input type="email" name="email" placeholder="{{ 'insurance.companies.new.email_placeholder'|trans }}" value="{{ company.email }}">
             </div>
             <div class="field">
-                <label>Примітки</label>
+                <label>{{ 'insurance.companies.new.notes_label'|trans }}</label>
                 <textarea name="notes" rows="3">{{ company.notes }}</textarea>
             </div>
             <div class="ui divider"></div>
 
-            <button class="ui primary button" type="submit"><i class="save icon"></i> Оновити</button>
-            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            <button class="ui primary button" type="submit"><i class="save icon"></i> {{ 'insurance.companies.edit.save_button'|trans }}</button>
+            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> {{ 'insurance.companies.new.cancel_button'|trans }}</a>
 
             <form action="/insurance/companies/delete" method="POST" style="display: inline-block;">
                 <input type="hidden" name="id" value="{{ company.id }}">
-                <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?');">Видалити</button>
+                <button class="ui negative button" type="submit" onclick="return confirm('{{ 'insurance.companies.edit.delete_confirm'|trans }}');">{{ 'insurance.companies.edit.delete_button'|trans }}</button>
             </form>
         </form>
     </div>

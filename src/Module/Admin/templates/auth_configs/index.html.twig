@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Конфігурації аутентифікації - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.auth_configs.list.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Керування конфігураціями аутентифікації</h2>
+                <h2 class="ui header">{{ 'admin.auth_configs.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/admin/auth_configs/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати конфігурацію
+                    <i class="plus icon"></i> {{ 'admin.auth_configs.list.add'|trans }}
                 </a>
             </div>
         </div>
@@ -19,16 +19,16 @@
         <div class="ui divider"></div>
 
         {% if configs is empty %}
-            <p>Немає конфігурацій для відображення.</p>
+            <p>{{ 'admin.auth_configs.list.no_configs'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Провайдер</th>
-                        <th>Client ID</th>
-                        <th>Активна</th>
-                        <th>Дії</th>
+                        <th>{{ 'admin.auth_configs.list.table.id'|trans }}</th>
+                        <th>{{ 'admin.auth_configs.list.table.provider'|trans }}</th>
+                        <th>{{ 'admin.auth_configs.list.table.client_id'|trans }}</th>
+                        <th>{{ 'admin.auth_configs.list.table.active'|trans }}</th>
+                        <th>{{ 'admin.auth_configs.list.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,12 +36,12 @@
                         <tr>
                             <td>{{ config.id }}</td>
                             <td>{{ config.provider }}</td>
-                            <td>{{ config.client_id ?: 'Не вказано' }}</td>
+                            <td>{{ config.client_id ?: 'admin.auth_configs.list.not_specified'|trans }}</td>
                             <td>
                                 {% if config.is_active %}
-                                    <i class="check circle icon green"></i> Так
+                                    <i class="check circle icon green"></i> {{ 'admin.auth_configs.list.yes'|trans }}
                                 {% else %}
-                                    <i class="times circle icon red"></i> Ні
+                                    <i class="times circle icon red"></i> {{ 'admin.auth_configs.list.no'|trans }}
                                 {% endif %}
                             </td>
                             <td>
@@ -51,9 +51,9 @@
                                 <a href="/admin/auth_configs/edit?id={{ config.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/auth_configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?');">
+                                <form action="/admin/auth_configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.auth_configs.list.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ config.id }}">
-                                    <button type="submit" class="ui icon button red">
+                            <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>
                                     </button>
                                 </form>

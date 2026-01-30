@@ -1,23 +1,23 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Імпорт пацієнтів з JSON - Клініка{% endblock %}
+{% block title %}{{ 'patient.import_json.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Імпорт пацієнтів з JSON</h2>
+        <h2 class="ui header">{{ 'patient.import_json.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         {% if success_message %}
             <div class="ui success message">
-                <div class="header">Успіх!</div>
+                <div class="header">{{ 'patient.import_json.success_header'|trans }}</div>
                 <p>{{ success_message }}</p>
             </div>
         {% endif %}
 
         {% if errors %}
             <div class="ui error message">
-                <div class="header">Помилка імпорту</div>
+                <div class="header">{{ 'patient.import_json.error_header'|trans }}</div>
                 <ul class="list">
                     {% for error in errors %}
                         {% if error is iterable %}
@@ -34,17 +34,17 @@
 
         <form class="ui form" method="POST" action="/patients/import-json" enctype="multipart/form-data">
             <div class="field">
-                <label>Оберіть JSON файл</label>
+                <label>{{ 'patient.import_json.file_label'|trans }}</label>
                 <div class="ui action input">
-                    <input type="text" id="json-file-display" readonly placeholder="Файл не обрано">
-                    <label for="json-file-input" class="ui button">Обрати файл</label>
+                    <input type="text" id="json-file-display" readonly placeholder="{{ 'patient.import_json.file_placeholder'|trans }}">
+                    <label for="json-file-input" class="ui button">{{ 'patient.import_json.choose_file_button'|trans }}</label>
                 </div>
                 <input type="file" id="json-file-input" name="json_file" accept=".json" style="display: none;">
             </div>
 
-            {{ ui.button('Імпортувати', 'primary', 'large', 'upload') }}
+            {{ ui.button('patient.import_json.import_button'|trans, 'primary', 'large', 'upload') }}
             <a href="/patients" class="ui button">
-                <i class="arrow left icon"></i> Скасувати
+                <i class="arrow left icon"></i> {{ 'patient.import_json.cancel_button'|trans }}
             </a>
         </form>
     </div>
@@ -59,7 +59,7 @@
 
             if (fileInput && display) {
                 fileInput.addEventListener('change', function() {
-                    display.value = fileInput.files.length ? fileInput.files[0].name : 'Файл не обрано';
+                    display.value = fileInput.files.length ? fileInput.files[0].name : '{{ 'patient.import_json.file_placeholder'|trans }}';
                 });
             }
         });

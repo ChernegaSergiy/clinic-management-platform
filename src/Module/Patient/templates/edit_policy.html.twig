@@ -1,15 +1,15 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Редагувати страховий поліс - Клініка{% endblock %}
+{% block title %}{{ 'patient.edit_policy.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати страховий поліс для пацієнта: {{ patient.last_name }} {{ patient.first_name }}</h2>
+        <h2 class="ui header">{{ 'patient.edit_policy.header'|trans({'%last_name%': patient.last_name, '%first_name%': patient.first_name}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" action="/patients/{{ patient.id }}/policies/update?id={{ policy.id }}" method="POST">
             <div class="field">
-                <label>Страхова компанія</label>
+                <label>{{ 'patient.add_policy.company_label'|trans }}</label>
                 <select name="insurance_company_id" class="ui dropdown">
                     {% for company in insurance_companies %}
                         <option value="{{ company.id }}" {{ company.id == policy.insurance_company_id ? 'selected' : '' }}>{{ company.name }}</option>
@@ -17,42 +17,42 @@
                 </select>
             </div>
             <div class="field">
-                <label>Номер полісу</label>
-                <input type="text" name="policy_number" placeholder="Номер полісу" value="{{ policy.policy_number }}" required>
+                <label>{{ 'patient.add_policy.policy_number_label'|trans }}</label>
+                <input type="text" name="policy_number" placeholder="{{ 'patient.add_policy.policy_number_placeholder'|trans }}" value="{{ policy.policy_number }}" required>
             </div>
             <div class="field">
-                <label>Номер групи</label>
-                <input type="text" name="group_number" placeholder="Номер групи" value="{{ policy.group_number }}">
+                <label>{{ 'patient.add_policy.group_number_label'|trans }}</label>
+                <input type="text" name="group_number" placeholder="{{ 'patient.add_policy.group_number_placeholder'|trans }}" value="{{ policy.group_number }}">
             </div>
             <div class="two fields">
                 <div class="field">
-                    <label>Дійсний з</label>
+                    <label>{{ 'patient.add_policy.valid_from_label'|trans }}</label>
                     <input type="date" name="valid_from" value="{{ policy.valid_from|date('Y-m-d') }}" required>
                 </div>
                 <div class="field">
-                    <label>Дійсний до</label>
+                    <label>{{ 'patient.add_policy.valid_to_label'|trans }}</label>
                     <input type="date" name="valid_to" value="{{ policy.valid_to|date('Y-m-d') }}">
                 </div>
             </div>
             <div class="inline field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {{ policy.is_active ? 'checked' : '' }}>
-                    <label>Активний</label>
+                    <label>{{ 'patient.add_policy.is_active_label'|trans }}</label>
                 </div>
             </div>
 
             <div class="ui divider"></div>
 
             <button class="ui primary button" type="submit">
-                <i class="save icon"></i> Оновити
+                <i class="save icon"></i> {{ 'patient.edit_policy.save_button'|trans }}
             </button>
             <a href="/patients/show?id={{ patient.id }}" class="ui button">
-                <i class="arrow left icon"></i> Скасувати
+                <i class="arrow left icon"></i> {{ 'patient.edit_policy.cancel_button'|trans }}
             </a>
             <span style="display: inline-block;">
                 <form action="/patients/{{ patient.id }}/policies/delete" method="POST" style="display: inline;">
                     <input type="hidden" name="id" value="{{ policy.id }}">
-                    <button class="ui negative button" type="submit" onclick="return confirm('Ви впевнені, що хочете видалити цей поліс?');">Видалити</button>
+                    <button class="ui negative button" type="submit" onclick="return confirm('{{ 'patient.edit_policy.delete_confirm'|trans }}');">{{ 'patient.edit_policy.delete_button'|trans }}</button>
                 </form>
             </span>
         </form>

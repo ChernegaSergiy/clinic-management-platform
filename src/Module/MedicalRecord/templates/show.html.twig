@@ -1,37 +1,37 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Медичний запис #{{ record.id }} - Клініка{% endblock %}
+{% block title %}{{ 'medical_record.show.title'|trans({'%id%': record.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Деталі медичного запису #{{ record.id }}</h2>
+        <h2 class="ui header">{{ 'medical_record.show.title_full'|trans({'%id%': record.id}) }}</h2>
         <div class="ui divider"></div>
 
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td>ID</td>
+                    <td>{{ 'medical_record.show.table.id'|trans }}</td>
                     <td>{{ record.id }}</td>
                 </tr>
                 <tr>
-                    <td>Пацієнт</td>
+                    <td>{{ 'medical_record.show.table.patient'|trans }}</td>
                     <td><a href="/patients/show?id={{ record.patient_id }}">{{ record.patient_name }}</a></td>
                 </tr>
                 <tr>
-                    <td>Лікар</td>
+                    <td>{{ 'medical_record.show.table.doctor'|trans }}</td>
                     <td>{{ record.doctor_name }}</td>
                 </tr>
                 <tr>
-                    <td>Дата візиту</td>
+                    <td>{{ 'medical_record.show.table.visit_date'|trans }}</td>
                     <td>{{ record.visit_date|date('Y-m-d H:i') }}</td>
                 </tr>
                 <tr>
-                    <td>Код діагнозу (ICD-10)</td>
+                    <td>{{ 'medical_record.show.table.diagnosis_code'|trans }}</td>
                     <td>{{ record.diagnosis_code|default('—') }}</td>
                 </tr>
                 {% if record.icd_codes is not empty %}
                 <tr>
-                    <td>Додаткові коди ICD-10</td>
+                    <td>{{ 'medical_record.show.table.additional_icd_codes'|trans }}</td>
                     <td>
                         <div class="ui labels">
                             {% for icd in record.icd_codes %}
@@ -43,7 +43,7 @@
                 {% endif %}
                 {% if record.intervention_codes is not empty %}
                 <tr>
-                    <td>Коди медичних інтервенцій (НК 026:2021)</td>
+                    <td>{{ 'medical_record.show.table.intervention_codes'|trans }}</td>
                     <td>
                         <div class="ui labels">
                             {% for intervention in record.intervention_codes %}
@@ -54,15 +54,15 @@
                 </tr>
                 {% endif %}
                 <tr>
-                    <td>Діагноз</td>
+                    <td>{{ 'medical_record.show.table.diagnosis'|trans }}</td>
                     <td>{{ record.diagnosis_text|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Лікування</td>
+                    <td>{{ 'medical_record.show.table.treatment'|trans }}</td>
                     <td>{{ record.treatment|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Примітки</td>
+                    <td>{{ 'medical_record.show.table.notes'|trans }}</td>
                     <td>{{ record.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
@@ -71,38 +71,38 @@
         <div class="ui divider"></div>
 
         <a href="/medical-records/edit?id={{ record.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'medical_record.show.edit'|trans }}
         </a>
-        <a href="/patients/show?id={{ record.patient_id }}" class="ui button">Повернутися до пацієнта</a>
+        <a href="/patients/show?id={{ record.patient_id }}" class="ui button">{{ 'medical_record.show.back'|trans }}</a>
     </div>
 
     <div class="ui segment">
-        <h3 class="ui header">Вкладення</h3>
+        <h3 class="ui header">{{ 'medical_record.show.attachments.title'|trans }}</h3>
         <form class="ui form" action="/medical-records/attachments/upload?id={{ record.id }}" method="POST" enctype="multipart/form-data">
             <div class="field">
-                <label>Завантажити новий файл</label>
+                <label>{{ 'medical_record.show.attachments.upload_label'|trans }}</label>
                 <div class="ui action input">
-                    <input type="text" id="attachments-display" readonly placeholder="Файл не обрано">
-                    <label for="attachments-upload" class="ui button">Обрати файл</label>
+                    <input type="text" id="attachments-display" readonly placeholder="{{ 'medical_record.show.attachments.no_file_selected'|trans }}">
+                    <label for="attachments-upload" class="ui button">{{ 'medical_record.show.attachments.select_file'|trans }}</label>
                 </div>
                 <input type="file" id="attachments-upload" name="attachments[]" multiple style="display: none;">
             </div>
-            <button class="ui primary button" type="submit">Завантажити</button>
+            <button class="ui primary button" type="submit">{{ 'medical_record.show.attachments.upload'|trans }}</button>
         </form>
 
         <div class="ui divider"></div>
 
         {% if attachments is empty %}
-            <p>Немає вкладень для цього медичного запису.</p>
+            <p>{{ 'medical_record.show.attachments.no_attachments'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>Назва файлу</th>
-                        <th>Розмір</th>
-                        <th>Тип</th>
-                        <th>Завантажено</th>
-                        <th>Дії</th>
+                        <th>{{ 'medical_record.show.attachments.table.filename'|trans }}</th>
+                        <th>{{ 'medical_record.show.attachments.table.size'|trans }}</th>
+                        <th>{{ 'medical_record.show.attachments.table.type'|trans }}</th>
+                        <th>{{ 'medical_record.show.attachments.table.uploaded'|trans }}</th>
+                        <th>{{ 'medical_record.show.attachments.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,7 +114,7 @@
                             <td>{{ attachment.created_at|date('Y-m-d H:i') }}</td>
                             <td>
                                 <a href="/medical-records/attachments/download?record_id={{ record.id }}&attachment_id={{ attachment.id }}" class="ui icon button">
-                                    <i class="download icon"></i> Завантажити
+                                    <i class="download icon"></i> {{ 'medical_record.show.attachments.table.download'|trans }}
                                 </a>
                                 {# <a href="/attachments/{{ attachment.id }}/versions" class="ui icon button">
                                     <i class="history icon"></i> Версії
@@ -128,14 +128,14 @@
     </div>
 
     <div class="ui segment">
-        <h3 class="ui header">Лабораторні замовлення</h3>
-        <a href="/lab-orders/new?record_id={{ record.id }}" class="ui green button">Створити лабораторне замовлення</a>
+        <h3 class="ui header">{{ 'medical_record.show.lab_orders.title'|trans }}</h3>
+        <a href="/lab-orders/new?record_id={{ record.id }}" class="ui green button">{{ 'medical_record.show.lab_orders.create'|trans }}</a>
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>Код замовлення</th>
-                    <th>Статус</th>
-                    <th>Дії</th>
+                    <th>{{ 'medical_record.show.lab_orders.table.order_code'|trans }}</th>
+                    <th>{{ 'medical_record.show.lab_orders.table.status'|trans }}</th>
+                    <th>{{ 'medical_record.show.lab_orders.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -154,7 +154,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="3" class="center aligned">Немає лабораторних замовлень для цього запису.</td>
+                        <td colspan="3" class="center aligned">{{ 'medical_record.show.lab_orders.no_orders'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -172,7 +172,7 @@
             if (fileInput && displayInput) {
                 fileInput.addEventListener('change', function() {
                     if (fileInput.files.length === 0) {
-                        displayInput.value = 'Файл не обрано';
+                        displayInput.value = '{{ 'medical_record.show.attachments.no_file_selected'|trans }}';
                         return;
                     }
                     const names = Array.from(fileInput.files).map(f => f.name).join(', ');

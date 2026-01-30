@@ -2,31 +2,31 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нову кімнату - Клініка{% endblock %}
+{% block title %}{{ 'room.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нову кімнату</h2>
+        <h2 class="ui header">{{ 'room.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/rooms/new">
-            {{ forms.input('name', 'Назва кімнати', old.name ?? null, 'text', 'Назва кімнати', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.input('type', 'Тип кімнати', old.type ?? null, 'text', 'Напр: кабінет, операційна, лабораторія', errors.type ?? null, {'required': 'required'}) }}
+            {{ forms.input('name', 'room.new.name_label'|trans, old.name ?? null, 'text', 'room.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.input('type', 'room.new.type_label'|trans, old.type ?? null, 'text', 'room.new.type_placeholder'|trans, errors.type ?? null, {'required': 'required'}) }}
             <div class="two fields">
-                {{ forms.input('capacity', 'Місткість', old.capacity ?? null, 'number', 'Кількість місць', errors.capacity ?? null, {'required': 'required', 'min': '1'}) }}
-                {{ forms.input('location', 'Розташування', old.location ?? null, 'text', 'Поверх, номер', errors.location ?? null) }}
+                {{ forms.input('capacity', 'room.new.capacity_label'|trans, old.capacity ?? null, 'number', 'room.new.capacity_placeholder'|trans, errors.capacity ?? null, {'required': 'required', 'min': '1'}) }}
+                {{ forms.input('location', 'room.new.location_label'|trans, old.location ?? null, 'text', 'room.new.location_placeholder'|trans, errors.location ?? null) }}
             </div>
-            {{ forms.textarea('equipment', 'Обладнання', old.equipment ?? null, 'Перелік обладнання в кімнаті', errors.equipment ?? null) }}
+            {{ forms.textarea('equipment', 'room.new.equipment_label'|trans, old.equipment ?? null, 'room.new.equipment_placeholder'|trans, errors.equipment ?? null) }}
             <div class="field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_available" {{ old.is_available is defined and old.is_available == 0 ? '' : 'checked' }}>
-                    <label>Доступна для бронювання</label>
+                    <label>{{ 'room.new.is_available_label'|trans }}</label>
                 </div>
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти кімнату', 'primary', '', 'save') }}
-            <a href="/admin/rooms" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('room.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/admin/rooms" class="ui button"><i class="arrow left icon"></i> {{ 'room.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

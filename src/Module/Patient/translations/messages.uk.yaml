@@ -1,0 +1,118 @@
+patient:
+  title: Пацієнти - Клініка
+  list:
+    title: Список пацієнтів
+    export_csv: Експорт в CSV
+    export_json: Експорт в JSON
+    import_json: Імпорт з JSON
+    add: Додати пацієнта
+    search_placeholder: Пошук пацієнтів...
+    table:
+      id: ID
+      name: Ім'я
+      birth_date: Дата народження
+      phone: Телефон
+      actions: Дії
+    no_patients: Немає пацієнтів для відображення.
+  new:
+    title: Додати нового пацієнта
+    page_title: Додати нового пацієнта - Клініка
+    last_name: Прізвище
+    last_name_placeholder: Прізвище
+    first_name: Ім'я
+    first_name_placeholder: Ім'я
+    middle_name: По батькові
+    middle_name_placeholder: По батькові
+    birth_date: Дата народження
+    gender: Стать
+    phone: Телефон
+    phone_placeholder: +380 XX XXX XX XX
+    email: Email
+    email_placeholder: example@email.com
+    address: Адреса
+    address_placeholder: м. Київ, вул. Хрещатик, 1
+    tax_id: РНОКПП
+    tax_id_placeholder: 1234567890
+    document_id: ID-картка/паспорт
+    document_id_placeholder: 001234567
+    marital_status: Сімейний стан
+    save: Зберегти пацієнта
+    cancel: Скасувати
+    genders:
+      male: Чоловіча
+      female: Жіноча
+      other: Інша
+    marital_statuses:
+      single: Неодружений/Незамужня
+      married: Одружений/Заміжня
+      divorced: Розлучений/Розлучена
+      widowed: Вдівець/Вдова
+  edit:
+    title: "Редагувати пацієнта"
+    page_title: "Редагувати пацієнта - Клініка"
+    title_full: "Редагувати пацієнта: %first_name% %last_name%"
+    save: "Зберегти зміни"
+    cancel: "Скасувати"
+  show:
+    title: "Картка пацієнта"
+    page_title: "Пацієнт %first_name% %last_name% - Клініка"
+    title_full: "Картка пацієнта: %first_name% %last_name%"
+    basic_info: "Основна інформація"
+    additional_info: "Додаткова інформація"
+    status: "Статус"
+    active: "Активний"
+    archived: "Архівний"
+    edit: "Редагувати"
+    create_prescription: "Створити рецепт"
+    archive: "Архівувати"
+    activate: "Активувати"
+    back: "Повернутися до списку"
+    medical_records: "Медичні записи"
+    medical_records_table:
+      visit_date: "Дата візиту"
+      doctor: "Лікар"
+      diagnosis: "Діагноз"
+      actions: "Дії"
+    no_medical_records: "Немає медичних записів для відображення."
+    insurance_policies: "Страхові поліси"
+    add_policy: "Додати поліс"
+    policies_table:
+      policy_number: "Номер полісу"
+      company: "Компанія"
+      valid_from: "Дійсний з"
+      valid_to: "Дійсний до"
+      status: "Статус"
+      active: "Активний"
+      inactive: "Неактивний"
+      actions: "Дії"
+    no_policies: "Немає страхових полісів для відображення."
+  add_policy:
+    title: "Додати страховий поліс - Клініка"
+    header: "Додати страховий поліс для пацієнта: %last_name% %first_name%"
+    company_label: "Страхова компанія"
+    policy_number_label: "Номер полісу"
+    policy_number_placeholder: "Номер полісу"
+    group_number_label: "Номер групи"
+    group_number_placeholder: "Номер групи"
+    valid_from_label: "Дійсний з"
+    valid_to_label: "Дійсний до"
+    is_active_label: "Активний"
+    save_button: "Зберегти"
+    cancel_button: "Скасувати"
+  edit_policy:
+    title: "Редагувати страховий поліс - Клініка"
+    header: "Редагувати страховий поліс для пацієнта: %last_name% %first_name%"
+    save_button: "Оновити"
+    delete_button: "Видалити"
+    delete_confirm: "Ви впевнені, що хочете видалити цей поліс?"
+    cancel_button: "Скасувати"
+  import_json:
+    title: "Імпорт пацієнтів з JSON - Клініка"
+    header: "Імпорт пацієнтів з JSON"
+    success_header: "Успіх!"
+    error_header: "Помилка імпорту"
+    file_label: "Оберіть JSON файл"
+    file_placeholder: "Файл не обрано"
+    choose_file_button: "Обрати файл"
+    import_button: "Імпортувати"
+    cancel_button: "Скасувати"

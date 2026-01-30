@@ -1,23 +1,23 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Панель клініки{% endblock %}
+{% block title %}{{ 'dashboard.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui padded grid">
         <div class="row">
             <div class="ten wide column">
-                <h1 class="ui huge dividing header">Панель</h1>
+                <h1 class="ui huge dividing header">{{ 'dashboard.panel'|trans }}</h1>
                 <div class="ui mini horizontal divided list" style="margin-top:-8px;">
-                    <div class="item"><i class="clock outline icon"></i>Оновлено зараз</div>
-                    <div class="item"><i class="bell outline icon"></i>Сповіщення: {{ dashboardData.quickStats.lab_pending ?? 0 }} лаб, {{ dashboardData.quickStats.low_stock ?? 0 }} склад</div>
+                    <div class="item"><i class="clock outline icon"></i>{{ 'dashboard.updated_now'|trans }}</div>
+                    <div class="item"><i class="bell outline icon"></i>{{ 'dashboard.notifications'|trans }}: {{ dashboardData.quickStats.lab_pending ?? 0 }} {{ 'dashboard.lab_pending'|trans }}, {{ dashboardData.quickStats.low_stock ?? 0 }} {{ 'dashboard.low_stock'|trans }}</div>
                 </div>
             </div>
             {% if canExport %}
                 <div class="six wide column right aligned">
                     <div class="ui mini basic buttons">
-                        <a href="/dashboard/export-csv" class="ui button">CSV</a>
-                        <a href="/dashboard/export-pdf" class="ui button">PDF</a>
-                        <a href="/dashboard/export-excel" class="ui button">Excel</a>
+                        <a href="/dashboard/export-csv" class="ui button">{{ 'dashboard.export.csv'|trans }}</a>
+                        <a href="/dashboard/export-pdf" class="ui button">{{ 'dashboard.export.pdf'|trans }}</a>
+                        <a href="/dashboard/export-excel" class="ui button">{{ 'dashboard.export.excel'|trans }}</a>
                     </div>
                 </div>
             {% endif %}
@@ -25,37 +25,37 @@
 
         <div class="row">
             <div class="sixteen wide column">
-                <h3 class="ui header">Оперативні показники</h3>
+                <h3 class="ui header">{{ 'dashboard.quick_stats.title'|trans }}</h3>
                 <div class="ui five stackable cards">
                     <div class="blue card">
                         <div class="content">
-                            <div class="header"><i class="users icon"></i> Пацієнтів</div>
+                            <div class="header"><i class="users icon"></i> {{ 'dashboard.quick_stats.patients'|trans }}</div>
                             <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.patients_total|default(0) }}</span></div>
                         </div>
                     </div>
                     <div class="teal card">
                         <div class="content">
-                            <div class="header"><i class="calendar check icon"></i> Прийомів сьогодні</div>
+                            <div class="header"><i class="calendar check icon"></i> {{ 'dashboard.quick_stats.appointments_today'|trans }}</div>
                             <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.appointments_today|default(0) }}</span></div>
                         </div>
                     </div>
                     {% if canSeeFinance %}
                         <div class="green card">
                             <div class="content">
-                                <div class="header"><i class="dollar sign icon"></i> Дохід 7д</div>
+                                <div class="header"><i class="dollar sign icon"></i> {{ 'dashboard.quick_stats.revenue_7d'|trans }}</div>
                                 <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.revenue_7d|default(0)|number_format(0, '.', ',') }} ₴</span></div>
                             </div>
                         </div>
                     {% endif %}
                     <div class="orange card">
                         <div class="content">
-                            <div class="header"><i class="flask icon"></i> Лаб. в роботі</div>
+                            <div class="header"><i class="flask icon"></i> {{ 'dashboard.quick_stats.lab_in_progress'|trans }}</div>
                             <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.lab_pending|default(0) }}</span></div>
                         </div>
                     </div>
                     <div class="red card">
                         <div class="content">
-                            <div class="header"><i class="warehouse icon"></i> Low stock</div>
+                            <div class="header"><i class="warehouse icon"></i> {{ 'dashboard.quick_stats.low_stock'|trans }}</div>
                             <div class="description"><span class="ui huge header">{{ dashboardData.quickStats.low_stock|default(0) }}</span></div>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
             <div class="ui hidden divider"></div>
             <div class="row">
                 <div class="sixteen wide column">
-                    <h3 class="ui header">KPI / фінансові картки</h3>
+                    <h3 class="ui header">{{ 'dashboard.kpi.title'|trans }}</h3>
                     {% if dashboardData.kpis is not empty %}
                         <div class="ui five statistics">
                             {% for kpi_type, kpi_data in dashboardData.kpis %}
@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="label">{{ kpi_data.definition.name }}</div>
                                     {% if kpi_data.definition.target_value is not null %}
-                                        <div class="ui tiny grey sub header">Ціль: {{ kpi_data.definition.target_value }}{% if kpi_data.definition.unit %} {{ kpi_data.definition.unit }}{% endif %}</div>
+                                        <div class="ui tiny grey sub header">{{ 'dashboard.kpi.target'|trans }}: {{ kpi_data.definition.target_value }}{% if kpi_data.definition.unit %} {{ kpi_data.definition.unit }}{% endif %}</div>
                                     {% endif %}
                                 </div>
                             {% endfor %}
@@ -91,7 +91,7 @@
                         <div class="ui placeholder segment">
                             <div class="ui icon header">
                                 <i class="chart bar outline icon"></i>
-                                Немає активних KPI для відображення. Додайте визначення в адмінці.
+                                {{ 'dashboard.kpi.no_kpis'|trans }}
                             </div>
                         </div>
                     {% endif %}
@@ -101,7 +101,7 @@
         {% if canSeeFinance %}
             <div class="ui hidden section divider"></div>
             <div class="row">
-                <h1 class="ui huge dividing header">Щоденний дохід за 7 днів</h1>
+                <h1 class="ui huge dividing header">{{ 'dashboard.kpi.revenue_7d_title'|trans }}</h1>
                 <div class="sixteen wide column">
                     <canvas id="revenueChart"></canvas>
                 </div>
@@ -111,16 +111,16 @@
         {% if canSeeKpi %}
             <div class="ui hidden section divider"></div>
             <div class="row">
-                <h1 class="ui huge dividing header">Зведена таблиця KPI</h1>
+                <h1 class="ui huge dividing header">{{ 'dashboard.kpi.summary_table_title'|trans }}</h1>
             </div>
             <div class="row">
                 <table class="ui celled stackable table">
                     <thead>
                     <tr>
-                        <th>Показник</th>
-                        <th>Поточне значення</th>
-                        <th>Зміна</th>
-                        <th>Коментар</th>
+                        <th>{{ 'dashboard.kpi.table.indicator'|trans }}</th>
+                        <th>{{ 'dashboard.kpi.table.current_value'|trans }}</th>
+                        <th>{{ 'dashboard.kpi.table.change'|trans }}</th>
+                        <th>{{ 'dashboard.kpi.table.comment'|trans }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -145,14 +145,14 @@
                                     {% endif %}
                                     {{ kpi_data.trend }}
                                 {% else %}
-                                    N/A
+                                    {{ 'dashboard.kpi.na'|trans }}
                                 {% endif %}
                             </td>
-                            <td>{{ kpi_data.definition.description|default('Немає опису') }}</td>
+                            <td>{{ kpi_data.definition.description|default('dashboard.kpi.no_description'|trans) }}</td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="4" class="center aligned">Немає доступних даних KPI.</td>
+                            <td colspan="4" class="center aligned">{{ 'dashboard.kpi.no_data'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -185,13 +185,13 @@
                 type: 'bar',
                 data: {
                     labels: revenueChartData.labels,
-                    datasets: [{
-                        label: 'Щоденний дохід (₴)',
-                        data: revenueChartData.data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
+                        datasets: [{
+                            label: '{{ 'dashboard.kpi.daily_revenue_label'|trans }}',
+                            data: revenueChartData.data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
                 },
                 options: {
                     responsive: true,
@@ -202,21 +202,21 @@
                         },
                         title: {
                             display: true,
-                            text: 'Щоденний дохід за останні 7 днів'
+                            text: '{{ 'dashboard.kpi.daily_revenue_title'|trans }}'
                         }
                     },
                     scales: {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Дата'
+                                text: '{{ 'dashboard.kpi.date'|trans }}'
                             }
                         },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Дохід (₴)'
+                                text: '{{ 'dashboard.kpi.revenue'|trans }}'
                             }
                         }
                     }

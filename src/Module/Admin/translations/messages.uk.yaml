@@ -1,0 +1,348 @@
+admin:
+  title: "Адмін-панель"
+  roles:
+    title: "Ролі користувачів"
+    page_title: "Ролі користувачів - Адмін-панель"
+    add: "Додати роль"
+    no_roles: "Немає ролей для відображення."
+    table:
+      id: "ID"
+      name: "Назва"
+      description: "Опис"
+      actions: "Дії"
+    delete_confirm: "Ви впевнені, що хочете видалити цю роль?"
+    new:
+      title: "Створити нову роль"
+      page_title: "Створити нову роль - Адмін-панель"
+      name: "Назва ролі"
+      name_placeholder: "Наприклад, Адміністратор, Лікар"
+      description: "Опис ролі"
+      description_placeholder: "Детальний опис прав та обов'язків"
+      save: "Зберегти роль"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати роль #%id%"
+      page_title: "Редагувати роль #%id% - Адмін-панель"
+      save: "Зберегти зміни"
+  dictionaries:
+    title: Керування словниками
+    page_title: Словники - Адмін-панель
+    add: Додати словник
+    no_dictionaries: Немає словників для відображення.
+    table:
+      id: ID
+      name: Назва
+      description: Опис
+      type: Тип
+      actions: Дії
+    delete_confirm: Ви впевнені, що хочете видалити цей словник?
+    show:
+      title: "Словник #%id% - Адмін-панель"
+      title_full: "Словник #%id%"
+      back: Повернутися до списку
+      type: "Тип"
+      values_header: "Значення словника"
+      add_value: "Додати значення"
+      no_values: "Немає значень для цього словника."
+      table:
+        id: "ID"
+        value: "Значення"
+        label: "Мітка"
+        order: "Порядок"
+        active: "Активне"
+        actions: "Дії"
+        yes: "Так"
+        no: "Ні"
+      delete_confirm: "Ви впевнені, що хочете видалити це значення словника?"
+    new:
+      title: "Додати новий словник - Адмін-панель"
+      header: "Додати новий словник"
+      name: "Назва словника"
+      name_placeholder: "Наприклад, Статуси записів"
+      description: "Опис словника"
+      description_placeholder: "Детальний опис словника"
+      type: "Тип словника (необов'язково)"
+      type_placeholder: "Наприклад, appointment_status"
+      save_button: "Зберегти словник"
+      cancel_button: "Скасувати"
+    edit:
+      title: "Редагувати словник #%id% - Адмін-панель"
+      header: "Редагувати словник #%id%"
+      name: "Назва словника"
+      name_placeholder: "Наприклад, Статуси записів"
+      description: "Опис словника"
+      description_placeholder: "Детальний опис словника"
+      type: "Тип словника (необов'язково)"
+      type_placeholder: "Наприклад, appointment_status"
+      save_button: "Зберегти зміни"
+      cancel_button: "Скасувати"
+  auth_configs:
+    list:
+      title: Конфігурації аутентифікації - Адмін-панель
+      header: Керування конфігураціями аутентифікації
+      add: Додати конфігурацію
+      no_configs: Немає конфігурацій для відображення.
+      table:
+        id: ID
+        provider: Провайдер
+        client_id: Client ID
+        active: Активна
+        actions: Дії
+      not_specified: Не вказано
+      yes: Так
+      no: Ні
+      delete_confirm: Ви впевнені, що хочете видалити цю конфігурацію аутентифікації?
+    show:
+      title: "Перегляд конфігурації #%id%"
+      title_full: "Перегляд конфігурації аутентифікації #%id%"
+      redirect_uri_title: "URL зворотного виклику (Redirect URI)"
+      redirect_uri_desc: "Переконайтеся, що наступний URL вказано у налаштуваннях вашого OAuth-провайдера:"
+      table:
+        id: "ID"
+        provider: "Провайдер"
+        client_id: "Client ID"
+        client_secret: "Client Secret"
+        active: "Активна"
+        yes: "Так"
+        no: "Ні"
+        config: "Додаткова конфігурація"
+        created_at: "Створено"
+        updated_at: "Оновлено"
+      edit_button: "Редагувати"
+      back_button: "Повернутися до списку"
+    new:
+      title: "Додати нову конфігурацію аутентифікації - Адмін-панель"
+      header: "Додати нову конфігурацію аутентифікації"
+      provider: "Провайдер"
+      select_provider: "Оберіть провайдера"
+      client_id: "Client ID (необов'язково)"
+      client_id_placeholder: "Client ID для OAuth2"
+      client_secret: "Client Secret (необов'язково)"
+      client_secret_placeholder: "Client Secret для OAuth2"
+      config: "Додаткова конфігурація (JSON, необов'язково)"
+      config_placeholder: "{\"key\": \"value\"}"
+      is_active: "Активна конфігурація"
+      save_button: "Зберегти конфігурацію"
+      cancel_button: "Скасувати"
+    edit:
+      title: "Редагувати конфігурацію аутентифікації #%id% - Адмін-панель"
+      title_full: "Редагувати конфігурацію аутентифікації #%id%"
+      provider: Провайдер
+      select_provider: Оберіть провайдера
+      client_id: "Client ID (необов'язково)"
+      client_id_placeholder: Client ID для OAuth2
+      client_secret: "Client Secret (необов'язково)"
+      client_secret_placeholder: Client Secret для OAuth2
+      config: "Додаткова конфігурація (JSON, необов'язково)"
+      config_placeholder: "{\"key\": \"value\"}"
+      is_active: Активна конфігурація
+      save: Зберегти зміни
+      cancel: Скасувати
+  dictionary_values:
+    edit:
+      title: "Редагувати значення словника #%id% - Адмін-панель"
+      title_full: "Редагувати значення словника #%id%"
+      label: Мітка
+      label_placeholder: Наприклад, Заплановано
+      value: Значення
+      value_placeholder: Наприклад, scheduled
+      order_num: Порядковий номер
+      order_num_placeholder: "0"
+      is_active: Активне значення
+      save: Зберегти зміни
+      cancel: Скасувати
+  services:
+    title: Список послуг
+    page_title: Послуги - Адмін-панель
+    add: Додати послугу
+    table:
+      id: ID
+      name: Назва
+      price: Ціна
+      duration: Тривалість (хв)
+      category: Категорія
+      active: Активна
+      actions: Дії
+    yes: Так
+    no: Ні
+    new:
+      title: "Додати нову послугу - Адмін-панель"
+      header: "Додати нову послугу"
+      name: "Назва послуги"
+      name_placeholder: "Наприклад, Консультація терапевта"
+      category: "Категорія послуги"
+      select_category: "Виберіть категорію"
+      price: "Ціна"
+      price_placeholder: "0.00"
+      duration: "Тривалість (хв)"
+      duration_placeholder: "60"
+      description: "Опис"
+      description_placeholder: "Детальний опис послуги"
+      is_active: "Активна послуга"
+      save: "Зберегти послугу"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати послугу #%id% - Адмін-панель"
+      header: "Редагувати послугу #%id%"
+      name: "Назва послуги"
+      name_placeholder: "Наприклад, Консультація терапевта"
+      category: "Категорія послуги"
+      select_category: "Виберіть категорію"
+      price: "Ціна"
+      price_placeholder: "0.00"
+      duration: "Тривалість (хв)"
+      duration_placeholder: "60"
+      description: "Опис"
+      description_placeholder: "Детальний опис послуги"
+      is_active: "Активна послуга"
+      save: "Зберегти зміни"
+      cancel: "Скасувати"
+  service_categories:
+    list:
+      title: "Категорії послуг - Адмін-панель"
+      header: "Категорії послуг"
+      add_category: "Додати категорію"
+      table:
+        id: "ID"
+        name: "Назва"
+        description: "Опис"
+        actions: "Дії"
+      no_categories: "Немає категорій для відображення."
+      confirm_delete: "Ви впевнені, що хочете видалити цю категорію послуг?"
+    new:
+      title: "Додати нову категорію послуг - Адмін-панель"
+      header: "Додати нову категорію послуг"
+      name: "Назва"
+      name_placeholder: "Наприклад, Діагностика"
+      description: "Опис"
+      description_placeholder: "Детальний опис категорії"
+      save: "Зберегти категорію"
+      cancel: "Скасувати"
+    edit:
+      title: "Редагувати категорію послуг #%id% - Адмін-панель"
+      header: "Редагувати категорію послуг #%id%"
+      name: "Назва"
+      name_placeholder: "Наприклад, Діагностика"
+      description: "Опис"
+      description_placeholder: "Детальний опис категорії"
+      save: "Зберегти зміни"
+      cancel: "Скасувати"
+  users:
+    title: Користувачі
+    page_title: Користувачі - Адмін-панель
+    add: Додати користувача
+    search_placeholder: Пошук користувачів...
+    table:
+      id: ID
+      first_name: Ім'я
+      last_name: Прізвище
+      email: Email
+      role: Роль
+      mfa: 2FA
+      actions: Дії
+    no_users: Немає користувачів для відображення.
+    new:
+      title: Додати нового користувача
+      page_title: Додати нового користувача - Адмін-панель
+      first_name: Ім'я
+      first_name_placeholder: Ім'я користувача
+      last_name: Прізвище
+      last_name_placeholder: Прізвище користувача
+      email: Email
+      email_placeholder: Email користувача
+      password: Пароль
+      password_placeholder: Пароль
+      role: Роль
+      save: Зберегти користувача
+      cancel: Скасувати
+    show:
+      title: "Деталі користувача #%id%"
+      page_title: "Користувач #%id% - Адмін-панель"
+      table:
+        id: ID
+        first_name: Ім'я
+        last_name: Прізвище
+        email: Email
+        role: Роль
+        created_at: Створено
+        updated_at: Оновлено
+      edit: Редагувати
+      back: Повернутися до списку
+    edit:
+      title: "Редагувати користувача #%id%"
+      page_title: "Редагувати користувача #%id% - Адмін-панель"
+      new_password: Новий пароль (залиште пустим, щоб не змінювати)
+      new_password_placeholder: Новий пароль
+      save: Зберегти зміни
+      cancel: Скасувати
+    mfa:
+      enabled: Увімкнено
+      disabled: Вимкнено
+      disable_confirm: Ви впевнені, що хочете вимкнути 2FA для цього користувача?
+      disable_title: Вимкнути 2FA
+    delete_confirm: Ви впевнені, що хочете видалити цього користувача?
+  settings:
+    title: Налаштування системи
+    page_title: Налаштування - Адмін-панель
+    general_info: Загальна інформація
+    clinic_name: Назва клініки
+    clinic_name_placeholder: Міська клінічна лікарня №1
+    mfa_policy: Політика двофакторної автентифікації (2FA)
+    mfa_mode: Режим MFA
+    select_mode: Виберіть режим
+    mfa_force_roles: Вимагати MFA для ролей (якщо вибрано "Обов'язково для всіх")
+    select_roles: Виберіть ролі
+    modes:
+      optional: Вибірково
+      optional_desc: Користувач сам вирішує увімкнути 2FA
+      admin_required: Обов'язково для адмінів
+      admin_required_desc: Всі користувачі з роллю admin повинні мати 2FA
+      all_required: Обов'язково для всіх
+      all_required_desc: Всі користувачі повинні мати 2FA
+      disabled: Вимкнено
+      disabled_desc: 2FA недоступний
+    save: Зберегти
+    interface_language: "Мова інтерфейсу"
+    language_ukrainian: "Українська"
+    language_english: "English"
+  backup_policies:
+    index:
+      title: "Політики резервного копіювання - Адмін-панель"
+      header: "Керування політиками резервного копіювання"
+      add_policy: "Додати політику"
+      no_policies: "Немає політик резервного копіювання для відображення."
+      table:
+        id: "ID"
+        name: "Назва"
+        description: "Опис"
+        frequency: "Частота"
+        retention_days: "Днів зберігання"
+        last_run: "Останній запуск"
+        status: "Статус"
+        actions: "Дії"
+      not_specified: "Не вказано"
+      never: "Ніколи"
+      active: "Активна"
+      inactive: "Неактивна"
+      delete_confirm: "Ви впевнені, що хочете видалити цю політику резервного копіювання?"
+    new:
+      title: "Додати нову політику резервного копіювання - Адмін-панель"
+      header: "Додати нову політику резервного копіювання"
+      name: "Назва"
+      name_placeholder: "Наприклад, Daily Backup"
+      description: "Опис"
+      description_placeholder: "Детальний опис політики"
+      frequency: "Частота"
+      frequency_placeholder: "Наприклад, daily, weekly, monthly"
+      retention_days: "Днів зберігання"
+      retention_days_placeholder: "Кількість днів для зберігання резервних копій"
+      status_label: "Статус"
+      status_active: "Активна"
+      status_inactive: "Неактивна"
+      save_button: "Зберегти політику"
+      cancel_button: "Скасувати"
+    edit:
+      title: "Редагувати політику резервного копіювання #%id% - Адмін-панель"
+      header: "Редагувати політику резервного копіювання #%id%"
+      save_button: "Зберегти зміни"
+      cancel_button: "Скасувати"

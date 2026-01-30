@@ -48,11 +48,15 @@ class AdminController
             'clinic_name' => $this->settingsRepository->get('clinic_name', ''),
             'mfa_policy' => $this->settingsRepository->getMfaPolicy(),
             'mfa_force_roles' => $this->settingsRepository->getMfaForceRoles(),
+            'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
+
+        $availableLocales = View::getTranslationService()->getAvailableLocales();
 
         View::render('@modules/Admin/templates/settings.html.twig', [
             'settings' => $settings,
             'roles' => $roles,
+            'availableLocales' => $availableLocales,
         ]);
     }
 
@@ -63,6 +67,7 @@ class AdminController
         $clinicName = $_POST['clinic_name'] ?? '';
         $mfaPolicy = $_POST['mfa_policy'] ?? 'optional';
         $mfaForceRolesRaw = $_POST['mfa_force_roles'] ?? '';
+        $locale = $_POST['locale'] ?? 'uk';
 
         $mfaForceRoles = [];
         if (!empty($mfaForceRolesRaw)) {
@@ -72,6 +77,10 @@ class AdminController
         $this->settingsRepository->set('clinic_name', $clinicName);
         $this->settingsRepository->setMfaPolicy($mfaPolicy);
         $this->settingsRepository->setMfaForceRoles($mfaForceRoles);
+        $this->settingsRepository->set('system_locale', $locale);
+
+        // Clear View cache to force re-initialization with new locale
+        View::clearCache();
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
         header('Location: /admin/settings');

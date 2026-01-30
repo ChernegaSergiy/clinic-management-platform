@@ -1,54 +1,54 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Страховий кейс #{{ claim.id }} - Клініка{% endblock %}
+{% block title %}{{ 'insurance.claims.show.title'|trans({'%id%': claim.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Страховий кейс #{{ claim.id }}</h2>
+        <h2 class="ui header">{{ 'insurance.claims.show.header'|trans({'%id%': claim.id}) }}</h2>
         <div class="ui divider"></div>
 
         <div class="ui grid">
             <div class="eight wide column">
-                <h3 class="ui header">Деталі кейсу</h3>
+                <h3 class="ui header">{{ 'insurance.claims.show.details_header'|trans }}</h3>
                 <table class="ui definition table">
                     <tbody>
                         <tr>
-                            <td>ID</td>
+                            <td>{{ 'insurance.claims.show.table.id'|trans }}</td>
                             <td>{{ claim.id }}</td>
                         </tr>
                         <tr>
-                            <td>Статус</td>
+                            <td>{{ 'insurance.claims.show.table.status'|trans }}</td>
                             <td>{{ claim.status }}</td>
                         </tr>
                         <tr>
-                            <td>Сума до відшкодування</td>
+                            <td>{{ 'insurance.claims.show.table.amount_claimed'|trans }}</td>
                             <td>{{ claim.total_claimed|number_format(2, ',', ' ') }}</td>
                         </tr>
                         <tr>
-                            <td>Відшкодовано</td>
+                            <td>{{ 'insurance.claims.show.table.amount_paid'|trans }}</td>
                             <td>{{ claim.total_paid|number_format(2, ',', ' ') }}</td>
                         </tr>
                         <tr>
-                            <td>Дата подання</td>
-                            <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : 'Не подано' }}</td>
+                            <td>{{ 'insurance.claims.show.table.submitted_at'|trans }}</td>
+                            <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : 'insurance.claims.show.table.not_submitted'|trans }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="eight wide column">
-                <h3 class="ui header">Пов'язана інформація</h3>
+                <h3 class="ui header">{{ 'insurance.claims.show.related_info_header'|trans }}</h3>
                 <table class="ui definition table">
                     <tbody>
                         <tr>
-                            <td>Рахунок</td>
-                            <td><a href="/billing/show?id={{ claim.invoice_id }}">Рахунок #{{ claim.invoice_id }}</a></td>
+                            <td>{{ 'insurance.claims.show.table.invoice'|trans }}</td>
+                            <td><a href="/billing/show?id={{ claim.invoice_id }}">{{ 'insurance.claims.show.table.invoice_link'|trans({'%id%': claim.invoice_id}) }}</a></td>
                         </tr>
                         <tr>
-                            <td>Пацієнт</td>
+                            <td>{{ 'insurance.claims.show.table.patient'|trans }}</td>
                             <td><a href="/patients/show?id={{ claim.patient_id }}">{{ claim.patient_name }}</a></td>
                         </tr>
                         <tr>
-                            <td>Страхова компанія</td>
+                            <td>{{ 'insurance.claims.show.table.company'|trans }}</td>
                             <td>{{ claim.insurance_company_name }}</td>
                         </tr>
                     </tbody>
@@ -58,32 +58,32 @@
 
         <div class="ui divider"></div>
 
-        <h3 class="ui header">Змінити статус</h3>
+        <h3 class="ui header">{{ 'insurance.claims.show.update_status_header'|trans }}</h3>
         <form class="ui form" action="/insurance/claims/update-status" method="POST">
             <input type="hidden" name="id" value="{{ claim.id }}">
             <div class="two fields">
                 <div class="field">
-                    <label>Новий статус</label>
+                    <label>{{ 'insurance.claims.show.new_status_label'|trans }}</label>
                     <select name="status" class="ui dropdown">
-                        <option value="draft" {{ claim.status == 'draft' ? 'selected' : '' }}>Чернетка (Draft)</option>
-                        <option value="submitted" {{ claim.status == 'submitted' ? 'selected' : '' }}>Подано (Submitted)</option>
-                        <option value="paid" {{ claim.status == 'paid' ? 'selected' : '' }}>Сплачено (Paid)</option>
-                        <option value="partially_paid" {{ claim.status == 'partially_paid' ? 'selected' : '' }}>Частково сплачено (Partially Paid)</option>
-                        <option value="denied" {{ claim.status == 'denied' ? 'selected' : '' }}>Відмовлено (Denied)</option>
+                        <option value="draft" {{ claim.status == 'draft' ? 'selected' : '' }}>{{ 'insurance.claims.show.status_draft'|trans }}</option>
+                        <option value="submitted" {{ claim.status == 'submitted' ? 'selected' : '' }}>{{ 'insurance.claims.show.status_submitted'|trans }}</option>
+                        <option value="paid" {{ claim.status == 'paid' ? 'selected' : '' }}>{{ 'insurance.claims.show.status_paid'|trans }}</option>
+                        <option value="partially_paid" {{ claim.status == 'partially_paid' ? 'selected' : '' }}>{{ 'insurance.claims.show.status_partially_paid'|trans }}</option>
+                        <option value="denied" {{ claim.status == 'denied' ? 'selected' : '' }}>{{ 'insurance.claims.show.status_denied'|trans }}</option>
                     </select>
                 </div>
                 <div class="field">
-                    <label>Сплачена сума (якщо є)</label>
+                    <label>{{ 'insurance.claims.show.amount_paid_label'|trans }}</label>
                     <input type="number" step="0.01" name="total_paid" placeholder="0.00" value="{{ claim.total_paid }}">
                 </div>
             </div>
              <div class="field">
-                <label>Дата подання (якщо змінюється)</label>
+                <label>{{ 'insurance.claims.show.submitted_at_label'|trans }}</label>
                 <input type="date" name="submitted_at" value="{{ claim.submitted_at|date('Y-m-d') }}">
             </div>
-            <button class="ui primary button" type="submit">Оновити статус</button>
+            <button class="ui primary button" type="submit">{{ 'insurance.claims.show.update_button'|trans }}</button>
             <a href="/insurance/claims" class="ui button">
-                <i class="arrow left icon"></i> Повернутися до списку
+                <i class="arrow left icon"></i> {{ 'insurance.claims.show.back_button'|trans }}
             </a>
         </form>
 

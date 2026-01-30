@@ -1,40 +1,40 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Користувач #{{ user.id }} - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.users.show.page_title'|trans({'%id%': user.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Деталі користувача #{{ user.id }}</h2>
+        <h2 class="ui header">{{ 'admin.users.show.title'|trans({'%id%': user.id}) }}</h2>
         <div class="ui divider"></div>
 
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td>ID</td>
+                    <td>{{ 'admin.users.show.table.id'|trans }}</td>
                     <td>{{ user.id }}</td>
                 </tr>
                 <tr>
-                    <td>Ім'я</td>
+                    <td>{{ 'admin.users.show.table.first_name'|trans }}</td>
                     <td>{{ user.first_name }}</td>
                 </tr>
                 <tr>
-                    <td>Прізвище</td>
+                    <td>{{ 'admin.users.show.table.last_name'|trans }}</td>
                     <td>{{ user.last_name }}</td>
                 </tr>
                 <tr>
-                    <td>Email</td>
+                    <td>{{ 'admin.users.show.table.email'|trans }}</td>
                     <td>{{ user.email }}</td>
                 </tr>
                 <tr>
-                    <td>Роль</td>
+                    <td>{{ 'admin.users.show.table.role'|trans }}</td>
                     <td>{{ user.role_name }}</td>
                 </tr>
                 <tr>
-                    <td>Створено</td>
+                    <td>{{ 'admin.users.show.table.created_at'|trans }}</td>
                     <td>{{ user.created_at|date('Y-m-d H:i') }}</td>
                 </tr>
                 <tr>
-                    <td>Оновлено</td>
+                    <td>{{ 'admin.users.show.table.updated_at'|trans }}</td>
                     <td>{{ user.updated_at|date('Y-m-d H:i') }}</td>
                 </tr>
             </tbody>
@@ -43,10 +43,10 @@
         <div class="ui divider"></div>
 
         <a href="/admin/users/edit?id={{ user.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'admin.users.show.edit'|trans }}
         </a>
         <a href="/admin/users" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'admin.users.show.back'|trans }}
         </a>
     </div>
 {% endblock %}

@@ -1,42 +1,42 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Рецепт #{{ prescription.id }} - Клініка{% endblock %}
+{% block title %}{{ 'prescription.show.title'|trans({'%id%': prescription.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Деталі рецепта #{{ prescription.id }}</h2>
+        <h2 class="ui header">{{ 'prescription.show.title_full'|trans({'%id%': prescription.id}) }}</h2>
         <div class="ui divider"></div>
 
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td>Пацієнт</td>
+                    <td>{{ 'prescription.show.table.patient'|trans }}</td>
                     <td><a href="/patients/show?id={{ prescription.patient_id }}">{{ prescription.patient_name }}</a></td>
                 </tr>
                 <tr>
-                    <td>Лікар</td>
+                    <td>{{ 'prescription.show.table.doctor'|trans }}</td>
                     <td>{{ prescription.doctor_name }}</td>
                 </tr>
                 <tr>
-                    <td>Медичний запис</td>
+                    <td>{{ 'prescription.show.table.medical_record'|trans }}</td>
                     <td>
                         {% if prescription.medical_record_id %}
                             <a href="/medical-records/show?id={{ prescription.medical_record_id }}">#{{ prescription.medical_record_id }}</a>
                         {% else %}
-                            Немає
+                            {{ 'prescription.show.no_medical_record'|trans }}
                         {% endif %}
                     </td>
                 </tr>
                 <tr>
-                    <td>Дата виписки</td>
+                    <td>{{ 'prescription.show.table.issue_date'|trans }}</td>
                     <td>{{ prescription.issue_date|date('Y-m-d') }}</td>
                 </tr>
                 <tr>
-                    <td>Дата закінчення</td>
-                    <td>{{ prescription.expiry_date ? prescription.expiry_date|date('Y-m-d') : 'Не вказано' }}</td>
+                    <td>{{ 'prescription.show.table.expiry_date'|trans }}</td>
+                    <td>{{ prescription.expiry_date ? prescription.expiry_date|date('Y-m-d') : 'prescription.show.not_specified'|trans }}</td>
                 </tr>
                 <tr>
-                    <td>Примітки</td>
+                    <td>{{ 'prescription.show.table.notes'|trans }}</td>
                     <td>{{ prescription.notes|nl2br|default('—') }}</td>
                 </tr>
             </tbody>
@@ -44,18 +44,18 @@
 
         <div class="ui divider"></div>
 
-        <h3 class="ui header">Пункти рецепта</h3>
+        <h3 class="ui header">{{ 'prescription.show.items_title'|trans }}</h3>
         {% if prescription.items is empty %}
-            <p>Немає пунктів у цьому рецепті.</p>
+            <p>{{ 'prescription.show.no_items'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>Назва медикаменту</th>
-                        <th>Дозування</th>
-                        <th>Частота</th>
-                        <th>Тривалість</th>
-                        <th>Примітки</th>
+                        <th>{{ 'prescription.show.table_items.medication_name'|trans }}</th>
+                        <th>{{ 'prescription.show.table_items.dosage'|trans }}</th>
+                        <th>{{ 'prescription.show.table_items.frequency'|trans }}</th>
+                        <th>{{ 'prescription.show.table_items.duration'|trans }}</th>
+                        <th>{{ 'prescription.show.table_items.notes'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,8 +64,8 @@
                             <td>{{ item.medication_name }}</td>
                             <td>{{ item.dosage }}</td>
                             <td>{{ item.frequency }}</td>
-                            <td>{{ item.duration ?: 'Не вказано' }}</td>
-                            <td>{{ item.notes ?: 'Немає' }}</td>
+                            <td>{{ item.duration ?: 'prescription.show.not_specified'|trans }}</td>
+                            <td>{{ item.notes ?: 'prescription.show.no_notes'|trans }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -74,7 +74,7 @@
 
         <div class="ui divider"></div>
 
-        {# <a href="/prescriptions/edit?id={{ prescription.id }}" class="ui primary button">Редагувати</a> #}
-        <a href="/patients/show?id={{ prescription.patient_id }}" class="ui button">Повернутися до пацієнта</a>
+        {# <a href="/prescriptions/edit?id={{ prescription.id }}" class="ui primary button">{{ 'prescription.show.edit'|trans }}</a> #}
+        <a href="/patients/show?id={{ prescription.patient_id }}" class="ui button">{{ 'prescription.show.back'|trans }}</a>
     </div>
 {% endblock %}

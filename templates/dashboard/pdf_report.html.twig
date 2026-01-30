@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Звіт по ключовим показникам</title>
+    <title>{{ 'dashboard.pdf_report.title'|trans }}</title>
     <style>
         body { font-family: 'DejaVu Sans', 'dejavusans', sans-serif; }
         h1 {
@@ -31,15 +31,15 @@
     </style>
 </head>
 <body>
-    <h1>Звіт по ключовим показникам (KPI)</h1>
-    <p><strong>Дата створення звіту:</strong> {{ "now"|date("Y-m-d H:i:s") }}</p>
+    <h1>{{ 'dashboard.pdf_report.title'|trans }}</h1>
+    <p><strong>{{ 'dashboard.pdf_report.report_generation_date'|trans }}</strong> {{ "now"|date("Y-m-d H:i:s") }}</p>
     <table>
         <thead>
             <tr>
-                <th>Показник</th>
-                <th>Значення</th>
-                <th>Тренд</th>
-                <th>Опис</th>
+                <th>{{ 'dashboard.pdf_report.indicator'|trans }}</th>
+                <th>{{ 'dashboard.pdf_report.value'|trans }}</th>
+                <th>{{ 'dashboard.pdf_report.trend'|trans }}</th>
+                <th>{{ 'dashboard.pdf_report.description'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -55,7 +55,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="4" style="text-align: center;">Дані відсутні.</td>
+                    <td colspan="4" style="text-align: center;">{{ 'dashboard.pdf_report.no_data_available'|trans }}</td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,37 +1,37 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Нова страхова компанія - Клініка{% endblock %}
+{% block title %}{{ 'insurance.companies.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Нова страхова компанія</h2>
+        <h2 class="ui header">{{ 'insurance.companies.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" action="/insurance/companies/new" method="POST">
             <div class="field">
-                <label>Назва</label>
-                <input type="text" name="name" placeholder="Назва компанії" value="{{ old.name }}" required>
+                <label>{{ 'insurance.companies.new.name_label'|trans }}</label>
+                <input type="text" name="name" placeholder="{{ 'insurance.companies.new.name_placeholder'|trans }}" value="{{ old.name }}" required>
             </div>
             <div class="field">
-                <label>Контактна особа</label>
-                <input type="text" name="contact_person" placeholder="ПІБ контактної особи" value="{{ old.contact_person }}">
+                <label>{{ 'insurance.companies.new.contact_person_label'|trans }}</label>
+                <input type="text" name="contact_person" placeholder="{{ 'insurance.companies.new.contact_person_placeholder'|trans }}" value="{{ old.contact_person }}">
             </div>
             <div class="field">
-                <label>Телефон</label>
-                <input type="text" name="phone" placeholder="Телефон" value="{{ old.phone }}">
+                <label>{{ 'insurance.companies.new.phone_label'|trans }}</label>
+                <input type="text" name="phone" placeholder="{{ 'insurance.companies.new.phone_placeholder'|trans }}" value="{{ old.phone }}">
             </div>
             <div class="field">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="Email" value="{{ old.email }}">
+                <label>{{ 'insurance.companies.new.email_label'|trans }}</label>
+                <input type="email" name="email" placeholder="{{ 'insurance.companies.new.email_placeholder'|trans }}" value="{{ old.email }}">
             </div>
             <div class="field">
-                <label>Примітки</label>
+                <label>{{ 'insurance.companies.new.notes_label'|trans }}</label>
                 <textarea name="notes" rows="3">{{ old.notes }}</textarea>
             </div>
             <div class="ui divider"></div>
 
-            <button class="ui primary button" type="submit"><i class="save icon"></i> Зберегти</button>
-            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            <button class="ui primary button" type="submit"><i class="save icon"></i> {{ 'insurance.companies.new.save_button'|trans }}</button>
+            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> {{ 'insurance.companies.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

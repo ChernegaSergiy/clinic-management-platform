@@ -2,20 +2,20 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати нове визначення KPI - Адмін-панель{% endblock %}
+{% block title %}{{ 'kpi.definitions.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати нове визначення KPI</h2>
+        <h2 class="ui header">{{ 'kpi.definitions.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         {% set kpi_options = {
-            'revenue_generated': 'Дохід (revenue_generated)',
-            'appointments_count': 'Кількість прийомів (appointments_count)',
-            'doctor_utilization': 'Завантаженість лікарів (doctor_utilization)',
-            'readmission_rate': 'Повторні звернення (readmission_rate)',
-            'patient_satisfaction': 'Задоволеність пацієнтів (patient_satisfaction)',
-            'custom': 'Інше (manual)'
+            'revenue_generated': 'kpi.definitions.edit.kpi_types.revenue_generated'|trans,
+            'appointments_count': 'kpi.definitions.edit.kpi_types.appointments_count'|trans,
+            'doctor_utilization': 'kpi.definitions.edit.kpi_types.doctor_utilization'|trans,
+            'readmission_rate': 'kpi.definitions.edit.kpi_types.readmission_rate'|trans,
+            'patient_satisfaction': 'kpi.definitions.edit.kpi_types.patient_satisfaction'|trans,
+            'custom': 'kpi.definitions.edit.kpi_types.custom'|trans
         } %}
         {% set selected_type = old.kpi_type ?? 'revenue_generated' %}
         {% if selected_type is not empty and (selected_type not in kpi_options|keys) %}
@@ -23,30 +23,30 @@
         {% endif %}
 
         {% set period_options = {
-            'day': 'Щодня',
-            'week': 'Щотижня',
-            'month': 'Щомісяця'
+            'day': 'kpi.definitions.edit.periods.day'|trans,
+            'week': 'kpi.definitions.edit.periods.week'|trans,
+            'month': 'kpi.definitions.edit.periods.month'|trans
         } %}
         {% set selected_period = old.period ?? 'day' %}
 
         <form class="ui form" method="POST" action="/kpi/definitions/new">
-            {{ forms.input('name', 'Назва', old.name ?? '', 'text', 'Наприклад, Patient Wait Time', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('description', 'Опис', old.description ?? '', 'Детальний опис KPI', errors.description ?? null) }}
-            {{ forms.select('kpi_type', 'Тип KPI', kpi_options, selected_type, errors.kpi_type ?? null, {'required': 'required'}) }}
-            {{ forms.select('period', 'Період розрахунку', period_options, selected_period, errors.period ?? null, {'required': 'required'}) }}
-            {{ forms.input('target_value', 'Цільове значення', old.target_value ?? '', 'text', 'Наприклад, 15, 95%, 100', errors.target_value ?? null) }}
-            {{ forms.input('unit', 'Одиниця виміру', old.unit ?? '', 'text', 'Наприклад, minutes, %, patients', errors.unit ?? null) }}
+            {{ forms.input('name', 'kpi.definitions.new.name'|trans, old.name ?? '', 'text', 'kpi.definitions.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'kpi.definitions.new.description'|trans, old.description ?? '', 'kpi.definitions.new.description_placeholder'|trans, errors.description ?? null) }}
+            {{ forms.select('kpi_type', 'kpi.definitions.new.kpi_type'|trans, kpi_options, selected_type, errors.kpi_type ?? null, {'required': 'required'}) }}
+            {{ forms.select('period', 'kpi.definitions.new.period'|trans, period_options, selected_period, errors.period ?? null, {'required': 'required'}) }}
+            {{ forms.input('target_value', 'kpi.definitions.new.target_value'|trans, old.target_value ?? '', 'text', 'kpi.definitions.new.target_value_placeholder'|trans, errors.target_value ?? null) }}
+            {{ forms.input('unit', 'kpi.definitions.new.unit'|trans, old.unit ?? '', 'text', 'kpi.definitions.new.unit_placeholder'|trans, errors.unit ?? null) }}
 
             <div class="field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
-                    <label>Активне визначення</label>
+                    <label>{{ 'kpi.definitions.new.is_active'|trans }}</label>
                 </div>
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти визначення', 'primary', '', 'save') }}
-            <a href="/kpi/definitions" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('kpi.definitions.new.save'|trans, 'primary', '', 'save') }}
+            <a href="/kpi/definitions" class="ui button"><i class="arrow left icon"></i> {{ 'kpi.definitions.new.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

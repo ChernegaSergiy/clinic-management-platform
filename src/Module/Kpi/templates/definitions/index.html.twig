@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Визначення KPI - Адмін-панель{% endblock %}
+{% block title %}{{ 'kpi.definitions.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Керування визначеннями KPI</h2>
+                <h2 class="ui header">{{ 'kpi.definitions.list_title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/kpi/definitions/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати визначення
+                    <i class="plus icon"></i> {{ 'kpi.definitions.add_definition'|trans }}
                 </a>
             </div>
         </div>
@@ -19,19 +19,19 @@
         <div class="ui divider"></div>
 
         {% if definitions is empty %}
-            <p>Немає визначень KPI для відображення.</p>
+            <p>{{ 'kpi.definitions.no_definitions'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Назва</th>
-                        <th>Опис</th>
-                        <th>Тип</th>
-                        <th>Цільове значення</th>
-                        <th>Одиниця</th>
-                        <th>Активний</th>
-                        <th>Дії</th>
+                        <th>{{ 'kpi.definitions.table.id'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.name'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.description'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.type'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.target_value'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.unit'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.active'|trans }}</th>
+                        <th>{{ 'kpi.definitions.table.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,22 +39,22 @@
                         <tr>
                             <td>{{ definition.id }}</td>
                             <td>{{ definition.name }}</td>
-                            <td>{{ definition.description ?: 'Не вказано' }}</td>
+                            <td>{{ definition.description ?: 'kpi.definitions.not_specified'|trans }}</td>
                             <td>{{ definition.kpi_type }}</td>
                             <td>{{ definition.target_value }}</td>
                             <td>{{ definition.unit }}</td>
                             <td>
                                 {% if definition.is_active %}
-                                    <i class="check circle icon green"></i> Так
+                                    <i class="check circle icon green"></i> {{ 'kpi.definitions.yes'|trans }}
                                 {% else %}
-                                    <i class="times circle icon red"></i> Ні
+                                    <i class="times circle icon red"></i> {{ 'kpi.definitions.no'|trans }}
                                 {% endif %}
                             </td>
                             <td>
                                 <a href="/kpi/definitions/edit?id={{ definition.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/kpi/definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити це визначення KPI?');">
+                                <form action="/kpi/definitions/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'kpi.definitions.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ definition.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

@@ -1,14 +1,14 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати графік: {{ doctor.full_name }}{% endblock %}
+{% block title %}{{ 'schedule.edit.title'|trans({'%full_name%': doctor.full_name}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="sixteen wide column">
                 <h2 class="ui header">
-                    Редагувати графік{% if doctor %}: {{ doctor.full_name }}{% endif %}
+                    {{ 'schedule.edit.title_full'|trans }}{% if doctor %}: {{ doctor.full_name }}{% endif %}
                 </h2>
 
             </div>
@@ -20,29 +20,29 @@
             <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
             
             <div class="ui four column grid">
-                {% for day_num, day_name in {1: 'Понеділок', 2: 'Вівторок', 3: 'Середа', 4: 'Четвер', 5: 'П\'ятниця', 6: 'Субота', 0: 'Неділя'} %}
+                {% for day_num, day_name in {1: 'schedule.show.days.1'|trans, 2: 'schedule.show.days.2'|trans, 3: 'schedule.show.days.3'|trans, 4: 'schedule.show.days.4'|trans, 5: 'schedule.show.days.5'|trans, 6: 'schedule.show.days.6'|trans, 0: 'schedule.show.days.0'|trans} %}
                     {% set schedule_entry = scheduleByDay[day_num] ?? null %}
                     <div class="column">
                         <div class="ui segment">
                             <h4 class="ui header">{{ day_name }}</h4>
                             
-                            <div class="field">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
-                                    <label>Робочий день</label>
-                                </div>
-                            </div>
-                            
-                            <div class="two fields">
-                                <div class="field">
-                                    <label>Початок</label>
-                                    <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
-                                </div>
-                                <div class="field">
-                                    <label>Кінець</label>
-                                    <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
-                                </div>
-                            </div>
+                             <div class="field">
+                                 <div class="ui toggle checkbox">
+                                     <input type="checkbox" name="schedule[{{ day_num }}][is_available]" {% if schedule_entry.is_available is not defined or schedule_entry.is_available %}checked{% endif %}>
+                                     <label>{{ 'schedule.edit.working_day'|trans }}</label>
+                                 </div>
+                             </div>
+
+                             <div class="two fields">
+                                 <div class="field">
+                                     <label>{{ 'schedule.edit.start_time'|trans }}</label>
+                                     <input type="time" name="schedule[{{ day_num }}][start_time]" value="{{ schedule_entry.start_time ?? '09:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                 </div>
+                                 <div class="field">
+                                     <label>{{ 'schedule.edit.end_time'|trans }}</label>
+                                     <input type="time" name="schedule[{{ day_num }}][end_time]" value="{{ schedule_entry.end_time ?? '18:00' }}" {% if schedule_entry.is_available is defined and not schedule_entry.is_available %}disabled{% endif %}>
+                                 </div>
+                             </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -52,14 +52,14 @@
             
             <div class="ui grid">
                 <div class="eight wide column">
-                    <button class="ui primary button" type="submit">
-                        <i class="save icon"></i>
-                        Зберегти графік
-                    </button>
-                    <a href="/admin/schedules/show?id={{ doctor.id }}" class="ui button">
-                        <i class="arrow left icon"></i>
-                        Повернутися
-                    </a>
+                     <button class="ui primary button" type="submit">
+                         <i class="save icon"></i>
+                         {{ 'schedule.edit.save'|trans }}
+                     </button>
+                     <a href="/admin/schedules/show?id={{ doctor.id }}" class="ui button">
+                         <i class="arrow left icon"></i>
+                         {{ 'schedule.edit.cancel'|trans }}
+                     </a>
                 </div>
             </div>
         </form>

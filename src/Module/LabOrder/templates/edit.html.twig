@@ -2,27 +2,27 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати лабораторне замовлення #{{ order.id }} - Клініка{% endblock %}
+{% block title %}{{ 'lab_order.edit.title'|trans({'%id%': order.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати лабораторне замовлення #{{ order.id }}</h2>
+        <h2 class="ui header">{{ 'lab_order.edit.header'|trans({'%id%': order.id}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/lab-orders/edit">
             <input type="hidden" name="id" value="{{ order.id }}">
-            <p><strong>Пацієнт:</strong> {{ order.patient_name }}</p>
-            <p><strong>Лікар:</strong> {{ order.doctor_name }}</p>
-            <p><strong>Медичний запис ID:</strong> {{ order.medical_record_id }}</p>
+            <p><strong>{{ 'lab_order.edit.patient'|trans }}</strong> {{ order.patient_name }}</p>
+            <p><strong>{{ 'lab_order.edit.doctor'|trans }}</strong> {{ order.doctor_name }}</p>
+            <p><strong>{{ 'lab_order.edit.medical_record_id'|trans }}</strong> {{ order.medical_record_id }}</p>
             <div class="ui divider"></div>
 
-            {{ forms.input('order_code', 'Код замовлення', old.order_code ?? order.order_code, 'text', 'Наприклад, Загальний аналіз крові', errors.order_code ?? null, {'required': 'required'}) }}
-            {{ forms.select('status', 'Статус', {'ordered': 'Замовлено', 'in_progress': 'В процесі', 'completed': 'Виконано', 'cancelled': 'Скасовано'}, old.status ?? order.status, errors.status ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('results', 'Результати', old.results ?? order.results, 'Введіть результати лабораторного дослідження', errors.results ?? null) }}
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? order.notes, 'Додаткові примітки до замовлення', errors.notes ?? null) }}
+            {{ forms.input('order_code', 'lab_order.edit.order_code'|trans, old.order_code ?? order.order_code, 'text', 'lab_order.edit.order_code_placeholder'|trans, errors.order_code ?? null, {'required': 'required'}) }}
+            {{ forms.select('status', 'lab_order.edit.status'|trans, {'ordered': 'lab_order.edit.status_ordered'|trans, 'in_progress': 'lab_order.edit.status_in_progress'|trans, 'completed': 'lab_order.edit.status_completed'|trans, 'cancelled': 'lab_order.edit.status_cancelled'|trans}, old.status ?? order.status, errors.status ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('results', 'lab_order.edit.results'|trans, old.results ?? order.results, 'lab_order.edit.results_placeholder'|trans, errors.results ?? null) }}
+            {{ forms.textarea('notes', 'lab_order.edit.notes'|trans, old.notes ?? order.notes, 'lab_order.edit.notes_placeholder'|trans, errors.notes ?? null) }}
 
-            {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
-            <a href="/lab-orders/show?id={{ order.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('lab_order.edit.save'|trans, 'primary', '', 'save') }}
+            <a href="/lab-orders/show?id={{ order.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'lab_order.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

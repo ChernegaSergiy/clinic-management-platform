@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Склад - Клініка{% endblock %}
+{% block title %}{{ 'inventory.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Складські позиції</h2>
+                <h2 class="ui header">{{ 'inventory.list.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/inventory/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати позицію
+                    <i class="plus icon"></i> {{ 'inventory.list.add_item'|trans }}
                 </a>
             </div>
         </div>
@@ -20,11 +20,11 @@
 
         {% if lowStockItems is not empty %}
             <div class="ui warning message">
-                <div class="header">Увага: Низький рівень запасів!</div>
-                <p>Наступні позиції мають кількість нижче мінімального порогу:</p>
+                <div class="header">{{ 'inventory.list.low_stock_warning'|trans }}</div>
+                <p>{{ 'inventory.list.low_stock_message'|trans }}</p>
                 <ul class="list">
                     {% for item in lowStockItems %}
-                        <li>{{ item.name }} (Кількість: {{ item.quantity }}, Мін. поріг: {{ item.min_stock_level }})</li>
+                        <li>{{ item.name }} ({{ 'inventory.list.quantity'|trans }}: {{ item.quantity }}, {{ 'inventory.list.min_threshold'|trans }}: {{ item.min_stock_level }})</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -32,11 +32,11 @@
 
         {% if overStockedItems is not empty %}
             <div class="ui info message">
-                <div class="header">Інформація: Надлишок запасів!</div>
-                <p>Наступні позиції мають кількість вище максимального порогу:</p>
+                <div class="header">{{ 'inventory.list.over_stock_info'|trans }}</div>
+                <p>{{ 'inventory.list.over_stock_message'|trans }}</p>
                 <ul class="list">
                     {% for item in overStockedItems %}
-                        <li>{{ item.name }} (Кількість: {{ item.quantity }}, Макс. поріг: {{ item.max_stock_level }})</li>
+                        <li>{{ item.name }} ({{ 'inventory.list.quantity'|trans }}: {{ item.quantity }}, {{ 'inventory.list.max_threshold'|trans }}: {{ item.max_stock_level }})</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -45,7 +45,7 @@
         <form class="ui form" method="get" action="/inventory">
             <div class="field">
                 <div class="ui icon input">
-                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="Пошук позицій...">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'inventory.list.search_placeholder'|trans }}">
                     <i class="search icon"></i>
                 </div>
             </div>
@@ -54,13 +54,13 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Назва</th>
-                    <th>INN</th>
-                    <th>Кількість</th>
-                    <th>Мін. рівень запасу</th>
-                    <th>Термін придатності</th>
-                    <th>Дії</th>
+                    <th>{{ 'inventory.list.table.id'|trans }}</th>
+                    <th>{{ 'inventory.list.table.name'|trans }}</th>
+                    <th>{{ 'inventory.list.table.inn'|trans }}</th>
+                    <th>{{ 'inventory.list.table.quantity'|trans }}</th>
+                    <th>{{ 'inventory.list.table.min_stock_level'|trans }}</th>
+                    <th>{{ 'inventory.list.table.expiry_date'|trans }}</th>
+                    <th>{{ 'inventory.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +83,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="center aligned">Немає позицій на складі.</td>
+                        <td colspan="7" class="center aligned">{{ 'inventory.list.no_items'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

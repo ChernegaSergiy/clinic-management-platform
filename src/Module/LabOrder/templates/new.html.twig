@@ -2,22 +2,22 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Створити лабораторне замовлення - Клініка{% endblock %}
+{% block title %}{{ 'lab_order.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Створити нове лабораторне замовлення</h2>
-        <p><strong>Пацієнт:</strong> {{ medical_record.patient_name }}</p>
-        <p><strong>Лікар:</strong> {{ medical_record.doctor_name }}</p>
-        <p><strong>Медичний запис ID:</strong> {{ medical_record.id }}</p>
+        <h2 class="ui header">{{ 'lab_order.new.header'|trans }}</h2>
+        <p><strong>{{ 'lab_order.new.patient'|trans }}</strong> {{ medical_record.patient_name }}</p>
+        <p><strong>{{ 'lab_order.new.doctor'|trans }}</strong> {{ medical_record.doctor_name }}</p>
+        <p><strong>{{ 'lab_order.new.medical_record_id'|trans }}</strong> {{ medical_record.id }}</p>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/lab-orders/new?record_id={{ medical_record.id }}">
-            {{ forms.input('order_code', 'Код замовлення', old.order_code ?? null, 'text', 'Наприклад, Загальний аналіз крові', errors.order_code ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('notes', 'Примітки', old.notes ?? null, 'Додаткові примітки до замовлення', errors.notes ?? null) }}
+            {{ forms.input('order_code', 'lab_order.new.order_code'|trans, old.order_code ?? null, 'text', 'lab_order.new.order_code_placeholder'|trans, errors.order_code ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('notes', 'lab_order.new.notes'|trans, old.notes ?? null, 'lab_order.new.notes_placeholder'|trans, errors.notes ?? null) }}
 
-            {{ ui.button('Зберегти замовлення', 'primary', '', 'save') }}
-            <a href="/medical-records/show?id={{ medical_record.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('lab_order.new.save'|trans, 'primary', '', 'save') }}
+            <a href="/medical-records/show?id={{ medical_record.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'lab_order.new.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

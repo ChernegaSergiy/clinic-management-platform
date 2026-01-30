@@ -1,21 +1,21 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Список очікування - Клініка{% endblock %}
+{% block title %}{{ 'appointment.waitlist.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Список очікування</h2>
+        <h2 class="ui header">{{ 'appointment.waitlist.header'|trans }}</h2>
 
         <div class="ui divider"></div>
 
-        <h3 class="ui header">Додати до списку очікування</h3>
+        <h3 class="ui header">{{ 'appointment.waitlist.add_form_title'|trans }}</h3>
         <form class="ui form" action="/appointments/waitlist/add" method="POST">
             <div class="two fields">
                 <div class="field {% if errors.patient_id %}error{% endif %}">
-                    <label>Пацієнт</label>
+                    <label>{{ 'appointment.waitlist.patient_label'|trans }}</label>
                     <select class="ui search dropdown" name="patient_id">
-                        <option value="">Виберіть пацієнта</option>
+                        <option value="">{{ 'appointment.waitlist.patient_placeholder'|trans }}</option>
                         {% for id, name in patients %}
                             <option value="{{ id }}" {% if old.patient_id == id %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
@@ -23,9 +23,9 @@
                     {% if errors.patient_id %}<div class="ui red basic pointing label">{{ errors.patient_id | first }}</div>{% endif %}
                 </div>
                 <div class="field {% if errors.desired_doctor_id %}error{% endif %}">
-                    <label>Бажаний лікар (необов'язково)</label>
+                    <label>{{ 'appointment.waitlist.desired_doctor_label'|trans }}</label>
                     <select class="ui search dropdown" name="desired_doctor_id">
-                        <option value="">Виберіть лікаря</option>
+                        <option value="">{{ 'appointment.waitlist.desired_doctor_placeholder'|trans }}</option>
                         {% for id, name in doctors %}
                             <option value="{{ id }}" {% if old.desired_doctor_id == id %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
@@ -35,39 +35,39 @@
             </div>
             <div class="two fields">
                 <div class="field {% if errors.desired_start_time %}error{% endif %}">
-                    <label>Бажаний час початку (необов'язково)</label>
+                    <label>{{ 'appointment.waitlist.desired_start_time_label'|trans }}</label>
                     <input type="datetime-local" name="desired_start_time" value="{{ old.desired_start_time }}">
                     {% if errors.desired_start_time %}<div class="ui red basic pointing label">{{ errors.desired_start_time | first }}</div>{% endif %}
                 </div>
                 <div class="field {% if errors.desired_end_time %}error{% endif %}">
-                    <label>Бажаний час закінчення (необов'язково)</label>
+                    <label>{{ 'appointment.waitlist.desired_end_time_label'|trans }}</label>
                     <input type="datetime-local" name="desired_end_time" value="{{ old.desired_end_time }}">
                     {% if errors.desired_end_time %}<div class="ui red basic pointing label">{{ errors.desired_end_time | first }}</div>{% endif %}
                 </div>
             </div>
             <div class="field {% if errors.notes %}error{% endif %}">
-                <label>Примітки (необов'язково)</label>
+                <label>{{ 'appointment.waitlist.notes_label'|trans }}</label>
                 <textarea name="notes" rows="3">{{ old.notes }}</textarea>
                 {% if errors.notes %}<div class="ui red basic pointing label">{{ errors.notes | first }}</div>{% endif %}
             </div>
-            <button class="ui primary button" type="submit">Додати до списку</button>
+            <button class="ui primary button" type="submit">{{ 'appointment.waitlist.add_button'|trans }}</button>
         </form>
 
         <div class="ui divider"></div>
 
-        <h3 class="ui header">Записи в списку очікування</h3>
+        <h3 class="ui header">{{ 'appointment.waitlist.list_title'|trans }}</h3>
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Пацієнт</th>
-                    <th>Контакт</th>
-                    <th>Бажаний лікар</th>
-                    <th>Бажаний час</th>
-                    <th>Примітки</th>
-                    <th>Статус</th>
-                    <th>Дата створення</th>
-                    <th>Дії</th>
+                    <th>{{ 'appointment.waitlist.table.id'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.patient'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.contact'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.desired_doctor'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.desired_time'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.notes'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.status'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.created_at'|trans }}</th>
+                    <th>{{ 'appointment.waitlist.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,40 +77,40 @@
                         <td>
                             {{ entry.patient_name }}
                             {% if entry.patient_status == 'pending' %}
-                                <span class="ui tiny orange label">Публічна заявка</span>
+                                <span class="ui tiny orange label">{{ 'appointment.waitlist.public_request_label'|trans }}</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if entry.patient_status == 'pending' %}
                                 <div>
-                                    <i class="phone icon"></i> {{ entry.contact_phone ?: entry.patient_phone ?: 'Немає' }}
+                                    <i class="phone icon"></i> {{ entry.contact_phone ?: entry.patient_phone ?: 'appointment.waitlist.no_contact'|trans }}
                                 </div>
                                 <div>
-                                    <i class="mail icon"></i> {{ entry.contact_email ?: entry.patient_email ?: 'Немає' }}
+                                    <i class="mail icon"></i> {{ entry.contact_email ?: entry.patient_email ?: 'appointment.waitlist.no_contact'|trans }}
                                 </div>
                             {% else %}
-                                <span class="ui mini grey label">Існуючий пацієнт</span>
+                                <span class="ui mini grey label">{{ 'appointment.waitlist.existing_patient_label'|trans }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ entry.doctor_name ?: 'Будь-який' }}</td>
+                        <td>{{ entry.doctor_name ?: 'appointment.waitlist.any_doctor'|trans }}</td>
                         <td>
-                            {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}Будь-який{% endif %}
+                            {% if entry.desired_start_time %}{{ entry.desired_start_time|date('Y-m-d H:i') }}{% else %}{{ 'appointment.waitlist.any_time'|trans }}{% endif %}
                             {% if entry.desired_end_time %} - {{ entry.desired_end_time|date('H:i') }}{% endif %}
                         </td>
-                        <td>{{ entry.notes ?: 'Немає' }}</td>
+                        <td>{{ entry.notes ?: 'appointment.waitlist.no_notes'|trans }}</td>
                         <td>{{ entry.status }}</td>
                         <td>{{ entry.created_at|date('Y-m-d H:i') }}</td>
                         <td>
-                            <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">Виконати</a>
+                            <a href="/appointments/waitlist/fulfill?id={{ entry.id }}" class="ui green button">{{ 'appointment.waitlist.fulfill_button'|trans }}</a>
                             <form action="/appointments/waitlist/cancel" method="POST" style="display:inline;">
                                 <input type="hidden" name="id" value="{{ entry.id }}">
-                                <button type="submit" class="ui red button" onclick="return confirm('Ви впевнені, що хочете скасувати цю заявку?');">Скасувати</button>
+                                <button type="submit" class="ui red button" onclick="return confirm('{{ 'appointment.waitlist.confirm_cancel'|trans }}');">{{ 'appointment.waitlist.cancel_button'|trans }}</button>
                             </form>
                         </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="9" class="center aligned">Наразі немає записів у списку очікування.</td>
+                        <td colspan="9" class="center aligned">{{ 'appointment.waitlist.no_entries'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

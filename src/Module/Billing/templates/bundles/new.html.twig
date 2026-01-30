@@ -2,24 +2,24 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати новий пакет послуг - Клініка{% endblock %}
+{% block title %}{{ 'billing.bundles.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати новий пакет послуг</h2>
+        <h2 class="ui header">{{ 'billing.bundles.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/billing/bundles/new">
-            {{ forms.input('name', 'Назва пакету', old.name ?? '', 'text', 'Назва пакету послуг', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('description', 'Опис пакету', old.description ?? '', 'Детальний опис пакету послуг', errors.description ?? null) }}
-            {{ forms.input('price', 'Ціна пакету', old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
+            {{ forms.input('name', 'billing.bundles.new.name_label'|trans, old.name ?? '', 'text', 'billing.bundles.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'billing.bundles.new.description_label'|trans, old.description ?? '', 'billing.bundles.new.description_placeholder'|trans, errors.description ?? null) }}
+            {{ forms.input('price', 'billing.bundles.new.price_label'|trans, old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
             
             <div class="field {% if errors.services %}error{% endif %}">
-                <label>Послуги в пакеті</label>
+                <label>{{ 'billing.bundles.new.services_label'|trans }}</label>
                 <div class="ui fluid search multiple selection dropdown">
                     <input type="hidden" name="services[]" value="{{ old.services|json_encode|raw }}">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Виберіть послуги</div>
+                    <div class="default text">{{ 'billing.bundles.new.services_placeholder'|trans }}</div>
                     <div class="menu">
                         {% for service in services %}
                             <div class="item" data-value="{{ service.id }}">{{ service.name }} ({{ service.price | number_format(2) }})</div>
@@ -32,13 +32,13 @@
             <div class="field">
                 <div class="ui toggle checkbox">
                     <input type="checkbox" name="is_active" {% if old.is_active is defined and old.is_active %}checked{% else %}checked{% endif %} value="1">
-                    <label>Активний пакет</label>
+                    <label>{{ 'billing.bundles.new.is_active_label'|trans }}</label>
                 </div>
             </div>
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти пакет', 'primary', '', 'save') }}
-            <a href="/billing/bundles" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('billing.bundles.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/billing/bundles" class="ui button"><i class="arrow left icon"></i> {{ 'billing.bundles.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

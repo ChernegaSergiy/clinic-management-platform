@@ -2,20 +2,20 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Додати новий словник - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.dictionaries.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Додати новий словник</h2>
+        <h2 class="ui header">{{ 'admin.dictionaries.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/dictionaries/new">
-            {{ forms.input('name', 'Назва словника', old.name ?? '', 'text', 'Наприклад, Статуси записів', errors.name ?? null, {'required': 'required'}) }}
-            {{ forms.textarea('description', 'Опис словника', old.description ?? '', 'Детальний опис словника', errors.description ?? null) }}
-            {{ forms.input('type', 'Тип словника (необов\'язково)', old.type ?? '', 'text', 'Наприклад, appointment_status', errors.type ?? null) }}
+            {{ forms.input('name', 'admin.dictionaries.new.name'|trans, old.name ?? '', 'text', 'admin.dictionaries.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'admin.dictionaries.new.description'|trans, old.description ?? '', 'admin.dictionaries.new.description_placeholder'|trans, errors.description ?? null) }}
+            {{ forms.input('type', 'admin.dictionaries.new.type'|trans, old.type ?? '', 'text', 'admin.dictionaries.new.type_placeholder'|trans, errors.type ?? null) }}
 
-            {{ ui.button('Зберегти словник', 'primary', '', 'save') }}
-            <a href="/admin/dictionaries" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('admin.dictionaries.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/admin/dictionaries" class="ui button"><i class="arrow left icon"></i> {{ 'admin.dictionaries.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

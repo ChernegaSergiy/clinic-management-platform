@@ -1,64 +1,64 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Контракт #{{ contract.id }} - Клініка{% endblock %}
+{% block title %}{{ 'billing.contracts.show.title'|trans({'%id%': contract.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Деталі контракту #{{ contract.id }}</h2>
+        <h2 class="ui header">{{ 'billing.contracts.show.header'|trans({'%id%': contract.id}) }}</h2>
         <div class="ui divider"></div>
 
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td>ID</td>
+                    <td>{{ 'billing.contracts.show.table.id'|trans }}</td>
                     <td>{{ contract.id }}</td>
                 </tr>
                 <tr>
-                    <td>Назва</td>
+                    <td>{{ 'billing.contracts.show.table.title'|trans }}</td>
                     <td>{{ contract.title }}</td>
                 </tr>
                 <tr>
-                    <td>Опис</td>
+                    <td>{{ 'billing.contracts.show.table.description'|trans }}</td>
                     <td>{{ contract.description|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Дата початку</td>
+                    <td>{{ 'billing.contracts.show.table.start_date'|trans }}</td>
                     <td>{{ contract.start_date|date('Y-m-d') }}</td>
                 </tr>
                 <tr>
-                    <td>Дата закінчення</td>
-                    <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'Не вказано' }}</td>
+                    <td>{{ 'billing.contracts.show.table.end_date'|trans }}</td>
+                    <td>{{ contract.end_date ? contract.end_date|date('Y-m-d') : 'billing.contracts.not_specified'|trans }}</td>
                 </tr>
                 <tr>
-                    <td>Сторона А</td>
+                    <td>{{ 'billing.contracts.show.table.party_a'|trans }}</td>
                     <td>{{ contract.party_a|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Сторона Б</td>
+                    <td>{{ 'billing.contracts.show.table.party_b'|trans }}</td>
                     <td>{{ contract.party_b|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Статус</td>
+                    <td>{{ 'billing.contracts.show.table.status'|trans }}</td>
                     <td>{{ contract.status }}</td>
                 </tr>
                 <tr>
-                    <td>Файл контракту</td>
+                    <td>{{ 'billing.contracts.show.table.contract_file'|trans }}</td>
                     <td>
                         {% if contract.file_path %}
                             <a href="/billing/contracts/{{ contract.id }}/download" class="ui basic button">
-                                <i class="download icon"></i> Завантажити файл
+                                <i class="download icon"></i> {{ 'billing.contracts.show.download_file'|trans }}
                             </a>
                         {% else %}
-                            Немає файлу
+{{ 'billing.contracts.show.no_file'|trans }}
                         {% endif %}
                     </td>
                 </tr>
                 <tr>
-                    <td>Створено</td>
+                    <td>{{ 'billing.contracts.show.table.created_at'|trans }}</td>
                     <td>{{ contract.created_at|date('Y-m-d H:i') }}</td>
                 </tr>
                 <tr>
-                    <td>Оновлено</td>
+                    <td>{{ 'billing.contracts.show.table.updated_at'|trans }}</td>
                     <td>{{ contract.updated_at|date('Y-m-d H:i')|default('—') }}</td>
                 </tr>
             </tbody>
@@ -67,10 +67,10 @@
         <div class="ui divider"></div>
 
         <a href="/billing/contracts/edit?id={{ contract.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'billing.contracts.show.edit'|trans }}
         </a>
         <a href="/billing/contracts" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'billing.contracts.show.back'|trans }}
         </a>
     </div>
 {% endblock %}

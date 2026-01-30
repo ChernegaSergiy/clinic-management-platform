@@ -1,16 +1,16 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Страхові компанії - Клініка{% endblock %}
+{% block title %}{{ 'insurance.companies.list.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
         <div class="ui grid">
             <div class="eight wide column">
-                <h2 class="ui header">Страхові компанії</h2>
+                <h2 class="ui header">{{ 'insurance.companies.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
                 <a href="/insurance/companies/new" class="ui primary button">
-                    <i class="plus icon"></i> Додати компанію
+                    <i class="plus icon"></i> {{ 'insurance.companies.list.add_company'|trans }}
                 </a>
             </div>
         </div>
@@ -20,12 +20,12 @@
         <table class="ui celled unstackable table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Назва</th>
-                    <th>Контактна особа</th>
-                    <th>Телефон</th>
-                    <th>Email</th>
-                    <th>Дії</th>
+                    <th>{{ 'insurance.companies.list.table.id'|trans }}</th>
+                    <th>{{ 'insurance.companies.list.table.name'|trans }}</th>
+                    <th>{{ 'insurance.companies.list.table.contact_person'|trans }}</th>
+                    <th>{{ 'insurance.companies.list.table.phone'|trans }}</th>
+                    <th>{{ 'insurance.companies.list.table.email'|trans }}</th>
+                    <th>{{ 'insurance.companies.list.table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6" class="center aligned">Немає страхових компаній для відображення.</td>
+                        <td colspan="6" class="center aligned">{{ 'insurance.companies.list.no_companies'|trans }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

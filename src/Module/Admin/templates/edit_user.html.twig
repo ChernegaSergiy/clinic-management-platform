@@ -2,26 +2,26 @@
 {% import "components/forms.html.twig" as forms %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагувати користувача #{{ user.id }} - Адмін-панель{% endblock %}
+{% block title %}{{ 'admin.users.edit.page_title'|trans({'%id%': user.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагувати користувача #{{ user.id }}</h2>
+        <h2 class="ui header">{{ 'admin.users.edit.title'|trans({'%id%': user.id}) }}</h2>
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/users/edit?id={{ user.id }}">
             <div class="two fields">
-                {{ forms.input('first_name', 'Ім\'я', user.first_name, 'text', 'Ім\'я користувача', errors.first_name ?? null, {'required': 'required'}) }}
-                {{ forms.input('last_name', 'Прізвище', user.last_name, 'text', 'Прізвище користувача', errors.last_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('first_name', 'admin.users.new.first_name'|trans, user.first_name, 'text', 'admin.users.new.first_name_placeholder'|trans, errors.first_name ?? null, {'required': 'required'}) }}
+                {{ forms.input('last_name', 'admin.users.new.last_name'|trans, user.last_name, 'text', 'admin.users.new.last_name_placeholder'|trans, errors.last_name ?? null, {'required': 'required'}) }}
             </div>
-            {{ forms.input('email', 'Email', user.email, 'email', 'Email користувача', errors.email ?? null, {'required': 'required'}) }}
-            {{ forms.input('password', 'Новий пароль (залиште пустим, щоб не змінювати)', null, 'password', 'Новий пароль', errors.password ?? null) }}
-            {{ forms.select('role_id', 'Роль', roles, user.role_id, errors.role_id ?? null, {'required': 'required'}) }}
+            {{ forms.input('email', 'admin.users.new.email'|trans, user.email, 'email', 'admin.users.new.email_placeholder'|trans, errors.email ?? null, {'required': 'required'}) }}
+            {{ forms.input('password', 'admin.users.edit.new_password'|trans, null, 'password', 'admin.users.edit.new_password_placeholder'|trans, errors.password ?? null) }}
+            {{ forms.select('role_id', 'admin.users.new.role'|trans, roles, user.role_id, errors.role_id ?? null, {'required': 'required'}) }}
 
             <div class="ui divider"></div>
 
-            {{ ui.button('Зберегти зміни', 'primary', '', 'save') }}
-            <a href="/admin/users/show?id={{ user.id }}" class="ui button"><i class="arrow left icon"></i> Скасувати</a>
+            {{ ui.button('admin.users.edit.save'|trans, 'primary', '', 'save') }}
+            <a href="/admin/users/show?id={{ user.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.users.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

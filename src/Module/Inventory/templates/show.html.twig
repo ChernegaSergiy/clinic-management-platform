@@ -1,68 +1,68 @@
 {% extends "layouts/base.html.twig" %}
 
-{% block title %}Позиція складу #{{ item.id }} - Клініка{% endblock %}
+{% block title %}{{ 'inventory.show.title'|trans({'%id%': item.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Деталі позиції складу #{{ item.id }}</h2>
+        <h2 class="ui header">{{ 'inventory.show.title_full'|trans({'%id%': item.id}) }}</h2>
         <div class="ui divider"></div>
 
         <table class="ui unstackable definition table">
             <tbody>
                 <tr>
-                    <td>ID</td>
+                    <td>{{ 'inventory.show.table.id'|trans }}</td>
                     <td>{{ item.id }}</td>
                 </tr>
                 <tr>
-                    <td>Назва</td>
+                    <td>{{ 'inventory.show.table.name'|trans }}</td>
                     <td>{{ item.name }}</td>
                 </tr>
                 <tr>
-                    <td>Опис</td>
+                    <td>{{ 'inventory.show.table.description'|trans }}</td>
                     <td>{{ item.description|nl2br|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>INN</td>
+                    <td>{{ 'inventory.show.table.inn'|trans }}</td>
                     <td>{{ item.inn|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Номер партії</td>
+                    <td>{{ 'inventory.show.table.batch_number'|trans }}</td>
                     <td>{{ item.batch_number|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Термін придатності</td>
+                    <td>{{ 'inventory.show.table.expiry_date'|trans }}</td>
                     <td>{{ item.expiry_date }}</td>
                 </tr>
                 <tr>
-                    <td>Постачальник</td>
+                    <td>{{ 'inventory.show.table.supplier'|trans }}</td>
                     <td>{{ item.supplier|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Вартість (за одиницю)</td>
+                    <td>{{ 'inventory.show.table.cost'|trans }}</td>
                     <td>{{ item.cost|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Кількість</td>
+                    <td>{{ 'inventory.show.table.quantity'|trans }}</td>
                     <td>{{ item.quantity|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Мінімальний рівень запасу</td>
+                    <td>{{ 'inventory.show.table.min_stock_level'|trans }}</td>
                     <td>{{ item.min_stock_level|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Максимальний рівень запасу</td>
+                    <td>{{ 'inventory.show.table.max_stock_level'|trans }}</td>
                     <td>{{ item.max_stock_level|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Місце зберігання</td>
+                    <td>{{ 'inventory.show.table.location'|trans }}</td>
                     <td>{{ item.location|default('—') }}</td>
                 </tr>
                 <tr>
-                    <td>Створено</td>
+                    <td>{{ 'inventory.show.table.created_at'|trans }}</td>
                     <td>{{ item.created_at|date('Y-m-d H:i') }}</td>
                 </tr>
                 <tr>
-                    <td>Оновлено</td>
+                    <td>{{ 'inventory.show.table.updated_at'|trans }}</td>
                     <td>{{ item.updated_at|date('Y-m-d H:i') }}</td>
                 </tr>
             </tbody>
@@ -71,27 +71,27 @@
         <div class="ui divider"></div>
 
         <a href="/inventory/edit?id={{ item.id }}" class="ui primary button">
-            <i class="edit icon"></i> Редагувати
+            <i class="edit icon"></i> {{ 'inventory.show.edit'|trans }}
         </a>
         <a href="/inventory" class="ui button">
-            <i class="arrow left icon"></i> Повернутися до списку
+            <i class="arrow left icon"></i> {{ 'inventory.show.back'|trans }}
         </a>
     </div>
 
     <div class="ui segment">
-        <h3 class="ui header">Історія рухів</h3>
+        <h3 class="ui header">{{ 'inventory.show.movement_history'|trans }}</h3>
         {% if movementHistory is empty %}
-            <p>Немає записів історії рухів для цієї позиції.</p>
+            <p>{{ 'inventory.show.no_movements'|trans }}</p>
         {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
-                        <th>Тип руху</th>
-                        <th>Зміна кількості</th>
-                        <th>Нова кількість</th>
-                        <th>Причина</th>
-                        <th>Користувач</th>
-                        <th>Дата</th>
+                        <th>{{ 'inventory.show.movements_table.movement_type'|trans }}</th>
+                        <th>{{ 'inventory.show.movements_table.quantity_change'|trans }}</th>
+                        <th>{{ 'inventory.show.movements_table.new_quantity'|trans }}</th>
+                        <th>{{ 'inventory.show.movements_table.reason'|trans }}</th>
+                        <th>{{ 'inventory.show.movements_table.user'|trans }}</th>
+                        <th>{{ 'inventory.show.movements_table.date'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,8 +100,8 @@
                             <td>{{ movement.movement_type }}</td>
                             <td>{{ movement.quantity_change }}</td>
                             <td>{{ movement.new_quantity }}</td>
-                            <td>{{ movement.reason ?: 'Не вказано' }}</td>
-                            <td>{{ movement.user_name ?: 'Система' }}</td>
+                            <td>{{ movement.reason ?: 'inventory.show.movements_table.not_specified'|trans }}</td>
+                            <td>{{ movement.user_name ?: 'inventory.show.movements_table.system'|trans }}</td>
                             <td>{{ movement.created_at|date('Y-m-d H:i') }}</td>
                         </tr>
                     {% endfor %}

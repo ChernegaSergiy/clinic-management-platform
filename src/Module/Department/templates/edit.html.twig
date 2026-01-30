@@ -1,17 +1,17 @@
 {% extends "layouts/base.html.twig" %}
 {% import "components/ui.html.twig" as ui %}
 
-{% block title %}Редагування відділу #{{ department.id }} - Клініка{% endblock %}
+{% block title %}{{ 'department.edit.title'|trans({'%id%': department.id}) }}{% endblock %}
 
 {% block body %}
     <div class="ui segment">
-        <h2 class="ui header">Редагування відділу #{{ department.id }}</h2>
+        <h2 class="ui header">{{ 'department.edit.header'|trans({'%id%': department.id}) }}</h2>
         
         <div class="ui divider"></div>
         
         {% if errors is defined and errors is not empty %}
             <div class="ui error message">
-                <div class="header">Помилка валідації</div>
+                <div class="header">{{ 'department.new.validation_error'|trans }}</div>
                 <ul class="list">
                     {% for field, messages in errors %}
                         {% for message in messages %}
@@ -24,20 +24,20 @@
 
         <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/admin/departments/edit?id={{ department.id }}">
             <div class="field">
-                <label>Назва відділу *</label>
-                <input type="text" name="name" placeholder="напр. Терапевтичне відділення" 
+                <label>{{ 'department.new.name_label'|trans }} *</label>
+                <input type="text" name="name" placeholder="{{ 'department.new.name_placeholder'|trans }}" 
                        value="{{ department.name }}" required>
             </div>
 
             <div class="field">
-                <label>Опис</label>
-                <textarea name="description" rows="4" placeholder="Опис функцій відділення">{{ department.description }}</textarea>
+                <label>{{ 'department.new.description_label'|trans }}</label>
+                <textarea name="description" rows="4" placeholder="{{ 'department.new.description_placeholder'|trans }}">{{ department.description }}</textarea>
             </div>
 
             <div class="field">
-                <label>Батьківський відділ</label>
+                <label>{{ 'department.new.parent_label'|trans }}</label>
                 <select name="parent_id" class="ui dropdown">
-                    <option value="">Оберіть батьківський відділ (необов'язково)</option>
+                    <option value="">{{ 'department.new.parent_placeholder'|trans }}</option>
                     {% for dept in parentOptions %}
                         {% if dept.id != department.id %}
                             <option value="{{ dept.id }}" 
@@ -51,15 +51,15 @@
 
             <div class="two fields">
                 <div class="field">
-                    <label>Статус</label>
+                    <label>{{ 'department.new.status_label'|trans }}</label>
                     <select name="is_active" class="ui dropdown">
-                        <option value="1" {% if department.is_active %}selected{% endif %}>Активний</option>
-                        <option value="0" {% if not department.is_active %}selected{% endif %}>Неактивний</option>
+                        <option value="1" {% if department.is_active %}selected{% endif %}>{{ 'department.new.active'|trans }}</option>
+                        <option value="0" {% if not department.is_active %}selected{% endif %}>{{ 'department.new.inactive'|trans }}</option>
                     </select>
                 </div>
 
                 <div class="field">
-                    <label>Порядок сортування</label>
+                    <label>{{ 'department.new.sort_order_label'|trans }}</label>
                     <input type="number" name="sort_order" value="{{ department.sort_order }}" min="0">
                 </div>
             </div>
@@ -67,13 +67,13 @@
             <div class="ui divider"></div>
 
             <button type="submit" class="ui primary button">
-                <i class="save icon"></i> Зберегти зміни
+                <i class="save icon"></i> {{ 'department.edit.save_button'|trans }}
             </button>
             <a href="/admin/departments/show?id={{ department.id }}" class="ui button">
-                <i class="arrow left icon"></i> Скасувати
+                <i class="arrow left icon"></i> {{ 'department.edit.cancel_button'|trans }}
             </a>
             <a href="/admin/departments" class="ui button">
-                <i class="list icon"></i> До списку
+                <i class="list icon"></i> {{ 'department.edit.back_to_list'|trans }}
             </a>
         </form>
     </div>

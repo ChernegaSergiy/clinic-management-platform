@@ -20,6 +20,9 @@
     "require": {
         "twig/twig": "^3.22",
         "symfony/yaml": "^7.3",
+        "symfony/translation": "^7.0",
+        "symfony/twig-bridge": "^7.0",
+        "symfony/contracts": "^3.0",
         "vlucas/phpdotenv": "^5.6",
         "chillerlan/php-qrcode": "^5.0",
         "dompdf/dompdf": "^3.1",
@@ -32,7 +35,8 @@
         "league/oauth2-google": "^4.0",
         "league/oauth2-facebook": "^2.2",
         "league/oauth2-github": "^3.1",
-        "spomky-labs/otphp": "^11.3"
+        "spomky-labs/otphp": "^11.3",
+        "symfony/intl": "^7.4"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
