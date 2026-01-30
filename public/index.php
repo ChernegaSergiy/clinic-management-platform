@@ -1,5 +1,20 @@
 <?php
 
+$requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$resource = __DIR__ . $requestedPath;
+
+if (file_exists($resource)) {
+    // Якщо це директорія з індексним файлом (окрім кореневої public), дозволяємо серверу обробити її
+    if (is_dir($resource) && realpath($resource) !== __DIR__ && (file_exists($resource . '/index.php') || file_exists($resource . '/index.html'))) {
+        return false;
+    }
+
+    // Якщо це файл (і не цей самий скрипт), дозволяємо серверу обробити його
+    if (is_file($resource) && realpath($resource) !== __FILE__) {
+        return false;
+    }
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Controller\InstallController;
@@ -16,29 +31,6 @@ if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
     if (file_exists($envPath)) {
         Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
     }
-}
-
-$requestedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$staticFile = realpath(__DIR__ . $requestedPath);
-if ($staticFile && str_starts_with($staticFile, realpath(__DIR__)) && is_file($staticFile)) {
-    $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
-    $mimeMap = [
-        'css' => 'text/css',
-        'js' => 'application/javascript',
-        'png' => 'image/png',
-        'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'svg' => 'image/svg+xml',
-        'gif' => 'image/gif',
-        'ico' => 'image/x-icon',
-        'woff' => 'font/woff',
-        'woff2' => 'font/woff2',
-        'ttf' => 'font/ttf',
-    ];
-    $mime = $mimeMap[$ext] ?? mime_content_type($staticFile) ?: 'application/octet-stream';
-    header('Content-Type: ' . $mime);
-    readfile($staticFile);
-    exit;
 }
 
 if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
