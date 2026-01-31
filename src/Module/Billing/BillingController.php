@@ -30,20 +30,36 @@ class BillingController
     private ServiceRepository $serviceRepository;
     private ServiceBundleRepository $serviceBundleRepository;
     private InsuranceService $insuranceService;
+    private InsuranceCompanyRepository $insuranceCompanyRepository;
+    private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
+    private ClaimRepository $claimRepository;
 
-    public function __construct()
-    {
-        $this->invoiceRepository = new InvoiceRepository();
-        $this->patientRepository = new PatientRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->serviceRepository = new ServiceRepository();
-        $this->serviceBundleRepository = new ServiceBundleRepository();
+    public function __construct(
+        ?InvoiceRepository $invoiceRepository = null,
+        ?PatientRepository $patientRepository = null,
+        ?AppointmentRepository $appointmentRepository = null,
+        ?MedicalRecordRepository $medicalRecordRepository = null,
+        ?ServiceRepository $serviceRepository = null,
+        ?ServiceBundleRepository $serviceBundleRepository = null,
+        ?InsuranceService $insuranceService = null,
+        ?InsuranceCompanyRepository $insuranceCompanyRepository = null,
+        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null,
+        ?ClaimRepository $claimRepository = null
+    ) {
+        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
+        $this->serviceBundleRepository = $serviceBundleRepository ?? new ServiceBundleRepository();
+        $this->insuranceCompanyRepository = $insuranceCompanyRepository ?? new InsuranceCompanyRepository();
+        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository ?? new PatientInsurancePolicyRepository();
+        $this->claimRepository = $claimRepository ?? new ClaimRepository();
 
-        $this->insuranceService = new InsuranceService(
-            new InsuranceCompanyRepository(),
-            new PatientInsurancePolicyRepository(),
-            new ClaimRepository(),
+        $this->insuranceService = $insuranceService ?? new InsuranceService(
+            $this->insuranceCompanyRepository,
+            $this->patientInsurancePolicyRepository,
+            $this->claimRepository,
             $this->invoiceRepository
         );
     }
