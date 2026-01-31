@@ -2,8 +2,8 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -62,7 +62,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ':notes' => $data['notes'] ?? null,
             ':type' => $data['type'] ?? 'invoice',
         ]);
-        return (int)$this->pdo->lastInsertId();
+        $invoiceId = (int)$this->pdo->lastInsertId();
+        EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
+        return $invoiceId;
     }
 
     public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue): bool
@@ -99,6 +101,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        $oldInvoice = $this->findById($id);
+        if (!$oldInvoice) {
+            return false;
+        }
+
         $sql = "UPDATE invoices SET 
                     patient_id = :patient_id, 
                     appointment_id = :appointment_id, 
@@ -112,7 +119,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute(
+        $result = $stmt->execute(
             [
                 ':id' => $id,
                 ':patient_id' => $data['patient_id'],
@@ -127,7 +134,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ':type' => $data['type'] ?? 'invoice',
             ]
         );
-    }
+
+        if ($result) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
+        }
+
+        return $result;
 
     public function addPayment(
         int $invoiceId,
