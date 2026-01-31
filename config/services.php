@@ -97,6 +97,7 @@ return function (ContainerBuilder $container) {
     // LabOrder module
     $container->register(\App\Module\LabOrder\Repository\LabOrderRepository::class)->setPublic(true);
     $container->register(\App\Module\LabOrder\Repository\LabResourceRepository::class)->setPublic(true);
+    $container->register(\App\Module\Inventory\Repository\InventoryItemRepository::class)->setPublic(true);
     $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
     $container->register(\App\Module\LabOrder\Service\LabImportService::class)
         ->setPublic(true);
@@ -139,4 +140,43 @@ return function (ContainerBuilder $container) {
             new Reference(\App\Module\Room\Repository\RoomRepository::class),
         ])
         ->setPublic(true);
+
+    // Inventory
+    $container->register(\App\Module\Inventory\Repository\InventoryItemRepository::class)->setPublic(true);
+    $container->register(\App\Module\Inventory\InventoryController::class)
+        ->setArguments([
+            new Reference(\App\Module\Inventory\Repository\InventoryItemRepository::class),
+        ])->setPublic(true);
+
+    // Department
+    $container->register(\App\Module\Department\Repository\DepartmentRepository::class)->setPublic(true);
+    $container->register(\App\Module\Department\Repository\HrmRepository::class)->setPublic(true);
+    $container->register(\App\Module\Department\DepartmentController::class)
+        ->setArguments([
+            new Reference(\App\Module\Department\Repository\DepartmentRepository::class),
+            new Reference(\App\Module\Department\Repository\HrmRepository::class),
+        ])->setPublic(true);
+
+    // Room
+    $container->register(\App\Module\Room\RoomController::class)
+        ->setArguments([
+            new Reference(\App\Module\Room\Repository\RoomRepository::class),
+        ])->setPublic(true);
+
+    // Prescription
+    $container->register(\App\Module\Prescription\Repository\PrescriptionRepository::class)->setPublic(true);
+    $container->register(\App\Module\Prescription\PrescriptionController::class)
+        ->setArguments([
+            new Reference(\App\Module\Prescription\Repository\PrescriptionRepository::class),
+            new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+            new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Module\Inventory\Repository\InventoryItemRepository::class),
+        ])->setPublic(true);
+
+    // Insurance controller wired to InsuranceService
+    $container->register(\App\Module\Insurance\InsuranceController::class)
+        ->setArguments([
+            new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+        ])->setPublic(true);
 };
