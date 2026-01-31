@@ -17,11 +17,11 @@ class KpiController
     private InvoiceRepository $invoiceRepository;
     private AppointmentRepository $appointmentRepository;
 
-    public function __construct()
+    public function __construct(?KpiRepository $kpiRepository = null, ?InvoiceRepository $invoiceRepository = null, ?AppointmentRepository $appointmentRepository = null)
     {
-        $this->kpiRepository = new KpiRepository();
-        $this->invoiceRepository = new InvoiceRepository();
-        $this->appointmentRepository = new AppointmentRepository();
+        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
+        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
     }
 
     // --- KPI Definitions ---

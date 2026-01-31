@@ -16,11 +16,11 @@ class HrmController
     private UserRepository $userRepository;
     private DepartmentRepository $departmentRepository;
 
-    public function __construct()
+    public function __construct(?HrmRepository $hrmRepository = null, ?UserRepository $userRepository = null, ?DepartmentRepository $departmentRepository = null)
     {
-        $this->hrmRepository = new HrmRepository();
-        $this->userRepository = new UserRepository();
-        $this->departmentRepository = new DepartmentRepository();
+        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->departmentRepository = $departmentRepository ?? new DepartmentRepository();
     }
 
     public function index(): void
