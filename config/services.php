@@ -10,6 +10,10 @@ return function (ContainerBuilder $container) {
         ->setPublic(true);
 
     // Core services
+    // Event dispatcher
+    $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)
+        ->setPublic(true);
+
     $container->register(\App\Core\Service\TranslationService::class)
         ->setPublic(true);
 
