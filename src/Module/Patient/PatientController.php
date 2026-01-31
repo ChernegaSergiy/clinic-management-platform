@@ -13,6 +13,7 @@ use App\Module\Appointment\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
+use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use App\Module\Patient\Repository\PatientRepository;
@@ -31,18 +32,22 @@ class PatientController
         ?AppointmentRepository $appointmentRepository = null,
         ?InsuranceService $insuranceService = null,
         ?InsuranceCompanyRepository $insuranceCompanyRepository = null,
-        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null
+        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null,
+        ?ClaimRepository $claimRepository = null,
+        ?InvoiceRepository $invoiceRepository = null
     ) {
         $this->patientRepository = $patientRepository ?? new PatientRepository();
         $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
         $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
         $this->insuranceCompanyRepository = $insuranceCompanyRepository ?? new \App\Module\Insurance\Repository\InsuranceCompanyRepository();
         $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository ?? new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository();
+        $this->claimRepository = $claimRepository ?? new \App\Module\Insurance\Repository\ClaimRepository();
+        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
         $this->insuranceService = $insuranceService ?? new \App\Module\Insurance\Service\InsuranceService(
             $this->insuranceCompanyRepository,
             $this->patientInsurancePolicyRepository,
-            new \App\Module\Insurance\Repository\ClaimRepository(),
-            new InvoiceRepository()
+            $this->claimRepository,
+            $this->invoiceRepository
         );
     }
 
