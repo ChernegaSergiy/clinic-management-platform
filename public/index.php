@@ -25,6 +25,8 @@ use App\Core\Http\Router;
 use App\Core\Http\View;
 use App\Core\Module\ModuleLoader;
 use App\Core\Module\ModuleManager;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
     $envPath = __DIR__ . '/../.env';
@@ -47,6 +49,8 @@ if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
     }
 }
 session_start();
+
+$request = Request::createFromGlobals();
 
 $router = new Router();
 
@@ -79,26 +83,26 @@ $router->add('GET', '/install', [InstallController::class, 'check']);
 
 $installed = $_ENV['APP_INSTALLED'] ?? false;
 if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/install') {
-    header('Location: /install');
+    $response = new Response('', 302, ['Location' => '/install']);
+    $response->send();
     exit;
 }
 
 try {
-    $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+    $response = $router->dispatch($request);
+    $response->send();
 } catch (RedirectException $e) {
-    header('Location: ' . $e->getUrl());
-    exit;
+    $response = new Response('', 302, ['Location' => $e->getUrl()]);
+    $response->send();
 } catch (ExitException $e) {
-    http_response_code($e->getStatusCode());
-    if ($e->getExitMessage() !== '') {
-        echo $e->getExitMessage();
-    }
-    exit;
+    $response = new Response($e->getExitMessage(), $e->getStatusCode());
+    $response->send();
 } catch (\Throwable $e) {
-    http_response_code(500);
     $isDebug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
-    View::render('errors/error.html.twig', [
+    $content = View::render('errors/error.html.twig', [
         'message' => 'Щось пішло не так. Ми вже розбираємося.',
         'detail' => $isDebug ? $e->getMessage() : null,
     ]);
+    $response = new Response($content, 500);
+    $response->send();
 }
