@@ -2,8 +2,8 @@
 
 namespace App\Module\User\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -129,7 +129,7 @@ class UserRepository implements UserRepositoryInterface
         return $result === false ? null : $result;
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|false
     {
         $username = $data['username'] ?? $data['email'];
 
@@ -140,7 +140,7 @@ class UserRepository implements UserRepositoryInterface
 
         $passwordHash = !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
 
-        return $stmt->execute([
+        $result = $stmt->execute([
             ':first_name' => $data['first_name'],
             ':last_name' => $data['last_name'],
             ':email' => $data['email'],
@@ -148,10 +148,23 @@ class UserRepository implements UserRepositoryInterface
             ':password_hash' => $passwordHash,
             ':role_id' => $data['role_id'],
         ]);
+
+        if ($result) {
+            $id = (int)$this->pdo->lastInsertId();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'create', null, $data));
+            return $id;
+        }
+
+        return false;
     }
 
     public function update(int $id, array $data): bool
     {
+        $oldData = $this->findById($id);
+        if (!$oldData) {
+            return false;
+        }
+
         $sql = "UPDATE users SET 
                     first_name = :first_name, 
                     last_name = :last_name, 
@@ -175,13 +188,30 @@ class UserRepository implements UserRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute($params);
+        $result = $stmt->execute($params);
+
+        if ($result) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'update', $oldData, $data));
+        }
+
+        return $result;
     }
 
     public function delete(int $id): bool
     {
+        $oldData = $this->findById($id);
+        if (!$oldData) {
+            return false;
+        }
+
         $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $result = $stmt->execute([':id' => $id]);
+
+        if ($result) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'delete', $oldData, null));
+        }
+
+        return $result;
     }
 
     public function countUsers(): int
