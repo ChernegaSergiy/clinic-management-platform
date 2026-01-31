@@ -115,6 +115,7 @@ return function (ContainerBuilder $container) {
     $container->register(\App\Module\Appointment\Repository\AppointmentRepository::class)->setPublic(true);
     $container->register(\App\Module\Patient\Repository\PatientRepository::class)->setPublic(true);
     $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
+    $container->register(\App\Module\Billing\Repository\ServiceRepository::class)->setPublic(true);
     $container->register(\App\Module\Schedule\Repository\DoctorScheduleRepository::class)->setPublic(true);
     $container->register(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class)->setPublic(true);
     $container->register(\App\Module\Room\Repository\RoomRepository::class)->setPublic(true);
