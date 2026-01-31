@@ -47,9 +47,9 @@ class UniqueValidator extends ConstraintValidator
                     ->addViolation();
             }
         } catch (\PDOException $e) {
-            // In test environments or when database is not available,
-            // skip the unique validation rather than failing
-            if (getenv('APP_ENV') === 'testing' || str_contains($e->getMessage(), 'Access denied')) {
+            // In test environments, skip the unique validation rather than failing
+            // In production, rethrow the exception to surface database issues
+            if (getenv('APP_ENV') === 'testing') {
                 return;
             }
             throw $e;
