@@ -2,8 +2,8 @@
 
 namespace App\Module\MedicalRecord\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 {
@@ -116,6 +116,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
                 $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
             return $medicalRecordId;
         }
         return false;
@@ -123,6 +124,11 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        $oldMedicalRecord = $this->findById($id);
+        if (!$oldMedicalRecord) {
+            return false;
+        }
+
         $sql = "UPDATE medical_records SET
                     patient_id = :patient_id,
                     appointment_id = :appointment_id,
@@ -157,6 +163,7 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
                 $this->attachInterventionCodes($id, $data['intervention_codes']);
             }
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $id, 'update', $oldMedicalRecord, $data));
             return true;
         }
         return false;
