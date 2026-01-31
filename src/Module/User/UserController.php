@@ -8,6 +8,7 @@ use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Hrm\Repository\HrmRepository;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\User\Repository\UserRepository;
+use App\Core\Repository\SettingsRepository;
 
 class UserController
 {
@@ -15,13 +16,15 @@ class UserController
     private AuthConfigRepository $authConfigRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
     private HrmRepository $hrmRepository;
+    private SettingsRepository $settingsRepository;
 
-    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?UserOAuthIdentityRepository $userOAuthIdentityRepository = null, ?HrmRepository $hrmRepository = null)
+    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?UserOAuthIdentityRepository $userOAuthIdentityRepository = null, ?HrmRepository $hrmRepository = null, ?SettingsRepository $settingsRepository = null)
     {
         $this->userRepository = $userRepository ?? new UserRepository();
         $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
         $this->userOAuthIdentityRepository = $userOAuthIdentityRepository ?? new UserOAuthIdentityRepository();
         $this->hrmRepository = $hrmRepository ?? new HrmRepository();
+        $this->settingsRepository = $settingsRepository ?? new SettingsRepository();
     }
 
     public function profile(): void
@@ -44,8 +47,7 @@ class UserController
 
         $linkedProviders = $this->userOAuthIdentityRepository->findAllByUserId($user['id']);
 
-        $settingsRepository = new \App\Core\Repository\SettingsRepository();
-        $mfaPolicy = $settingsRepository->getMfaPolicy();
+        $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
         View::render('@modules/User/templates/profile.html.twig', [
             'user' => $user,

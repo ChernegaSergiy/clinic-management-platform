@@ -21,6 +21,7 @@ class OAuthController
         $this->authConfigRepository = new AuthConfigRepository();
         $this->userRepository = new UserRepository();
         $this->userOAuthIdentityRepository = new UserOAuthIdentityRepository();
+        // no deps currently; keep constructor for DI compatibility
     }
 
     public function redirect(string $provider): void
