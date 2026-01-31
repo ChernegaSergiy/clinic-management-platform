@@ -2,13 +2,9 @@
 
 namespace App\Module\User;
 
-use App\Database\Database;
-use App\Core\Auth\AuthGuard;
-use App\Core\Http\View;
-use App\Core\Validation\Validator;
-use App\Module\Admin\Repository\AuthConfigRepository;
-use App\Module\User\Repository\RoleRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Core\Event\EventDispatcherService;
+use App\Event\UserLoggedInEvent;
+use App\Event\UserLoggedOutEvent;
 
 class AuthController
 {
@@ -76,6 +72,7 @@ class AuthController
                     'role_id' => $user['role_id'],
                     'role_name' => $role['name'] ?? null,
                 ];
+                EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
                 $redirect = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
                 header('Location: ' . $redirect);
@@ -111,6 +108,7 @@ class AuthController
                 'role_id' => $user['role_id'],
                 'role_name' => $role['name'] ?? null,
             ];
+            EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
             $redirect = $_SESSION['intended_url'] ?? '/dashboard';
             unset($_SESSION['intended_url']);
             header('Location: ' . $redirect);
@@ -136,6 +134,11 @@ class AuthController
 
     public function logout(): void
     {
+        $userId = $_SESSION['user']['id'] ?? null;
+        $userEmail = $_SESSION['user']['email'] ?? null;
+        if ($userId && $userEmail) {
+            EventDispatcherService::getDispatcher()->dispatch(new UserLoggedOutEvent($userId, $userEmail));
+        }
         session_destroy();
         header('Location: /');
         exit();
