@@ -41,12 +41,20 @@ class Router
                 $handler = $route['handler'];
 
                 if (is_array($handler) && is_string($handler[0])) {
-                    if ($this->container && $this->container->has($handler[0])) {
-                        $controller = $this->container->get($handler[0]);
-                    } else {
-                        $controller = new $handler[0]();
+                    try {
+                        if ($this->container && $this->container->has($handler[0])) {
+                            $controller = $this->container->get($handler[0]);
+                        } else {
+                            $controller = new $handler[0]();
+                        }
+                        $callback = [$controller, $handler[1]];
+                    } catch (\Throwable $e) {
+                        $detail = $e->getMessage() . "\n\n" . $e->getTraceAsString();
+                        $content = View::render('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
+                        $response = new Response($content, 500);
+                        $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                        return $response;
                     }
-                    $callback = [$controller, $handler[1]];
                 } else {
                     $callback = $handler;
                 }
