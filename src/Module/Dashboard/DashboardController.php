@@ -11,9 +11,9 @@ class DashboardController
 {
     private DashboardService $dashboardService;
 
-    public function __construct()
+    public function __construct(?DashboardService $dashboardService = null)
     {
-        $this->dashboardService = new DashboardService();
+        $this->dashboardService = $dashboardService ?? new DashboardService();
     }
 
     public function index(): void

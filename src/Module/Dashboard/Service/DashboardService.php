@@ -19,14 +19,14 @@ class DashboardService
     private LabOrderRepository $labOrderRepository;
     private InventoryItemRepository $inventoryItemRepository;
 
-    public function __construct()
+    public function __construct(?KpiRepository $kpiRepository = null, ?InvoiceRepository $invoiceRepository = null, ?PatientRepository $patientRepository = null, ?AppointmentRepository $appointmentRepository = null, ?LabOrderRepository $labOrderRepository = null, ?InventoryItemRepository $inventoryItemRepository = null)
     {
-        $this->kpiRepository = new KpiRepository();
-        $this->invoiceRepository = new InvoiceRepository();
-        $this->patientRepository = new PatientRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->labOrderRepository = new LabOrderRepository();
-        $this->inventoryItemRepository = new InventoryItemRepository();
+        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
+        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
+        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
     }
 
     /**
