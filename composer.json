@@ -38,6 +38,9 @@
         "spomky-labs/otphp": "^11.3",
         "symfony/intl": "^7.4",
         "symfony/console": "^7.4",
+        "symfony/config": "^7.0",
+        "symfony/finder": "^7.0",
+        "symfony/event-dispatcher": "^7.0",
         "symfony/process": "^7.4",
         "symfony/http-foundation": "^7.4",
         "symfony/event-dispatcher": "^7.4"
