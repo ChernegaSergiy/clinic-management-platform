@@ -5,11 +5,11 @@
 [![PHPUnit](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml/badge.svg)](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml)
 [![Test Coverage](https://img.shields.io/codecov/c/github/ChernegaSergiy/clinic-management-platform?label=Test%20Coverage&logo=codecov)](https://app.codecov.io/gh/ChernegaSergiy/clinic-management-platform)
 
-This is an educational course project aimed at developing a three-tier web system for automating key processes of a modern clinic. The system is developed taking into account Ukrainian realities and regulatory requirements.
+A robust, three-tier healthcare information system designed to automate key workflows in modern medical centers. This platform is built with a modular architecture, prioritizing scalability, security, and compliance with national regulatory requirements.
 
 ## Overview
 
-The project covers the full patient service cycle: from appointment booking to maintaining electronic medical records, resource management, and reporting. The system architecture is modular, allowing flexible expansion of functionality.
+The platform provides a comprehensive suite of tools for healthcare providers, covering the full patient service cycle from initial appointment booking to the maintenance of detailed electronic medical records (EMR). Built with a modular three-tier architecture, the system integrates resource management, staff scheduling, and automated reporting into a single workspace, ensuring scalability and compliance with national regulatory standards. Currently, the project is undergoing a strategic transition to a Symfony-based component architecture to further enhance its flexibility and long-term maintainability.
 
 ## Technology Stack
 
