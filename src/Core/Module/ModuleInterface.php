@@ -5,6 +5,7 @@ namespace App\Core\Module;
 use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 interface ModuleInterface
 {
@@ -19,4 +20,6 @@ interface ModuleInterface
     public function registerPermissions(PermissionRegistry $registry): void;
 
     public function registerPolicies(PolicyRegistry $registry): void;
+
+    public function registerEventListeners(EventDispatcherInterface $dispatcher): void;
 }
