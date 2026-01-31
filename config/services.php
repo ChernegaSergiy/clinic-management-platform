@@ -21,7 +21,14 @@ return function (ContainerBuilder $container) {
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
 
-    // Example: register repositories (kept simple for now)
+    // Repositories
     $container->register(\App\Module\Patient\Repository\PatientRepository::class)
+        ->setArguments([new Reference('pdo'), new Reference(\App\Core\Service\AuditLogger::class)])
+        ->setPublic(true);
+
+    // Controllers (allow resolving controllers from container)
+    $container->register(\App\Controller\PageController::class)
+        ->setPublic(true);
+    $container->register(\App\Controller\InstallController::class)
         ->setPublic(true);
 };
