@@ -2,8 +2,8 @@
 
 namespace App\Module\Appointment\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class AppointmentRepository implements AppointmentRepositoryInterface
 {
@@ -43,7 +43,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        $result = $stmt->execute([
             ':patient_id' => $data['patient_id'],
             ':doctor_id' => $data['doctor_id'],
             ':start_time' => $data['start_time'],
@@ -53,6 +53,14 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':waitlist_id' => $data['waitlist_id'] ?? null,
             ':room_id' => $data['room_id'] ?? null,
         ]);
+
+        if ($result) {
+            $appointmentId = (int)$this->pdo->lastInsertId();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
+            return $appointmentId;
+        }
+
+        return false;
     }
 
     public function findById(int $id): ?array
@@ -76,6 +84,11 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        $oldAppointment = $this->findById($id);
+        if (!$oldAppointment) {
+            return false;
+        }
+
         $sql = "UPDATE appointments SET 
                     patient_id = :patient_id, 
                     doctor_id = :doctor_id, 
@@ -88,7 +101,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        $result = $stmt->execute([
             ':id' => $id,
             ':patient_id' => $data['patient_id'],
             ':doctor_id' => $data['doctor_id'],
@@ -98,12 +111,29 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             ':notes' => $data['notes'] ?? null,
             ':room_id' => $data['room_id'] ?? null,
         ]);
+
+        if ($result) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, $data));
+        }
+
+        return $result;
     }
 
     public function updateStatus(int $id, string $status): bool
     {
+        $oldAppointment = $this->findById($id);
+        if (!$oldAppointment) {
+            return false;
+        }
+
         $stmt = $this->pdo->prepare("UPDATE appointments SET status = :status WHERE id = :id");
-        return $stmt->execute([':status' => $status, ':id' => $id]);
+        $result = $stmt->execute([':status' => $status, ':id' => $id]);
+
+        if ($result && $oldAppointment['status'] !== $status) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, ['status' => $status]));
+        }
+
+        return $result;
     }
 
     public function findWaitlistById(int $id): ?array
