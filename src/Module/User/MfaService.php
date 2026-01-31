@@ -13,12 +13,11 @@ class MfaService
     private PDO $db;
     private QrCodeGenerator $qrCodeGenerator;
     private string $issuerName;
-
-    public function __construct()
+    public function __construct(?PDO $db = null, ?QrCodeGenerator $qrCodeGenerator = null, ?string $issuerName = null)
     {
-        $this->db = Database::getInstance();
-        $this->qrCodeGenerator = new QrCodeGenerator();
-        $this->issuerName = $_ENV['APP_NAME'] ?? 'Clinic';
+        $this->db = $db ?? Database::getInstance();
+        $this->qrCodeGenerator = $qrCodeGenerator ?? new QrCodeGenerator();
+        $this->issuerName = $issuerName ?? ($_ENV['APP_NAME'] ?? 'Clinic');
     }
 
     public function generateSecret(): string

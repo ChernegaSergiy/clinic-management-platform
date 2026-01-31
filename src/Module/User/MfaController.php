@@ -11,11 +11,10 @@ class MfaController
 {
     private MfaService $mfaService;
     private \App\Module\User\Repository\UserRepository $userRepository;
-
-    public function __construct()
+    public function __construct(?MfaService $mfaService = null, ?\App\Module\User\Repository\UserRepository $userRepository = null)
     {
-        $this->mfaService = new MfaService();
-        $this->userRepository = new UserRepository();
+        $this->mfaService = $mfaService ?? new MfaService();
+        $this->userRepository = $userRepository ?? new UserRepository();
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode): void
