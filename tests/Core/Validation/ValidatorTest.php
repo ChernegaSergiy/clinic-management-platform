@@ -206,6 +206,18 @@ class ValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testUniqueRuleValidatesZeroValue(): void
+    {
+        $this->mockStmt->expects($this->once())
+            ->method('execute')
+            ->with([':value' => '0']);
+        $this->mockStmt->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(0); // No duplicates found
+        $result = $this->validator->validate(['status' => '0'], ['status' => ['unique:users,status']]);
+        $this->assertTrue($result);
+    }
+
     public function testHasErrorsReturnsTrueWhenErrorsExist(): void
     {
         $this->validator->validate(['name' => ''], ['name' => ['required']]);
