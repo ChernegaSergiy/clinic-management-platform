@@ -14,10 +14,10 @@ class DepartmentController
     private DepartmentRepository $departmentRepository;
     private HrmRepository $hrmRepository;
 
-    public function __construct()
+    public function __construct(?DepartmentRepository $departmentRepository = null, ?HrmRepository $hrmRepository = null)
     {
-        $this->departmentRepository = new DepartmentRepository();
-        $this->hrmRepository = new HrmRepository();
+        $this->departmentRepository = $departmentRepository ?? new DepartmentRepository();
+        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
     }
 
     public function index(): void
