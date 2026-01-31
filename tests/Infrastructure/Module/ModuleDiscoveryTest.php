@@ -2,10 +2,10 @@
 
 namespace Tests\Infrastructure\Module;
 
-use App\Infrastructure\Module\ModuleDiscovery;
 use PHPUnit\Framework\TestCase;
+use App\Infrastructure\Module\ModuleDiscovery;
 
-final class ModuleDiscoveryTest extends TestCase
+class ModuleDiscoveryTest extends TestCase
 {
     private string $tempDir;
 
@@ -17,48 +17,45 @@ final class ModuleDiscoveryTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->deleteDir($this->tempDir);
-    }
-
-    public function testDiscoversValidModules(): void
-    {
-        mkdir($this->tempDir . '/User');
-        mkdir($this->tempDir . '/Billing');
-
-        $discovery = new ModuleDiscovery($this->tempDir);
-        $modules = $discovery->discover();
-
-        $this->assertContains('User', $modules);
-        $this->assertContains('Billing', $modules);
-    }
-
-    public function testIgnoresInvalidDirectories(): void
-    {
-        mkdir($this->tempDir . '/ValidModule');
-        file_put_contents($this->tempDir . '/not_a_module.txt', 'test');
-
-        $discovery = new ModuleDiscovery($this->tempDir);
-        $modules = $discovery->discover();
-
-        $this->assertContains('ValidModule', $modules);
-        $this->assertNotContains('not_a_module.txt', $modules);
+        if (is_dir($this->tempDir)) {
+            $this->deleteDir($this->tempDir);
+        }
     }
 
     private function deleteDir(string $dir): void
     {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        foreach (scandir($dir) as $item) {
+        $items = scandir($dir);
+        foreach ($items as $item) {
             if ($item === '.' || $item === '..') {
                 continue;
             }
-
-            $path = $dir . '/' . $item;
-            is_dir($path) ? $this->deleteDir($path) : unlink($path);
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                $this->deleteDir($path);
+            } else {
+                unlink($path);
+            }
         }
-
         rmdir($dir);
+    }
+
+    public function test_discovers_valid_modules(): void
+    {
+        mkdir($this->tempDir . '/User');
+        mkdir($this->tempDir . '/Billing');
+        $discovery = new ModuleDiscovery($this->tempDir);
+        $modules = $discovery->discover();
+        sort($modules);
+        $this->assertSame(['Billing', 'User'], $modules);
+    }
+
+    public function test_ignores_invalid_directories(): void
+    {
+        mkdir($this->tempDir . '/ValidModule');
+        touch($this->tempDir . '/not_a_dir.txt');
+        mkdir($this->tempDir . '/.hidden');
+        $discovery = new ModuleDiscovery($this->tempDir);
+        $modules = $discovery->discover();
+        $this->assertSame(['ValidModule'], $modules);
     }
 }
