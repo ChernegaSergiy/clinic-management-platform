@@ -1,6 +1,9 @@
 <?php
 
+
 namespace App\Core\Module;
+
+use App\Infrastructure\Module\ModuleDiscovery;
 
 class ModuleLoader
 {
@@ -44,25 +47,14 @@ class ModuleLoader
 
     public function discoverModules(): array
     {
+        $discovery = new ModuleDiscovery($this->modulesPath);
+        $moduleNames = $discovery->discover();
         $modules = [];
 
-        if (!is_dir($this->modulesPath)) {
-            return $modules;
-        }
-
-        $dirs = scandir($this->modulesPath);
-
-        foreach ($dirs as $dir) {
-            if ($dir === '.' || $dir === '..' || !is_dir($this->modulesPath . '/' . $dir)) {
-                continue;
-            }
-
-            $moduleName = $dir;
+        foreach ($moduleNames as $moduleName) {
             $moduleClass = $this->namespacePrefix . $moduleName . '\\' . $moduleName . 'Module';
-
             if (class_exists($moduleClass)) {
                 $reflection = new \ReflectionClass($moduleClass);
-
                 if ($reflection->implementsInterface(ModuleInterface::class)) {
                     $modules[$moduleName] = $moduleClass;
                 }
