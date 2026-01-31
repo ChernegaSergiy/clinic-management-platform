@@ -16,12 +16,12 @@ class UserController
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
     private HrmRepository $hrmRepository;
 
-    public function __construct()
+    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?UserOAuthIdentityRepository $userOAuthIdentityRepository = null, ?HrmRepository $hrmRepository = null)
     {
-        $this->userRepository = new UserRepository();
-        $this->authConfigRepository = new AuthConfigRepository();
-        $this->userOAuthIdentityRepository = new UserOAuthIdentityRepository();
-        $this->hrmRepository = new HrmRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
+        $this->userOAuthIdentityRepository = $userOAuthIdentityRepository ?? new UserOAuthIdentityRepository();
+        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
     }
 
     public function profile(): void
