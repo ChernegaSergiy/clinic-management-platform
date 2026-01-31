@@ -13,7 +13,7 @@ final class ModuleDiscovery
      */
     public function discover(): array
     {
-        $modulesPath = __DIR__ . '/../../../Module';
+        $modulesPath = __DIR__ . '/../../Module';
         $finder = new Finder();
         $modules = [];
 
