@@ -2,8 +2,8 @@
 
 namespace App\Module\Prescription\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class PrescriptionRepository
 {
@@ -73,7 +73,9 @@ class PrescriptionRepository
             }
 
             $this->pdo->commit();
-            return (int)$prescriptionId;
+            $prescriptionIdInt = (int)$prescriptionId;
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('prescription', $prescriptionIdInt, 'create', null, $data));
+            return $prescriptionIdInt;
         } catch (\PDOException $e) {
             $this->pdo->rollBack();
             // Log error
