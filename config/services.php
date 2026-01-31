@@ -43,6 +43,16 @@ return function (ContainerBuilder $container) {
         ->setPublic(true);
     $container->register(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class)
         ->setPublic(true);
+
+    // Core utility services
+    $container->register(\App\Core\Service\AttachmentService::class)
+        ->setArguments([new Reference('pdo')])
+        ->setPublic(true);
+    $container->register(\App\Core\Service\NotificationService::class)
+        ->setArguments([new Reference('pdo')])
+        ->setPublic(true);
+    $container->register(\App\Core\Service\QrCodeGenerator::class)
+        ->setPublic(true);
     $container->register(\App\Module\MedicalRecord\MedicalRecordController::class)
         ->setArguments([
             new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
@@ -81,6 +91,22 @@ return function (ContainerBuilder $container) {
             new Reference(\App\Module\Insurance\Service\InsuranceService::class),
             new Reference(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class),
             new Reference(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class),
+        ])
+        ->setPublic(true);
+    // LabOrder module
+    $container->register(\App\Module\LabOrder\Repository\LabOrderRepository::class)->setPublic(true);
+    $container->register(\App\Module\LabOrder\Repository\LabResourceRepository::class)->setPublic(true);
+    $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
+    $container->register(\App\Module\LabOrder\Service\LabImportService::class)
+        ->setPublic(true);
+    $container->register(\App\Module\LabOrder\LabOrderController::class)
+        ->setArguments([
+            new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+            new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Core\Service\NotificationService::class),
+            new Reference(\App\Core\Service\QrCodeGenerator::class),
+            new Reference(\App\Module\LabOrder\Service\LabImportService::class),
         ])
         ->setPublic(true);
 };

@@ -23,15 +23,20 @@ class LabOrderController
     private NotificationService $notificationService;
     private QrCodeGenerator $qrCodeGenerator;
     private LabImportService $labImportService;
-
-    public function __construct()
-    {
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->labOrderRepository = new LabOrderRepository();
-        $this->userRepository = new UserRepository();
-        $this->notificationService = new NotificationService();
-        $this->qrCodeGenerator = new QrCodeGenerator();
-        $this->labImportService = new LabImportService();
+    public function __construct(
+        ?MedicalRecordRepository $medicalRecordRepository = null,
+        ?LabOrderRepository $labOrderRepository = null,
+        ?UserRepository $userRepository = null,
+        ?NotificationService $notificationService = null,
+        ?QrCodeGenerator $qrCodeGenerator = null,
+        ?LabImportService $labImportService = null
+    ) {
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->notificationService = $notificationService ?? new NotificationService();
+        $this->qrCodeGenerator = $qrCodeGenerator ?? new QrCodeGenerator();
+        $this->labImportService = $labImportService ?? new LabImportService();
     }
 
     public function create(): void
