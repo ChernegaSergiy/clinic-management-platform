@@ -3,7 +3,7 @@
 namespace App\Event;
 
 use App\Core\Model\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class UserLoggedInEvent extends Event
 {
