@@ -3,6 +3,7 @@
 namespace App\Module\User;
 
 use App\Core\Event\EventDispatcherService;
+use App\Core\Http\View;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
 use App\Module\Admin\Repository\AuthConfigRepository;
