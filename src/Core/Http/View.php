@@ -14,29 +14,33 @@ class View
     private static array $twigGlobals = [];
     private static ?TranslationService $translationService = null;
 
+    public static function setTranslationService(TranslationService $service): void
+    {
+        self::$translationService = $service;
+        // Ensure globals are loaded so locale detection can use system settings
+        self::loadTwigGlobals();
+
+        $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
+        $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
+        $finalLocale = 'uk';
+        if (in_array($preferredLocale, $rawAvailableLocales)) {
+            $finalLocale = $preferredLocale;
+        }
+        self::$translationService->setLocale($finalLocale);
+    }
+
     public static function getTranslationService(): TranslationService
     {
         if (self::$translationService === null) {
             self::$translationService = new TranslationService();
-
-            // Ensure globals are loaded to get system_locale
+            // If setTranslationService wasn't used, preserve old behavior
             self::loadTwigGlobals();
-
-            // Determine initial locale preference
             $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
-
-            // Get actual available locales from the TranslationService instance
-            // Note: Calling getAvailableLocales() here on the instance is safe
-            // as the TranslationService is already initialized above.
             $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
-
-            // Validate preferredLocale against truly available locales
-            $finalLocale = 'uk'; // Default fallback
+            $finalLocale = 'uk';
             if (in_array($preferredLocale, $rawAvailableLocales)) {
                 $finalLocale = $preferredLocale;
             }
-            // If preferredLocale is not available, $finalLocale remains 'uk'
-
             self::$translationService->setLocale($finalLocale);
         }
         return self::$translationService;
