@@ -14,5 +14,6 @@ class ConsoleApplication extends Application
 
         // Register commands here
         $this->add(new CalculateKpisCommand());
+        $this->add(new MigrateCommand());
     }
 }
