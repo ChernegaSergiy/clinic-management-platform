@@ -31,4 +31,27 @@ return function (ContainerBuilder $container) {
         ->setPublic(true);
     $container->register(\App\Controller\InstallController::class)
         ->setPublic(true);
+
+    // MedicalRecord module services
+    $container->register(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class)
+        ->setPublic(true);
+    $container->register(\App\Module\Appointment\Repository\AppointmentRepository::class)
+        ->setPublic(true);
+    $container->register(\App\Module\LabOrder\Repository\LabOrderRepository::class)
+        ->setPublic(true);
+    $container->register(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class)
+        ->setPublic(true);
+    $container->register(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class)
+        ->setPublic(true);
+    $container->register(\App\Module\MedicalRecord\MedicalRecordController::class)
+        ->setArguments([
+            new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+            new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+            new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
+            new Reference(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class),
+            new Reference(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class),
+            new Reference(\App\Core\Service\AttachmentService::class),
+            new Reference(\App\Core\Service\AuditLogger::class),
+        ])
+        ->setPublic(true);
 };

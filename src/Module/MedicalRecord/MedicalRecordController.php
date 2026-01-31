@@ -24,15 +24,22 @@ class MedicalRecordController
     private AttachmentService $attachmentService;
     private AuditLogger $auditLogger;
 
-    public function __construct()
-    {
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->labOrderRepository = new LabOrderRepository();
-        $this->icdCodeRepository = new IcdCodeRepository();
-        $this->interventionCodeRepository = new InterventionCodeRepository();
-        $this->attachmentService = new AttachmentService();
-        $this->auditLogger = new AuditLogger();
+    public function __construct(
+        ?MedicalRecordRepository $medicalRecordRepository = null,
+        ?AppointmentRepository $appointmentRepository = null,
+        ?LabOrderRepository $labOrderRepository = null,
+        ?IcdCodeRepository $icdCodeRepository = null,
+        ?InterventionCodeRepository $interventionCodeRepository = null,
+        ?AttachmentService $attachmentService = null,
+        ?AuditLogger $auditLogger = null
+    ) {
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
+        $this->icdCodeRepository = $icdCodeRepository ?? new IcdCodeRepository();
+        $this->interventionCodeRepository = $interventionCodeRepository ?? new InterventionCodeRepository();
+        $this->attachmentService = $attachmentService ?? new AttachmentService();
+        $this->auditLogger = $auditLogger ?? new AuditLogger();
     }
 
     public function create(): void
