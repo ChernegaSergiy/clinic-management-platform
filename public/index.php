@@ -26,6 +26,9 @@ use App\Core\Http\View;
 use App\Core\Module\ModuleLoader;
 use App\Core\Module\ModuleManager;
 use App\Core\Event\EventDispatcherService;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
     $envPath = __DIR__ . '/../.env';
