@@ -67,7 +67,7 @@ Labels are assigned based on the type and intent of work:
 
 ## Commit Style
 
-We use a Conventional-Commits-inspired style with project-specific rules.
+We use a style inspired by [Conventional Commits](https://www.conventionalcommits.org/) with project-specific rules.
 
 **Format:** `type: Message` or `scope(type): Message`
 
