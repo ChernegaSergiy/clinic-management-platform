@@ -99,6 +99,8 @@ return function (ContainerBuilder $container) {
     $container->register(\App\Module\LabOrder\Repository\LabResourceRepository::class)->setPublic(true);
     $container->register(\App\Module\Inventory\Repository\InventoryItemRepository::class)->setPublic(true);
     $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
+    $container->register(\App\Module\User\Repository\RoleRepository::class)->setPublic(true);
+    $container->register(\App\Module\User\Repository\UserOAuthIdentityRepository::class)->setPublic(true);
     $container->register(\App\Module\LabOrder\Service\LabImportService::class)
         ->setPublic(true);
     $container->register(\App\Module\LabOrder\LabOrderController::class)
@@ -117,6 +119,7 @@ return function (ContainerBuilder $container) {
     $container->register(\App\Module\Patient\Repository\PatientRepository::class)->setPublic(true);
     $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
     $container->register(\App\Module\Billing\Repository\ServiceRepository::class)->setPublic(true);
+    $container->register(\App\Module\Billing\Repository\ServiceBundleRepository::class)->setPublic(true);
     $container->register(\App\Module\Schedule\Repository\DoctorScheduleRepository::class)->setPublic(true);
     $container->register(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class)->setPublic(true);
     $container->register(\App\Module\Room\Repository\RoomRepository::class)->setPublic(true);
@@ -136,6 +139,8 @@ return function (ContainerBuilder $container) {
             new Reference(\App\Module\User\Repository\UserRepository::class),
             new Reference(\App\Core\Service\NotificationService::class),
             new Reference(\App\Module\Schedule\Service\SchedulingService::class),
+            new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
+            new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
             new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
             new Reference(\App\Module\Room\Repository\RoomRepository::class),
         ])
@@ -148,6 +153,24 @@ return function (ContainerBuilder $container) {
             new Reference(\App\Module\Inventory\Repository\InventoryItemRepository::class),
         ])->setPublic(true);
 
+    // News
+    $container->register(\App\Module\News\Repository\NewsRepository::class)->setPublic(true);
+    $container->register(\App\Module\News\NewsController::class)
+        ->setArguments([
+            new Reference(\App\Module\News\Repository\NewsRepository::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+        ])->setPublic(true);
+
+    // Schedule
+    $container->register(\App\Module\Schedule\Repository\DoctorScheduleRepository::class)->setPublic(true);
+    $container->register(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class)->setPublic(true);
+    $container->register(\App\Module\Schedule\ScheduleController::class)
+        ->setArguments([
+            new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
+            new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+        ])->setPublic(true);
+
     // Department
     $container->register(\App\Module\Department\Repository\DepartmentRepository::class)->setPublic(true);
     $container->register(\App\Module\Department\Repository\HrmRepository::class)->setPublic(true);
@@ -158,9 +181,81 @@ return function (ContainerBuilder $container) {
         ])->setPublic(true);
 
     // Room
+    $container->register(\App\Module\Room\RoomRepository::class)->setPublic(true);
     $container->register(\App\Module\Room\RoomController::class)
         ->setArguments([
             new Reference(\App\Module\Room\Repository\RoomRepository::class),
+        ])->setPublic(true);
+
+    // Core repositories
+    $container->register(\App\Core\Repository\SettingsRepository::class)->setPublic(true);
+
+    // User services
+    $container->register(\App\Module\User\MfaService::class)
+        ->setArguments([
+            new Reference('pdo'),
+            new Reference(\App\Core\Service\QrCodeGenerator::class),
+        ])->setPublic(true);
+
+    // Admin
+    $container->register(\App\Module\Admin\Repository\AuthConfigRepository::class)->setPublic(true);
+    $container->register(\App\Module\Admin\Repository\BackupPolicyRepository::class)->setPublic(true);
+    $container->register(\App\Module\Admin\Repository\DictionaryRepository::class)->setPublic(true);
+    $container->register(\App\Module\Kpi\Repository\KpiRepository::class)->setPublic(true);
+    $container->register(\App\Module\Admin\AdminController::class)
+        ->setArguments([
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Module\User\Repository\RoleRepository::class),
+            new Reference(\App\Module\Admin\Repository\DictionaryRepository::class),
+            new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+            new Reference(\App\Module\Admin\Repository\BackupPolicyRepository::class),
+            new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+            new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+            new Reference(\App\Core\Repository\SettingsRepository::class),
+            new Reference(\App\Module\User\MfaService::class),
+        ])->setPublic(true);
+
+    // User controllers
+    $container->register(\App\Module\User\AuthController::class)
+        ->setArguments([
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+            new Reference(\App\Module\User\Repository\RoleRepository::class),
+            new Reference(\App\Module\User\MfaService::class),
+        ])->setPublic(true);
+    $container->register(\App\Module\User\MfaController::class)
+        ->setArguments([
+            new Reference(\App\Module\User\MfaService::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Core\Repository\SettingsRepository::class),
+            new Reference(\App\Module\User\Repository\RoleRepository::class),
+        ])->setPublic(true);
+    $container->register(\App\Module\User\OAuthController::class)
+        ->setArguments([
+            new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+            new Reference(\App\Module\User\Repository\UserRepository::class),
+            new Reference(\App\Module\User\Repository\UserOAuthIdentityRepository::class),
+        ])->setPublic(true);
+
+    // Kpi
+    $container->register(\App\Module\Kpi\Repository\KpiRepository::class)->setPublic(true);
+    $container->register(\App\Module\Kpi\KpiController::class)
+        ->setArguments([
+            new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+            new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+            new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+        ])->setPublic(true);
+
+    // Billing controller
+    $container->register(\App\Module\Billing\BillingController::class)
+        ->setArguments([
+            new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+            new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+            new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+            new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+            new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+            new Reference(\App\Module\Billing\Repository\ServiceBundleRepository::class),
+            new Reference(\App\Module\Insurance\Service\InsuranceService::class),
         ])->setPublic(true);
 
     // Prescription
@@ -178,5 +273,44 @@ return function (ContainerBuilder $container) {
     $container->register(\App\Module\Insurance\InsuranceController::class)
         ->setArguments([
             new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+        ])->setPublic(true);
+
+    // Notification
+    $container->register(\App\Module\Notification\Repository\NotificationRepository::class)->setPublic(true);
+    $container->register(\App\Module\Notification\NotificationController::class)
+        ->setArguments([
+            new Reference(\App\Module\Notification\Repository\NotificationRepository::class),
+        ])->setPublic(true);
+
+    // Kpi
+    $container->register(\App\Module\Kpi\Repository\KpiRepository::class)->setPublic(true);
+    $container->register(\App\Module\Kpi\KpiController::class)
+        ->setArguments([
+            new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+            new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+            new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+        ])->setPublic(true);
+
+    // Billing - Contract controller
+    $container->register(\App\Module\Billing\Repository\ContractRepository::class)->setPublic(true);
+    $container->register(\App\Module\Billing\ContractController::class)
+        ->setArguments([
+            new Reference(\App\Module\Billing\Repository\ContractRepository::class),
+        ])->setPublic(true);
+
+    // Dashboard
+    $container->register(\App\Module\Dashboard\Service\DashboardService::class)->setPublic(true);
+    $container->register(\App\Module\Dashboard\DashboardController::class)
+        ->setArguments([
+            new Reference(\App\Module\Dashboard\Service\DashboardService::class),
+        ])->setPublic(true);
+
+    // ClinicalReference
+    $container->register(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class)->setPublic(true);
+    $container->register(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class)->setPublic(true);
+    $container->register(\App\Module\ClinicalReference\ClinicalReferenceController::class)
+        ->setArguments([
+            new Reference(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class),
+            new Reference(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class),
         ])->setPublic(true);
 };
