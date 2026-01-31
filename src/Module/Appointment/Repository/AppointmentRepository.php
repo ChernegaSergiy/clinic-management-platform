@@ -2,8 +2,7 @@
 
 namespace App\Module\Appointment\Repository;
 
-use App\Core\Event\EventDispatcherService;
-use App\Event\EntityChangedEvent;
+use App\Event\PatientNotificationEvent;
 
 class AppointmentRepository implements AppointmentRepositoryInterface
 {
@@ -57,6 +56,12 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         if ($result) {
             $appointmentId = (int)$this->pdo->lastInsertId();
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
+            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+                $data['patient_id'],
+                'appointment_scheduled',
+                'Ваш прийом заплановано на ' . $data['start_time'],
+                ['appointment_id' => $appointmentId]
+            ));
             return $appointmentId;
         }
 

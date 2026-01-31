@@ -2,8 +2,7 @@
 
 namespace App\Module\Prescription\Repository;
 
-use App\Core\Event\EventDispatcherService;
-use App\Event\EntityChangedEvent;
+use App\Event\PatientNotificationEvent;
 
 class PrescriptionRepository
 {
@@ -75,6 +74,12 @@ class PrescriptionRepository
             $this->pdo->commit();
             $prescriptionIdInt = (int)$prescriptionId;
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('prescription', $prescriptionIdInt, 'create', null, $data));
+            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+                $data['patient_id'],
+                'prescription_created',
+                'Виписано новий рецепт',
+                ['prescription_id' => $prescriptionIdInt]
+            ));
             return $prescriptionIdInt;
         } catch (\PDOException $e) {
             $this->pdo->rollBack();

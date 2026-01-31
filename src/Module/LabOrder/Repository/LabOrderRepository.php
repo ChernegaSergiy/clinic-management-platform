@@ -2,8 +2,7 @@
 
 namespace App\Module\LabOrder\Repository;
 
-use App\Core\Event\EventDispatcherService;
-use App\Event\EntityChangedEvent;
+use App\Event\PatientNotificationEvent;
 
 class LabOrderRepository implements LabOrderRepositoryInterface
 {
@@ -47,6 +46,12 @@ class LabOrderRepository implements LabOrderRepositoryInterface
         if ($success) {
             $labOrderId = (int)$this->pdo->lastInsertId();
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
+            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+                $data['patient_id'],
+                'lab_order_created',
+                'Створено замовлення на лабораторні дослідження',
+                ['lab_order_id' => $labOrderId]
+            ));
             return $labOrderId;
         }
         return false;

@@ -2,8 +2,7 @@
 
 namespace App\Module\MedicalRecord\Repository;
 
-use App\Core\Event\EventDispatcherService;
-use App\Event\EntityChangedEvent;
+use App\Event\PatientNotificationEvent;
 
 class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 {
@@ -117,6 +116,12 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
                 $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
+            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+                $data['patient_id'],
+                'medical_record_created',
+                'Створено новий медичний запис після візиту',
+                ['medical_record_id' => $medicalRecordId]
+            ));
             return $medicalRecordId;
         }
         return false;

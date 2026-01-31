@@ -2,8 +2,7 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Core\Event\EventDispatcherService;
-use App\Event\EntityChangedEvent;
+use App\Event\PatientNotificationEvent;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -64,6 +63,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ]);
         $invoiceId = (int)$this->pdo->lastInsertId();
         EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
+        EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+            $data['patient_id'],
+            'invoice_created',
+            sprintf('Створено рахунок на суму %.2f грн', $data['amount']),
+            ['invoice_id' => $invoiceId]
+        ));
         return $invoiceId;
     }
 
