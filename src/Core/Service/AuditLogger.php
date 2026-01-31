@@ -9,9 +9,9 @@ class AuditLogger
 {
     private PDO $pdo;
 
-    public function __construct()
+    public function __construct(?PDO $pdo = null)
     {
-        $this->pdo = Database::getInstance();
+        $this->pdo = $pdo ?? Database::getInstance();
     }
 
     public function log(string $entityType, int $entityId, string $action, ?string $oldValue = null, ?string $newValue = null, ?int $userId = null): bool
