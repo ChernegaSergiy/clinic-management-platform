@@ -12,10 +12,10 @@ class PrescriptionPolicy implements Policy
     private PrescriptionRepository $prescriptionRepository;
     private AppointmentRepository $appointmentRepository;
 
-    public function __construct()
+    public function __construct(?PrescriptionRepository $prescriptionRepository = null, ?AppointmentRepository $appointmentRepository = null)
     {
-        $this->prescriptionRepository = new PrescriptionRepository();
-        $this->appointmentRepository = new AppointmentRepository();
+        $this->prescriptionRepository = $prescriptionRepository ?? new PrescriptionRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
     }
 
     public function view(User $user, array $context): bool
