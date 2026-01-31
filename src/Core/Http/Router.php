@@ -40,11 +40,17 @@ class Router
                 }
 
                 ob_start();
-                call_user_func_array($callback, $params);
-                $content = ob_get_clean();
+                $result = call_user_func_array($callback, $params);
+                $output = ob_get_clean();
 
-                $response = new Response($content);
-                $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                if (is_array($result)) {
+                    $response = new Response(json_encode($result));
+                    $response->headers->set('Content-Type', 'application/json');
+                } else {
+                    $content = $output ?: $result;
+                    $response = new Response($content);
+                    $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                }
                 return $response;
             }
         }
