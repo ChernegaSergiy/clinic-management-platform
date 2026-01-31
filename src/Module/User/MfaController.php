@@ -11,10 +11,18 @@ class MfaController
 {
     private MfaService $mfaService;
     private \App\Module\User\Repository\UserRepository $userRepository;
-    public function __construct(?MfaService $mfaService = null, ?\App\Module\User\Repository\UserRepository $userRepository = null)
-    {
+    private \App\Core\Repository\SettingsRepository $settingsRepository;
+    private \App\Module\User\Repository\RoleRepository $roleRepository;
+    public function __construct(
+        ?MfaService $mfaService = null,
+        ?\App\Module\User\Repository\UserRepository $userRepository = null,
+        ?\App\Core\Repository\SettingsRepository $settingsRepository = null,
+        ?\App\Module\User\Repository\RoleRepository $roleRepository = null
+    ) {
         $this->mfaService = $mfaService ?? new MfaService();
         $this->userRepository = $userRepository ?? new UserRepository();
+        $this->settingsRepository = $settingsRepository ?? new \App\Core\Repository\SettingsRepository();
+        $this->roleRepository = $roleRepository ?? new \App\Module\User\Repository\RoleRepository();
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode): void
@@ -51,8 +59,7 @@ class MfaController
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
 
-            $settingsRepository = new \App\Core\Repository\SettingsRepository();
-            $mfaPolicy = $settingsRepository->getMfaPolicy();
+            $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
             if ($mfaPolicy === 'disabled') {
                 $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
@@ -210,8 +217,7 @@ class MfaController
         if (isset($_SESSION['user'])) {
             AuthGuard::check();
 
-            $settingsRepository = new \App\Core\Repository\SettingsRepository();
-            $mfaPolicy = $settingsRepository->getMfaPolicy();
+            $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
             if ($mfaPolicy === 'disabled') {
                 $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
@@ -264,8 +270,7 @@ class MfaController
                 } else {
                     MfaGuard::clearRequired();
                     $user = $this->userRepository->findById($userId);
-                    $roleRepository = new \App\Module\User\Repository\RoleRepository();
-                    $role = $roleRepository->findById((int)$user['role_id']);
+                    $role = $this->roleRepository->findById((int)$user['role_id']);
 
                     $_SESSION['user'] = [
                         'id' => $user['id'],
@@ -318,8 +323,7 @@ class MfaController
                 } else {
                     MfaGuard::clearRequired();
                     $user = $this->userRepository->findById($userId);
-                    $roleRepository = new \App\Module\User\Repository\RoleRepository();
-                    $role = $roleRepository->findById((int)$user['role_id']);
+                    $role = $this->roleRepository->findById((int)$user['role_id']);
 
                     $_SESSION['user'] = [
                         'id' => $user['id'],
@@ -389,8 +393,7 @@ class MfaController
                 MfaGuard::clearRequired();
 
                 $user = $this->userRepository->findById($userId);
-                $roleRepository = new \App\Module\User\Repository\RoleRepository();
-                $role = $roleRepository->findById((int)$user['role_id']);
+                $role = $this->roleRepository->findById((int)$user['role_id']);
 
                 $_SESSION['user'] = [
                     'id' => $user['id'],
@@ -436,8 +439,7 @@ class MfaController
                 MfaGuard::clearRequired();
 
                 $user = $this->userRepository->findById($userId);
-                $roleRepository = new \App\Module\User\Repository\RoleRepository();
-                $role = $roleRepository->findById((int)$user['role_id']);
+                $role = $this->roleRepository->findById((int)$user['role_id']);
 
                 $_SESSION['user'] = [
                     'id' => $user['id'],
@@ -534,8 +536,7 @@ class MfaController
             MfaGuard::clearRequired();
 
             $user = $this->userRepository->findById($userId);
-            $roleRepository = new \App\Module\User\Repository\RoleRepository();
-            $role = $roleRepository->findById((int)$user['role_id']);
+            $role = $this->roleRepository->findById((int)$user['role_id']);
 
             $_SESSION['user'] = [
                 'id' => $user['id'],

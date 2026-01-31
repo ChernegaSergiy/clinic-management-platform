@@ -10,6 +10,7 @@ use App\Event\UserLoggedOutEvent;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\User\Repository\RoleRepository;
 use App\Module\User\Repository\UserRepository;
+use App\Module\User\OAuthController;
 
 class AuthController
 {
@@ -17,13 +18,17 @@ class AuthController
     private AuthConfigRepository $authConfigRepository;
     private RoleRepository $roleRepository;
     private ?MfaService $mfaService = null;
+    private OAuthController $oauthController;
+    private \App\Core\Repository\SettingsRepository $settingsRepository;
 
-    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?RoleRepository $roleRepository = null, ?MfaService $mfaService = null)
+    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?RoleRepository $roleRepository = null, ?MfaService $mfaService = null, ?\App\Core\Repository\SettingsRepository $settingsRepository = null, ?OAuthController $oauthController = null)
     {
         $this->userRepository = $userRepository ?? new UserRepository();
         $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
         $this->roleRepository = $roleRepository ?? new RoleRepository();
         $this->mfaService = $mfaService ?? new MfaService();
+        $this->settingsRepository = $settingsRepository ?? new \App\Core\Repository\SettingsRepository();
+        $this->oauthController = $oauthController ?? new OAuthController();
     }
 
     public function showLoginForm(): void
@@ -66,9 +71,8 @@ class AuthController
 
         if ($user && password_verify($password, $user['password_hash'])) {
             $mfaService = $this->mfaService ?? new MfaService();
-            $settingsRepository = new \App\Core\Repository\SettingsRepository();
-            $mfaPolicy = $settingsRepository->getMfaPolicy();
-            $mfaForceRoles = $settingsRepository->getMfaForceRoles();
+            $mfaPolicy = $this->settingsRepository->getMfaPolicy();
+            $mfaForceRoles = $this->settingsRepository->getMfaForceRoles();
 
             if ($mfaPolicy === 'disabled') {
                 $_SESSION['user'] = [
@@ -136,7 +140,7 @@ class AuthController
      */
     public function redirectToProvider(string $provider): void
     {
-        (new OAuthController())->redirect($provider);
+        $this->oauthController->redirect($provider);
     }
 
     public function logout(): void
