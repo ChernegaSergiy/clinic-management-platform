@@ -25,9 +25,7 @@ use App\Core\Http\Router;
 use App\Core\Http\View;
 use App\Core\Module\ModuleLoader;
 use App\Core\Module\ModuleManager;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use App\Core\Event\EventDispatcherService;
 
 if (!isset($_ENV['APP_BASE_URL']) || empty($_ENV['APP_BASE_URL'])) {
     $envPath = __DIR__ . '/../.env';
@@ -68,6 +66,7 @@ $moduleManager->bootstrapAll();
 $moduleManager->registerPermissions($permissionRegistry);
 $moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerEventListeners($eventDispatcher);
+EventDispatcherService::setDispatcher($eventDispatcher);
 $moduleManager->registerRoutes($router);
 
 \App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
