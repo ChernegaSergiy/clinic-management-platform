@@ -1,8 +1,8 @@
 # Clinic Management Platform
 
-![PHPStan](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpstan.yml/badge.svg)
-![PHPCS](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpcs.yml/badge.svg)
-![PHPUnit](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml/badge.svg)
+[![PHPStan](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpstan.yml)
+[![PHPCS](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpcs.yml/badge.svg)](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpcs.yml)
+[![PHPUnit](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml/badge.svg)](https://github.com/ChernegaSergiy/clinic-management-platform/actions/workflows/phpunit.yml)
 [![Test Coverage](https://img.shields.io/codecov/c/github/ChernegaSergiy/clinic-management-platform?label=Test%20Coverage&logo=codecov)](https://app.codecov.io/gh/ChernegaSergiy/clinic-management-platform)
 
 This is an educational course project aimed at developing a three-tier web system for automating key processes of a modern clinic. The system is developed taking into account Ukrainian realities and regulatory requirements.
