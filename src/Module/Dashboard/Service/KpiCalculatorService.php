@@ -17,13 +17,13 @@ class KpiCalculatorService
     private UserRepository $userRepository;
     private MedicalRecordRepository $medicalRecordRepository;
 
-    public function __construct()
+    public function __construct(?KpiRepository $kpiRepository = null, ?AppointmentRepository $appointmentRepository = null, ?InvoiceRepository $invoiceRepository = null, ?UserRepository $userRepository = null, ?MedicalRecordRepository $medicalRecordRepository = null)
     {
-        $this->kpiRepository = new KpiRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->invoiceRepository = new InvoiceRepository();
-        $this->userRepository = new UserRepository();
-        $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
     }
 
     public function calculateAndStoreAll(?string $forDate = null): void
