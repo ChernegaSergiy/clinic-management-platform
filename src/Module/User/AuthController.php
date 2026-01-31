@@ -5,6 +5,9 @@ namespace App\Module\User;
 use App\Core\Event\EventDispatcherService;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
+use App\Module\Admin\Repository\AuthConfigRepository;
+use App\Module\User\Repository\RoleRepository;
+use App\Module\User\Repository\UserRepository;
 
 class AuthController
 {

@@ -145,6 +145,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
 
         return $result;
+    }
 
     public function addPayment(
         int $invoiceId,
