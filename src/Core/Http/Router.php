@@ -2,6 +2,7 @@
 
 namespace App\Core\Http;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Core\Http\View;
@@ -9,6 +10,12 @@ use App\Core\Http\View;
 class Router
 {
     private array $routes = [];
+    private ?ContainerInterface $container;
+
+    public function __construct(?ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     public function add(string $method, string $path, callable|array $handler): void
     {
@@ -34,7 +41,11 @@ class Router
                 $handler = $route['handler'];
 
                 if (is_array($handler) && is_string($handler[0])) {
-                    $controller = new $handler[0]();
+                    if ($this->container && $this->container->has($handler[0])) {
+                        $controller = $this->container->get($handler[0]);
+                    } else {
+                        $controller = new $handler[0]();
+                    }
                     $callback = [$controller, $handler[1]];
                 } else {
                     $callback = $handler;
