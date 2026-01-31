@@ -43,11 +43,15 @@ class Router
                 call_user_func_array($callback, $params);
                 $content = ob_get_clean();
 
-                return new Response($content);
+                $response = new Response($content);
+                $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                return $response;
             }
         }
 
         $content = View::render('errors/error.html.twig', ['message' => '404 Not Found']);
-        return new Response($content, 404);
+        $response = new Response($content, 404);
+        $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+        return $response;
     }
 }
