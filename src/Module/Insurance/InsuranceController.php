@@ -16,9 +16,9 @@ class InsuranceController
 {
     private InsuranceService $insuranceService;
 
-    public function __construct()
+    public function __construct(?InsuranceService $insuranceService = null)
     {
-        $this->insuranceService = new InsuranceService(
+        $this->insuranceService = $insuranceService ?? new InsuranceService(
             new \App\Module\Insurance\Repository\InsuranceCompanyRepository(),
             new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository(),
             new \App\Module\Insurance\Repository\ClaimRepository(),
