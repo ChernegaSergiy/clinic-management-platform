@@ -2,9 +2,8 @@
 
 namespace App\Module\Patient\Repository;
 
-use App\Core\Service\AuditLogger;
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class PatientRepository implements PatientRepositoryInterface
 {
@@ -111,7 +110,9 @@ class PatientRepository implements PatientRepositoryInterface
             );
 
             if ($success) {
-                return (int)$this->pdo->lastInsertId();
+                $id = (int)$this->pdo->lastInsertId();
+                EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'create', null, $data));
+                return $id;
             }
             return false;
 
@@ -229,6 +230,10 @@ class PatientRepository implements PatientRepositoryInterface
             $auditLogger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
         }
 
+        if ($success) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, $data));
+        }
+
         return $success;
     }
 
@@ -254,6 +259,7 @@ class PatientRepository implements PatientRepositoryInterface
         if ($success && $oldStatus !== $status) {
             $auditLogger = new AuditLogger();
             $auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, ['status' => $status]));
         }
         return $success;
     }
