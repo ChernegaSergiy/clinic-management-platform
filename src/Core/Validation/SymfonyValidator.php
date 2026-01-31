@@ -10,10 +10,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SymfonyValidator
 {
     private ValidatorInterface $validator;
+    private \PDO $pdo;
     private array $errors = [];
 
-    public function __construct()
+    public function __construct(\PDO $pdo)
     {
+        $this->pdo = $pdo;
         $this->validator = Validation::createValidator();
     }
 
@@ -90,7 +92,7 @@ class SymfonyValidator
         $ignoreId = $params[2] ?? null;
 
         try {
-            $pdo = Database::getInstance();
+            $pdo = $this->pdo;
             $sql = "SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` = :value";
             $queryParams = [':value' => $value];
 
@@ -106,10 +108,7 @@ class SymfonyValidator
                 $this->errors[$field][] = "Значення поля '{$field}' вже існує.";
             }
         } catch (\PDOException $e) {
-            // In test environments, skip database validation
-            if (getenv('APP_ENV') === 'testing') {
-                return;
-            }
+            // In testing environment, re-throw the exception for proper testing
             throw $e;
         }
     }
