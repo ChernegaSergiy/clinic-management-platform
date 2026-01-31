@@ -16,12 +16,14 @@ class AuthController
     private UserRepository $userRepository;
     private AuthConfigRepository $authConfigRepository;
     private RoleRepository $roleRepository;
+    private ?MfaService $mfaService = null;
 
-    public function __construct()
+    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?RoleRepository $roleRepository = null, ?MfaService $mfaService = null)
     {
-        $this->userRepository = new UserRepository();
-        $this->authConfigRepository = new AuthConfigRepository();
-        $this->roleRepository = new RoleRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
+        $this->roleRepository = $roleRepository ?? new RoleRepository();
+        $this->mfaService = $mfaService ?? new MfaService();
     }
 
     public function showLoginForm(): void
@@ -63,7 +65,7 @@ class AuthController
         $role = $user ? $this->roleRepository->findById((int)$user['role_id']) : null;
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            $mfaService = new MfaService();
+            $mfaService = $this->mfaService ?? new MfaService();
             $settingsRepository = new \App\Core\Repository\SettingsRepository();
             $mfaPolicy = $settingsRepository->getMfaPolicy();
             $mfaForceRoles = $settingsRepository->getMfaForceRoles();
