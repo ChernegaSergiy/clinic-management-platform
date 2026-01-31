@@ -3,6 +3,8 @@
 namespace App\Module\LabOrder\Repository;
 
 use App\Event\PatientNotificationEvent;
+use App\Database\Database;
+use PDO;
 
 class LabOrderRepository implements LabOrderRepositoryInterface
 {

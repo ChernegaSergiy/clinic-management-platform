@@ -3,6 +3,8 @@
 namespace App\Module\MedicalRecord\Repository;
 
 use App\Event\PatientNotificationEvent;
+use App\Database\Database;
+use PDO;
 
 class MedicalRecordRepository implements MedicalRecordRepositoryInterface
 {

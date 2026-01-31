@@ -3,6 +3,8 @@
 namespace App\Module\Appointment\Repository;
 
 use App\Event\PatientNotificationEvent;
+use App\Database\Database;
+use PDO;
 
 class AppointmentRepository implements AppointmentRepositoryInterface
 {

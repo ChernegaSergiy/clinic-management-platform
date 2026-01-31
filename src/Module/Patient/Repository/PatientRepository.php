@@ -4,6 +4,8 @@ namespace App\Module\Patient\Repository;
 
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
+use App\Database\Database;
+use PDO;
 
 class PatientRepository implements PatientRepositoryInterface
 {
