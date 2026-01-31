@@ -87,7 +87,7 @@ We use a style inspired by [Conventional Commits](https://www.conventionalcommit
 
 ```
 feat: Add patient intake form
-auth(fix): Resolve session regeneration bug
+fix(auth): Resolve session regeneration bug
 docs: Add instructions for local setup
 ```
 
