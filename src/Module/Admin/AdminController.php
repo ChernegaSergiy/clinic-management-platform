@@ -25,17 +25,28 @@ class AdminController
     private KpiRepository $kpiRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
+    private \App\Module\User\MfaService $mfaService;
 
-    public function __construct()
-    {
-        $this->userRepository = new UserRepository();
-        $this->roleRepository = new RoleRepository();
-        $this->dictionaryRepository = new DictionaryRepository();
-        $this->authConfigRepository = new AuthConfigRepository();
-        $this->backupPolicyRepository = new BackupPolicyRepository();
-        $this->kpiRepository = new KpiRepository();
-        $this->serviceRepository = new ServiceRepository();
-        $this->settingsRepository = new SettingsRepository();
+    public function __construct(
+        ?UserRepository $userRepository = null,
+        ?RoleRepository $roleRepository = null,
+        ?DictionaryRepository $dictionaryRepository = null,
+        ?AuthConfigRepository $authConfigRepository = null,
+        ?BackupPolicyRepository $backupPolicyRepository = null,
+        ?KpiRepository $kpiRepository = null,
+        ?ServiceRepository $serviceRepository = null,
+        ?SettingsRepository $settingsRepository = null,
+        ?\App\Module\User\MfaService $mfaService = null
+    ) {
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->roleRepository = $roleRepository ?? new RoleRepository();
+        $this->dictionaryRepository = $dictionaryRepository ?? new DictionaryRepository();
+        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
+        $this->backupPolicyRepository = $backupPolicyRepository ?? new BackupPolicyRepository();
+        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
+        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
+        $this->settingsRepository = $settingsRepository ?? new SettingsRepository();
+        $this->mfaService = $mfaService ?? new \App\Module\User\MfaService();
     }
 
     public function showSettings(): void
@@ -319,8 +330,7 @@ class AdminController
             return;
         }
 
-        $mfaService = new \App\Module\User\MfaService();
-        $mfaService->disableMfaForUser($id);
+        $this->mfaService->disableMfaForUser($id);
 
         $_SESSION['success_message'] = "2FA для користувача " . $user['email'] . " успішно вимкнено.";
         header('Location: /admin/users');
