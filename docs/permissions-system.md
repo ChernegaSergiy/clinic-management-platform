@@ -1,24 +1,24 @@
-# Система прав доступу та полісів
+# Access Rights and Policies System
 
-## Огляд
+## Overview
 
-Нова модульна система прав доступу дозволяє модулям самостійно реєструвати свої права та політики перевірки доступу.
+The new modular access rights system allows modules to independently register their rights and access verification policies.
 
-## Архітектура
+## Architecture
 
 ### PermissionRegistry
 
-Клас для реєстрації та управління правами доступу.
+Class for registering and managing access rights.
 
 ```php
 $registry = new PermissionRegistry();
-$registry->add('hrm.read', 'Перегляд співробітників');
+$registry->add('hrm.read', 'View employees');
 $registry->addRoleMapping('hr_manager', ['hrm.read', 'hrm.write']);
 ```
 
 ### PolicyRegistry
 
-Клас для реєстрації полісів перевірки доступу до ресурсів.
+Class for registering access verification policies for resources.
 
 ```php
 $registry = new PolicyRegistry();
@@ -27,7 +27,7 @@ $registry->register('hrm', HrmPolicy::class);
 
 ### Policy
 
-Абстрактний базовий клас для всіх полісів.
+Abstract base class for all policies.
 
 ```php
 class HrmPolicy extends Policy

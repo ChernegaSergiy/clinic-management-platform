@@ -1,10 +1,10 @@
-# ER-діаграма основних сутностей
+# ER Diagram of Main Entities
 
-> **Примітка:** Ця діаграма є базовим проєктом. Вона буде розширена та деталізована відповідно до вимог Національної служби здоров'я України (НСЗУ) та стандартів електронної системи охорони здоров'я (eHealth), включаючи специфічні ідентифікатори, довідники та обов'язкові поля.
+> **Note:** This diagram is a basic design. It will be expanded and detailed according to the requirements of the National Health Service of Ukraine (NSZU) and eHealth electronic healthcare system standards, including specific identifiers, directories, and mandatory fields.
 
-## 1. Сутності та їх атрибути
+## 1. Entities and Their Attributes
 
-### User (Користувач)
+### User
 -   `id` (PK, INT)
 -   `username` (VARCHAR)
 -   `password_hash` (VARCHAR)
@@ -15,12 +15,12 @@
 -   `created_at` (DATETIME)
 -   `updated_at` (DATETIME)
 
-### Role (Роль)
+### Role
 -   `id` (PK, INT)
 -   `name` (VARCHAR, UNIQUE) (e.g., 'admin', 'doctor', 'registrar')
 -   `description` (TEXT)
 
-### Patient (Пацієнт)
+### Patient
 -   `id` (PK, INT)
 -   `first_name` (VARCHAR)
 -   `last_name` (VARCHAR)

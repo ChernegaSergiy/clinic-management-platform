@@ -1,30 +1,30 @@
-# Система дизайну клініки
+# Clinic Design System
 
-Цей документ описує візуальну мову та компоненти, що використовуються в проєкті, для забезпечення єдності та послідовності інтерфейсу.
+This document describes the visual language and components used in the project to ensure interface consistency and coherence.
 
-## 1. Кольорова палітра
+## 1. Color Palette
 
-Ми використовуємо палітру, що базується на корпоративних кольорах клініки, з акцентом на чистоту, довіру та професіоналізм.
+We use a palette based on the clinic's corporate colors, with an emphasis on cleanliness, trust, and professionalism.
 
--   **Основні кольори:**
-    -   `Primary Blue`: #2185d0 (Semantic UI Blue) - для основних дій, кнопок, посилань.
-    -   `Secondary Grey`: #767676 - для другорядних елементів, тексту.
-    -   `Success Green`: #21ba45 - для повідомлень про успіх.
-    -   `Warning Yellow`: #fbbd08 - для попереджень.
-    -   `Danger Red`: #db2828 - для помилок та критичних дій.
+-   **Primary colors:**
+    -   `Primary Blue`: #2185d0 (Semantic UI Blue) - for primary actions, buttons, links.
+    -   `Secondary Grey`: #767676 - for secondary elements, text.
+    -   `Success Green`: #21ba45 - for success messages.
+    -   `Warning Yellow`: #fbbd08 - for warnings.
+    -   `Danger Red`: #db2828 - for errors and critical actions.
 
--   **Нейтральні кольори:**
+-   **Neutral colors:**
     -   `White`: #FFFFFF
     -   `Light Grey`: #F9FAFB
     -   `Dark Grey`: #333333
     -   `Black`: #000000
 
-## 2. Типографіка
+## 2. Typography
 
-Ми використовуємо шрифти, що забезпечують читабельність та сучасний вигляд.
+We use fonts that ensure readability and a modern appearance.
 
--   **Основний шрифт:** `Lato` (або системний `sans-serif` як фолбек).
--   **Розміри шрифтів:**
+-   **Primary font:** `Lato` (or system `sans-serif` as fallback).
+-   **Font sizes:**
     -   `H1`: 2.5rem (40px)
     -   `H2`: 2rem (32px)
     -   `H3`: 1.75rem (28px)
