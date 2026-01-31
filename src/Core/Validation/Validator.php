@@ -14,7 +14,7 @@ class Validator
 
     public function __construct(PDO $pdo)
     {
-        // PDO is no longer needed as SymfonyValidator handles database validation internally
+        // Pass PDO to SymfonyValidator for database-dependent validation (e.g., unique rule)
         $this->symfonyValidator = new SymfonyValidator($pdo);
     }
 
