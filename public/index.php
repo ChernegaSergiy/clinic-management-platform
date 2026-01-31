@@ -17,6 +17,8 @@ if (file_exists($resource)) {
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Infrastructure\DI\ContainerFactory;
+
 use App\Controller\InstallController;
 use App\Controller\PageController;
 use App\Core\Exception\ExitException;
@@ -50,7 +52,16 @@ if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
         session_set_cookie_params($cookieParams);
     }
 }
+
 session_start();
+
+$container = ContainerFactory::createContainer();
+
+// Get EventDispatcher from container (falls back to manual if not available)
+$eventDispatcher = null;
+if ($container->has(\Symfony\Component\EventDispatcher\EventDispatcher::class)) {
+    $eventDispatcher = $container->get(\Symfony\Component\EventDispatcher\EventDispatcher::class);
+}
 
 $request = Request::createFromGlobals();
 
@@ -60,7 +71,9 @@ $permissionRegistry = new \App\Core\Auth\PermissionRegistry();
 $policyRegistry = new \App\Core\Auth\PolicyRegistry();
 
 $moduleManager = new ModuleManager();
-$eventDispatcher = new EventDispatcher();
+if ($eventDispatcher === null) {
+    $eventDispatcher = new EventDispatcher();
+}
 $moduleLoader = new ModuleLoader($moduleManager);
 $moduleLoader->loadAll();
 
@@ -70,6 +83,11 @@ $moduleManager->registerPermissions($permissionRegistry);
 $moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerEventListeners($eventDispatcher);
 EventDispatcherService::setDispatcher($eventDispatcher);
+
+// Inject translation service into View if present in container
+if ($container->has(\App\Core\Service\TranslationService::class)) {
+    \App\Core\Http\View::setTranslationService($container->get(\App\Core\Service\TranslationService::class));
+}
 $moduleManager->registerRoutes($router);
 
 \App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
