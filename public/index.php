@@ -81,6 +81,11 @@ $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 
 $router->add('GET', '/install', [InstallController::class, 'check']);
 
+// API routes
+$router->add('GET', '/api/status', function() {
+    return ['status' => 'ok', 'version' => '1.0'];
+});
+
 $installed = $_ENV['APP_INSTALLED'] ?? false;
 if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/install') {
     $response = new Response('', 302, ['Location' => '/install']);
