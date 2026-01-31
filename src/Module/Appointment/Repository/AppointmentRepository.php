@@ -37,7 +37,7 @@ class AppointmentRepository implements AppointmentRepositoryInterface
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|false
     {
         $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id, room_id) 
                 VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id, :room_id)";
