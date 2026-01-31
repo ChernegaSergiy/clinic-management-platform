@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+// Load .env file
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->safeLoad();
+
+// Set timezone from env or default to UTC
+$tz = $_ENV['APP_TIMEZONE'] ?? 'UTC';
+date_default_timezone_set($tz);
+
+use App\Console\ConsoleApplication;
+
+$application = new ConsoleApplication();
+$application->run();
