@@ -54,4 +54,33 @@ return function (ContainerBuilder $container) {
             new Reference(\App\Core\Service\AuditLogger::class),
         ])
         ->setPublic(true);
+
+    // Patient module
+    $container->register(\App\Module\Patient\Repository\PatientRepository::class)
+        ->setArguments([new Reference('pdo'), new Reference(\App\Core\Service\AuditLogger::class)])
+        ->setPublic(true);
+    $container->register(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class)->setPublic(true);
+    $container->register(\App\Module\Appointment\Repository\AppointmentRepository::class)->setPublic(true);
+    $container->register(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class)->setPublic(true);
+    $container->register(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class)->setPublic(true);
+    $container->register(\App\Module\Insurance\Repository\ClaimRepository::class)->setPublic(true);
+    $container->register(\App\Module\Billing\Repository\InvoiceRepository::class)->setPublic(true);
+    $container->register(\App\Module\Insurance\Service\InsuranceService::class)
+        ->setArguments([
+            new Reference(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class),
+            new Reference(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class),
+            new Reference(\App\Module\Insurance\Repository\ClaimRepository::class),
+            new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+        ])
+        ->setPublic(true);
+    $container->register(\App\Module\Patient\PatientController::class)
+        ->setArguments([
+            new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+            new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+            new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+            new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+            new Reference(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class),
+            new Reference(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class),
+        ])
+        ->setPublic(true);
 };

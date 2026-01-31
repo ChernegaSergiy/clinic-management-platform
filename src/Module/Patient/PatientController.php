@@ -25,15 +25,20 @@ class PatientController
     private InsuranceService $insuranceService;
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
-
-    public function __construct()
-    {
-        $this->patientRepository = new PatientRepository();
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->insuranceCompanyRepository = new \App\Module\Insurance\Repository\InsuranceCompanyRepository();
-        $this->patientInsurancePolicyRepository = new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository();
-        $this->insuranceService = new \App\Module\Insurance\Service\InsuranceService(
+    public function __construct(
+        ?PatientRepository $patientRepository = null,
+        ?MedicalRecordRepository $medicalRecordRepository = null,
+        ?AppointmentRepository $appointmentRepository = null,
+        ?InsuranceService $insuranceService = null,
+        ?InsuranceCompanyRepository $insuranceCompanyRepository = null,
+        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null
+    ) {
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->insuranceCompanyRepository = $insuranceCompanyRepository ?? new \App\Module\Insurance\Repository\InsuranceCompanyRepository();
+        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository ?? new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository();
+        $this->insuranceService = $insuranceService ?? new \App\Module\Insurance\Service\InsuranceService(
             $this->insuranceCompanyRepository,
             $this->patientInsurancePolicyRepository,
             new \App\Module\Insurance\Repository\ClaimRepository(),
