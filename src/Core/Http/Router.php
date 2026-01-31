@@ -2,6 +2,9 @@
 
 namespace App\Core\Http;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class Router
 {
     private array $routes = [];
@@ -15,9 +18,10 @@ class Router
         ];
     }
 
-    public function dispatch(string $method, string $uri): void
+    public function dispatch(Request $request): Response
     {
-        $path = parse_url($uri, PHP_URL_PATH);
+        $method = $request->getMethod();
+        $path = $request->getPathInfo();
 
         foreach ($this->routes as $route) {
             $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-zA-Z0-9_]+)', $route['path']);
@@ -35,12 +39,15 @@ class Router
                     $callback = $handler;
                 }
 
+                ob_start();
                 call_user_func_array($callback, $params);
-                return;
+                $content = ob_get_clean();
+
+                return new Response($content);
             }
         }
 
-        http_response_code(404);
-        View::render('errors/error.html.twig', ['message' => '404 Not Found']);
+        $content = View::render('errors/error.html.twig', ['message' => '404 Not Found']);
+        return new Response($content, 404);
     }
 }
