@@ -69,7 +69,7 @@ Labels are assigned based on the type and intent of work:
 
 We use a style inspired by [Conventional Commits](https://www.conventionalcommits.org/) with project-specific rules.
 
-**Format:** `type: Message` or `scope(type): Message`
+**Format:** `type: Message` or `type(scope): Message`
 
 -   **scope:** Optional context (`patients`, `auth`, `infra`, etc.).
 -   **type:** The type of change:
