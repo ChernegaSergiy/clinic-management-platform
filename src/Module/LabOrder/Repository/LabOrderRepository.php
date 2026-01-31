@@ -2,8 +2,8 @@
 
 namespace App\Module\LabOrder\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 
 class LabOrderRepository implements LabOrderRepositoryInterface
 {
@@ -45,7 +45,9 @@ class LabOrderRepository implements LabOrderRepositoryInterface
         ]);
 
         if ($success) {
-            return (int)$this->pdo->lastInsertId();
+            $labOrderId = (int)$this->pdo->lastInsertId();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
+            return $labOrderId;
         }
         return false;
     }
@@ -69,6 +71,11 @@ class LabOrderRepository implements LabOrderRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        $oldLabOrder = $this->findById($id);
+        if (!$oldLabOrder) {
+            return false;
+        }
+
         $sql = "UPDATE lab_orders SET 
                     order_code = :order_code, 
                     status = :status, 
@@ -78,13 +85,19 @@ class LabOrderRepository implements LabOrderRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        $result = $stmt->execute([
             ':id' => $id,
             ':order_code' => $data['order_code'],
             ':status' => $data['status'],
             ':results' => $data['results'] ?? null,
             ':notes' => $data['notes'] ?? null,
         ]);
+
+        if ($result) {
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
+        }
+
+        return $result;
     }
 
     public function updateQrCodeHash(int $id, string $qrCodeHash): bool
