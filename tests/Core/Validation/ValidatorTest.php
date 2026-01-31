@@ -197,6 +197,15 @@ class ValidatorTest extends TestCase
         $this->assertNotEmpty($this->validator->getErrors()['email']);
     }
 
+    public function testUniqueRulePassesWhenDuplicateIsIgnoredId(): void
+    {
+        $this->mockStmt->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(0); // No duplicates found (current record ignored)
+        $result = $this->validator->validate(['email' => 'existing@example.com'], ['email' => ['unique:users,email,1']]);
+        $this->assertTrue($result);
+    }
+
     public function testHasErrorsReturnsTrueWhenErrorsExist(): void
     {
         $this->validator->validate(['name' => ''], ['name' => ['required']]);
