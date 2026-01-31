@@ -65,7 +65,7 @@ if ($container->has(\Symfony\Component\EventDispatcher\EventDispatcher::class)) 
 
 $request = Request::createFromGlobals();
 
-$router = new Router();
+$router = new Router($container);
 
 $permissionRegistry = new \App\Core\Auth\PermissionRegistry();
 $policyRegistry = new \App\Core\Auth\PolicyRegistry();
