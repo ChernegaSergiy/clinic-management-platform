@@ -5,6 +5,7 @@ namespace App\Core\Module;
 use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ModuleManager
 {
@@ -122,6 +123,20 @@ class ModuleManager
             $module = $this->getModule($moduleClass);
             if ($module) {
                 $module->registerPolicies($registry);
+            }
+        }
+    }
+
+    public function registerEventListeners(EventDispatcherInterface $dispatcher): void
+    {
+        foreach ($this->modules as $moduleClass => $config) {
+            if (!$config['enabled']) {
+                continue;
+            }
+
+            $module = $this->getModule($moduleClass);
+            if ($module) {
+                $module->registerEventListeners($dispatcher);
             }
         }
     }
