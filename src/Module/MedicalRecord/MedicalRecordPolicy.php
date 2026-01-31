@@ -10,9 +10,9 @@ class MedicalRecordPolicy implements Policy
 {
     private MedicalRecordRepository $medicalRecordRepository;
 
-    public function __construct()
+    public function __construct(?MedicalRecordRepository $medicalRecordRepository = null)
     {
-        $this->medicalRecordRepository = new MedicalRecordRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
     }
 
     public function view(User $user, array $context): bool
