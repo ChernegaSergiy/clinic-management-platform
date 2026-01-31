@@ -25,6 +25,8 @@ class AppointmentController
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
     private \App\Module\Room\Repository\RoomRepository $roomRepository;
+    private DoctorScheduleRepository $doctorScheduleRepository;
+    private ScheduleExceptionRepository $scheduleExceptionRepository;
 
     public function __construct(
         ?AppointmentRepository $appointmentRepository = null,
@@ -32,6 +34,8 @@ class AppointmentController
         ?UserRepository $userRepository = null,
         ?NotificationService $notificationService = null,
         ?SchedulingService $schedulingService = null,
+        ?DoctorScheduleRepository $doctorScheduleRepository = null,
+        ?ScheduleExceptionRepository $scheduleExceptionRepository = null,
         ?ServiceRepository $serviceRepository = null,
         ?\App\Module\Room\Repository\RoomRepository $roomRepository = null
     ) {
@@ -44,14 +48,15 @@ class AppointmentController
         $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
         $this->roomRepository = $roomRepository ?? new \App\Module\Room\Repository\RoomRepository();
 
+        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
+        $this->scheduleExceptionRepository = $scheduleExceptionRepository ?? new ScheduleExceptionRepository();
+
         if ($schedulingService !== null) {
             $this->schedulingService = $schedulingService;
         } else {
-            $doctorScheduleRepository = new DoctorScheduleRepository();
-            $scheduleExceptionRepository = new ScheduleExceptionRepository();
             $this->schedulingService = new SchedulingService(
-                $doctorScheduleRepository,
-                $scheduleExceptionRepository,
+                $this->doctorScheduleRepository,
+                $this->scheduleExceptionRepository,
                 $this->appointmentRepository,
                 $this->serviceRepository,
                 $this->roomRepository
