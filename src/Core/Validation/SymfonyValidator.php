@@ -82,7 +82,7 @@ class SymfonyValidator
 
     private function validateUniqueRule(?string $value, string $rule, string $field): void
     {
-        if (empty($value)) {
+        if ($value === null || $value === '') {
             return;
         }
 
