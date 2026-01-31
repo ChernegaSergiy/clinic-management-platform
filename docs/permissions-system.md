@@ -34,7 +34,7 @@ class HrmPolicy extends Policy
 {
     public function view(mixed $resource): bool
     {
-        // Логіка перевірки доступу
+        // Access verification logic
         return $this->isAdmin();
     }
 
@@ -44,20 +44,20 @@ class HrmPolicy extends Policy
 }
 ```
 
-## Використання в модулях
+## Usage in Modules
 
-### Реєстрація прав
+### Permission Registration
 
-Кожен модуль може реєструвати свої права через метод `registerPermissions`:
+Each module can register its permissions through the `registerPermissions` method:
 
 ```php
 class HrmModule extends BaseModule
 {
     public function registerPermissions(PermissionRegistry $registry): void
     {
-        $registry->add('hrm.read', 'Перегляд співробітників');
-        $registry->add('hrm.write', 'Редагування співробітників');
-        $registry->add('hrm.manage', 'Керування співробітниками');
+        $registry->add('hrm.read', 'View employees');
+        $registry->add('hrm.write', 'Edit employees');
+        $registry->add('hrm.manage', 'Manage employees');
 
         $registry->addRoleMapping('admin', ['hrm.read', 'hrm.write', 'hrm.manage']);
         $registry->addRoleMapping('hr_manager', ['hrm.read', 'hrm.write', 'hrm.manage']);
@@ -66,9 +66,9 @@ class HrmModule extends BaseModule
 }
 ```
 
-### Реєстрація полісів
+### Policy Registration
 
-Можна також зареєструвати політики для перевірки доступу:
+You can also register policies for access verification:
 
 ```php
 public function registerPolicies(PolicyRegistry $registry): void
@@ -77,33 +77,33 @@ public function registerPolicies(PolicyRegistry $registry): void
 }
 ```
 
-## Перевірка прав у контролерах
+## Permission Checking in Controllers
 
-### Сучасний спосіб (через Gate)
+### Modern Way (via Gate)
 
 ```php
 public function index(): void
 {
     Gate::authorize('hrm.read');
-    // ... код методу
+    // ... method code
 }
 ```
 
-### Перевірка без викидання помилки
+### Checking Without Throwing Error
 
 ```php
 if (Gate::allows('hrm.write')) {
-    // Користувач має доступ
+    // User has access
 }
 ```
 
-### З контекстом
+### With Context
 
 ```php
 Gate::authorize('patients.read', ['patient_id' => $id]);
 ```
 
-## Ініціалізація в index.php
+## Initialization in index.php
 
 ```php
 $permissionRegistry = new PermissionRegistry();
@@ -122,15 +122,15 @@ Gate::setPermissionRegistry($permissionRegistry);
 Gate::setPolicyRegistry($policyRegistry);
 ```
 
-## Переваги нової системи
+## Advantages of the New System
 
-1. **Модульність** - кожен модуль самостійно керує своїми правами
-2. **Гнучкість** - легко додавати нові права та політики
-3. **Type safety** - поліси типізовані та перевіряються
-4. **No hardcode** - права не захардкоджені в ядрі
-5. **Легкість тестування** - поліси легко мокати для тестів
-6. **Читабельність** - логіка доступу зрозуміла та структурована
+1. **Modularity** - each module manages its own permissions independently
+2. **Flexibility** - easy to add new permissions and policies
+3. **Type safety** - policies are typed and validated
+4. **No hardcode** - permissions are not hardcoded in the core
+5. **Easy testing** - policies are easy to mock for tests
+6. **Readability** - access logic is clear and structured
 
-## Міграція з старої системи
+## Migration from Old System
 
-Стара система Gate все ще підтримується через `GateNew.php` з fallback на legacy права. Можна повільно мігрувати модулі на нову систему.
+The old Gate system is still supported through `GateNew.php` with fallback to legacy permissions. Modules can be gradually migrated to the new system.

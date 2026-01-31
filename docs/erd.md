@@ -30,39 +30,39 @@
 -   `phone` (VARCHAR)
 -   `email` (VARCHAR, UNIQUE, NULLABLE)
 -   `address` (TEXT, NULLABLE)
--   `tax_id` (VARCHAR, UNIQUE, NULLABLE) - РНОКПП
--   `document_id` (VARCHAR, UNIQUE, NULLABLE) - ID-картка/паспорт
--   `ehealth_patient_id` (UUID, UNIQUE, NULLABLE) - Ідентифікатор пацієнта в eHealth
+-   `tax_id` (VARCHAR, UNIQUE, NULLABLE) - RNOKPP
+-   `document_id` (VARCHAR, UNIQUE, NULLABLE) - ID card/passport
+-   `ehealth_patient_id` (UUID, UNIQUE, NULLABLE) - Patient identifier in eHealth
 -   `created_at` (DATETIME)
 -   `updated_at` (DATETIME)
 
-### Appointment (Прийом/Епізод)
+### Appointment (Appointment/Episode)
 -   `id` (PK, INT)
 -   `patient_id` (FK, INT)
--   `doctor_id` (FK, INT) (FK до User, де role_id = doctor)
+-   `doctor_id` (FK, INT) (FK to User, where role_id = doctor)
 -   `start_time` (DATETIME)
 -   `end_time` (DATETIME)
 -   `status` (ENUM('scheduled', 'completed', 'cancelled', 'no-show'))
--   `ehealth_episode_id` (UUID, UNIQUE, NULLABLE) - Ідентифікатор епізоду в eHealth
+-   `ehealth_episode_id` (UUID, UNIQUE, NULLABLE) - Episode identifier in eHealth
 -   `notes` (TEXT, NULLABLE)
 -   `created_at` (DATETIME)
 -   `updated_at` (DATETIME)
 
-### MedicalRecord (Медичний запис)
+### MedicalRecord (Medical Record)
 -   `id` (PK, INT)
 -   `patient_id` (FK, INT)
 -   `appointment_id` (FK, INT)
--   `doctor_id` (FK, INT) (FK до User, де role_id = doctor)
+-   `doctor_id` (FK, INT) (FK to User, where role_id = doctor)
 -   `visit_date` (DATETIME)
--   `diagnosis_code` (VARCHAR) - Код за ICD-10
+-   `diagnosis_code` (VARCHAR) - ICD-10 code
 -   `diagnosis_text` (TEXT)
 -   `treatment` (TEXT)
--   `ehealth_record_id` (UUID, UNIQUE, NULLABLE) - Ідентифікатор запису в eHealth
+-   `ehealth_record_id` (UUID, UNIQUE, NULLABLE) - Record identifier in eHealth
 -   `notes` (TEXT, NULLABLE)
 -   `created_at` (DATETIME)
 -   `updated_at` (DATETIME)
 
-## 2. Взаємозв'язки (Relationships)
+## 2. Relationships
 
 ```mermaid
 erDiagram
@@ -94,9 +94,9 @@ erDiagram
         VARCHAR phone
         VARCHAR email UK
         TEXT address
-        VARCHAR tax_id UK "РНОКПП"
-        VARCHAR document_id UK "ID-картка/паспорт"
-        UUID ehealth_patient_id UK "ID пацієнта в eHealth"
+        VARCHAR tax_id UK "Individual Taxpayer Number (ITIN)"
+        VARCHAR document_id UK "ID card/passport"
+        UUID ehealth_patient_id UK "Patient ID in eHealth system"
         DATETIME created_at
         DATETIME updated_at
     }
@@ -108,7 +108,7 @@ erDiagram
         DATETIME start_time
         DATETIME end_time
         ENUM status
-        UUID ehealth_episode_id UK "ID епізоду в eHealth"
+        UUID ehealth_episode_id UK "Episode ID in eHealth system"
         TEXT notes
         DATETIME created_at
         DATETIME updated_at
@@ -123,7 +123,7 @@ erDiagram
         VARCHAR diagnosis_code "ICD-10"
         TEXT diagnosis_text
         TEXT treatment
-        UUID ehealth_record_id UK "ID запису в eHealth"
+        UUID ehealth_record_id UK "Record ID in eHealth system"
         TEXT notes
         DATETIME created_at
         DATETIME updated_at

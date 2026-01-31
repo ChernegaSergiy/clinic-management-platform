@@ -33,15 +33,15 @@ We use fonts that ensure readability and a modern appearance.
     -   `Body Text`: 1rem (16px)
     -   `Small Text`: 0.875rem (14px)
 
--   **Вага шрифтів:**
+-   **Font weights:**
     -   `Light`: 300
     -   `Regular`: 400
     -   `Semi-bold`: 600
     -   `Bold`: 700
 
-## 3. Відступи та інтервали (Spacing)
+## 3. Spacing and Intervals
 
-Ми використовуємо систему відступів, кратну 4px або 8px, для забезпечення візуальної гармонії.
+We use a spacing system that is a multiple of 4px or 8px to ensure visual harmony.
 
 -   `Extra Small`: 4px
 -   `Small`: 8px
@@ -49,27 +49,27 @@ We use fonts that ensure readability and a modern appearance.
 -   `Large`: 24px
 -   `Extra Large`: 32px
 
-## 4. Іконографія
+## 4. Iconography
 
-Для іконок використовується бібліотека `Font Awesome` (через Semantic UI) або власні SVG-іконки для унікальних елементів.
+For icons, we use the `Font Awesome` library (via Semantic UI) or custom SVG icons for unique elements.
 
--   **Приклади використання:**
-    -   `user icon`: для профілів користувачів.
-    -   `calendar icon`: для подій та розкладів.
-    -   `file medical alternate icon`: для медичних записів.
-    -   `pills icon`: для медикаментів.
+-   **Usage examples:**
+    -   `user icon`: for user profiles.
+    -   `calendar icon`: for events and schedules.
+    -   `file medical alternate icon`: for medical records.
+    -   `pills icon`: for medications.
 
-## 5. Компоненти UI (Twig Macros)
+## 5. UI Components (Twig Macros)
 
-Детальний опис та приклади використання компонентів (кнопки, картки, поля форм) будуть надані в окремих Twig-макросах.
+Detailed descriptions and usage examples of components (buttons, cards, form fields) will be provided in separate Twig macros.
 
--   **Кнопки:** `button.html.twig`
--   **Картки:** `card.html.twig`
--   **Поля форм:** `form_field.html.twig`
+-   **Buttons:** `button.html.twig`
+-   **Cards:** `card.html.twig`
+-   **Form fields:** `form_field.html.twig`
 
-## 6. Доступність (WCAG 2.1 AA)
+## 6. Accessibility (WCAG 2.1 AA)
 
-Усі компоненти розробляються з урахуванням вимог доступності:
--   **Контрастність:** Забезпечення достатньої контрастності тексту та фону.
--   **Семантична розмітка:** Використання правильних HTML-тегів та ARIA-атрибутів.
--   **Навігація з клавіатури:** Можливість взаємодії з усіма елементами за допомогою клавіатури.
+All components are developed taking into account accessibility requirements:
+-   **Contrast:** Ensuring sufficient contrast between text and background.
+-   **Semantic markup:** Using correct HTML tags and ARIA attributes.
+-   **Keyboard navigation:** Ability to interact with all elements using the keyboard.
