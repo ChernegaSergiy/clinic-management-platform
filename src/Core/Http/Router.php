@@ -4,6 +4,7 @@ namespace App\Core\Http;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Core\Http\View;
 
 class Router
 {

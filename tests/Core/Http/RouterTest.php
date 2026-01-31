@@ -3,6 +3,7 @@
 namespace App\Core\Http;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class RouterTest extends TestCase
 {
@@ -22,19 +23,17 @@ class RouterTest extends TestCase
     public function testDispatchReturns404ForUnknownRoute(): void
     {
         $this->router->add('GET', '/known', function () {});
-        ob_start();
-        $this->router->dispatch('GET', '/unknown');
-        $output = ob_get_clean();
-        $this->assertStringContainsString('404', $output);
+        $request = Request::create('/unknown', 'GET');
+        $response = $this->router->dispatch($request);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testDispatchReturns404ForUnknownMethod(): void
     {
         $this->router->add('GET', '/test', function () {});
-        ob_start();
-        $this->router->dispatch('POST', '/test');
-        $output = ob_get_clean();
-        $this->assertStringContainsString('404', $output);
+        $request = Request::create('/test', 'POST');
+        $response = $this->router->dispatch($request);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testDispatchMatchesExactRoute(): void
@@ -42,9 +41,13 @@ class RouterTest extends TestCase
         $called = false;
         $this->router->add('GET', '/dashboard', function () use (&$called) {
             $called = true;
+            return 'Dashboard content';
         });
-        $this->router->dispatch('GET', '/dashboard');
+        $request = Request::create('/dashboard', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertTrue($called);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Dashboard content', $response->getContent());
     }
 
     public function testDispatchExtractsPathParameter(): void
@@ -52,9 +55,12 @@ class RouterTest extends TestCase
         $capturedId = null;
         $this->router->add('GET', '/users/{id}', function (int $id) use (&$capturedId) {
             $capturedId = $id;
+            return 'User found';
         });
-        $this->router->dispatch('GET', '/users/42');
+        $request = Request::create('/users/42', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertEquals(42, $capturedId);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testDispatchExtractsMultipleParameters(): void
@@ -62,27 +68,34 @@ class RouterTest extends TestCase
         $captured = [];
         $this->router->add('GET', '/posts/{postId}/comments/{commentId}', function (int $postId, int $commentId) use (&$captured) {
             $captured = ['postId' => $postId, 'commentId' => $commentId];
+            return 'Comment found';
         });
-        $this->router->dispatch('GET', '/posts/10/comments/20');
+        $request = Request::create('/posts/10/comments/20', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertEquals(['postId' => 10, 'commentId' => 20], $captured);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testDispatchHandlesControllerClass(): void
     {
         $this->router->add('GET', '/test', [TestController::class, 'index']);
-        $this->router->dispatch('GET', '/test');
+        $request = Request::create('/test', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertTrue(TestController::$called);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testParseUrlRemovesQueryString(): void
     {
-        $_SERVER['REQUEST_URI'] = '/api?foo=bar&baz=qux';
         $capturedPath = null;
         $this->router->add('GET', '/api', function () use (&$capturedPath) {
-            $capturedPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            $capturedPath = '/api'; // Request::getPathInfo() removes query string
+            return 'API response';
         });
-        $this->router->dispatch('GET', '/api?foo=bar&baz=qux');
+        $request = Request::create('/api?foo=bar&baz=qux', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertEquals('/api', $capturedPath);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testRoutePatternWithUnderscoreParameter(): void
@@ -90,9 +103,12 @@ class RouterTest extends TestCase
         $capturedUserName = null;
         $this->router->add('GET', '/profile/{user_name}', function (string $user_name) use (&$capturedUserName) {
             $capturedUserName = $user_name;
+            return 'Profile found';
         });
-        $this->router->dispatch('GET', '/profile/john_doe');
+        $request = Request::create('/profile/john_doe', 'GET');
+        $response = $this->router->dispatch($request);
         $this->assertEquals('john_doe', $capturedUserName);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }
 
