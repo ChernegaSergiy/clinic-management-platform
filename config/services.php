@@ -10,6 +10,23 @@ return function (ContainerBuilder $container) {
         ->setPublic(true);
 
     // Core services
+    // Router (needs the compiled container for controller resolution)
+    $container->register(\App\Core\Http\Router::class)
+        ->setArguments([new Reference('service_container')])
+        ->setPublic(true);
+
+    // ModuleManager
+    $container->register(\App\Core\Module\ModuleManager::class)
+        ->setPublic(true);
+
+    // PermissionRegistry
+    $container->register(\App\Core\Auth\PermissionRegistry::class)
+        ->setPublic(true);
+
+    // PolicyRegistry
+    $container->register(\App\Core\Auth\PolicyRegistry::class)
+        ->setPublic(true);
+
     // Event dispatcher
     $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)
         ->setPublic(true);
