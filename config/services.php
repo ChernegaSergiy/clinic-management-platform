@@ -190,15 +190,15 @@ return function (ContainerBuilder $container) {
 
     // Department
     $container->register(\App\Module\Department\Repository\DepartmentRepository::class)->setPublic(true);
-    $container->register(\App\Module\Department\Repository\HrmRepository::class)->setPublic(true);
+    $container->register(\App\Module\Hrm\Repository\HrmRepository::class)->setPublic(true);
     $container->register(\App\Module\Department\DepartmentController::class)
         ->setArguments([
             new Reference(\App\Module\Department\Repository\DepartmentRepository::class),
-            new Reference(\App\Module\Department\Repository\HrmRepository::class),
+            new Reference(\App\Module\Hrm\Repository\HrmRepository::class),
         ])->setPublic(true);
 
     // Room
-    $container->register(\App\Module\Room\RoomRepository::class)->setPublic(true);
+    $container->register(\App\Module\Room\Repository\RoomRepository::class)->setPublic(true);
     $container->register(\App\Module\Room\RoomController::class)
         ->setArguments([
             new Reference(\App\Module\Room\Repository\RoomRepository::class),
