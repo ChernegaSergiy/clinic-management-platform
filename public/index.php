@@ -65,12 +65,12 @@ if ($container->has(\Symfony\Component\EventDispatcher\EventDispatcher::class)) 
 
 $request = Request::createFromGlobals();
 
-$router = new Router($container);
+$router = $container->get(Router::class);
 
-$permissionRegistry = new \App\Core\Auth\PermissionRegistry();
-$policyRegistry = new \App\Core\Auth\PolicyRegistry();
+$permissionRegistry = $container->get(\App\Core\Auth\PermissionRegistry::class);
+$policyRegistry = $container->get(\App\Core\Auth\PolicyRegistry::class);
 
-$moduleManager = new ModuleManager();
+$moduleManager = $container->get(ModuleManager::class);
 if ($eventDispatcher === null) {
     $eventDispatcher = new EventDispatcher();
 }
