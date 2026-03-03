@@ -9,7 +9,7 @@ use Symfony\Component\Intl\Locales;
 
 class TranslationService
 {
-    private TranslatorInterface $translator;
+    private Translator $translator;
     private string $currentLocale = 'uk';
     private array $availableLocales = []; // Cache for available locales
 

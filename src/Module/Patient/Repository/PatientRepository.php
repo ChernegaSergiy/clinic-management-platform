@@ -120,7 +120,6 @@ class PatientRepository implements PatientRepositoryInterface
                 return $id;
             }
             return false;
-
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000') {
                 $this->lastError = 'duplicate_key';

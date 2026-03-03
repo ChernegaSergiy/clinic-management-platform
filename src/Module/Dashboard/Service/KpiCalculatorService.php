@@ -14,7 +14,9 @@ class KpiCalculatorService
     private KpiRepository $kpiRepository;
     private AppointmentRepository $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
+    /** @phpstan-ignore property.onlyWritten */
     private UserRepository $userRepository;
+    /** @phpstan-ignore property.onlyWritten */
     private MedicalRecordRepository $medicalRecordRepository;
 
     public function __construct(?KpiRepository $kpiRepository = null, ?AppointmentRepository $appointmentRepository = null, ?InvoiceRepository $invoiceRepository = null, ?UserRepository $userRepository = null, ?MedicalRecordRepository $medicalRecordRepository = null)

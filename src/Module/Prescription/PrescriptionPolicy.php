@@ -84,7 +84,7 @@ class PrescriptionPolicy implements Policy
         if ($prescription && (int)$prescription['doctor_id'] === $userId) {
             return true;
         }
-        if (isset($prescription['patient_id']) && $userId) {
+        if (isset($prescription['patient_id'])) {
             return $this->appointmentRepository->isPatientAssignedToDoctor((int)$prescription['patient_id'], $userId);
         }
 

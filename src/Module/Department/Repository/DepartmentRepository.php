@@ -22,7 +22,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             LEFT JOIN departments dp ON d.parent_id = dp.id 
             ORDER BY d.sort_order ASC, d.name ASC
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -37,7 +37,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             WHERE d.is_active = 1 
             ORDER BY d.sort_order ASC, d.name ASC
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -51,7 +51,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             LEFT JOIN departments dp ON d.parent_id = dp.id 
             WHERE d.id = :id
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
@@ -135,7 +135,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             WHERE d.is_active = 1 
             ORDER BY d.sort_order ASC, d.name ASC
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         $departments = $stmt->fetchAll();

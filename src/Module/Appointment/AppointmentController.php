@@ -688,24 +688,23 @@ class AppointmentController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            if ($errors) {
-                $patients = $this->patientRepository->findAllActive();
-                $doctors = $this->userRepository->findAllDoctors();
-                $patientOptions = [];
-                foreach ($patients as $patient) {
-                    $patientOptions[$patient['id']] = $patient['full_name'];
-                }
-                $doctorOptions = [];
-                foreach ($doctors as $doctor) {
-                    $doctorOptions[$doctor['id']] = $doctor['full_name'];
-                }
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
 
-                $roomOptions = [];
-                foreach ($rooms as $room) {
-                    $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
-                }
+            $roomOptions = [];
+            foreach ($rooms as $room) {
+                $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+            }
 
-                View::render('@modules/Appointment/templates/edit.html.twig', [
+            View::render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -715,9 +714,8 @@ class AppointmentController
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
                 'rooms' => $roomOptions,
-                ]);
-                return;
-            }
+            ]);
+            return;
         }
 
         $this->appointmentRepository->update($id, $_POST);

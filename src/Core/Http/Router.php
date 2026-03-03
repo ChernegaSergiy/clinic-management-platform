@@ -50,7 +50,7 @@ class Router
                         $callback = [$controller, $handler[1]];
                     } catch (\Throwable $e) {
                         $detail = $e->getMessage() . "\n\n" . $e->getTraceAsString();
-                        $content = View::render('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
+                        $content = View::renderToString('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
                         $response = new Response($content, 500);
                         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
                         return $response;
@@ -75,7 +75,7 @@ class Router
             }
         }
 
-        $content = View::render('errors/error.html.twig', ['message' => '404 Not Found']);
+        $content = View::renderToString('errors/error.html.twig', ['message' => '404 Not Found']);
         $response = new Response($content, 404);
         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
         return $response;

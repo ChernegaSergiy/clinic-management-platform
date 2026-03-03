@@ -8,7 +8,9 @@ use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
-use App\Module\User\Repository\UserRepository; // To get author info
+use App\Module\User\Repository\UserRepository;
+
+// To get author info
 
 class NewsController
 {

@@ -2,6 +2,7 @@
 
 namespace App\Module\User;
 
+use App\Core\Auth\AuthGuard;
 use App\Core\Event\EventDispatcherService;
 use App\Core\Http\View;
 use App\Database\Database;

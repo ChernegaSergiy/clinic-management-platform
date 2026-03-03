@@ -49,5 +49,4 @@ class PageController
     {
         View::render('our-team/index.html.twig');
     }
-
 }

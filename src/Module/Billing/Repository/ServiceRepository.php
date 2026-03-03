@@ -73,6 +73,12 @@ class ServiceRepository
         ]);
     }
 
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM services WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
+
     public function findCategories(): array
     {
         $stmt = $this->pdo->query("SELECT id, name, description FROM service_categories ORDER BY name ASC");

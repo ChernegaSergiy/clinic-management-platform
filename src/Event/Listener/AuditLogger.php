@@ -17,16 +17,16 @@ class AuditLogger implements EventSubscriberInterface
     public function onEntityChanged(EntityChangedEvent $event): void
     {
         // Log the change
-        $entity = $event->entity;
+        $entityType = $event->entityType;
         $action = $event->action;
-        $user = $event->user;
+        $entityId = $event->entityId;
 
         // Example: write to log file or database
         error_log(sprintf(
-            'Entity %s %s by user %s',
-            get_class($entity),
-            $action,
-            $user ? $user->getId() : 'unknown'
+            'Entity %s#%d %s',
+            $entityType,
+            $entityId,
+            $action
         ));
     }
 }

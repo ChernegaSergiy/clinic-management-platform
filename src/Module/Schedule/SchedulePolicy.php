@@ -8,6 +8,7 @@ use App\Module\Schedule\Repository\DoctorScheduleRepository;
 
 class SchedulePolicy implements Policy
 {
+    /** @phpstan-ignore property.onlyWritten */
     private DoctorScheduleRepository $doctorScheduleRepository;
 
     public function __construct(?DoctorScheduleRepository $doctorScheduleRepository = null)

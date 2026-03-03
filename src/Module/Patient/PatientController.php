@@ -26,6 +26,8 @@ class PatientController
     private InsuranceService $insuranceService;
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
+    private ClaimRepository $claimRepository;
+    private InvoiceRepository $invoiceRepository;
     public function __construct(
         ?PatientRepository $patientRepository = null,
         ?MedicalRecordRepository $medicalRecordRepository = null,
