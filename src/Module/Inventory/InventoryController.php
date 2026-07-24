@@ -7,6 +7,7 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class InventoryController
 {
@@ -17,6 +18,7 @@ class InventoryController
         $this->inventoryItemRepository = $inventoryItemRepository;
     }
 
+    #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -34,6 +36,7 @@ class InventoryController
         ]);
     }
 
+    #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -51,6 +54,7 @@ class InventoryController
         ]);
     }
 
+    #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -76,6 +80,7 @@ class InventoryController
         exit();
     }
 
+    #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -98,6 +103,7 @@ class InventoryController
         ]);
     }
 
+    #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -126,6 +132,7 @@ class InventoryController
         ]);
     }
 
+    #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
