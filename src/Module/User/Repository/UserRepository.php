@@ -2,122 +2,104 @@
 
 namespace App\Module\User\Repository;
 
+use App\Entity\User;
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
-use App\Database\Database;
-use PDO;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, User::class);
     }
 
     public function findByEmail(string $email): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->setParameter('email', $email);
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "SELECT id, first_name, last_name, email, role_id, mfa_enabled, CONCAT(first_name, ' ', last_name) AS full_name FROM users";
-        $params = [];
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', 'u.mfa_enabled', "CONCAT(u.first_name, ' ', u.last_name) AS full_name");
 
         if (!empty($searchTerm)) {
-            $sql .= " WHERE first_name LIKE :term OR last_name LIKE :term OR email LIKE :term"
-                . " OR CONCAT(first_name, ' ', last_name) LIKE :term";
-            $params[':term'] = '%' . $searchTerm . '%';
+            $qb->where('u.first_name LIKE :term')
+               ->orWhere('u.last_name LIKE :term')
+               ->orWhere('u.email LIKE :term')
+               ->orWhere("CONCAT(u.first_name, ' ', u.last_name) LIKE :term")
+               ->setParameter('term', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY last_name, first_name";
+        $qb->orderBy('u.last_name', 'ASC')
+           ->addOrderBy('u.first_name', 'ASC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAllByRole(string $roleName): array
     {
-        $sql = "
-            SELECT 
-                u.id, 
-                u.first_name, 
-                u.last_name, 
-                u.email, 
-                u.role_id, 
-                CONCAT(u.first_name, ' ', u.last_name) AS full_name
-            FROM users AS u
-            JOIN roles AS r ON u.role_id = r.id
-            WHERE r.name = :role_name
-            ORDER BY u.last_name, u.first_name
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':role_name' => $roleName]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
+            ->join('u.role', 'r')
+            ->where('r.name = :role_name')
+            ->setParameter('role_name', $roleName)
+            ->orderBy('u.last_name', 'ASC')
+            ->addOrderBy('u.first_name', 'ASC');
+
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAllActive(): array
     {
-        $stmt = $this->pdo->query("
-            SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name
-            FROM users 
-            WHERE role_id IS NOT NULL
-            ORDER BY last_name, first_name
-        ");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
+            ->where('u.role IS NOT NULL')
+            ->orderBy('u.last_name', 'ASC')
+            ->addOrderBy('u.first_name', 'ASC');
+
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAllDoctors(): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT id, first_name, last_name, email, role_id, CONCAT(first_name, ' ', last_name) AS full_name
-            FROM users 
-            WHERE role_id = (SELECT id FROM roles WHERE name = 'doctor' LIMIT 1)
-            ORDER BY last_name, first_name
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
+            ->join('u.role', 'r')
+            ->where('r.name = :role_name')
+            ->setParameter('role_name', 'doctor')
+            ->orderBy('u.last_name', 'ASC')
+            ->addOrderBy('u.first_name', 'ASC');
+
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                id, 
-                first_name, 
-                last_name, 
-                email, 
-                role_id, 
-                password_hash,
-                created_at, 
-                updated_at,
-                profile_photo_path,
-                mfa_enabled,
-                mfa_type,
-                mfa_verified_at,
-                mfa_pending,
-                CONCAT(first_name, ' ', last_name) AS full_name
-            FROM users 
-            WHERE id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        if ($result === false) {
-            return null;
-        }
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', 'u.password_hash', 'u.created_at', 'u.updated_at', 'u.profile_photo_path', 'u.mfa_enabled', 'u.mfa_type', 'u.mfa_verified_at', 'u.mfa_pending', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
+            ->where('u.id = :id')
+            ->setParameter('id', $id);
 
-        // Cast timestamps to DateTime objects for safer usage in views.
-        if (!empty($result['created_at'])) {
-            $result['created_at'] = new \DateTimeImmutable($result['created_at']);
-        }
-        if (!empty($result['updated_at'])) {
-            $result['updated_at'] = new \DateTimeImmutable($result['updated_at']);
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        
+        if ($result) {
+            // Cast timestamps to DateTime objects for safer usage in views if they are returned as strings.
+            // Doctrine usually returns DateTime objects for datetime types if hydrated as array? Actually, it does!
+            // But just in case, we do the check from the legacy code:
+            if (!empty($result['created_at']) && is_string($result['created_at'])) {
+                $result['created_at'] = new \DateTimeImmutable($result['created_at']);
+            }
+            if (!empty($result['updated_at']) && is_string($result['updated_at'])) {
+                $result['updated_at'] = new \DateTimeImmutable($result['updated_at']);
+            }
         }
 
         return $result;
@@ -125,39 +107,44 @@ class UserRepository implements UserRepositoryInterface
 
     public function findByEmailExcludingId(string $email, int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email AND id != :id");
-        $stmt->execute([':email' => $email, ':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->andWhere('u.id != :id')
+            ->setParameter('email', $email)
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data): int|false
     {
         $username = $data['username'] ?? $data['email'];
 
-        $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
-                VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $passwordHash = !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
-
-        $result = $stmt->execute([
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':email' => $data['email'],
-            ':username' => $username,
-            ':password_hash' => $passwordHash,
-            ':role_id' => $data['role_id'],
-        ]);
-
-        if ($result) {
-            $id = (int)$this->pdo->lastInsertId();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'create', null, $data));
-            return $id;
+        $user = new User();
+        $user->setFirstName($data['first_name']);
+        $user->setLastName($data['last_name']);
+        $user->setEmail($data['email']);
+        $user->setUsername($username);
+        
+        if (!empty($data['password'])) {
+            $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
         }
 
-        return false;
+        if (!empty($data['role_id'])) {
+            $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, $data['role_id']);
+            $user->setRole($role);
+        }
+
+        try {
+            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->flush();
+
+            $id = $user->getId();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'create', null, $data));
+            return $id;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function update(int $id, array $data): bool
@@ -167,36 +154,36 @@ class UserRepository implements UserRepositoryInterface
             return false;
         }
 
-        $sql = "UPDATE users SET 
-                    first_name = :first_name, 
-                    last_name = :last_name, 
-                    email = :email, 
-                    role_id = :role_id";
-
-        $params = [
-            ':id' => $id,
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':email' => $data['email'],
-            ':role_id' => $data['role_id'],
-        ];
-
-        if (isset($data['password']) && !empty($data['password'])) { // Only update password if provided
-            $sql .= ", password_hash = :password_hash";
-            $params[':password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        /** @var User|null $user */
+        $user = $this->find($id);
+        if (!$user) {
+            return false;
         }
 
-        $sql .= " WHERE id = :id";
+        if (isset($data['first_name'])) {
+            $user->setFirstName($data['first_name']);
+        }
+        if (isset($data['last_name'])) {
+            $user->setLastName($data['last_name']);
+        }
+        if (isset($data['email'])) {
+            $user->setEmail($data['email']);
+        }
+        if (isset($data['role_id'])) {
+            $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, $data['role_id']);
+            $user->setRole($role);
+        }
+        if (!empty($data['password'])) {
+            $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
+        }
 
-        $stmt = $this->pdo->prepare($sql);
-
-        $result = $stmt->execute($params);
-
-        if ($result) {
+        try {
+            $this->getEntityManager()->flush();
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'update', $oldData, $data));
+            return true;
+        } catch (\Exception $e) {
+            return false;
         }
-
-        return $result;
     }
 
     public function delete(int $id): bool
@@ -206,19 +193,25 @@ class UserRepository implements UserRepositoryInterface
             return false;
         }
 
-        $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = :id");
-        $result = $stmt->execute([':id' => $id]);
-
-        if ($result) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'delete', $oldData, null));
+        /** @var User|null $user */
+        $user = $this->find($id);
+        if (!$user) {
+            return false;
         }
 
-        return $result;
+        try {
+            $this->getEntityManager()->remove($user);
+            $this->getEntityManager()->flush();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'delete', $oldData, null));
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function countUsers(): int
     {
-        return (int)$this->pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        return $this->count([]);
     }
 
     public function ensureDefaultAdminExists(): void
@@ -229,36 +222,52 @@ class UserRepository implements UserRepositoryInterface
 
         $email = getenv('ADMIN_EMAIL') ?: 'admin@clinic.ua';
         $password = getenv('ADMIN_PASSWORD') ?: 'password';
+        $firstName = getenv('ADMIN_FIRST_NAME') ?: 'Адмін';
+        $lastName = getenv('ADMIN_LAST_NAME') ?: 'Адміненко';
 
-        $sql = "INSERT INTO users (first_name, last_name, email, username, password_hash, role_id) 
-                VALUES (:first_name, :last_name, :email, :username, :password_hash, :role_id)";
+        $user = new User();
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setEmail($email);
+        $user->setUsername('admin');
+        $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':first_name' => getenv('ADMIN_FIRST_NAME') ?: 'Адмін',
-            ':last_name' => getenv('ADMIN_LAST_NAME') ?: 'Адміненко',
-            ':email' => $email,
-            ':username' => 'admin',
-            ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
-            ':role_id' => 1,
-        ]);
+        // Assuming Role ID 1 is Admin
+        $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, 1);
+        $user->setRole($role);
+
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
     }
 
     public function updateProfilePhotoPath(int $userId, ?string $path): bool
     {
-        $sql = "UPDATE users SET profile_photo_path = :profile_photo_path WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':profile_photo_path' => $path,
-            ':id' => $userId,
-        ]);
+        /** @var User|null $user */
+        $user = $this->find($userId);
+        if (!$user) {
+            return false;
+        }
+
+        $user->setProfilePhotoPath($path);
+        
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function findRoleIdByName(string $roleName): ?int
     {
-        $stmt = $this->pdo->prepare("SELECT id FROM roles WHERE name = :role_name LIMIT 1");
-        $stmt->execute([':role_name' => $roleName]);
-        $result = $stmt->fetchColumn();
-        return $result === false ? null : (int)$result;
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('r.id')
+           ->from(\App\Entity\Role::class, 'r')
+           ->where('r.name = :role_name')
+           ->setParameter('role_name', $roleName)
+           ->setMaxResults(1);
+
+        $result = $qb->getQuery()->getOneOrNullResult();
+        return $result ? (int)$result['id'] : null;
     }
 }
