@@ -2,31 +2,37 @@
 
 namespace App\Module\Dashboard\Service;
 
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
-use App\Module\Inventory\Repository\InventoryItemRepository;
+use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\LabOrder\Repository\LabOrderRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
 use DateTime;
 
 class DashboardService
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
-    private PatientRepository $patientRepository;
-    private AppointmentRepository $appointmentRepository;
-    private LabOrderRepository $labOrderRepository;
-    private InventoryItemRepository $inventoryItemRepository;
+    private PatientRepositoryInterface $patientRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private LabOrderRepositoryInterface $labOrderRepository;
+    private InventoryItemRepositoryInterface $inventoryItemRepository;
 
-    public function __construct(?KpiRepository $kpiRepository = null, ?InvoiceRepository $invoiceRepository = null, ?PatientRepository $patientRepository = null, ?AppointmentRepository $appointmentRepository = null, ?LabOrderRepository $labOrderRepository = null, ?InventoryItemRepository $inventoryItemRepository = null)
-    {
-        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
-        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
-        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
+    public function __construct(
+        KpiRepository $kpiRepository,
+        InvoiceRepository $invoiceRepository,
+        PatientRepositoryInterface $patientRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        LabOrderRepositoryInterface $labOrderRepository,
+        InventoryItemRepositoryInterface $inventoryItemRepository
+    ) {
+        $this->kpiRepository = $kpiRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->patientRepository = $patientRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->labOrderRepository = $labOrderRepository;
+        $this->inventoryItemRepository = $inventoryItemRepository;
     }
 
     /**
