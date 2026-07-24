@@ -10,7 +10,7 @@ use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
 use App\Module\Billing\Repository\ServiceRepository;
@@ -18,15 +18,15 @@ use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 use App\Module\Insurance\Service\InsuranceService;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
 
 class BillingController
 {
     private InvoiceRepository $invoiceRepository;
-    private PatientRepository $patientRepository;
-    private AppointmentRepository $appointmentRepository;
-    private MedicalRecordRepository $medicalRecordRepository;
+    private PatientRepositoryInterface $patientRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private ServiceRepository $serviceRepository;
     private ServiceBundleRepository $serviceBundleRepository;
     private InsuranceService $insuranceService;
@@ -35,33 +35,27 @@ class BillingController
     private ClaimRepository $claimRepository;
 
     public function __construct(
-        ?InvoiceRepository $invoiceRepository = null,
-        ?PatientRepository $patientRepository = null,
-        ?AppointmentRepository $appointmentRepository = null,
-        ?MedicalRecordRepository $medicalRecordRepository = null,
-        ?ServiceRepository $serviceRepository = null,
-        ?ServiceBundleRepository $serviceBundleRepository = null,
-        ?InsuranceService $insuranceService = null,
-        ?InsuranceCompanyRepository $insuranceCompanyRepository = null,
-        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null,
-        ?ClaimRepository $claimRepository = null
+        InvoiceRepository $invoiceRepository,
+        PatientRepositoryInterface $patientRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        ServiceRepository $serviceRepository,
+        ServiceBundleRepository $serviceBundleRepository,
+        InsuranceService $insuranceService,
+        InsuranceCompanyRepository $insuranceCompanyRepository,
+        PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
+        ClaimRepository $claimRepository
     ) {
-        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
-        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
-        $this->serviceBundleRepository = $serviceBundleRepository ?? new ServiceBundleRepository();
-        $this->insuranceCompanyRepository = $insuranceCompanyRepository ?? new InsuranceCompanyRepository();
-        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository ?? new PatientInsurancePolicyRepository();
-        $this->claimRepository = $claimRepository ?? new ClaimRepository();
-
-        $this->insuranceService = $insuranceService ?? new InsuranceService(
-            $this->insuranceCompanyRepository,
-            $this->patientInsurancePolicyRepository,
-            $this->claimRepository,
-            $this->invoiceRepository
-        );
+        $this->invoiceRepository = $invoiceRepository;
+        $this->patientRepository = $patientRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->serviceRepository = $serviceRepository;
+        $this->serviceBundleRepository = $serviceBundleRepository;
+        $this->insuranceCompanyRepository = $insuranceCompanyRepository;
+        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
+        $this->claimRepository = $claimRepository;
+        $this->insuranceService = $insuranceService;
     }
 
     public function index(): void
