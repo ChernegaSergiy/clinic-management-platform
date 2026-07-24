@@ -9,6 +9,8 @@ use App\Core\Module\BaseModule;
 use App\Module\User\AuthController;
 use App\Module\User\OAuthController;
 use App\Module\User\UserController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class UserModule extends BaseModule
 {
@@ -41,6 +43,42 @@ class UserModule extends BaseModule
         $router->add('POST', '/user/mfa/verify', [MfaController::class, 'verifyMfa']);
         $router->add('GET', '/user/mfa/clear-backup-codes', [MfaController::class, 'clearNewBackupCodes']);
         $router->add('POST', '/user/mfa/regenerate-backup-codes', [MfaController::class, 'regenerateBackupCodes']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
+        $container->register(\App\Module\User\Repository\RoleRepository::class)->setPublic(true);
+        $container->register(\App\Module\User\Repository\UserOAuthIdentityRepository::class)->setPublic(true);
+
+        $container->register(\App\Module\User\MfaService::class)
+            ->setArguments([
+                new Reference('pdo'),
+                new Reference(\App\Core\Service\QrCodeGenerator::class),
+            ])->setPublic(true);
+
+        $container->register(\App\Module\User\AuthController::class)
+            ->setArguments([
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+                new Reference(\App\Module\User\Repository\RoleRepository::class),
+                new Reference(\App\Module\User\MfaService::class),
+            ])->setPublic(true);
+
+        $container->register(\App\Module\User\MfaController::class)
+            ->setArguments([
+                new Reference(\App\Module\User\MfaService::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Core\Repository\SettingsRepository::class),
+                new Reference(\App\Module\User\Repository\RoleRepository::class),
+            ])->setPublic(true);
+
+        $container->register(\App\Module\User\OAuthController::class)
+            ->setArguments([
+                new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Module\User\Repository\UserOAuthIdentityRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
