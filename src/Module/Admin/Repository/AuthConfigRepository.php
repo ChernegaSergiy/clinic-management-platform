@@ -2,63 +2,67 @@
 
 namespace App\Module\Admin\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\AuthConfig;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class AuthConfigRepository
+class AuthConfigRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, AuthConfig::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM auth_configs ORDER BY provider ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM auth_configs ORDER BY provider ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findActive(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM auth_configs WHERE is_active = 1 ORDER BY provider ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM auth_configs WHERE is_active = 1 ORDER BY provider ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM auth_configs WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM auth_configs WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function findByProvider(string $provider): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM auth_configs WHERE provider = :provider");
-        $stmt->execute([':provider' => $provider]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM auth_configs WHERE provider = :provider";
+        $result = $conn->fetchAssociative($sql, ['provider' => $provider]);
+        return $result ?: null;
     }
 
     public function save(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO auth_configs (provider, client_id, client_secret, is_active, config) 
                 VALUES (:provider, :client_id, :client_secret, :is_active, :config)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':provider' => $data['provider'],
-            ':client_id' => $data['client_id'] ?? null,
-            ':client_secret' => $data['client_secret'] ?? null,
-            ':is_active' => $data['is_active'] ?? false,
-            ':config' => $data['config'] ?? null,
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        
+        $success = $conn->executeStatement($sql, [
+            'provider' => $data['provider'],
+            'client_id' => $data['client_id'] ?? null,
+            'client_secret' => $data['client_secret'] ?? null,
+            'is_active' => $data['is_active'] ?? false,
+            'config' => $data['config'] ?? null,
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function update(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE auth_configs SET 
                     provider = :provider, 
                     client_id = :client_id, 
@@ -66,20 +70,21 @@ class AuthConfigRepository
                     is_active = :is_active, 
                     config = :config 
                 WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':provider' => $data['provider'],
-            ':client_id' => $data['client_id'] ?? null,
-            ':client_secret' => $data['client_secret'] ?? null,
-            ':is_active' => $data['is_active'] ?? false,
-            ':config' => $data['config'] ?? null,
-        ]);
+                
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'provider' => $data['provider'],
+            'client_id' => $data['client_id'] ?? null,
+            'client_secret' => $data['client_secret'] ?? null,
+            'is_active' => $data['is_active'] ?? false,
+            'config' => $data['config'] ?? null,
+        ]) > 0;
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM auth_configs WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM auth_configs WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 }

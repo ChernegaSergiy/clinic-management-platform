@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Admin\Repository\BackupPolicyRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: BackupPolicyRepository::class)]
 #[ORM\Table(name: 'backup_policies')]
 class BackupPolicy
 {

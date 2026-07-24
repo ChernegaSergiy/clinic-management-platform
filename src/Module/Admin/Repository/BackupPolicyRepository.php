@@ -2,49 +2,52 @@
 
 namespace App\Module\Admin\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\BackupPolicy;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class BackupPolicyRepository
+class BackupPolicyRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, BackupPolicy::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM backup_policies ORDER BY name ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM backup_policies ORDER BY name ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM backup_policies WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM backup_policies WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function save(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO backup_policies (name, description, frequency, retention_days, status) 
                 VALUES (:name, :description, :frequency, :retention_days, :status)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':frequency' => $data['frequency'] ?? 'daily',
-            ':retention_days' => $data['retention_days'] ?? 30,
-            ':status' => $data['status'] ?? 'inactive',
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+                
+        $success = $conn->executeStatement($sql, [
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'frequency' => $data['frequency'] ?? 'daily',
+            'retention_days' => $data['retention_days'] ?? 30,
+            'status' => $data['status'] ?? 'inactive',
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function update(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE backup_policies SET 
                     name = :name, 
                     description = :description, 
@@ -53,21 +56,22 @@ class BackupPolicyRepository
                     last_run_at = :last_run_at, 
                     status = :status 
                 WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':frequency' => $data['frequency'] ?? 'daily',
-            ':retention_days' => $data['retention_days'] ?? 30,
-            ':last_run_at' => $data['last_run_at'] ?? null,
-            ':status' => $data['status'] ?? 'inactive',
-        ]);
+                
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'frequency' => $data['frequency'] ?? 'daily',
+            'retention_days' => $data['retention_days'] ?? 30,
+            'last_run_at' => $data['last_run_at'] ?? null,
+            'status' => $data['status'] ?? 'inactive',
+        ]) > 0;
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM backup_policies WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM backup_policies WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 }

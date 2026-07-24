@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Admin\Repository\DictionaryRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: DictionaryRepository::class)]
 #[ORM\Table(name: 'dictionaries')]
 class Dictionary
 {
