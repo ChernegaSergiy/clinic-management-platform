@@ -2,58 +2,62 @@
 
 namespace App\Module\Kpi\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\KpiDefinition;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class KpiRepository
+class KpiRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, KpiDefinition::class);
     }
 
     // --- KPI Definitions ---
     public function findAllKpiDefinitions(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM kpi_definitions ORDER BY name ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM kpi_definitions ORDER BY name ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findActiveKpiDefinitions(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM kpi_definitions WHERE is_active = 1 ORDER BY name ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM kpi_definitions WHERE is_active = 1 ORDER BY name ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findKpiDefinitionById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM kpi_definitions WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM kpi_definitions WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function saveKpiDefinition(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO kpi_definitions (name, description, kpi_type, target_value, unit, is_active, period) 
                 VALUES (:name, :description, :kpi_type, :target_value, :unit, :is_active, :period)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':kpi_type' => $data['kpi_type'],
-            ':target_value' => $data['target_value'] ?? null,
-            ':unit' => $data['unit'] ?? null,
-            ':is_active' => $data['is_active'] ?? true,
-            ':period' => $data['period'] ?? 'day',
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        
+        $success = $conn->executeStatement($sql, [
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'kpi_type' => $data['kpi_type'],
+            'target_value' => $data['target_value'] ?? null,
+            'unit' => $data['unit'] ?? null,
+            'is_active' => (int)($data['is_active'] ?? true),
+            'period' => $data['period'] ?? 'day',
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function updateKpiDefinition(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE kpi_definitions SET 
                     name = :name, 
                     description = :description, 
@@ -63,74 +67,76 @@ class KpiRepository
                     is_active = :is_active,
                     period = :period
                 WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':kpi_type' => $data['kpi_type'],
-            ':target_value' => $data['target_value'] ?? null,
-            ':unit' => $data['unit'] ?? null,
-            ':is_active' => $data['is_active'] ?? true,
-            ':period' => $data['period'] ?? 'day',
-        ]);
+                
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'kpi_type' => $data['kpi_type'],
+            'target_value' => $data['target_value'] ?? null,
+            'unit' => $data['unit'] ?? null,
+            'is_active' => (int)($data['is_active'] ?? true),
+            'period' => $data['period'] ?? 'day',
+        ]) > 0;
     }
 
     public function deleteKpiDefinition(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM kpi_definitions WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM kpi_definitions WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 
     // --- KPI Results ---
     public function saveKpiResult(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO kpi_results (kpi_id, user_id, period_start, period_end, calculated_value, notes) 
                 VALUES (:kpi_id, :user_id, :period_start, :period_end, :calculated_value, :notes)
                 ON DUPLICATE KEY UPDATE 
                     calculated_value = VALUES(calculated_value),
                     notes = VALUES(notes)";
 
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':kpi_id' => $data['kpi_id'],
-            ':user_id' => $data['user_id'],
-            ':period_start' => $data['period_start'],
-            ':period_end' => $data['period_end'],
-            ':calculated_value' => $data['calculated_value'],
-            ':notes' => $data['notes'] ?? null,
-        ]);
+        $success = $conn->executeStatement($sql, [
+            'kpi_id' => $data['kpi_id'],
+            'user_id' => $data['user_id'],
+            'period_start' => $data['period_start'],
+            'period_end' => $data['period_end'],
+            'calculated_value' => $data['calculated_value'],
+            'notes' => $data['notes'] ?? null,
+        ]) > 0;
 
         if (!$success) {
             return null;
         }
 
-        // If a duplicate was updated, lastInsertId will be 0; fetch existing id for consistency
-        $lastId = (int)$this->pdo->lastInsertId();
+        $lastId = (int)$conn->lastInsertId();
         if ($lastId > 0) {
             return $lastId;
         }
 
-        $stmt = $this->pdo->prepare("
+        $sql = "
             SELECT id FROM kpi_results 
             WHERE kpi_id = :kpi_id 
               AND user_id = :user_id 
               AND period_start = :period_start 
               AND period_end = :period_end
             LIMIT 1
-        ");
-        $stmt->execute([
-            ':kpi_id' => $data['kpi_id'],
-            ':user_id' => $data['user_id'],
-            ':period_start' => $data['period_start'],
-            ':period_end' => $data['period_end'],
+        ";
+        
+        $row = $conn->fetchAssociative($sql, [
+            'kpi_id' => $data['kpi_id'],
+            'user_id' => $data['user_id'],
+            'period_start' => $data['period_start'],
+            'period_end' => $data['period_end'],
         ]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
         return $row ? (int)$row['id'] : null;
     }
 
     public function findKpiResultsForUser(int $userId, ?string $periodStart = null, ?string $periodEnd = null): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 kr.*,
@@ -140,25 +146,24 @@ class KpiRepository
             JOIN kpi_definitions kd ON kr.kpi_id = kd.id
             WHERE kr.user_id = :user_id
         ";
-        $params = [':user_id' => $userId];
+        $params = ['user_id' => $userId];
 
         if ($periodStart) {
             $sql .= " AND kr.period_start >= :period_start";
-            $params[':period_start'] = $periodStart;
+            $params['period_start'] = $periodStart;
         }
         if ($periodEnd) {
             $sql .= " AND kr.period_end <= :period_end";
-            $params[':period_end'] = $periodEnd;
+            $params['period_end'] = $periodEnd;
         }
         $sql .= " ORDER BY kr.period_start DESC";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     public function findAllKpiResults(): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 kr.*,
@@ -170,60 +175,55 @@ class KpiRepository
             JOIN users u ON kr.user_id = u.id
             ORDER BY kr.period_start DESC
         ";
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findLatestKpiResult(int $kpiId, string $periodType): ?array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT kr.*
             FROM kpi_results kr
             WHERE kr.kpi_id = :kpi_id
         ";
-        $params = [':kpi_id' => $kpiId];
+        $params = ['kpi_id' => $kpiId];
 
         switch ($periodType) {
             case 'day':
-                $sql .= " AND kr.period_start = kr.period_end"; // For 'day' period, start and end dates are the same.
+                $sql .= " AND kr.period_start = kr.period_end"; 
                 break;
             case 'week':
-                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6"; // A week covers 7 days, so the difference is 6.
+                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6"; 
                 break;
             case 'month':
-                // For month, we need to be more flexible as month length varies.
-                // A common approximation for 'month' is around 30 days, so DATEDIFF >= 28 AND DATEDIFF <= 31
-                // Given the resolvePeriodRange, it's 29 days diff.
                 $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 29";
                 break;
             default:
-                // If periodType is unknown or unsupported, do not add period filtering.
                 break;
         }
 
         $sql .= " ORDER BY kr.period_end DESC, kr.id DESC LIMIT 1";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $result = $conn->fetchAssociative($sql, $params);
+        return $result ?: null;
     }
 
     public function findKpiResultForPreviousPeriod(int $kpiId, string $currentPeriodEnd, string $periodType = 'day'): ?array
     {
-        // Adjust currentPeriodEnd to exclude the current period
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT kr.*
             FROM kpi_results kr
             WHERE kr.kpi_id = :kpi_id AND kr.period_end < :current_period_end
             ORDER BY kr.period_end DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
             LIMIT 1
-        ");
-        $stmt->execute([
-            ':kpi_id' => $kpiId,
-            ':current_period_end' => $currentPeriodEnd
+        ";
+        
+        $result = $conn->fetchAssociative($sql, [
+            'kpi_id' => $kpiId,
+            'current_period_end' => $currentPeriodEnd
         ]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        
+        return $result ?: null;
     }
 }
