@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Insurance\InsuranceController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class InsuranceModule extends BaseModule
 {
@@ -22,6 +24,24 @@ class InsuranceModule extends BaseModule
         $router->add('GET', '/insurance/claims', [InsuranceController::class, 'listClaims']);
         $router->add('GET', '/insurance/claims/show', [InsuranceController::class, 'showClaim']);
         $router->add('POST', '/insurance/claims/update-status', [InsuranceController::class, 'updateClaimStatus']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class)->setPublic(true);
+        $container->register(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class)->setPublic(true);
+        $container->register(\App\Module\Insurance\Repository\ClaimRepository::class)->setPublic(true);
+        $container->register(\App\Module\Insurance\Service\InsuranceService::class)
+            ->setArguments([
+                new Reference(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class),
+                new Reference(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class),
+                new Reference(\App\Module\Insurance\Repository\ClaimRepository::class),
+                new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+            ])->setPublic(true);
+        $container->register(\App\Module\Insurance\InsuranceController::class)
+            ->setArguments([
+                new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
