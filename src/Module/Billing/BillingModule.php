@@ -8,6 +8,8 @@ use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Billing\BillingController;
 use App\Module\Billing\ContractController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class BillingModule extends BaseModule
 {
@@ -32,6 +34,30 @@ class BillingModule extends BaseModule
         $router->add('POST', '/billing/contracts/edit', [ContractController::class, 'update']);
         $router->add('POST', '/billing/contracts/delete', [ContractController::class, 'delete']);
         $router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Billing\Repository\InvoiceRepository::class)->setPublic(true);
+        $container->register(\App\Module\Billing\Repository\ServiceRepository::class)->setPublic(true);
+        $container->register(\App\Module\Billing\Repository\ServiceBundleRepository::class)->setPublic(true);
+        $container->register(\App\Module\Billing\Repository\ContractRepository::class)->setPublic(true);
+
+        $container->register(\App\Module\Billing\BillingController::class)
+            ->setArguments([
+                new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+                new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+                new Reference(\App\Module\Billing\Repository\ServiceBundleRepository::class),
+                new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+            ])->setPublic(true);
+
+        $container->register(\App\Module\Billing\ContractController::class)
+            ->setArguments([
+                new Reference(\App\Module\Billing\Repository\ContractRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
