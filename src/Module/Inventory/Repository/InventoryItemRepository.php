@@ -2,69 +2,72 @@
 
 namespace App\Module\Inventory\Repository;
 
-use App\Database\Database;
+use App\Entity\InventoryItem;
 use App\Module\Billing\Repository\InvoiceRepository;
-use PDO;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InventoryItemRepository implements InventoryItemRepositoryInterface
+class InventoryItemRepository extends ServiceEntityRepository implements InventoryItemRepositoryInterface
 {
-    private PDO $pdo;
     private InvoiceRepository $invoiceRepository;
 
-    public function __construct()
+    public function __construct(ManagerRegistry $registry, InvoiceRepository $invoiceRepository)
     {
-        $this->pdo = Database::getInstance();
-        $this->invoiceRepository = new InvoiceRepository();
+        parent::__construct($registry, InventoryItem::class);
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     public function findAll(string $searchTerm = ''): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM inventory_items";
         $params = [];
 
         if (!empty($searchTerm)) {
             $sql .= " WHERE name LIKE :term OR inn LIKE :term OR supplier LIKE :term OR batch_number LIKE :term";
-            $params[':term'] = '%' . $searchTerm . '%';
+            $params['term'] = '%' . $searchTerm . '%';
         }
 
         $sql .= " ORDER BY name";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     public function findItemsBelowMinStock(): array
     {
-        $stmt = $this->pdo->query("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT * 
             FROM inventory_items 
             WHERE quantity < min_stock_level 
             ORDER BY name
-        ");
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function countItemsBelowMinStock(): int
     {
-        $stmt = $this->pdo->query("SELECT COUNT(*) FROM inventory_items WHERE quantity < min_stock_level");
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) FROM inventory_items WHERE quantity < min_stock_level";
+        return (int)$conn->fetchOne($sql);
     }
 
     public function findItemsAboveMaxStock(): array
     {
-        $stmt = $this->pdo->query("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT * 
             FROM inventory_items 
             WHERE quantity > max_stock_level 
             ORDER BY name
-        ");
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function save(array $data): bool
     {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
         try {
             $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, 
                                                 supplier, cost, quantity, min_stock_level, 
@@ -73,23 +76,22 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                             :supplier, :cost, :quantity, :min_stock_level, 
                             :max_stock_level, :location)";
 
-            $stmt = $this->pdo->prepare($sql);
-            $success = $stmt->execute([
-                ':name' => $data['name'],
-                ':description' => $data['description'] ?? null,
-                ':inn' => $data['inn'] ?? null,
-                ':batch_number' => $data['batch_number'] ?? null,
-                ':expiry_date' => $data['expiry_date'] ?? null,
-                ':supplier' => $data['supplier'] ?? null,
-                ':cost' => $data['cost'] ?? 0.00,
-                ':quantity' => $data['quantity'] ?? 0,
-                ':min_stock_level' => $data['min_stock_level'] ?? 0,
-                ':max_stock_level' => $data['max_stock_level'] ?? 0,
-                ':location' => $data['location'] ?? null,
+            $success = $conn->executeStatement($sql, [
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'inn' => $data['inn'] ?? null,
+                'batch_number' => $data['batch_number'] ?? null,
+                'expiry_date' => $data['expiry_date'] ?? null,
+                'supplier' => $data['supplier'] ?? null,
+                'cost' => $data['cost'] ?? 0.00,
+                'quantity' => $data['quantity'] ?? 0,
+                'min_stock_level' => $data['min_stock_level'] ?? 0,
+                'max_stock_level' => $data['max_stock_level'] ?? 0,
+                'location' => $data['location'] ?? null,
             ]);
 
-            if ($success) {
-                $itemId = (int)$this->pdo->lastInsertId();
+            if ($success > 0) {
+                $itemId = (int)$conn->lastInsertId();
                 if (($data['quantity'] ?? 0) > 0) {
                     $this->logMovement(
                         $itemId,
@@ -101,40 +103,39 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                         $data['cost'] ?? 0.00
                     );
                 }
-                $this->pdo->commit();
+                $conn->commit();
                 return true;
             }
-            $this->pdo->rollBack();
+            $conn->rollBack();
             return false;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
-            // Log error
+        } catch (\Exception $e) {
+            $conn->rollBack();
             return false;
         }
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM inventory_items WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM inventory_items WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function update(int $id, array $data): bool
     {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
         try {
             $oldItem = $this->findById($id);
             if (!$oldItem) {
-                $this->pdo->rollBack();
+                $conn->rollBack();
                 return false;
             }
             $oldQuantity = $oldItem['quantity'];
             $newQuantity = $data['quantity'] ?? $oldQuantity;
             $oldCost = $oldItem['cost'];
             $newCost = $data['cost'] ?? $oldCost;
-
 
             $sql = "UPDATE inventory_items SET 
                         name = :name, 
@@ -150,24 +151,22 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                         location = :location 
                     WHERE id = :id";
 
-            $stmt = $this->pdo->prepare($sql);
-
-            $success = $stmt->execute([
-                ':id' => $id,
-                ':name' => $data['name'],
-                ':description' => $data['description'] ?? null,
-                ':inn' => $data['inn'] ?? null,
-                ':batch_number' => $data['batch_number'] ?? null,
-                ':expiry_date' => $data['expiry_date'] ?? null,
-                ':supplier' => $data['supplier'] ?? null,
-                ':cost' => $newCost,
-                ':quantity' => $newQuantity,
-                ':min_stock_level' => $data['min_stock_level'] ?? 0,
-                ':max_stock_level' => $data['max_stock_level'] ?? 0,
-                ':location' => $data['location'] ?? null,
+            $success = $conn->executeStatement($sql, [
+                'id' => $id,
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'inn' => $data['inn'] ?? null,
+                'batch_number' => $data['batch_number'] ?? null,
+                'expiry_date' => $data['expiry_date'] ?? null,
+                'supplier' => $data['supplier'] ?? null,
+                'cost' => $newCost,
+                'quantity' => $newQuantity,
+                'min_stock_level' => $data['min_stock_level'] ?? 0,
+                'max_stock_level' => $data['max_stock_level'] ?? 0,
+                'location' => $data['location'] ?? null,
             ]);
 
-            if ($success) {
+            if ($success > 0) {
                 if ($newQuantity !== $oldQuantity) {
                     $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
                     $quantityChange = abs($newQuantity - $oldQuantity);
@@ -183,11 +182,10 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                     );
                 }
             }
-            $this->pdo->commit();
-            return $success;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
-            // Log error
+            $conn->commit();
+            return $success > 0;
+        } catch (\Exception $e) {
+            $conn->rollBack();
             return false;
         }
     }
@@ -201,30 +199,30 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
         string $reason,
         float $itemCost
     ): bool {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, 
                                                 quantity_change, new_quantity, reason) 
                 VALUES (:inventory_item_id, :user_id, :movement_type, 
                         :quantity_change, :new_quantity, :reason)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':inventory_item_id' => $itemId,
-            ':user_id' => $userId,
-            ':movement_type' => $movementType,
-            ':quantity_change' => $quantityChange,
-            ':new_quantity' => $newQuantity,
-            ':reason' => $reason,
+        $success = $conn->executeStatement($sql, [
+            'inventory_item_id' => $itemId,
+            'user_id' => $userId,
+            'movement_type' => $movementType,
+            'quantity_change' => $quantityChange,
+            'new_quantity' => $newQuantity,
+            'reason' => $reason,
         ]);
 
-        if ($success) {
+        if ($success > 0) {
             $amount = $quantityChange * $itemCost;
             $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue';
             if ($movementType === 'out') {
-                $amount = -$amount; // Negative for cost deduction
+                $amount = -$amount;
             }
 
             $itemDetails = $this->findById($itemId);
-            $patientId = 0; // Placeholder, as inventory movement might not directly link to a patient
-            if (isset($_SESSION['current_patient_id'])) { // If there's a context of a patient
+            $patientId = 0;
+            if (isset($_SESSION['current_patient_id'])) {
                 $patientId = $_SESSION['current_patient_id'];
             }
 
@@ -242,12 +240,13 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
                 $itemId
             );
         }
-        return $success;
+        return $success > 0;
     }
 
     public function getMovementHistory(int $itemId): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 im.*,
                 CONCAT(u.last_name, ' ', u.first_name) as user_name
@@ -255,42 +254,40 @@ class InventoryItemRepository implements InventoryItemRepositoryInterface
             LEFT JOIN users u ON im.user_id = u.id
             WHERE im.inventory_item_id = :inventory_item_id
             ORDER BY im.created_at DESC
-        ");
-        $stmt->execute([':inventory_item_id' => $itemId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ";
+        return $conn->fetchAllAssociative($sql, ['inventory_item_id' => $itemId]);
     }
 
     public function findByName(string $name): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM inventory_items WHERE name = :name");
-        $stmt->execute([':name' => $name]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM inventory_items WHERE name = :name";
+        $result = $conn->fetchAssociative($sql, ['name' => $name]);
+        return $result ?: null;
     }
 
     public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту'): bool
     {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
         try {
             $item = $this->findById($itemId);
             if (!$item || $item['quantity'] < $quantity) {
-                $this->pdo->rollBack();
-                return false; // Not enough stock or item not found
+                $conn->rollBack();
+                return false;
             }
 
             $newQuantity = $item['quantity'] - $quantity;
             $sql = "UPDATE inventory_items SET quantity = :quantity WHERE id = :id";
-            $stmt = $this->pdo->prepare($sql);
-            $success = $stmt->execute([':quantity' => $newQuantity, ':id' => $itemId]);
+            $success = $conn->executeStatement($sql, ['quantity' => $newQuantity, 'id' => $itemId]);
 
-            if ($success) {
+            if ($success > 0) {
                 $this->logMovement($itemId, $userId, 'out', $quantity, $newQuantity, $reason, $item['cost']);
             }
-            $this->pdo->commit();
-            return $success;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
-            // Log error
+            $conn->commit();
+            return $success > 0;
+        } catch (\Exception $e) {
+            $conn->rollBack();
             return false;
         }
     }
