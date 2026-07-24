@@ -7,6 +7,7 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Repository\SettingsRepository;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
@@ -49,6 +50,7 @@ class AdminController
         $this->mfaService = $mfaService;
     }
 
+    #[Route('/admin/settings', name: 'admin_settings', methods: ['GET'])]
     public function showSettings(): void
     {
         $this->authorizeAdmin();
@@ -71,6 +73,7 @@ class AdminController
         ]);
     }
 
+    #[Route('/admin/settings', name: 'admin_settings_post', methods: ['POST'])]
     public function updateSettings(): void
     {
         $this->authorizeAdmin();
@@ -98,6 +101,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
     public function users(): void
     {
         $this->authorizeAdmin();
@@ -120,6 +124,7 @@ class AdminController
         ]);
     }
 
+    #[Route('/admin/users/new', name: 'admin_users_new', methods: ['GET'])]
     public function createUser(): void
     {
         $this->authorizeAdmin();
@@ -138,6 +143,7 @@ class AdminController
         ]);
     }
 
+    #[Route('/admin/users/new', name: 'admin_users_new_post', methods: ['POST'])]
     public function storeUser(): void
     {
         $this->authorizeAdmin();
@@ -168,6 +174,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/users/show', name: 'admin_users_show', methods: ['GET'])]
     public function showUser(): void
     {
         $this->authorizeAdmin();
@@ -187,6 +194,7 @@ class AdminController
         View::render('@modules/Admin/templates/show_user.html.twig', ['user' => $user]);
     }
 
+    #[Route('/admin/users/edit', name: 'admin_users_edit', methods: ['GET'])]
     public function editUser(): void
     {
         $this->authorizeAdmin();
@@ -246,6 +254,7 @@ class AdminController
         return $roleOptions;
     }
 
+    #[Route('/admin/users/edit', name: 'admin_users_edit_post', methods: ['POST'])]
     public function updateUser(): void
     {
         $this->authorizeAdmin();
@@ -291,6 +300,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/users/delete', name: 'admin_users_delete', methods: ['POST'])]
     public function deleteUser(): void
     {
         $this->authorizeAdmin();
@@ -317,6 +327,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
     public function disableUserMfa(): void
     {
         $this->authorizeAdmin();
@@ -338,6 +349,7 @@ class AdminController
     }
 
     // --- Role Management ---
+    #[Route('/admin/roles', name: 'admin_roles', methods: ['GET'])]
     public function listRoles(): void
     {
         $this->authorizeAdmin();
@@ -345,6 +357,7 @@ class AdminController
         View::render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
     }
 
+    #[Route('/admin/roles/new', name: 'admin_roles_new', methods: ['GET'])]
     public function createRole(): void
     {
         $this->authorizeAdmin();
@@ -355,6 +368,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/roles/new', name: 'admin_roles_new_post', methods: ['POST'])]
     public function storeRole(): void
     {
         $this->authorizeAdmin();
@@ -378,6 +392,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
     public function editRole(): void
     {
         $this->authorizeAdmin();
@@ -399,6 +414,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/roles/edit', name: 'admin_roles_edit_post', methods: ['POST'])]
     public function updateRole(): void
     {
         $this->authorizeAdmin();
@@ -431,6 +447,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
     public function deleteRole(): void
     {
         $this->authorizeAdmin();
@@ -451,6 +468,7 @@ class AdminController
     }
 
     // --- Dictionary Management ---
+    #[Route('/admin/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
     public function listDictionaries(): void
     {
         $this->authorizeAdmin();
@@ -458,6 +476,7 @@ class AdminController
         View::render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
+    #[Route('/admin/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
     public function showDictionary(): void
     {
         $this->authorizeAdmin();
@@ -477,6 +496,7 @@ class AdminController
         ]);
     }
 
+    #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new', methods: ['GET'])]
     public function createDictionary(): void
     {
         $this->authorizeAdmin();
@@ -487,6 +507,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new_post', methods: ['POST'])]
     public function storeDictionary(): void
     {
         $this->authorizeAdmin();
@@ -510,6 +531,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
     public function editDictionary(): void
     {
         $this->authorizeAdmin();
@@ -531,6 +553,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit_post', methods: ['POST'])]
     public function updateDictionary(): void
     {
         $this->authorizeAdmin();
@@ -563,6 +586,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
     public function deleteDictionary(): void
     {
         $this->authorizeAdmin();
@@ -575,6 +599,7 @@ class AdminController
     }
 
     // --- Dictionary Value Management ---
+    #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new', methods: ['GET'])]
     public function createDictionaryValue(): void
     {
         $this->authorizeAdmin();
@@ -587,6 +612,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new_post', methods: ['POST'])]
     public function storeDictionaryValue(): void
     {
         $this->authorizeAdmin();
@@ -612,6 +638,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
     public function editDictionaryValue(): void
     {
         $this->authorizeAdmin();
@@ -633,6 +660,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit_post', methods: ['POST'])]
     public function updateDictionaryValue(): void
     {
         $this->authorizeAdmin();
@@ -661,6 +689,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
     public function deleteDictionaryValue(): void
     {
         $this->authorizeAdmin();
@@ -676,6 +705,7 @@ class AdminController
     }
 
     // --- Auth Configuration Management ---
+    #[Route('/admin/auth_configs', name: 'admin_auth_configs', methods: ['GET'])]
     public function listAuthConfigs(): void
     {
         $this->authorizeAdmin();
@@ -683,6 +713,7 @@ class AdminController
         View::render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
+    #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
     public function createAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -696,6 +727,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new_post', methods: ['POST'])]
     public function storeAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -721,6 +753,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
     public function editAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -744,6 +777,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit_post', methods: ['POST'])]
     public function updateAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -778,6 +812,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/auth_configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
     public function deleteAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -789,6 +824,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/auth_configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
     public function showAuthConfig(): void
     {
         $this->authorizeAdmin();
@@ -1037,6 +1073,7 @@ class AdminController
     }
 
     // --- Service Management ---
+    #[Route('/admin/services', name: 'admin_services', methods: ['GET'])]
     public function listServices(): void
     {
         $this->authorizeAdmin();
@@ -1045,6 +1082,7 @@ class AdminController
         View::render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
     }
 
+    #[Route('/admin/services/new', name: 'admin_services_new', methods: ['GET'])]
     public function createService(): void
     {
         $this->authorizeAdmin();
@@ -1063,6 +1101,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/services/new', name: 'admin_services_new_post', methods: ['POST'])]
     public function storeService(): void
     {
         $this->authorizeAdmin();
@@ -1091,6 +1130,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/services/edit', name: 'admin_services_edit', methods: ['GET'])]
     public function editService(): void
     {
         $this->authorizeAdmin();
@@ -1120,6 +1160,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
     public function updateService(): void
     {
         $this->authorizeAdmin();
@@ -1157,6 +1198,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/services/delete', name: 'admin_services_delete', methods: ['POST'])]
     public function deleteService(): void
     {
         $this->authorizeAdmin();
@@ -1170,6 +1212,7 @@ class AdminController
     }
 
     // --- Service Category Management ---
+    #[Route('/admin/service-categories', name: 'admin_service_categories', methods: ['GET'])]
     public function listServiceCategories(): void
     {
         $this->authorizeAdmin();
@@ -1178,6 +1221,7 @@ class AdminController
         View::render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
+    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
     public function createServiceCategory(): void
     {
         $this->authorizeAdmin();
@@ -1189,6 +1233,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
     public function storeServiceCategory(): void
     {
         $this->authorizeAdmin();
@@ -1213,6 +1258,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
     public function editServiceCategory(): void
     {
         $this->authorizeAdmin();
@@ -1235,6 +1281,7 @@ class AdminController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
     public function updateServiceCategory(): void
     {
         $this->authorizeAdmin();
@@ -1268,6 +1315,7 @@ class AdminController
         exit();
     }
 
+    #[Route('/admin/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
     public function deleteServiceCategory(): void
     {
         $this->authorizeAdmin();
