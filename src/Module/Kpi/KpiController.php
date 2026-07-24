@@ -7,7 +7,7 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
 
@@ -15,13 +15,16 @@ class KpiController
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
-    private AppointmentRepository $appointmentRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
 
-    public function __construct(?KpiRepository $kpiRepository = null, ?InvoiceRepository $invoiceRepository = null, ?AppointmentRepository $appointmentRepository = null)
-    {
-        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
-        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+    public function __construct(
+        KpiRepository $kpiRepository,
+        InvoiceRepository $invoiceRepository,
+        AppointmentRepositoryInterface $appointmentRepository
+    ) {
+        $this->kpiRepository = $kpiRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->appointmentRepository = $appointmentRepository;
     }
 
     // --- KPI Definitions ---
