@@ -8,6 +8,7 @@ use App\Core\Http\View;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ScheduleController
 {
@@ -22,6 +23,7 @@ class ScheduleController
         $this->userRepository = $userRepository;
     }
 
+    #[Route('/doctor/schedule', name: 'doctor_schedule_index', methods: ['GET'])]
     public function index(): void
     {
         // Personal schedule for doctors
@@ -46,6 +48,7 @@ class ScheduleController
         ]);
     }
 
+    #[Route('/admin/schedules', name: 'admin_schedules_index', methods: ['GET'])]
     public function adminIndex(): void
     {
         // Admin schedule management for all doctors
@@ -58,6 +61,7 @@ class ScheduleController
         ]);
     }
 
+    #[Route('/admin/schedules/show', name: 'admin_schedules_show', methods: ['GET'])]
     public function adminShow(): void
     {
         Gate::authorize('schedules.manage_all');
@@ -82,6 +86,7 @@ class ScheduleController
         ]);
     }
 
+    #[Route('/doctor/schedule/update', name: 'doctor_schedule_update', methods: ['POST'])]
     public function update(): void
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
@@ -122,6 +127,7 @@ class ScheduleController
         exit;
     }
 
+    #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
     public function addException(): void
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
@@ -153,6 +159,7 @@ class ScheduleController
         exit;
     }
 
+    #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
     public function deleteException(): void
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
@@ -188,6 +195,7 @@ class ScheduleController
     }
 
     // Admin schedule management methods
+    #[Route('/admin/schedules/update', name: 'admin_schedules_update', methods: ['POST'])]
     public function adminUpdate(): void
     {
         Gate::authorize('schedules.manage_all');
@@ -223,6 +231,7 @@ class ScheduleController
         exit;
     }
 
+    #[Route('/admin/schedules/exceptions/add', name: 'admin_schedules_exceptions_add', methods: ['POST'])]
     public function adminAddException(): void
     {
         Gate::authorize('schedules.manage_all');
@@ -249,6 +258,7 @@ class ScheduleController
         exit;
     }
 
+    #[Route('/admin/schedules/exceptions/delete', name: 'admin_schedules_exceptions_delete', methods: ['POST'])]
     public function adminDeleteException(): void
     {
         Gate::authorize('schedules.manage_all');
@@ -278,6 +288,7 @@ class ScheduleController
         exit;
     }
 
+    #[Route('/admin/schedules/edit', name: 'admin_schedules_edit', methods: ['GET'])]
     public function adminEdit(): void
     {
         Gate::authorize('schedules.manage_all');
