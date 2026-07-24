@@ -7,6 +7,7 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Billing\Repository\ContractRepository;
 
 class ContractController
@@ -18,6 +19,7 @@ class ContractController
         $this->contractRepository = $contractRepository;
     }
 
+    #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -26,6 +28,7 @@ class ContractController
         View::render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
+    #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -37,6 +40,7 @@ class ContractController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/billing/contracts/new', name: 'billing_contracts_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -88,6 +92,7 @@ class ContractController
         exit();
     }
 
+    #[Route('/billing/contracts/show', name: 'billing_contracts_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -105,6 +110,7 @@ class ContractController
         View::render('@modules/Billing/templates/contracts/show.html.twig', ['contract' => $contract]);
     }
 
+    #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -127,6 +133,7 @@ class ContractController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/billing/contracts/edit', name: 'billing_contracts_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -179,6 +186,7 @@ class ContractController
         exit();
     }
 
+    #[Route('/billing/contracts/delete', name: 'billing_contracts_delete', methods: ['POST'])]
     public function delete(): void
     {
         AuthGuard::check();
@@ -204,6 +212,7 @@ class ContractController
         exit();
     }
 
+    #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
     public function downloadFile(int $id = 0): void
     {
         AuthGuard::check();

@@ -10,6 +10,7 @@ use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
@@ -58,6 +59,7 @@ class BillingController
         $this->insuranceService = $insuranceService;
     }
 
+    #[Route('/billing', name: 'billing_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -163,6 +165,7 @@ class BillingController
         exit();
     }
 
+    #[Route('/billing/new', name: 'billing_new', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -209,6 +212,7 @@ class BillingController
         ]);
     }
 
+    #[Route('/billing/new', name: 'billing_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -261,6 +265,7 @@ class BillingController
         exit();
     }
 
+    #[Route('/billing/show', name: 'billing_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -282,6 +287,7 @@ class BillingController
         unset($_SESSION['errors']);
     }
 
+    #[Route('/billing/add-payment', name: 'billing_add_payment', methods: ['POST'])]
     public function addPayment(): void
     {
         AuthGuard::check();
@@ -322,6 +328,7 @@ class BillingController
         exit();
     }
 
+    #[Route('/billing/edit', name: 'billing_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -378,6 +385,7 @@ class BillingController
         ]);
     }
 
+    #[Route('/billing/edit', name: 'billing_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -414,6 +422,7 @@ class BillingController
         exit();
     }
 
+    #[Route('/billing/export-csv', name: 'billing_export_csv', methods: ['GET'])]
     public function exportInvoicesToCsv(): void
     {
         AuthGuard::check();
@@ -450,6 +459,7 @@ class BillingController
         $exporter->download('invoices_export.csv');
     }
 
+    #[Route('/billing/export-pdf', name: 'billing_export_pdf', methods: ['GET'])]
     public function exportInvoicesToPdf(): void
     {
         AuthGuard::check();
@@ -471,6 +481,7 @@ class BillingController
         $pdfExporter->download('invoices_export.pdf');
     }
 
+    #[Route('/billing/export-excel', name: 'billing_export_excel', methods: ['GET'])]
     public function exportInvoicesToExcel(): void
     {
         AuthGuard::check();
