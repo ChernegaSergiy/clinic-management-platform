@@ -2,30 +2,35 @@
 
 namespace App\Module\Dashboard\Service;
 
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
 use DateTimeImmutable;
 
 class KpiCalculatorService
 {
     private KpiRepository $kpiRepository;
-    private AppointmentRepository $appointmentRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
     /** @phpstan-ignore property.onlyWritten */
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
     /** @phpstan-ignore property.onlyWritten */
-    private MedicalRecordRepository $medicalRecordRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
 
-    public function __construct(?KpiRepository $kpiRepository = null, ?AppointmentRepository $appointmentRepository = null, ?InvoiceRepository $invoiceRepository = null, ?UserRepository $userRepository = null, ?MedicalRecordRepository $medicalRecordRepository = null)
-    {
-        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+    public function __construct(
+        KpiRepository $kpiRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        InvoiceRepository $invoiceRepository,
+        UserRepositoryInterface $userRepository,
+        MedicalRecordRepositoryInterface $medicalRecordRepository
+    ) {
+        $this->kpiRepository = $kpiRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->userRepository = $userRepository;
+        $this->medicalRecordRepository = $medicalRecordRepository;
     }
 
     public function calculateAndStoreAll(?string $forDate = null): void
