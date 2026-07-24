@@ -19,6 +19,7 @@ use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PatientController
 {
@@ -51,6 +52,7 @@ class PatientController
         $this->insuranceService = $insuranceService;
     }
 
+    #[Route('/patients', name: 'patient_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -73,6 +75,7 @@ class PatientController
         ]);
     }
 
+    #[Route('/patients/new', name: 'patient_create', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -80,6 +83,7 @@ class PatientController
         View::render('@modules/Patient/templates/new.html.twig');
     }
 
+    #[Route('/patients/new', name: 'patient_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -123,6 +127,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/show', name: 'patient_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -147,6 +152,7 @@ class PatientController
         ]);
     }
 
+    #[Route('/patients/edit', name: 'patient_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -164,6 +170,7 @@ class PatientController
         View::render('@modules/Patient/templates/edit.html.twig', ['patient' => $patient]);
     }
 
+    #[Route('/patients/edit', name: 'patient_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -214,6 +221,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/export-csv', name: 'patient_export_csv', methods: ['GET'])]
     public function exportCsv(): void
     {
         AuthGuard::check();
@@ -232,6 +240,7 @@ class PatientController
         $exporter->download('patients_export.csv');
     }
 
+    #[Route('/patients/export-json', name: 'patient_export_json', methods: ['GET'])]
     public function exportPatientsToJson(): void
     {
         AuthGuard::check();
@@ -249,6 +258,7 @@ class PatientController
         $jsonExporter->export($patients, 'patients_export.json');
     }
 
+    #[Route('/patients/import-json', name: 'patient_import_json', methods: ['GET', 'POST'])]
     public function importPatientsFromJson(): void
     {
         AuthGuard::check();
@@ -347,6 +357,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/toggle-status', name: 'patient_toggle_status', methods: ['POST'])]
     public function toggleStatus(): void
     {
         AuthGuard::check();
@@ -364,6 +375,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/{patientId}/policies/add', name: 'patient_policy_add', methods: ['GET'])]
     public function addPolicy(int $patientId): void
     {
         AuthGuard::check();
@@ -384,6 +396,7 @@ class PatientController
         ]);
     }
 
+    #[Route('/patients/{patientId}/policies/store', name: 'patient_policy_store', methods: ['POST'])]
     public function storePolicy(int $patientId): void
     {
         AuthGuard::check();
@@ -430,6 +443,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/{patientId}/policies/edit', name: 'patient_policy_edit', methods: ['GET'])]
     public function editPolicy(int $patientId): void
     {
         AuthGuard::check();
@@ -454,6 +468,7 @@ class PatientController
         ]);
     }
 
+    #[Route('/patients/{patientId}/policies/update', name: 'patient_policy_update', methods: ['POST'])]
     public function updatePolicy(int $patientId): void
     {
         AuthGuard::check();
@@ -505,6 +520,7 @@ class PatientController
         exit();
     }
 
+    #[Route('/patients/{patientId}/policies/delete', name: 'patient_policy_delete', methods: ['POST'])]
     public function deletePolicy(int $patientId): void
     {
         AuthGuard::check();
