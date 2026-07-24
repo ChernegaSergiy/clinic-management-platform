@@ -4,15 +4,15 @@ namespace App\Module\LabOrder;
 
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 
 class LabOrderPolicy implements Policy
 {
-    private LabOrderRepository $labOrderRepository;
+    private LabOrderRepositoryInterface $labOrderRepository;
 
-    public function __construct(?LabOrderRepository $labOrderRepository = null)
+    public function __construct(LabOrderRepositoryInterface $labOrderRepository)
     {
-        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
+        $this->labOrderRepository = $labOrderRepository;
     }
 
     public function view(User $user, array $context): bool
