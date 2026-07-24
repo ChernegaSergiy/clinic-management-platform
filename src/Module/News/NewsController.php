@@ -8,19 +8,19 @@ use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 // To get author info
 
 class NewsController
 {
     private NewsRepository $newsRepository;
-    private UserRepository $userRepository; // For author selection in admin forms
+    private UserRepositoryInterface $userRepository; // For author selection in admin forms
 
-    public function __construct(?NewsRepository $newsRepository = null, ?UserRepository $userRepository = null)
+    public function __construct(NewsRepository $newsRepository, UserRepositoryInterface $userRepository)
     {
-        $this->newsRepository = $newsRepository ?? new NewsRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->newsRepository = $newsRepository;
+        $this->userRepository = $userRepository;
     }
 
     // Public listing of news articles
