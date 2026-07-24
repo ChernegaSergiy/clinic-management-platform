@@ -63,6 +63,8 @@ class UserModule extends BaseModule
                 new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
                 new Reference(\App\Module\User\Repository\RoleRepository::class),
                 new Reference(\App\Module\User\MfaService::class),
+                new Reference(\App\Core\Repository\SettingsRepository::class),
+                new Reference(\App\Module\User\OAuthController::class),
             ])->setPublic(true);
 
         $container->register(\App\Module\User\MfaController::class)
