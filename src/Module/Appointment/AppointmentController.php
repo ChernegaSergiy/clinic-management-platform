@@ -16,6 +16,8 @@ use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\Schedule\Service\SchedulingService;
 use App\Module\User\Repository\UserRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AppointmentController
 {
@@ -51,6 +53,7 @@ class AppointmentController
         $this->roomRepository = $roomRepository;
     }
 
+    #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -88,6 +91,7 @@ class AppointmentController
         ]);
     }
 
+    #[Route('/book-appointment', name: 'appointment_public_form', methods: ['GET'])]
     public function publicForm(): void
     {
         $doctors = $this->userRepository->findAllDoctors();
@@ -119,6 +123,7 @@ class AppointmentController
         unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['public_success_message']);
     }
 
+    #[Route('/book-appointment', name: 'appointment_submit_public_form', methods: ['POST'])]
     public function submitPublicForm(): void
     {
         $rawInput = $_POST;
@@ -203,6 +208,7 @@ class AppointmentController
         exit();
     }
 
+    #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
     public function rejectWaitlist(): void
     {
         AuthGuard::check();
@@ -219,6 +225,7 @@ class AppointmentController
         exit();
     }
 
+    #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -310,6 +317,7 @@ class AppointmentController
         ]);
     }
 
+    #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -462,6 +470,7 @@ class AppointmentController
         return new \DateTime($value);
     }
 
+    #[Route('/appointments/json', name: 'appointment_json', methods: ['GET'])]
     public function json(): void
     {
         AuthGuard::check();
@@ -521,6 +530,7 @@ class AppointmentController
         echo json_encode($events);
     }
 
+    #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -538,6 +548,7 @@ class AppointmentController
         View::render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
     }
 
+    #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -589,6 +600,7 @@ class AppointmentController
         ]);
     }
 
+    #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -710,6 +722,7 @@ class AppointmentController
         exit();
     }
 
+    #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
     public function cancel(): void
     {
         AuthGuard::check();
@@ -749,6 +762,7 @@ class AppointmentController
         exit();
     }
 
+    #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
     public function showWaitlist(): void
     {
         AuthGuard::check();
@@ -775,6 +789,7 @@ class AppointmentController
         ]);
     }
 
+    #[Route('/appointments/waitlist/add', name: 'appointment_add_waitlist', methods: ['POST'])]
     public function addPatientToWaitlist(): void
     {
         AuthGuard::check();
