@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\LabOrder\LabOrderController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class LabOrderModule extends BaseModule
 {
@@ -19,6 +21,21 @@ class LabOrderModule extends BaseModule
         $router->add('POST', '/lab-orders/edit', [LabOrderController::class, 'update']);
     }
 
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\LabOrder\Repository\LabOrderRepository::class)->setPublic(true);
+        $container->register(\App\Module\LabOrder\Repository\LabResourceRepository::class)->setPublic(true);
+        $container->register(\App\Module\LabOrder\Service\LabImportService::class)->setPublic(true);
+        $container->register(\App\Module\LabOrder\LabOrderController::class)
+            ->setArguments([
+                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Core\Service\NotificationService::class),
+                new Reference(\App\Core\Service\QrCodeGenerator::class),
+                new Reference(\App\Module\LabOrder\Service\LabImportService::class),
+            ])->setPublic(true);
+    }
 
     public function registerPermissions(PermissionRegistry $registry): void
     {
