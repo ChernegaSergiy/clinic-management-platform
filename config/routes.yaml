@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../src/Module/*/Controller/
+        namespace: App\Module\
+    type: attribute
