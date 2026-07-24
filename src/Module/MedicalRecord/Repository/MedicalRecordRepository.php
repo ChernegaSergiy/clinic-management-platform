@@ -2,123 +2,142 @@
 
 namespace App\Module\MedicalRecord\Repository;
 
+use App\Entity\MedicalRecord;
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Database\Database;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 use PDO;
 
-class MedicalRecordRepository implements MedicalRecordRepositoryInterface
+class MedicalRecordRepository extends ServiceEntityRepository implements MedicalRecordRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, MedicalRecord::class);
     }
 
     public function findByPatientId(int $patientId): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                mr.id, mr.patient_id, mr.appointment_id, mr.doctor_id, mr.visit_date, 
-                mr.diagnosis_code, mr.diagnosis_text, mr.treatment, mr.notes,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name
-            FROM medical_records mr
-            JOIN users u ON mr.doctor_id = u.id
-            JOIN patients p ON mr.patient_id = p.id
-            WHERE mr.patient_id = :patient_id
-            ORDER BY mr.visit_date DESC
-        ");
-        $stmt->execute([':patient_id' => $patientId]);
-        return $stmt->fetchAll();
+        $qb = $this->createQueryBuilder('mr')
+            ->select(
+                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
+                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
+                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
+                "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
+            )
+            ->join('mr.doctor', 'u')
+            ->join('mr.patient', 'p')
+            ->where('mr.patient = :patient_id')
+            ->setParameter('patient_id', $patientId)
+            ->orderBy('mr.visit_date', 'DESC');
+
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "
-            SELECT 
-                mr.*,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name
-            FROM medical_records mr
-            JOIN users u ON mr.doctor_id = u.id
-            JOIN patients p ON mr.patient_id = p.id
-        ";
+        $qb = $this->createQueryBuilder('mr')
+            ->select(
+                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
+                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
+                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
+                "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
+            )
+            ->join('mr.doctor', 'u')
+            ->join('mr.patient', 'p');
 
-        $params = [];
         if (!empty($searchTerm)) {
-            $sql .= " WHERE CONCAT(p.last_name, ' ', p.first_name) LIKE :searchTerm 
-                      OR CONCAT(u.last_name, ' ', u.first_name) LIKE :searchTerm
-                      OR mr.diagnosis_code LIKE :searchTerm";
-            $params[':searchTerm'] = '%' . $searchTerm . '%';
+            $qb->where("CONCAT(p.last_name, ' ', p.first_name) LIKE :searchTerm")
+               ->orWhere("CONCAT(u.last_name, ' ', u.first_name) LIKE :searchTerm")
+               ->orWhere('mr.diagnosis_code LIKE :searchTerm')
+               ->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY mr.visit_date DESC";
+        $qb->orderBy('mr.visit_date', 'DESC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findByDoctorId(int $doctorId, string $searchTerm = ''): array
     {
-        $sql = "
-            SELECT 
-                mr.*,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name
-            FROM medical_records mr
-            JOIN users u ON mr.doctor_id = u.id
-            JOIN patients p ON mr.patient_id = p.id
-            WHERE mr.doctor_id = :doctor_id
-        ";
-
-        $params = [':doctor_id' => $doctorId];
+        $qb = $this->createQueryBuilder('mr')
+            ->select(
+                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
+                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
+                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
+                "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
+            )
+            ->join('mr.doctor', 'u')
+            ->join('mr.patient', 'p')
+            ->where('mr.doctor = :doctor_id')
+            ->setParameter('doctor_id', $doctorId);
 
         if (!empty($searchTerm)) {
-            $sql .= " AND (CONCAT(p.last_name, ' ', p.first_name) LIKE :searchTerm OR mr.diagnosis_code LIKE :searchTerm)";
-            $params[':searchTerm'] = '%' . $searchTerm . '%';
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like("CONCAT(p.last_name, ' ', p.first_name)", ':searchTerm'),
+                    $qb->expr()->like('mr.diagnosis_code', ':searchTerm')
+                )
+            )->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY mr.visit_date DESC";
+        $qb->orderBy('mr.visit_date', 'DESC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data): int|false
     {
-        $sql = "INSERT INTO medical_records (patient_id, appointment_id, doctor_id, visit_date, 
-                                            diagnosis_code, diagnosis_text, treatment, notes) 
-                VALUES (:patient_id, :appointment_id, :doctor_id, :visit_date, 
-                        :diagnosis_code, :diagnosis_text, :treatment, :notes)";
+        $mr = new MedicalRecord();
+        
+        $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+        $mr->setPatient($patient);
+        
+        $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+        $mr->setDoctor($doctor);
 
-        $stmt = $this->pdo->prepare($sql);
+        if (!empty($data['appointment_id'])) {
+            $appointment = $this->getEntityManager()->getReference(\App\Entity\Appointment::class, $data['appointment_id']);
+            $mr->setAppointment($appointment);
+        }
 
-        $success = $stmt->execute(
-            [
-                ':patient_id' => $data['patient_id'],
-                ':appointment_id' => $data['appointment_id'],
-                ':doctor_id' => $data['doctor_id'],
-                ':visit_date' => $data['visit_date'],
-                ':diagnosis_code' => $data['diagnosis_code'] ?? null,
-                ':diagnosis_text' => $data['diagnosis_text'] ?? null,
-                ':treatment' => $data['treatment'] ?? null,
-                ':notes' => $data['notes'] ?? null,
-            ]
-        );
+        if (!empty($data['visit_date'])) {
+            try {
+                $mr->setVisitDate(new \DateTime($data['visit_date']));
+            } catch (\Exception $e) {}
+        }
+        
+        if (array_key_exists('diagnosis_code', $data)) {
+            $mr->setDiagnosisCode($data['diagnosis_code']);
+        }
+        if (array_key_exists('diagnosis_text', $data)) {
+            $mr->setDiagnosisText($data['diagnosis_text']);
+        }
+        if (array_key_exists('treatment', $data)) {
+            $mr->setTreatment($data['treatment']);
+        }
+        if (array_key_exists('notes', $data)) {
+            $mr->setNotes($data['notes']);
+        }
 
-        if ($success) {
-            $medicalRecordId = (int)$this->pdo->lastInsertId();
+        try {
+            $this->getEntityManager()->persist($mr);
+            $this->getEntityManager()->flush();
+
+            $medicalRecordId = $mr->getId();
+
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
                 $this->attachIcdCodes($medicalRecordId, $data['icd_codes']);
             }
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
                 $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
+            
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
             EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -126,9 +145,11 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
                 'Створено новий медичний запис після візиту',
                 ['medical_record_id' => $medicalRecordId]
             ));
+            
             return $medicalRecordId;
+        } catch (\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     public function update(int $id, array $data): bool
@@ -138,34 +159,53 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             return false;
         }
 
-        $sql = "UPDATE medical_records SET
-                    patient_id = :patient_id,
-                    appointment_id = :appointment_id,
-                    doctor_id = :doctor_id,
-                    visit_date = :visit_date,
-                    diagnosis_code = :diagnosis_code,
-                    diagnosis_text = :diagnosis_text,
-                    treatment = :treatment,
-                    notes = :notes
-                WHERE id = :id";
+        /** @var MedicalRecord|null $mr */
+        $mr = $this->find($id);
+        if (!$mr) {
+            return false;
+        }
 
-        $stmt = $this->pdo->prepare($sql);
+        if (isset($data['patient_id'])) {
+            $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+            $mr->setPatient($patient);
+        }
+        
+        if (isset($data['doctor_id'])) {
+            $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+            $mr->setDoctor($doctor);
+        }
 
-        $success = $stmt->execute(
-            [
-                ':patient_id' => $data['patient_id'],
-                ':appointment_id' => $data['appointment_id'],
-                ':doctor_id' => $data['doctor_id'],
-                ':visit_date' => $data['visit_date'],
-                ':diagnosis_code' => $data['diagnosis_code'] ?? null,
-                ':diagnosis_text' => $data['diagnosis_text'] ?? null,
-                ':treatment' => $data['treatment'] ?? null,
-                ':notes' => $data['notes'] ?? null,
-                ':id' => $id,
-            ]
-        );
+        if (array_key_exists('appointment_id', $data)) {
+            if (!empty($data['appointment_id'])) {
+                $appointment = $this->getEntityManager()->getReference(\App\Entity\Appointment::class, $data['appointment_id']);
+                $mr->setAppointment($appointment);
+            } else {
+                $mr->setAppointment(null);
+            }
+        }
 
-        if ($success) {
+        if (!empty($data['visit_date'])) {
+            try {
+                $mr->setVisitDate(new \DateTime($data['visit_date']));
+            } catch (\Exception $e) {}
+        }
+        
+        if (array_key_exists('diagnosis_code', $data)) {
+            $mr->setDiagnosisCode($data['diagnosis_code']);
+        }
+        if (array_key_exists('diagnosis_text', $data)) {
+            $mr->setDiagnosisText($data['diagnosis_text']);
+        }
+        if (array_key_exists('treatment', $data)) {
+            $mr->setTreatment($data['treatment']);
+        }
+        if (array_key_exists('notes', $data)) {
+            $mr->setNotes($data['notes']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+
             if (isset($data['icd_codes']) && is_array($data['icd_codes'])) {
                 $this->attachIcdCodes($id, $data['icd_codes']);
             }
@@ -174,62 +214,66 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             }
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $id, 'update', $oldMedicalRecord, $data));
             return true;
+        } catch (\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 
-                mr.*,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
-            FROM medical_records mr
-            JOIN patients p ON mr.patient_id = p.id
-            JOIN users u ON mr.doctor_id = u.id
-            WHERE mr.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
+        $qb = $this->createQueryBuilder('mr')
+            ->select(
+                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
+                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
+                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
+                "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
+            )
+            ->join('mr.doctor', 'u')
+            ->join('mr.patient', 'p')
+            ->where('mr.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
 
         if ($result) {
             $result['icd_codes'] = $this->getIcdCodesForMedicalRecord($id);
             $result['intervention_codes'] = $this->getInterventionCodesForMedicalRecord($id);
         }
-        return $result === false ? null : $result;
+        return $result;
     }
 
     public function attachIcdCodes(int $medicalRecordId, array $icdCodeIds): bool
     {
-        // First, remove existing associations for this medical record
-        $deleteSql = "DELETE FROM medical_record_icd WHERE medical_record_id = :medical_record_id";
-        $deleteStmt = $this->pdo->prepare($deleteSql);
-        $deleteStmt->execute([':medical_record_id' => $medicalRecordId]);
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $conn->executeStatement(
+            "DELETE FROM medical_record_icd WHERE medical_record_id = :medical_record_id",
+            ['medical_record_id' => $medicalRecordId]
+        );
 
         $icdCodeIds = array_filter($icdCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
         if (empty($icdCodeIds)) {
-            return true; // No codes to attach, but delete was successful
+            return true;
         }
 
-        // Prepare for batch insert
         $insertSql = "INSERT INTO medical_record_icd (medical_record_id, icd_code_id) VALUES ";
         $values = [];
         $params = [];
         foreach ($icdCodeIds as $index => $icdCodeId) {
             $values[] = "(:medical_record_id_{$index}, :icd_code_id_{$index})";
-            $params[":medical_record_id_{$index}"] = $medicalRecordId;
-            $params[":icd_code_id_{$index}"] = $icdCodeId;
+            $params["medical_record_id_{$index}"] = $medicalRecordId;
+            $params["icd_code_id_{$index}"] = $icdCodeId;
         }
         $insertSql .= implode(', ', $values);
 
-        $insertStmt = $this->pdo->prepare($insertSql);
-        return $insertStmt->execute($params);
+        return $conn->executeStatement($insertSql, $params) > 0;
     }
 
     public function getIcdCodesForMedicalRecord(int $medicalRecordId): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 ic.id,
@@ -239,41 +283,40 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             JOIN icd_codes ic ON mri.icd_code_id = ic.id
             WHERE mri.medical_record_id = :medical_record_id
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':medical_record_id' => $medicalRecordId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
     }
 
     public function attachInterventionCodes(int $medicalRecordId, array $interventionCodeIds): bool
     {
-        // First, remove existing associations for this medical record
-        $deleteSql = "DELETE FROM medical_record_intervention WHERE medical_record_id = :medical_record_id";
-        $deleteStmt = $this->pdo->prepare($deleteSql);
-        $deleteStmt->execute([':medical_record_id' => $medicalRecordId]);
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $conn->executeStatement(
+            "DELETE FROM medical_record_intervention WHERE medical_record_id = :medical_record_id",
+            ['medical_record_id' => $medicalRecordId]
+        );
 
         $interventionCodeIds = array_filter($interventionCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
         if (empty($interventionCodeIds)) {
-            return true; // No codes to attach, but delete was successful
+            return true;
         }
 
-        // Prepare for batch insert
         $insertSql = "INSERT INTO medical_record_intervention (medical_record_id, intervention_code_id) VALUES ";
         $values = [];
         $params = [];
         foreach ($interventionCodeIds as $index => $interventionCodeId) {
             $values[] = "(:medical_record_id_{$index}, :intervention_code_id_{$index})";
-            $params[":medical_record_id_{$index}"] = $medicalRecordId;
-            $params[":intervention_code_id_{$index}"] = $interventionCodeId;
+            $params["medical_record_id_{$index}"] = $medicalRecordId;
+            $params["intervention_code_id_{$index}"] = $interventionCodeId;
         }
         $insertSql .= implode(', ', $values);
 
-        $insertStmt = $this->pdo->prepare($insertSql);
-        return $insertStmt->execute($params);
+        return $conn->executeStatement($insertSql, $params) > 0;
     }
 
     public function getInterventionCodesForMedicalRecord(int $medicalRecordId): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 ic.id,
@@ -283,8 +326,6 @@ class MedicalRecordRepository implements MedicalRecordRepositoryInterface
             JOIN intervention_codes ic ON mri.intervention_code_id = ic.id
             WHERE mri.medical_record_id = :medical_record_id
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':medical_record_id' => $medicalRecordId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
     }
 }
