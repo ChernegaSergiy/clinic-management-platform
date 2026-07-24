@@ -21,6 +21,17 @@ class ContainerFactory
             }
         }
 
+        $moduleManager = new \App\Core\Module\ModuleManager();
+        $loader = new \App\Core\Module\ModuleLoader($moduleManager);
+        $loader->loadAll();
+        
+        foreach ($moduleManager->getRegisteredModules() as $moduleClass) {
+            $module = $moduleManager->getModule($moduleClass);
+            $module?->registerServices($container);
+        }
+        
+        $container->set(\App\Core\Module\ModuleManager::class, $moduleManager);
+
         $container->compile();
 
         return $container;
