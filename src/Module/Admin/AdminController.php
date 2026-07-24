@@ -12,13 +12,13 @@ use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\User\Repository\RoleRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\RoleRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class AdminController
 {
-    private UserRepository $userRepository;
-    private RoleRepository $roleRepository;
+    private UserRepositoryInterface $userRepository;
+    private RoleRepositoryInterface $roleRepository;
     private DictionaryRepository $dictionaryRepository;
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
@@ -28,25 +28,25 @@ class AdminController
     private \App\Module\User\MfaService $mfaService;
 
     public function __construct(
-        ?UserRepository $userRepository = null,
-        ?RoleRepository $roleRepository = null,
-        ?DictionaryRepository $dictionaryRepository = null,
-        ?AuthConfigRepository $authConfigRepository = null,
-        ?BackupPolicyRepository $backupPolicyRepository = null,
-        ?KpiRepository $kpiRepository = null,
-        ?ServiceRepository $serviceRepository = null,
-        ?SettingsRepository $settingsRepository = null,
-        ?\App\Module\User\MfaService $mfaService = null
+        UserRepositoryInterface $userRepository,
+        RoleRepositoryInterface $roleRepository,
+        DictionaryRepository $dictionaryRepository,
+        AuthConfigRepository $authConfigRepository,
+        BackupPolicyRepository $backupPolicyRepository,
+        KpiRepository $kpiRepository,
+        ServiceRepository $serviceRepository,
+        SettingsRepository $settingsRepository,
+        \App\Module\User\MfaService $mfaService
     ) {
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->roleRepository = $roleRepository ?? new RoleRepository();
-        $this->dictionaryRepository = $dictionaryRepository ?? new DictionaryRepository();
-        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
-        $this->backupPolicyRepository = $backupPolicyRepository ?? new BackupPolicyRepository();
-        $this->kpiRepository = $kpiRepository ?? new KpiRepository();
-        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
-        $this->settingsRepository = $settingsRepository ?? new SettingsRepository();
-        $this->mfaService = $mfaService ?? new \App\Module\User\MfaService();
+        $this->userRepository = $userRepository;
+        $this->roleRepository = $roleRepository;
+        $this->dictionaryRepository = $dictionaryRepository;
+        $this->authConfigRepository = $authConfigRepository;
+        $this->backupPolicyRepository = $backupPolicyRepository;
+        $this->kpiRepository = $kpiRepository;
+        $this->serviceRepository = $serviceRepository;
+        $this->settingsRepository = $settingsRepository;
+        $this->mfaService = $mfaService;
     }
 
     public function showSettings(): void
