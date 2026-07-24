@@ -4,15 +4,15 @@ namespace App\Module\Appointment;
 
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 
 class AppointmentPolicy implements Policy
 {
-    private AppointmentRepository $appointmentRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
 
-    public function __construct(?AppointmentRepository $appointmentRepository = null)
+    public function __construct(AppointmentRepositoryInterface $appointmentRepository)
     {
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->appointmentRepository = $appointmentRepository;
     }
 
     public function view(User $user, array $context): bool
