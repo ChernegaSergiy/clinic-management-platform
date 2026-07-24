@@ -11,6 +11,7 @@ use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Service\InsuranceService;
+use Symfony\Component\Routing\Attribute\Route;
 
 class InsuranceController
 {
@@ -21,6 +22,7 @@ class InsuranceController
         $this->insuranceService = $insuranceService;
     }
 
+    #[Route('/insurance/companies', name: 'insurance_companies_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -33,6 +35,7 @@ class InsuranceController
         ]);
     }
 
+    #[Route('/insurance/companies/show', name: 'insurance_companies_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -52,6 +55,7 @@ class InsuranceController
         ]);
     }
 
+    #[Route('/insurance/companies/new', name: 'insurance_companies_new_get', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -64,6 +68,7 @@ class InsuranceController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/insurance/companies/new', name: 'insurance_companies_new_post', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -93,6 +98,7 @@ class InsuranceController
         exit();
     }
 
+    #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_get', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -114,6 +120,7 @@ class InsuranceController
         unset($_SESSION['errors']);
     }
 
+    #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_post', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -153,6 +160,7 @@ class InsuranceController
         exit();
     }
 
+    #[Route('/insurance/companies/delete', name: 'insurance_companies_delete', methods: ['POST'])]
     public function delete(): void
     {
         AuthGuard::check();
@@ -165,6 +173,7 @@ class InsuranceController
         exit();
     }
 
+    #[Route('/insurance/claims', name: 'insurance_claims_index', methods: ['GET'])]
     public function listClaims(): void
     {
         AuthGuard::check();
@@ -177,6 +186,7 @@ class InsuranceController
         ]);
     }
 
+    #[Route('/insurance/claims/show', name: 'insurance_claims_show', methods: ['GET'])]
     public function showClaim(): void
     {
         AuthGuard::check();
@@ -196,6 +206,7 @@ class InsuranceController
         ]);
     }
 
+    #[Route('/insurance/claims/update-status', name: 'insurance_claims_update_status', methods: ['POST'])]
     public function updateClaimStatus(): void
     {
         AuthGuard::check();
