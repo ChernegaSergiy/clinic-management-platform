@@ -2,6 +2,7 @@
 
 namespace App\Module\Room;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
@@ -17,6 +18,7 @@ class RoomController
         $this->roomRepository = $roomRepository;
     }
 
+    #[Route('/admin/rooms', name: 'admin_rooms_index', methods: ['GET'])]
     public function index(): void
     {
         $this->authorizeAdmin();
@@ -29,6 +31,7 @@ class RoomController
         ]);
     }
 
+    #[Route('/admin/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
     public function create(): void
     {
         $this->authorizeAdmin();
@@ -44,6 +47,7 @@ class RoomController
         ]);
     }
 
+    #[Route('/admin/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
     public function store(): void
     {
         $this->authorizeAdmin();
@@ -70,6 +74,7 @@ class RoomController
         exit();
     }
 
+    #[Route('/admin/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
     public function show(): void
     {
         $this->authorizeAdmin();
@@ -86,6 +91,7 @@ class RoomController
         View::render('@modules/Room/templates/show.html.twig', ['room' => $room]);
     }
 
+    #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
     public function edit(): void
     {
         $this->authorizeAdmin();
@@ -111,6 +117,7 @@ class RoomController
         ]);
     }
 
+    #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
     public function update(): void
     {
         $this->authorizeAdmin();
@@ -145,6 +152,7 @@ class RoomController
         exit();
     }
 
+    #[Route('/admin/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
     public function delete(): void
     {
         $this->authorizeAdmin();
@@ -165,6 +173,7 @@ class RoomController
     }
 
     // API endpoints for calendar integration
+    #[Route('/api/calendar/rooms', name: 'api_calendar_rooms_get', methods: ['GET'])]
     public function apiRooms(): void
     {
         header('Content-Type: application/json');
