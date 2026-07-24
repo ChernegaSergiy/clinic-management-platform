@@ -4,18 +4,20 @@ namespace App\Module\Prescription;
 
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Prescription\Repository\PrescriptionRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
+use App\Module\Prescription\Repository\PrescriptionRepositoryInterface;
 
 class PrescriptionPolicy implements Policy
 {
-    private PrescriptionRepository $prescriptionRepository;
-    private AppointmentRepository $appointmentRepository;
+    private PrescriptionRepositoryInterface $prescriptionRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
 
-    public function __construct(?PrescriptionRepository $prescriptionRepository = null, ?AppointmentRepository $appointmentRepository = null)
-    {
-        $this->prescriptionRepository = $prescriptionRepository ?? new PrescriptionRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+    public function __construct(
+        PrescriptionRepositoryInterface $prescriptionRepository,
+        AppointmentRepositoryInterface $appointmentRepository
+    ) {
+        $this->prescriptionRepository = $prescriptionRepository;
+        $this->appointmentRepository = $appointmentRepository;
     }
 
     public function view(User $user, array $context): bool
