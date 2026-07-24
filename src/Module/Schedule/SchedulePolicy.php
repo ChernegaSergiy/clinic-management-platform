@@ -11,9 +11,9 @@ class SchedulePolicy implements Policy
     /** @phpstan-ignore property.onlyWritten */
     private DoctorScheduleRepository $doctorScheduleRepository;
 
-    public function __construct(?DoctorScheduleRepository $doctorScheduleRepository = null)
+    public function __construct(DoctorScheduleRepository $doctorScheduleRepository)
     {
-        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
+        $this->doctorScheduleRepository = $doctorScheduleRepository;
     }
 
     public function view(User $user, array $context): bool
