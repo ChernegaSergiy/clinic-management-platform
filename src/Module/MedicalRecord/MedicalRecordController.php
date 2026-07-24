@@ -13,6 +13,7 @@ use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MedicalRecordController
 {
@@ -42,6 +43,7 @@ class MedicalRecordController
         $this->auditLogger = $auditLogger;
     }
 
+    #[Route('/medical-records/new', name: 'medical_records_new_get', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -64,6 +66,7 @@ class MedicalRecordController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/medical-records', name: 'medical_records_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -85,6 +88,7 @@ class MedicalRecordController
         ]);
     }
 
+    #[Route('/medical-records/new', name: 'medical_records_new_post', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -153,6 +157,7 @@ class MedicalRecordController
         exit();
     }
 
+    #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -186,6 +191,7 @@ class MedicalRecordController
         ]);
     }
 
+    #[Route('/medical-records/icd-codes', name: 'medical_records_icd_codes', methods: ['GET'])]
     public function getIcdCodes(): void
     {
         AuthGuard::check();
@@ -198,6 +204,7 @@ class MedicalRecordController
         echo json_encode($codes);
     }
 
+    #[Route('/medical-records/intervention-codes', name: 'medical_records_intervention_codes', methods: ['GET'])]
     public function getInterventionCodes(): void
     {
         AuthGuard::check();
@@ -210,6 +217,7 @@ class MedicalRecordController
         echo json_encode($codes);
     }
 
+    #[Route('/medical-records/edit', name: 'medical_records_edit_get', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -232,6 +240,7 @@ class MedicalRecordController
         unset($_SESSION['old'], $_SESSION['errors']);
     }
 
+    #[Route('/medical-records/edit', name: 'medical_records_edit_post', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -286,6 +295,7 @@ class MedicalRecordController
         exit();
     }
 
+    #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
     public function uploadAttachment(): void
     {
         AuthGuard::check();
@@ -324,6 +334,7 @@ class MedicalRecordController
         exit();
     }
 
+    #[Route('/medical-records/attachments/download', name: 'medical_records_attachments_download', methods: ['GET'])]
     public function downloadAttachment(): void
     {
         AuthGuard::check();
