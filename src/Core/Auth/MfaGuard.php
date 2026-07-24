@@ -14,7 +14,7 @@ class MfaGuard
 
         if ($step->requiresMfaVerify()) {
             $userId = $_SESSION['mfa_pending_user_id'] ?? null;
-            $mfaService = new MfaService();
+            $mfaService = new MfaService(\App\Database\Database::getInstance(), new \App\Core\Service\QrCodeGenerator());
 
             if ($mfaService->isMfaEnabled($userId)) {
                 throw new RedirectException('/user/mfa/verify');
@@ -60,7 +60,7 @@ class MfaGuard
 
     public static function getUserMfaType(int $userId): ?string
     {
-        $mfaService = new MfaService();
+        $mfaService = new MfaService(\App\Database\Database::getInstance(), new \App\Core\Service\QrCodeGenerator());
         $status = $mfaService->getUserMfaStatus($userId);
         return $status['type'] ?? null;
     }
