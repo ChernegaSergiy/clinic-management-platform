@@ -5,6 +5,7 @@ namespace App\Core\Module;
 use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class BaseModule implements ModuleInterface
@@ -27,6 +28,10 @@ abstract class BaseModule implements ModuleInterface
     public function getVersion(): string
     {
         return $this->getManifest()['version'] ?? '1.0.0';
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
     }
 
     public function bootstrap(): void
