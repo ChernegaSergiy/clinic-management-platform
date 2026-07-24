@@ -9,6 +9,7 @@ use App\Core\Http\View;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HrmController
 {
@@ -26,6 +27,7 @@ class HrmController
         $this->departmentRepository = $departmentRepository;
     }
 
+    #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -38,6 +40,7 @@ class HrmController
         ]);
     }
 
+    #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -52,6 +55,7 @@ class HrmController
         ]);
     }
 
+    #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -86,6 +90,7 @@ class HrmController
         exit();
     }
 
+    #[Route('/hrm/show', name: 'hrm_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -105,6 +110,7 @@ class HrmController
         ]);
     }
 
+    #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -129,6 +135,7 @@ class HrmController
         ]);
     }
 
+    #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -172,6 +179,7 @@ class HrmController
         exit();
     }
 
+    #[Route('/hrm/toggle-status', name: 'hrm_toggle_status', methods: ['POST'])]
     public function toggleStatus(): void
     {
         AuthGuard::check();
