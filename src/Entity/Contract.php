@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Billing\Repository\ContractRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ContractRepository::class)]
 #[ORM\Table(name: 'contracts')]
 class Contract
 {

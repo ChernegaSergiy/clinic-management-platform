@@ -2,23 +2,23 @@
 
 namespace App\Module\Billing\Repository;
 
+use App\Entity\Invoice;
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Database\Database;
-use PDO;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InvoiceRepository implements InvoiceRepositoryInterface
+class InvoiceRepository extends ServiceEntityRepository implements InvoiceRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Invoice::class);
     }
 
     public function findAll(string $searchTerm = ''): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 i.id, 
@@ -36,36 +36,35 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 . " OR CONCAT(p.last_name, ' ', p.first_name) LIKE :term OR i.status LIKE :term";
             if (is_numeric($searchTerm)) {
                 $sql .= " OR i.id = :idExact";
-                $params[':idExact'] = (int)$searchTerm;
+                $params['idExact'] = (int)$searchTerm;
             }
             $sql .= ")";
-            $params[':term'] = '%' . $searchTerm . '%';
+            $params['term'] = '%' . $searchTerm . '%';
         }
 
         $sql .= " ORDER BY i.issued_date DESC";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $conn->fetchAllAssociative($sql, $params);
     }
 
     public function save(array $data): int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
                 VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->execute([
-            ':patient_id' => $data['patient_id'],
-            ':appointment_id' => $data['appointment_id'] ?? null,
-            ':medical_record_id' => $data['medical_record_id'] ?? null,
-            ':amount' => $data['amount'],
-            ':status' => $data['status'] ?? 'pending',
-            ':notes' => $data['notes'] ?? null,
-            ':type' => $data['type'] ?? 'invoice',
+        $conn->executeStatement($sql, [
+            'patient_id' => $data['patient_id'],
+            'appointment_id' => $data['appointment_id'] ?? null,
+            'medical_record_id' => $data['medical_record_id'] ?? null,
+            'amount' => $data['amount'],
+            'status' => $data['status'] ?? 'pending',
+            'notes' => $data['notes'] ?? null,
+            'type' => $data['type'] ?? 'invoice',
         ]);
-        $invoiceId = (int)$this->pdo->lastInsertId();
+        
+        $invoiceId = (int)$conn->lastInsertId();
+        
         EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
         EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
             $data['patient_id'],
@@ -73,39 +72,43 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             sprintf('Створено рахунок на суму %.2f грн', $data['amount']),
             ['invoice_id' => $invoiceId]
         ));
+        
         return $invoiceId;
     }
 
     public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE invoices SET insurance_due = :insurance_due, patient_due = :patient_due WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $invoiceId,
-            ':insurance_due' => $insuranceDue,
-            ':patient_due' => $patientDue,
-        ]);
+        
+        return $conn->executeStatement($sql, [
+            'id' => $invoiceId,
+            'insurance_due' => $insuranceDue,
+            'patient_due' => $patientDue,
+        ]) > 0;
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 i.*,
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name
             FROM invoices i
             JOIN patients p ON i.patient_id = p.id
             WHERE i.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
+        ";
+        
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
 
         if ($result) {
             $result['payments'] = $this->getPaymentsForInvoice($id);
             $result['total_paid'] = array_sum(array_column($result['payments'], 'amount'));
             $result['remaining_amount'] = $result['amount'] - $result['total_paid'];
         }
-        return $result === false ? null : $result;
+        
+        return $result ?: null;
     }
 
     public function update(int $id, array $data): bool
@@ -115,6 +118,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             return false;
         }
 
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE invoices SET 
                     patient_id = :patient_id, 
                     appointment_id = :appointment_id, 
@@ -126,29 +130,24 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     type = :type
                 WHERE id = :id";
 
-        $stmt = $this->pdo->prepare($sql);
+        $result = $conn->executeStatement($sql, [
+            'id' => $id,
+            'patient_id' => $data['patient_id'],
+            'appointment_id' => $data['appointment_id'] ?? null,
+            'medical_record_id' => $data['medical_record_id'] ?? null,
+            'amount' => $data['amount'],
+            'status' => $data['status'],
+            'notes' => $data['notes'] ?? null,
+            'paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+            'type' => $data['type'] ?? 'invoice',
+        ]);
 
-        $result = $stmt->execute(
-            [
-                ':id' => $id,
-                ':patient_id' => $data['patient_id'],
-                ':appointment_id' => $data['appointment_id'] ?? null,
-                ':medical_record_id' => $data['medical_record_id'] ?? null,
-                ':amount' => $data['amount'],
-                ':status' => $data['status'],
-                ':notes' => $data['notes'] ?? null,
-                ':paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date']))
-                    ? $data['paid_date']
-                    : null,
-                ':type' => $data['type'] ?? 'invoice',
-            ]
-        );
-
-        if ($result) {
+        if ($result > 0) {
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     public function addPayment(
@@ -158,21 +157,22 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ?string $transactionId = null,
         ?string $notes = null
     ): bool {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
+        
         try {
             $sql = "INSERT INTO payments (invoice_id, amount, payment_method, transaction_id, notes) 
                     VALUES (:invoice_id, :amount, :payment_method, :transaction_id, :notes)";
-            $stmt = $this->pdo->prepare($sql);
-            $success = $stmt->execute([
-                ':invoice_id' => $invoiceId,
-                ':amount' => $amount,
-                ':payment_method' => $paymentMethod,
-                ':transaction_id' => $transactionId,
-                ':notes' => $notes,
+                    
+            $success = $conn->executeStatement($sql, [
+                'invoice_id' => $invoiceId,
+                'amount' => $amount,
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+                'notes' => $notes,
             ]);
 
-            if ($success) {
-                // Update invoice status if fully paid
+            if ($success > 0) {
                 $invoice = $this->findById($invoiceId);
                 if (
                     $invoice &&
@@ -186,25 +186,22 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $this->update($invoiceId, $updateData);
                 }
             }
-            $this->pdo->commit();
-            return $success;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
-            // Log error
+            
+            $conn->commit();
+            return $success > 0;
+        } catch (\Exception $e) {
+            $conn->rollBack();
             return false;
         }
     }
 
     public function getPaymentsForInvoice(int $invoiceId): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC");
-        $stmt->execute([':invoice_id' => $invoiceId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC";
+        return $conn->fetchAllAssociative($sql, ['invoice_id' => $invoiceId]);
     }
 
-    /**
-     * Placeholder for inventory movements until proper finance ledger is implemented.
-     */
     public function logFinancialTransaction(
         int $patientId,
         float $amount,
@@ -212,19 +209,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         string $description,
         ?int $entityId = null
     ): bool {
-        // No-op stub to avoid runtime errors from inventory module.
         return true;
     }
 
     public function sumTotalAmountByDate(string $date): float
     {
-        // 1) Sum actual payments for the day (covers partial payments)
+        $conn = $this->getEntityManager()->getConnection();
+        
         $paymentsSql = "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE DATE(payment_date) = :date";
-        $stmt = $this->pdo->prepare($paymentsSql);
-        $stmt->execute([':date' => $date]);
-        $paymentsSum = (float)$stmt->fetchColumn();
+        $paymentsSum = (float)$conn->fetchOne($paymentsSql, ['date' => $date]);
 
-        // 2) Include fully paid invoices that have no payment records (e.g., marked paid manually)
         $invoicesSql = "
             SELECT COALESCE(SUM(i.amount), 0)
             FROM invoices i
@@ -234,15 +228,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                   SELECT 1 FROM payments p WHERE p.invoice_id = i.id
               )
         ";
-        $stmt = $this->pdo->prepare($invoicesSql);
-        $stmt->execute([':date' => $date]);
-        $invoicesSum = (float)$stmt->fetchColumn();
+        $invoicesSum = (float)$conn->fetchOne($invoicesSql, ['date' => $date]);
 
         return $paymentsSum + $invoicesSum;
     }
 
     public function getDailyRevenueForPeriod(string $startDate, string $endDate): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 DATE(issued_date) as date,
@@ -252,26 +245,25 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             GROUP BY DATE(issued_date)
             ORDER BY DATE(issued_date) ASC
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':start_date' => $startDate,
-            ':end_date' => $endDate,
+        
+        return $conn->fetchAllAssociative($sql, [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function sumRevenueForPeriod(string $startDate, string $endDate): float
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT COALESCE(SUM(amount), 0) 
             FROM invoices 
             WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':start_date' => $startDate,
-            ':end_date' => $endDate,
+        
+        return (float)$conn->fetchOne($sql, [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
-        return (float)$stmt->fetchColumn();
     }
 }

@@ -2,59 +2,62 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Service;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ServiceRepository
+class ServiceRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Service::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT s.*, sc.name as category_name, s.duration_minutes
             FROM services s
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             ORDER BY s.name ASC
-        ");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT s.*, sc.name as category_name, s.duration_minutes
             FROM services s
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             WHERE s.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        ";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function save(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO services (name, description, price, category_id, is_active) 
                 VALUES (:name, :description, :price, :category_id, :is_active)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':price' => $data['price'],
-            ':category_id' => $data['category_id'] ?? null,
-            ':is_active' => $data['is_active'] ?? true,
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        
+        $success = $conn->executeStatement($sql, [
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'price' => $data['price'],
+            'category_id' => $data['category_id'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function update(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE services SET 
                     name = :name, 
                     description = :description, 
@@ -62,62 +65,69 @@ class ServiceRepository
                     category_id = :category_id, 
                     is_active = :is_active 
                 WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':price' => $data['price'],
-            ':category_id' => $data['category_id'] ?? null,
-            ':is_active' => $data['is_active'] ?? true,
-        ]);
+                
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'price' => $data['price'],
+            'category_id' => $data['category_id'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
+        ]) > 0;
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM services WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM services WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 
     public function findCategories(): array
     {
-        $stmt = $this->pdo->query("SELECT id, name, description FROM service_categories ORDER BY name ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT id, name, description FROM service_categories ORDER BY name ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function saveCategory(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO service_categories (name, description) VALUES (:name, :description)";
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        
+        $success = $conn->executeStatement($sql, [
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function findCategoryById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM service_categories WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM service_categories WHERE id = :id";
+        
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function updateCategory(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE service_categories SET name = :name, description = :description WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-        ]);
+        
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+        ]) > 0;
     }
 
     public function deleteCategory(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM service_categories WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM service_categories WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 }

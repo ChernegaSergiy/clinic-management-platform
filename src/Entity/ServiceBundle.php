@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Billing\Repository\ServiceBundleRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ServiceBundleRepository::class)]
 #[ORM\Table(name: 'service_bundles')]
 class ServiceBundle
 {

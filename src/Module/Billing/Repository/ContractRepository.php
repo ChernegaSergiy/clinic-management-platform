@@ -2,53 +2,55 @@
 
 namespace App\Module\Billing\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Contract;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ContractRepository
+class ContractRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Contract::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM contracts ORDER BY created_at DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM contracts ORDER BY created_at DESC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM contracts WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM contracts WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function save(array $data): ?int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO contracts (title, description, start_date, end_date, party_a, party_b, file_path, status) 
                 VALUES (:title, :description, :start_date, :end_date, :party_a, :party_b, :file_path, :status)";
 
-        $stmt = $this->pdo->prepare($sql);
-        $success = $stmt->execute([
-            ':title' => $data['title'],
-            ':description' => $data['description'] ?? null,
-            ':start_date' => $data['start_date'],
-            ':end_date' => $data['end_date'] ?? null,
-            ':party_a' => $data['party_a'] ?? null,
-            ':party_b' => $data['party_b'] ?? null,
-            ':file_path' => $data['file_path'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-        ]);
-        return $success ? (int)$this->pdo->lastInsertId() : null;
+        $success = $conn->executeStatement($sql, [
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'] ?? null,
+            'party_a' => $data['party_a'] ?? null,
+            'party_b' => $data['party_b'] ?? null,
+            'file_path' => $data['file_path'] ?? null,
+            'status' => $data['status'] ?? 'active',
+        ]) > 0;
+        
+        return $success ? (int)$conn->lastInsertId() : null;
     }
 
     public function update(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE contracts SET 
                     title = :title, 
                     description = :description, 
@@ -60,24 +62,23 @@ class ContractRepository
                     status = :status 
                 WHERE id = :id";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        return $stmt->execute([
-            ':id' => $id,
-            ':title' => $data['title'],
-            ':description' => $data['description'] ?? null,
-            ':start_date' => $data['start_date'],
-            ':end_date' => $data['end_date'] ?? null,
-            ':party_a' => $data['party_a'] ?? null,
-            ':party_b' => $data['party_b'] ?? null,
-            ':file_path' => $data['file_path'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-        ]);
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'] ?? null,
+            'party_a' => $data['party_a'] ?? null,
+            'party_b' => $data['party_b'] ?? null,
+            'file_path' => $data['file_path'] ?? null,
+            'status' => $data['status'] ?? 'active',
+        ]) > 0;
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM contracts WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM contracts WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 }
