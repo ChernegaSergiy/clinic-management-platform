@@ -7,19 +7,19 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class ScheduleController
 {
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
 
-    public function __construct(?DoctorScheduleRepository $doctorScheduleRepository = null, ?ScheduleExceptionRepository $scheduleExceptionRepository = null, ?UserRepository $userRepository = null)
+    public function __construct(DoctorScheduleRepository $doctorScheduleRepository, ScheduleExceptionRepository $scheduleExceptionRepository, UserRepositoryInterface $userRepository)
     {
-        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
-        $this->scheduleExceptionRepository = $scheduleExceptionRepository ?? new ScheduleExceptionRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->doctorScheduleRepository = $doctorScheduleRepository;
+        $this->scheduleExceptionRepository = $scheduleExceptionRepository;
+        $this->userRepository = $userRepository;
     }
 
     public function index(): void
