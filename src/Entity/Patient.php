@@ -4,8 +4,9 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Patient\Repository\PatientRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PatientRepository::class)]
 #[ORM\Table(name: 'patients')]
 class Patient
 {

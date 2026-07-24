@@ -2,45 +2,43 @@
 
 namespace App\Module\Patient\Repository;
 
+use App\Entity\Patient;
 use App\Core\Event\EventDispatcherService;
 use App\Core\Service\AuditLogger as CoreAuditLogger;
 use App\Event\EntityChangedEvent;
-use App\Database\Database;
-use PDO;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class PatientRepository implements PatientRepositoryInterface
+class PatientRepository extends ServiceEntityRepository implements PatientRepositoryInterface
 {
-    private PDO $pdo;
     private CoreAuditLogger $auditLogger;
     private ?string $lastError = null;
 
-    public function __construct(PDO $pdo, CoreAuditLogger $auditLogger)
+    public function __construct(ManagerRegistry $registry, CoreAuditLogger $auditLogger)
     {
-        $this->pdo = $pdo;
+        parent::__construct($registry, Patient::class);
         $this->auditLogger = $auditLogger;
     }
 
     public function findAll(string $searchTerm = ''): array
     {
-        $sql = "SELECT * FROM patients";
-        $params = [];
+        $qb = $this->createQueryBuilder('p');
 
         if (!empty($searchTerm)) {
-            // Use full-text search for relevant columns
-            $sql .= " WHERE MATCH(first_name, last_name, middle_name, address) AGAINST (:searchTerm IN BOOLEAN MODE)";
-            $params[':searchTerm'] = $searchTerm . '*'; // Adding wildcard for partial matches
-
-            // Fallback for other fields if full-text index doesn't cover all search needs or for older MySQL versions
-            // Uncomment and adjust if needed
-            // $sql .= " OR last_name LIKE :term OR first_name LIKE :term OR phone LIKE :term";
-            // $params[':term'] = '%' . $searchTerm . '%';
+            // Doctrine doesn't natively support MATCH AGAINST without custom DQL functions,
+            // so we fallback to standard LIKE searches for ORM portability.
+            $qb->where('p.last_name LIKE :term')
+               ->orWhere('p.first_name LIKE :term')
+               ->orWhere('p.middle_name LIKE :term')
+               ->orWhere('p.phone LIKE :term')
+               ->setParameter('term', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY last_name, first_name";
+        $qb->orderBy('p.last_name', 'ASC')
+           ->addOrderBy('p.first_name', 'ASC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findByIds(array $ids, string $searchTerm = ''): array
@@ -49,36 +47,38 @@ class PatientRepository implements PatientRepositoryInterface
             return [];
         }
 
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $sql = "SELECT * FROM patients WHERE id IN ($placeholders)";
-        $params = $ids;
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids);
 
         if (!empty($searchTerm)) {
-            $sql .= " AND MATCH(first_name, last_name, middle_name, address) AGAINST (? IN BOOLEAN MODE)";
-            $params[] = $searchTerm . '*';
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('p.last_name', ':term'),
+                    $qb->expr()->like('p.first_name', ':term'),
+                    $qb->expr()->like('p.middle_name', ':term'),
+                    $qb->expr()->like('p.phone', ':term')
+                )
+            )->setParameter('term', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY last_name, first_name";
+        $qb->orderBy('p.last_name', 'ASC')
+           ->addOrderBy('p.first_name', 'ASC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function countAll(): int
     {
-        $stmt = $this->pdo->query("SELECT COUNT(*) FROM patients");
-        return (int)$stmt->fetchColumn();
+        return $this->count([]);
     }
 
     public function save(array $data): int|false
     {
         $this->lastError = null;
 
-        // Check for duplicate patient before saving, but only if it's not a placeholder date
         if (isset($data['birth_date']) && $data['birth_date'] !== '1900-01-01') {
             if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
-                // Patient with same first name, last name, and birth date already exists
                 $this->lastError = 'patient_exists';
                 return false;
             }
@@ -89,39 +89,18 @@ class PatientRepository implements PatientRepositoryInterface
             return false;
         }
 
-        $sql = "INSERT INTO patients (first_name, last_name, middle_name, birth_date, gender, 
-                                    phone, email, address, tax_id, document_id, marital_status, status) 
-                VALUES (:first_name, :last_name, :middle_name, :birth_date, :gender, 
-                        :phone, :email, :address, :tax_id, :document_id, :marital_status, :status)";
-
-        $stmt = $this->pdo->prepare($sql);
+        $patient = new Patient();
+        $this->hydrateEntity($patient, $data);
 
         try {
-            $success = $stmt->execute(
-                [
-                    ':first_name' => $data['first_name'],
-                    ':last_name' => $data['last_name'],
-                    ':middle_name' => $data['middle_name'] ?? null,
-                    ':birth_date' => $data['birth_date'],
-                    ':gender' => $data['gender'],
-                    ':phone' => $data['phone'],
-                    ':email' => $data['email'] ?? null,
-                    ':address' => $data['address'] ?? null,
-                    ':tax_id' => $data['tax_id'] ?? null,
-                    ':document_id' => $data['document_id'] ?? null,
-                    ':marital_status' => $data['marital_status'] ?? null,
-                    ':status' => $data['status'] ?? 'active',
-                ]
-            );
+            $this->getEntityManager()->persist($patient);
+            $this->getEntityManager()->flush();
 
-            if ($success) {
-                $id = (int)$this->pdo->lastInsertId();
-                EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'create', null, $data));
-                return $id;
-            }
-            return false;
-        } catch (\PDOException $e) {
-            if ($e->getCode() === '23000') {
+            $id = $patient->getId();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'create', null, $data));
+            return $id;
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
                 $this->lastError = 'duplicate_key';
                 return false;
             }
@@ -131,112 +110,94 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE last_name = :last_name AND first_name = :first_name AND birth_date = :birth_date");
-        $stmt->execute([
-            ':last_name' => $lastName,
-            ':first_name' => $firstName,
-            ':birth_date' => $birthDate,
-        ]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        try {
+            $dt = new \DateTime($birthDate);
+        } catch (\Exception $e) {
+            return null;
+        }
+        
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.last_name = :last_name')
+            ->andWhere('p.first_name = :first_name')
+            ->andWhere('p.birth_date = :birth_date')
+            ->setParameter('last_name', $lastName)
+            ->setParameter('first_name', $firstName)
+            ->setParameter('birth_date', $dt->format('Y-m-d'));
+
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        return $result;
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function findByTaxId(string $taxId, ?int $excludeId = null): ?array
     {
-        $sql = "SELECT * FROM patients WHERE tax_id = :tax_id";
-        $params = [':tax_id' => $taxId];
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.tax_id = :tax_id')
+            ->setParameter('tax_id', $taxId);
 
         if ($excludeId !== null) {
-            $sql .= " AND id != :exclude_id";
-            $params[':exclude_id'] = $excludeId;
+            $qb->andWhere('p.id != :exclude_id')
+               ->setParameter('exclude_id', $excludeId);
         }
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function findByEmail(string $email): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM patients WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.email = :email')
+            ->setParameter('email', $email);
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function update(int $id, array $data): bool
     {
         $this->lastError = null;
 
-        $oldPatient = $this->findById($id);
-        $oldStatus = $oldPatient['status'] ?? null;
+        $oldPatientArray = $this->findById($id);
+        $oldStatus = $oldPatientArray['status'] ?? null;
 
         if (!empty($data['tax_id']) && $this->findByTaxId($data['tax_id'], $id)) {
             $this->lastError = 'tax_id_exists';
             return false;
         }
 
-        $sql = "UPDATE patients SET 
-                    first_name = :first_name, 
-                    last_name = :last_name, 
-                    middle_name = :middle_name, 
-                    birth_date = :birth_date, 
-                    gender = :gender, 
-                    phone = :phone, 
-                    email = :email, 
-                    address = :address, 
-                    tax_id = :tax_id, 
-                    document_id = :document_id, 
-                    marital_status = :marital_status,
-                    status = :status
-                WHERE id = :id";
+        /** @var Patient|null $patient */
+        $patient = $this->find($id);
+        if (!$patient) {
+            return false;
+        }
 
-        $stmt = $this->pdo->prepare($sql);
+        $this->hydrateEntity($patient, $data);
 
         try {
-            $success = $stmt->execute(
-                [
-                    ':id' => $id,
-                    ':first_name' => $data['first_name'],
-                    ':last_name' => $data['last_name'],
-                    ':middle_name' => $data['middle_name'] ?? null,
-                    ':birth_date' => $data['birth_date'],
-                    ':gender' => $data['gender'],
-                    ':phone' => $data['phone'],
-                    ':email' => $data['email'] ?? null,
-                    ':address' => $data['address'] ?? null,
-                    ':tax_id' => $data['tax_id'] ?? null,
-                    ':document_id' => $data['document_id'] ?? null,
-                    ':marital_status' => $data['marital_status'] ?? null,
-                    ':status' => $data['status'] ?? 'active',
-                ]
-            );
-        } catch (\PDOException $e) {
-            if ($e->getCode() === '23000') {
+            $this->getEntityManager()->flush();
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
                 $this->lastError = 'duplicate_key';
                 return false;
             }
             throw $e;
         }
 
-        if ($success && $oldStatus !== ($data['status'] ?? 'active')) {
-            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
+        $newStatus = $data['status'] ?? 'active';
+        if ($oldStatus !== $newStatus) {
+            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $newStatus);
         }
 
-        if ($success) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, $data));
-        }
+        EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, $data));
 
-        return $success;
+        return true;
     }
 
     public function getLastError(): ?string
@@ -246,22 +207,76 @@ class PatientRepository implements PatientRepositoryInterface
 
     public function findAllActive(): array
     {
-        $stmt = $this->pdo->query("SELECT id, CONCAT(last_name, ' ', first_name) as full_name FROM patients WHERE status = 'active' ORDER BY last_name, first_name");
-        return $stmt->fetchAll();
+        $qb = $this->createQueryBuilder('p')
+            ->select("p.id", "CONCAT(p.last_name, ' ', p.first_name) as full_name")
+            ->where('p.status = :status')
+            ->setParameter('status', 'active')
+            ->orderBy('p.last_name', 'ASC')
+            ->addOrderBy('p.first_name', 'ASC');
+
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function updateStatus(int $id, string $status): bool
     {
-        $oldPatient = $this->findById($id);
-        $oldStatus = $oldPatient['status'] ?? null;
+        $oldPatientArray = $this->findById($id);
+        $oldStatus = $oldPatientArray['status'] ?? null;
 
-        $stmt = $this->pdo->prepare("UPDATE patients SET status = :status WHERE id = :id");
-        $success = $stmt->execute([':status' => $status, ':id' => $id]);
-
-        if ($success && $oldStatus !== $status) {
-            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, ['status' => $status]));
+        /** @var Patient|null $patient */
+        $patient = $this->find($id);
+        if (!$patient) {
+            return false;
         }
-        return $success;
+
+        $patient->setStatus($status);
+        $this->getEntityManager()->flush();
+
+        if ($oldStatus !== $status) {
+            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, ['status' => $status]));
+        }
+        return true;
+    }
+
+    private function hydrateEntity(Patient $patient, array $data): void
+    {
+        if (isset($data['first_name'])) {
+            $patient->setFirstName($data['first_name']);
+        }
+        if (isset($data['last_name'])) {
+            $patient->setLastName($data['last_name']);
+        }
+        if (array_key_exists('middle_name', $data)) {
+            $patient->setMiddleName($data['middle_name']);
+        }
+        if (isset($data['birth_date'])) {
+            try {
+                $patient->setBirthDate(new \DateTime($data['birth_date']));
+            } catch (\Exception $e) {}
+        }
+        if (isset($data['gender'])) {
+            $patient->setGender($data['gender']);
+        }
+        if (isset($data['phone'])) {
+            $patient->setPhone($data['phone']);
+        }
+        if (array_key_exists('email', $data)) {
+            $patient->setEmail($data['email']);
+        }
+        if (array_key_exists('address', $data)) {
+            $patient->setAddress($data['address']);
+        }
+        if (array_key_exists('tax_id', $data)) {
+            $patient->setTaxId($data['tax_id']);
+        }
+        if (array_key_exists('document_id', $data)) {
+            $patient->setDocumentId($data['document_id']);
+        }
+        if (array_key_exists('marital_status', $data)) {
+            $patient->setMaritalStatus($data['marital_status']);
+        }
+        if (isset($data['status'])) {
+            $patient->setStatus($data['status']);
+        }
     }
 }
