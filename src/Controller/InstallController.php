@@ -201,13 +201,13 @@ class InstallController
         $envPath = __DIR__ . '/../../.env';
         if (file_exists($envPath)) {
             $envContent = file_get_contents($envPath);
-            
+
             // Remove existing APP_INSTALLED if present
             $envContent = preg_replace('/^APP_INSTALLED=.*$/m', '', $envContent);
-            
+
             // Add APP_INSTALLED=true at the end
             $envContent = trim($envContent) . "\nAPP_INSTALLED=true\n";
-            
+
             file_put_contents($envPath, $envContent);
         }
     }

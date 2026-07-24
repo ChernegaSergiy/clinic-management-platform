@@ -11,5 +11,6 @@ class PatientNotificationEvent extends Event
         public readonly string $type,
         public readonly string $message,
         public readonly ?array $context = null
-    ) {}
+    ) {
+    }
 }

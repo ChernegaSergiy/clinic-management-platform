@@ -10,9 +10,9 @@ class LabOrderPolicy implements Policy
 {
     private LabOrderRepository $labOrderRepository;
 
-    public function __construct()
+    public function __construct(?LabOrderRepository $labOrderRepository = null)
     {
-        $this->labOrderRepository = new LabOrderRepository();
+        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
     }
 
     public function view(User $user, array $context): bool

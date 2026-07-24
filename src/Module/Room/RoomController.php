@@ -12,9 +12,9 @@ class RoomController
 {
     private RoomRepository $roomRepository;
 
-    public function __construct()
+    public function __construct(?RoomRepository $roomRepository = null)
     {
-        $this->roomRepository = new RoomRepository();
+        $this->roomRepository = $roomRepository ?? new RoomRepository();
     }
 
     public function index(): void

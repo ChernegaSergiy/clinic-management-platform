@@ -2,14 +2,16 @@
 
 namespace App\Event;
 
-use App\Core\Model\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityChangedEvent extends Event
 {
     public function __construct(
-        public readonly object $entity,
-        public readonly string $action, // 'created', 'updated', 'deleted'
-        public readonly ?User $user = null
-    ) {}
+        public readonly string $entityType,
+        public readonly int $entityId,
+        public readonly string $action, // 'create', 'update', 'delete'
+        public readonly mixed $oldData = null,
+        public readonly mixed $newData = null
+    ) {
+    }
 }

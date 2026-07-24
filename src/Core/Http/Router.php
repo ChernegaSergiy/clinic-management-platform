@@ -2,6 +2,7 @@
 
 namespace App\Core\Http;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Core\Http\View;
@@ -9,6 +10,12 @@ use App\Core\Http\View;
 class Router
 {
     private array $routes = [];
+    private ?ContainerInterface $container;
+
+    public function __construct(?ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     public function add(string $method, string $path, callable|array $handler): void
     {
@@ -34,8 +41,20 @@ class Router
                 $handler = $route['handler'];
 
                 if (is_array($handler) && is_string($handler[0])) {
-                    $controller = new $handler[0]();
-                    $callback = [$controller, $handler[1]];
+                    try {
+                        if ($this->container && $this->container->has($handler[0])) {
+                            $controller = $this->container->get($handler[0]);
+                        } else {
+                            $controller = new $handler[0]();
+                        }
+                        $callback = [$controller, $handler[1]];
+                    } catch (\Throwable $e) {
+                        $detail = $e->getMessage() . "\n\n" . $e->getTraceAsString();
+                        $content = View::renderToString('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
+                        $response = new Response($content, 500);
+                        $response->headers->set('Content-Type', 'text/html; charset=utf-8');
+                        return $response;
+                    }
                 } else {
                     $callback = $handler;
                 }
@@ -56,7 +75,7 @@ class Router
             }
         }
 
-        $content = View::render('errors/error.html.twig', ['message' => '404 Not Found']);
+        $content = View::renderToString('errors/error.html.twig', ['message' => '404 Not Found']);
         $response = new Response($content, 404);
         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
         return $response;

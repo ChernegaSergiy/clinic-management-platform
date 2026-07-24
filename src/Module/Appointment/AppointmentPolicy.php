@@ -10,9 +10,9 @@ class AppointmentPolicy implements Policy
 {
     private AppointmentRepository $appointmentRepository;
 
-    public function __construct()
+    public function __construct(?AppointmentRepository $appointmentRepository = null)
     {
-        $this->appointmentRepository = new AppointmentRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
     }
 
     public function view(User $user, array $context): bool

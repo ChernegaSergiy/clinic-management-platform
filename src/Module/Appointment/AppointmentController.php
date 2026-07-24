@@ -25,27 +25,43 @@ class AppointmentController
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
     private \App\Module\Room\Repository\RoomRepository $roomRepository;
+    private DoctorScheduleRepository $doctorScheduleRepository;
+    private ScheduleExceptionRepository $scheduleExceptionRepository;
 
-    public function __construct()
-    {
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->patientRepository = new PatientRepository();
-        $this->userRepository = new UserRepository();
-        $this->notificationService = new NotificationService();
+    public function __construct(
+        ?AppointmentRepository $appointmentRepository = null,
+        ?PatientRepository $patientRepository = null,
+        ?UserRepository $userRepository = null,
+        ?NotificationService $notificationService = null,
+        ?SchedulingService $schedulingService = null,
+        ?DoctorScheduleRepository $doctorScheduleRepository = null,
+        ?ScheduleExceptionRepository $scheduleExceptionRepository = null,
+        ?ServiceRepository $serviceRepository = null,
+        ?\App\Module\Room\Repository\RoomRepository $roomRepository = null
+    ) {
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->notificationService = $notificationService ?? new NotificationService();
 
-        // Dependencies for SchedulingService
-        $this->serviceRepository = new ServiceRepository();
-        $this->roomRepository = new \App\Module\Room\Repository\RoomRepository();
-        $doctorScheduleRepository = new DoctorScheduleRepository();
-        $scheduleExceptionRepository = new ScheduleExceptionRepository();
+        // Scheduling dependencies (allow injecting composed SchedulingService)
+        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
+        $this->roomRepository = $roomRepository ?? new \App\Module\Room\Repository\RoomRepository();
 
-        $this->schedulingService = new SchedulingService(
-            $doctorScheduleRepository,
-            $scheduleExceptionRepository,
-            $this->appointmentRepository,
-            $this->serviceRepository,
-            $this->roomRepository
-        );
+        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
+        $this->scheduleExceptionRepository = $scheduleExceptionRepository ?? new ScheduleExceptionRepository();
+
+        if ($schedulingService !== null) {
+            $this->schedulingService = $schedulingService;
+        } else {
+            $this->schedulingService = new SchedulingService(
+                $this->doctorScheduleRepository,
+                $this->scheduleExceptionRepository,
+                $this->appointmentRepository,
+                $this->serviceRepository,
+                $this->roomRepository
+            );
+        }
     }
 
     public function index(): void
@@ -672,24 +688,23 @@ class AppointmentController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            if ($errors) {
-                $patients = $this->patientRepository->findAllActive();
-                $doctors = $this->userRepository->findAllDoctors();
-                $patientOptions = [];
-                foreach ($patients as $patient) {
-                    $patientOptions[$patient['id']] = $patient['full_name'];
-                }
-                $doctorOptions = [];
-                foreach ($doctors as $doctor) {
-                    $doctorOptions[$doctor['id']] = $doctor['full_name'];
-                }
+            $patients = $this->patientRepository->findAllActive();
+            $doctors = $this->userRepository->findAllDoctors();
+            $patientOptions = [];
+            foreach ($patients as $patient) {
+                $patientOptions[$patient['id']] = $patient['full_name'];
+            }
+            $doctorOptions = [];
+            foreach ($doctors as $doctor) {
+                $doctorOptions[$doctor['id']] = $doctor['full_name'];
+            }
 
-                $roomOptions = [];
-                foreach ($rooms as $room) {
-                    $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
-                }
+            $roomOptions = [];
+            foreach ($rooms as $room) {
+                $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
+            }
 
-                View::render('@modules/Appointment/templates/edit.html.twig', [
+            View::render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -699,9 +714,8 @@ class AppointmentController
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
                 'rooms' => $roomOptions,
-                ]);
-                return;
-            }
+            ]);
+            return;
         }
 
         $this->appointmentRepository->update($id, $_POST);

@@ -8,11 +8,12 @@ use App\Module\Schedule\Repository\DoctorScheduleRepository;
 
 class SchedulePolicy implements Policy
 {
+    /** @phpstan-ignore property.onlyWritten */
     private DoctorScheduleRepository $doctorScheduleRepository;
 
-    public function __construct()
+    public function __construct(?DoctorScheduleRepository $doctorScheduleRepository = null)
     {
-        $this->doctorScheduleRepository = new DoctorScheduleRepository();
+        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
     }
 
     public function view(User $user, array $context): bool

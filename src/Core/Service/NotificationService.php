@@ -8,10 +8,9 @@ use PDO;
 class NotificationService
 {
     private PDO $pdo;
-
-    public function __construct()
+    public function __construct(?PDO $pdo = null)
     {
-        $this->pdo = Database::getInstance();
+        $this->pdo = $pdo ?? Database::getInstance();
     }
 
     public function createNotification(int $userId, string $message): bool

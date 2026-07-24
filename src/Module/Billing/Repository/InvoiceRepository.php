@@ -2,6 +2,8 @@
 
 namespace App\Module\Billing\Repository;
 
+use App\Core\Event\EventDispatcherService;
+use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use App\Database\Database;
 use PDO;

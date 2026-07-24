@@ -9,9 +9,9 @@ class LabImportService
 {
     private LabOrderRepository $labOrderRepository;
 
-    public function __construct()
+    public function __construct(?LabOrderRepository $labOrderRepository = null)
     {
-        $this->labOrderRepository = new LabOrderRepository();
+        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
     }
 
     /**

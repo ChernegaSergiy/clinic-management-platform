@@ -9,10 +9,12 @@ class AttachmentService
 {
     private PDO $pdo;
     private string $uploadDir = __DIR__ . '/../../../uploads';
-
-    public function __construct()
+    public function __construct(?PDO $pdo = null, ?string $uploadDir = null)
     {
-        $this->pdo = Database::getInstance();
+        $this->pdo = $pdo ?? Database::getInstance();
+        if ($uploadDir !== null) {
+            $this->uploadDir = $uploadDir;
+        }
         if (!is_dir($this->uploadDir)) {
             mkdir($this->uploadDir, 0775, true);
         }

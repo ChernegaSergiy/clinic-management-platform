@@ -3,6 +3,7 @@
 namespace App\Module\Patient\Repository;
 
 use App\Core\Event\EventDispatcherService;
+use App\Core\Service\AuditLogger as CoreAuditLogger;
 use App\Event\EntityChangedEvent;
 use App\Database\Database;
 use PDO;
@@ -10,11 +11,13 @@ use PDO;
 class PatientRepository implements PatientRepositoryInterface
 {
     private PDO $pdo;
+    private ?CoreAuditLogger $auditLogger = null;
     private ?string $lastError = null;
 
-    public function __construct()
+    public function __construct(?PDO $pdo = null, ?CoreAuditLogger $auditLogger = null)
     {
-        $this->pdo = Database::getInstance();
+        $this->pdo = $pdo ?? Database::getInstance();
+        $this->auditLogger = $auditLogger;
     }
 
     public function findAll(string $searchTerm = ''): array
@@ -117,7 +120,6 @@ class PatientRepository implements PatientRepositoryInterface
                 return $id;
             }
             return false;
-
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000') {
                 $this->lastError = 'duplicate_key';
@@ -227,9 +229,8 @@ class PatientRepository implements PatientRepositoryInterface
         }
 
         if ($success && $oldStatus !== ($data['status'] ?? 'active')) {
-            $auditLogger = new AuditLogger();
-            // Assuming current user ID is available, for now, null or placeholder
-            $auditLogger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
+            $logger = $this->auditLogger ?? new CoreAuditLogger();
+            $logger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
         }
 
         if ($success) {
@@ -259,8 +260,8 @@ class PatientRepository implements PatientRepositoryInterface
         $success = $stmt->execute([':status' => $status, ':id' => $id]);
 
         if ($success && $oldStatus !== $status) {
-            $auditLogger = new AuditLogger();
-            $auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
+            $logger = $this->auditLogger ?? new CoreAuditLogger();
+            $logger->log('patient', $id, 'status_change', $oldStatus, $status);
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, ['status' => $status]));
         }
         return $success;

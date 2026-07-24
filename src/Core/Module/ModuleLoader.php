@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Core\Module;
 
 use App\Infrastructure\Module\ModuleDiscovery;

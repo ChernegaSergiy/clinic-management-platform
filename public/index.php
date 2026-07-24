@@ -5,7 +5,11 @@ $resource = __DIR__ . $requestedPath;
 
 if (file_exists($resource)) {
     // Якщо це директорія з індексним файлом (окрім кореневої public), дозволяємо серверу обробити її
-    if (is_dir($resource) && realpath($resource) !== __DIR__ && (file_exists($resource . '/index.php') || file_exists($resource . '/index.html'))) {
+    if (
+        is_dir($resource)
+        && realpath($resource) !== __DIR__
+        && (file_exists($resource . '/index.php') || file_exists($resource . '/index.html'))
+    ) {
         return false;
     }
 
@@ -16,6 +20,8 @@ if (file_exists($resource)) {
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Infrastructure\DI\ContainerFactory;
 
 use App\Controller\InstallController;
 use App\Controller\PageController;
@@ -50,17 +56,28 @@ if (isset($_ENV['APP_BASE_URL']) && !empty($_ENV['APP_BASE_URL'])) {
         session_set_cookie_params($cookieParams);
     }
 }
+
 session_start();
+
+$container = ContainerFactory::createContainer();
+
+// Get EventDispatcher from container (falls back to manual if not available)
+$eventDispatcher = null;
+if ($container->has(\Symfony\Component\EventDispatcher\EventDispatcher::class)) {
+    $eventDispatcher = $container->get(\Symfony\Component\EventDispatcher\EventDispatcher::class);
+}
 
 $request = Request::createFromGlobals();
 
-$router = new Router();
+$router = $container->get(Router::class);
 
-$permissionRegistry = new \App\Core\Auth\PermissionRegistry();
-$policyRegistry = new \App\Core\Auth\PolicyRegistry();
+$permissionRegistry = $container->get(\App\Core\Auth\PermissionRegistry::class);
+$policyRegistry = $container->get(\App\Core\Auth\PolicyRegistry::class);
 
-$moduleManager = new ModuleManager();
-$eventDispatcher = new EventDispatcher();
+$moduleManager = $container->get(ModuleManager::class);
+if ($eventDispatcher === null) {
+    $eventDispatcher = new EventDispatcher();
+}
 $moduleLoader = new ModuleLoader($moduleManager);
 $moduleLoader->loadAll();
 
@@ -70,6 +87,11 @@ $moduleManager->registerPermissions($permissionRegistry);
 $moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerEventListeners($eventDispatcher);
 EventDispatcherService::setDispatcher($eventDispatcher);
+
+// Inject translation service into View if present in container
+if ($container->has(\App\Core\Service\TranslationService::class)) {
+    \App\Core\Http\View::setTranslationService($container->get(\App\Core\Service\TranslationService::class));
+}
 $moduleManager->registerRoutes($router);
 
 \App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
@@ -87,7 +109,7 @@ $router->add('GET', '/doctors', [PageController::class, 'doctors']);
 $router->add('GET', '/install', [InstallController::class, 'check']);
 
 // API routes
-$router->add('GET', '/api/status', function() {
+$router->add('GET', '/api/status', function () {
     return ['status' => 'ok', 'version' => '1.0'];
 });
 
@@ -109,7 +131,7 @@ try {
     $response->send();
 } catch (\Throwable $e) {
     $isDebug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
-    $content = View::render('errors/error.html.twig', [
+    $content = View::renderToString('errors/error.html.twig', [
         'message' => 'Щось пішло не так. Ми вже розбираємося.',
         'detail' => $isDebug ? $e->getMessage() : null,
     ]);

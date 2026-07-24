@@ -8,3 +8,5 @@ node_modules/
 .phpunit.cache/
 build/
 public/uploads/*
+composer.phar
+composer-setup.php

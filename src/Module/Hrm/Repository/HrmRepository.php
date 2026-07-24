@@ -120,7 +120,7 @@ class HrmRepository implements HrmRepositoryInterface
             WHERE e.department_id = :department_id 
             ORDER BY e.last_name, e.first_name
         ";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':department_id' => $departmentId]);
         return $stmt->fetchAll();

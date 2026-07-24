@@ -43,6 +43,7 @@
         "symfony/process": "^7.4",
         "symfony/http-foundation": "^7.4",
         "symfony/event-dispatcher": "^7.4",
+        "symfony/dependency-injection": "^7.0",
         "symfony/validator": "^7.4"
     },
     "require-dev": {
@@ -62,8 +63,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "cs": "phpcbf --standard=PSR12 --ignore=vendor/ public/ src/",
-        "cs-check": "phpcs --standard=PSR12 --ignore=vendor/ public/ src/",
+        "cs": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
+        "cs-check": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
         "stan": "phpstan analyse",
         "db:migrate": "phinx migrate",
         "db:rollback": "phinx rollback",

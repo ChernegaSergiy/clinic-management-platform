@@ -14,15 +14,12 @@ class ScheduleController
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
     private UserRepository $userRepository;
-    private View $view;
 
-    public function __construct()
+    public function __construct(?DoctorScheduleRepository $doctorScheduleRepository = null, ?ScheduleExceptionRepository $scheduleExceptionRepository = null, ?UserRepository $userRepository = null)
     {
-        AuthGuard::check(); // Protect all actions in this controller
-        $this->doctorScheduleRepository = new DoctorScheduleRepository();
-        $this->scheduleExceptionRepository = new ScheduleExceptionRepository();
-        $this->userRepository = new UserRepository();
-        $this->view = new View();
+        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
+        $this->scheduleExceptionRepository = $scheduleExceptionRepository ?? new ScheduleExceptionRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
     }
 
     public function index(): void

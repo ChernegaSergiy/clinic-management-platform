@@ -51,10 +51,13 @@ class SymfonyValidator
         }
 
         // Create a simple data object for validation
-        $dataObject = new class($data) {
-            public function __construct(private array $data) {}
+        $dataObject = new class ($data) {
+            public function __construct(private array $data)
+            {
+            }
 
-            public function __get(string $name) {
+            public function __get(string $name)
+            {
                 return $this->data[$name] ?? null;
             }
         };
@@ -144,7 +147,7 @@ class SymfonyValidator
         }
 
         if ($rule === 'datetime') {
-            return new Assert\Callback(function($value, $context) use ($field) {
+            return new Assert\Callback(function ($value, $context) use ($field) {
                 if (empty($value)) {
                     return;
                 }
@@ -189,10 +192,10 @@ class SymfonyValidator
         }
 
         if ($rule === 'array') {
-            return new Assert\Type([
-                'type' => 'array',
-                'message' => "Поле '{$field}' повинно бути масивом."
-            ]);
+            return new Assert\Type(
+                type: 'array',
+                message: "Поле '{$field}' повинно бути масивом."
+            );
         }
 
         if (str_starts_with($rule, 'unique:')) {

@@ -21,13 +21,18 @@ class PrescriptionController
     private UserRepository $userRepository;
     private InventoryItemRepository $inventoryItemRepository;
 
-    public function __construct()
-    {
-        $this->prescriptionRepository = new PrescriptionRepository();
-        $this->patientRepository = new PatientRepository();
-        $this->medicalRecordRepository = new MedicalRecordRepository();
-        $this->userRepository = new UserRepository();
-        $this->inventoryItemRepository = new InventoryItemRepository();
+    public function __construct(
+        ?PrescriptionRepository $prescriptionRepository = null,
+        ?PatientRepository $patientRepository = null,
+        ?MedicalRecordRepository $medicalRecordRepository = null,
+        ?UserRepository $userRepository = null,
+        ?InventoryItemRepository $inventoryItemRepository = null
+    ) {
+        $this->prescriptionRepository = $prescriptionRepository ?? new PrescriptionRepository();
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->userRepository = $userRepository ?? new UserRepository();
+        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
     }
 
     public function index(): void

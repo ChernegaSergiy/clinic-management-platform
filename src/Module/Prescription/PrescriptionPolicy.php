@@ -12,10 +12,10 @@ class PrescriptionPolicy implements Policy
     private PrescriptionRepository $prescriptionRepository;
     private AppointmentRepository $appointmentRepository;
 
-    public function __construct()
+    public function __construct(?PrescriptionRepository $prescriptionRepository = null, ?AppointmentRepository $appointmentRepository = null)
     {
-        $this->prescriptionRepository = new PrescriptionRepository();
-        $this->appointmentRepository = new AppointmentRepository();
+        $this->prescriptionRepository = $prescriptionRepository ?? new PrescriptionRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
     }
 
     public function view(User $user, array $context): bool
@@ -84,7 +84,7 @@ class PrescriptionPolicy implements Policy
         if ($prescription && (int)$prescription['doctor_id'] === $userId) {
             return true;
         }
-        if (isset($prescription['patient_id']) && $userId) {
+        if (isset($prescription['patient_id'])) {
             return $this->appointmentRepository->isPatientAssignedToDoctor((int)$prescription['patient_id'], $userId);
         }
 

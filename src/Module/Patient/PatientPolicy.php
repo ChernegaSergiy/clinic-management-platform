@@ -10,12 +10,13 @@ use App\Module\Patient\Repository\PatientRepository;
 class PatientPolicy implements Policy
 {
     private AppointmentRepository $appointmentRepository;
+    /** @phpstan-ignore property.onlyWritten */
     private PatientRepository $patientRepository;
 
-    public function __construct()
+    public function __construct(?AppointmentRepository $appointmentRepository = null, ?PatientRepository $patientRepository = null)
     {
-        $this->appointmentRepository = new AppointmentRepository();
-        $this->patientRepository = new PatientRepository();
+        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
+        $this->patientRepository = $patientRepository ?? new PatientRepository();
     }
 
     public function view(User $user, array $context): bool

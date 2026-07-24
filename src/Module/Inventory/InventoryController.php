@@ -12,9 +12,9 @@ class InventoryController
 {
     private InventoryItemRepository $inventoryItemRepository;
 
-    public function __construct()
+    public function __construct(?InventoryItemRepository $inventoryItemRepository = null)
     {
-        $this->inventoryItemRepository = new InventoryItemRepository();
+        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
     }
 
     public function index(): void

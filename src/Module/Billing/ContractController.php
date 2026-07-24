@@ -13,9 +13,9 @@ class ContractController
 {
     private ContractRepository $contractRepository;
 
-    public function __construct()
+    public function __construct(?ContractRepository $contractRepository = null)
     {
-        $this->contractRepository = new ContractRepository();
+        $this->contractRepository = $contractRepository ?? new ContractRepository();
     }
 
     public function index(): void
