@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Patient\PatientController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class PatientModule extends BaseModule
 {
@@ -31,6 +33,22 @@ class PatientModule extends BaseModule
             $router->add('POST', '/patients/{patientId}/policies/update', [PatientController::class, 'updatePolicy']);
             $router->add('POST', '/patients/{patientId}/policies/delete', [PatientController::class, 'deletePolicy']);
         }
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Patient\Repository\PatientRepository::class)
+            ->setArguments([new Reference('pdo'), new Reference(\App\Core\Service\AuditLogger::class)])
+            ->setPublic(true);
+        $container->register(\App\Module\Patient\PatientController::class)
+            ->setArguments([
+                new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+                new Reference(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class),
+                new Reference(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
