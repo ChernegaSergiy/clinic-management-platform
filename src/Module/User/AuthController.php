@@ -9,27 +9,33 @@ use App\Database\Database;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
 use App\Module\Admin\Repository\AuthConfigRepository;
-use App\Module\User\Repository\RoleRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\RoleRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\OAuthController;
 
 class AuthController
 {
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
     private AuthConfigRepository $authConfigRepository;
-    private RoleRepository $roleRepository;
-    private ?MfaService $mfaService = null;
+    private RoleRepositoryInterface $roleRepository;
+    private MfaService $mfaService;
     private OAuthController $oauthController;
     private \App\Core\Repository\SettingsRepository $settingsRepository;
 
-    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?RoleRepository $roleRepository = null, ?MfaService $mfaService = null, ?\App\Core\Repository\SettingsRepository $settingsRepository = null, ?OAuthController $oauthController = null)
-    {
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
-        $this->roleRepository = $roleRepository ?? new RoleRepository();
-        $this->mfaService = $mfaService ?? new MfaService();
-        $this->settingsRepository = $settingsRepository ?? new \App\Core\Repository\SettingsRepository();
-        $this->oauthController = $oauthController ?? new OAuthController();
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthConfigRepository $authConfigRepository,
+        RoleRepositoryInterface $roleRepository,
+        MfaService $mfaService,
+        \App\Core\Repository\SettingsRepository $settingsRepository,
+        OAuthController $oauthController
+    ) {
+        $this->userRepository = $userRepository;
+        $this->authConfigRepository = $authConfigRepository;
+        $this->roleRepository = $roleRepository;
+        $this->mfaService = $mfaService;
+        $this->settingsRepository = $settingsRepository;
+        $this->oauthController = $oauthController;
     }
 
     public function showLoginForm(): void
@@ -71,7 +77,7 @@ class AuthController
         $role = $user ? $this->roleRepository->findById((int)$user['role_id']) : null;
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            $mfaService = $this->mfaService ?? new MfaService();
+            $mfaService = $this->mfaService;
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
             $mfaForceRoles = $this->settingsRepository->getMfaForceRoles();
 
