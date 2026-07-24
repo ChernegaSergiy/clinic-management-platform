@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1df12ffa334c5ddfe81951493bd4a240",
+    "content-hash": "4d5dea7f447ffb6fabcd67b9b354052b",
     "packages": [
         {
             "name": "cakephp/chronos",
@@ -1754,16 +1754,16 @@
         },
         {
             "name": "medcore-ua/nk-025-2021-parser",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/medcore-ua/nk-025-2021-parser.git",
-                "reference": "cf236e0efb0b4369f5d59cd0fa45ddde09d6e506"
+                "reference": "96f2052c84a85cf06c75150e59a12ac31eecf718"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/medcore-ua/nk-025-2021-parser/zipball/cf236e0efb0b4369f5d59cd0fa45ddde09d6e506",
-                "reference": "cf236e0efb0b4369f5d59cd0fa45ddde09d6e506",
+                "url": "https://api.github.com/repos/medcore-ua/nk-025-2021-parser/zipball/96f2052c84a85cf06c75150e59a12ac31eecf718",
+                "reference": "96f2052c84a85cf06c75150e59a12ac31eecf718",
                 "shasum": ""
             },
             "require": {
@@ -1772,8 +1772,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ChernegaSergiy\\Nk0252021Parser\\": "src/",
-                    "ChernegaSergiy\\Nk0252021Parser\\Dto\\": "src/Dto/"
+                    "MedCore\\Nk0252021Parser\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1789,22 +1788,22 @@
             "description": "A PHP library to parse the NK-025-2021 medical classifications from meddata.pp.ua.",
             "support": {
                 "issues": "https://github.com/medcore-ua/nk-025-2021-parser/issues",
-                "source": "https://github.com/medcore-ua/nk-025-2021-parser/tree/v0.1.0"
+                "source": "https://github.com/medcore-ua/nk-025-2021-parser/tree/v0.2.0"
             },
-            "time": "2025-11-23T20:21:40+00:00"
+            "time": "2026-05-03T21:20:03+00:00"
         },
         {
             "name": "medcore-ua/nk-026-2021-parser",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/medcore-ua/nk-026-2021-parser.git",
-                "reference": "a0d8d8ec8293500b3f071b4fd9059458f03ee62e"
+                "reference": "6cb4592b2766e9bc1bc4ce369c908f76fc00eef0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/medcore-ua/nk-026-2021-parser/zipball/a0d8d8ec8293500b3f071b4fd9059458f03ee62e",
-                "reference": "a0d8d8ec8293500b3f071b4fd9059458f03ee62e",
+                "url": "https://api.github.com/repos/medcore-ua/nk-026-2021-parser/zipball/6cb4592b2766e9bc1bc4ce369c908f76fc00eef0",
+                "reference": "6cb4592b2766e9bc1bc4ce369c908f76fc00eef0",
                 "shasum": ""
             },
             "require": {
@@ -1813,8 +1812,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ChernegaSergiy\\Nk0262021Parser\\": "src/",
-                    "ChernegaSergiy\\Nk0262021Parser\\Dto\\": "src/Dto/"
+                    "MedCore\\Nk0262021Parser\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1830,9 +1828,9 @@
             "description": "A PHP library to parse the NK-026-2021 (Classifier of Medical Interventions) from meddata.pp.ua.",
             "support": {
                 "issues": "https://github.com/medcore-ua/nk-026-2021-parser/issues",
-                "source": "https://github.com/medcore-ua/nk-026-2021-parser/tree/v0.1.0"
+                "source": "https://github.com/medcore-ua/nk-026-2021-parser/tree/v0.2.0"
             },
-            "time": "2025-11-24T11:08:17+00:00"
+            "time": "2026-05-03T21:19:15+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

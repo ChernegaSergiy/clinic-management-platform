@@ -7,8 +7,8 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
-use ChernegaSergiy\Nk0252021Parser\Parser;
-use ChernegaSergiy\Nk0262021Parser\Parser as Nk026Parser;
+use MedCore\Nk0252021Parser\Parser;
+use MedCore\Nk0262021Parser\Parser as Nk026Parser;
 
 class ClinicalReferenceController
 {

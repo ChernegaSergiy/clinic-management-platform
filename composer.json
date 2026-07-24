@@ -43,8 +43,8 @@
         "symfony/event-dispatcher": "^7.4",
         "symfony/dependency-injection": "^7.0",
         "symfony/validator": "^7.4",
-        "medcore-ua/nk-025-2021-parser": "^0.1.0",
-        "medcore-ua/nk-026-2021-parser": "^0.1.0"
+        "medcore-ua/nk-025-2021-parser": "^0.2.0",
+        "medcore-ua/nk-026-2021-parser": "^0.2.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
