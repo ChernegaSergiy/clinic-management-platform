@@ -11,12 +11,12 @@ use PDO;
 class PatientRepository implements PatientRepositoryInterface
 {
     private PDO $pdo;
-    private ?CoreAuditLogger $auditLogger = null;
+    private CoreAuditLogger $auditLogger;
     private ?string $lastError = null;
 
-    public function __construct(?PDO $pdo = null, ?CoreAuditLogger $auditLogger = null)
+    public function __construct(PDO $pdo, CoreAuditLogger $auditLogger)
     {
-        $this->pdo = $pdo ?? Database::getInstance();
+        $this->pdo = $pdo;
         $this->auditLogger = $auditLogger;
     }
 
@@ -229,8 +229,7 @@ class PatientRepository implements PatientRepositoryInterface
         }
 
         if ($success && $oldStatus !== ($data['status'] ?? 'active')) {
-            $logger = $this->auditLogger ?? new CoreAuditLogger();
-            $logger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
+            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $data['status'] ?? 'active');
         }
 
         if ($success) {
@@ -260,8 +259,7 @@ class PatientRepository implements PatientRepositoryInterface
         $success = $stmt->execute([':status' => $status, ':id' => $id]);
 
         if ($success && $oldStatus !== $status) {
-            $logger = $this->auditLogger ?? new CoreAuditLogger();
-            $logger->log('patient', $id, 'status_change', $oldStatus, $status);
+            $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatient, ['status' => $status]));
         }
         return $success;
