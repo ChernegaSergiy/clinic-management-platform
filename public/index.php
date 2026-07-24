@@ -23,7 +23,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Infrastructure\DI\ContainerFactory;
 
-use App\Controller\InstallController;
 use App\Core\Exception\ExitException;
 use App\Core\Exception\RedirectException;
 use App\Core\Http\Router;
@@ -93,13 +92,6 @@ $moduleManager->registerRoutes($router);
 
 \App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
 \App\Core\Auth\Gate::setPolicyRegistry($policyRegistry);
-
-$router->add('GET', '/install', [InstallController::class, 'check']);
-
-// API routes
-$router->add('GET', '/api/status', function () {
-    return ['status' => 'ok', 'version' => '1.0'];
-});
 
 $installed = $_ENV['APP_INSTALLED'] ?? false;
 if (!$installed && parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== '/install') {
