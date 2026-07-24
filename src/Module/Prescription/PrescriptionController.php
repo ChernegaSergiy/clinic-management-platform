@@ -7,32 +7,32 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Validation\Validator;
-use App\Module\Inventory\Repository\InventoryItemRepository;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class PrescriptionController
 {
     private PrescriptionRepository $prescriptionRepository;
-    private PatientRepository $patientRepository;
-    private MedicalRecordRepository $medicalRecordRepository;
-    private UserRepository $userRepository;
-    private InventoryItemRepository $inventoryItemRepository;
+    private PatientRepositoryInterface $patientRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private UserRepositoryInterface $userRepository;
+    private InventoryItemRepositoryInterface $inventoryItemRepository;
 
     public function __construct(
-        ?PrescriptionRepository $prescriptionRepository = null,
-        ?PatientRepository $patientRepository = null,
-        ?MedicalRecordRepository $medicalRecordRepository = null,
-        ?UserRepository $userRepository = null,
-        ?InventoryItemRepository $inventoryItemRepository = null
+        PrescriptionRepository $prescriptionRepository,
+        PatientRepositoryInterface $patientRepository,
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        UserRepositoryInterface $userRepository,
+        InventoryItemRepositoryInterface $inventoryItemRepository
     ) {
-        $this->prescriptionRepository = $prescriptionRepository ?? new PrescriptionRepository();
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
+        $this->prescriptionRepository = $prescriptionRepository;
+        $this->patientRepository = $patientRepository;
+        $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->userRepository = $userRepository;
+        $this->inventoryItemRepository = $inventoryItemRepository;
     }
 
     public function index(): void
