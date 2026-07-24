@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Notification\NotificationController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class NotificationModule extends BaseModule
 {
@@ -15,6 +17,15 @@ class NotificationModule extends BaseModule
         $router->add('GET', '/api/notifications', [NotificationController::class, 'getUnread']);
         $router->add('POST', '/api/notifications/mark-read', [NotificationController::class, 'markAllRead']);
         $router->add('POST', '/api/notifications/delete', [NotificationController::class, 'delete']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Notification\Repository\NotificationRepository::class)->setPublic(true);
+        $container->register(\App\Module\Notification\NotificationController::class)
+            ->setArguments([
+                new Reference(\App\Module\Notification\Repository\NotificationRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
