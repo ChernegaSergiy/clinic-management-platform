@@ -15,42 +15,40 @@ use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Service\InsuranceService;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
+use App\Module\Billing\Repository\InvoiceRepositoryInterface;
 
 class PatientController
 {
-    private PatientRepository $patientRepository;
-    private MedicalRecordRepository $medicalRecordRepository;
-    private AppointmentRepository $appointmentRepository;
+    private PatientRepositoryInterface $patientRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
     private InsuranceService $insuranceService;
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
     private ClaimRepository $claimRepository;
-    private InvoiceRepository $invoiceRepository;
+    private InvoiceRepositoryInterface $invoiceRepository;
+    
     public function __construct(
-        ?PatientRepository $patientRepository = null,
-        ?MedicalRecordRepository $medicalRecordRepository = null,
-        ?AppointmentRepository $appointmentRepository = null,
-        ?InsuranceService $insuranceService = null,
-        ?InsuranceCompanyRepository $insuranceCompanyRepository = null,
-        ?PatientInsurancePolicyRepository $patientInsurancePolicyRepository = null,
-        ?ClaimRepository $claimRepository = null,
-        ?InvoiceRepository $invoiceRepository = null
+        PatientRepositoryInterface $patientRepository,
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        InsuranceService $insuranceService,
+        InsuranceCompanyRepository $insuranceCompanyRepository,
+        PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
+        ClaimRepository $claimRepository,
+        InvoiceRepositoryInterface $invoiceRepository
     ) {
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->insuranceCompanyRepository = $insuranceCompanyRepository ?? new \App\Module\Insurance\Repository\InsuranceCompanyRepository();
-        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository ?? new \App\Module\Insurance\Repository\PatientInsurancePolicyRepository();
-        $this->claimRepository = $claimRepository ?? new \App\Module\Insurance\Repository\ClaimRepository();
-        $this->invoiceRepository = $invoiceRepository ?? new InvoiceRepository();
-        $this->insuranceService = $insuranceService ?? new \App\Module\Insurance\Service\InsuranceService(
-            $this->insuranceCompanyRepository,
-            $this->patientInsurancePolicyRepository,
-            $this->claimRepository,
-            $this->invoiceRepository
-        );
+        $this->patientRepository = $patientRepository;
+        $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->insuranceCompanyRepository = $insuranceCompanyRepository;
+        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
+        $this->claimRepository = $claimRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->insuranceService = $insuranceService;
     }
 
     public function index(): void
