@@ -6,21 +6,24 @@ use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
-use App\Module\Hrm\Repository\HrmRepository;
+use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\Department\Repository\DepartmentRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class HrmController
 {
-    private HrmRepository $hrmRepository;
-    private UserRepository $userRepository;
+    private HrmRepositoryInterface $hrmRepository;
+    private UserRepositoryInterface $userRepository;
     private DepartmentRepository $departmentRepository;
 
-    public function __construct(?HrmRepository $hrmRepository = null, ?UserRepository $userRepository = null, ?DepartmentRepository $departmentRepository = null)
-    {
-        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->departmentRepository = $departmentRepository ?? new DepartmentRepository();
+    public function __construct(
+        HrmRepositoryInterface $hrmRepository,
+        UserRepositoryInterface $userRepository,
+        DepartmentRepository $departmentRepository
+    ) {
+        $this->hrmRepository = $hrmRepository;
+        $this->userRepository = $userRepository;
+        $this->departmentRepository = $departmentRepository;
     }
 
     public function index(): void
