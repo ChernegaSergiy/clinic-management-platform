@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Schedule\ScheduleController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ScheduleModule extends BaseModule
 {
@@ -23,6 +25,26 @@ class ScheduleModule extends BaseModule
         $router->add('POST', '/admin/schedules/update', [ScheduleController::class, 'adminUpdate']);
         $router->add('POST', '/admin/schedules/exceptions/add', [ScheduleController::class, 'adminAddException']);
         $router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Schedule\Repository\DoctorScheduleRepository::class)->setPublic(true);
+        $container->register(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class)->setPublic(true);
+        $container->register(\App\Module\Schedule\Service\SchedulingService::class)
+            ->setArguments([
+                new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
+                new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+                new Reference(\App\Module\Room\Repository\RoomRepository::class),
+            ])->setPublic(true);
+        $container->register(\App\Module\Schedule\ScheduleController::class)
+            ->setArguments([
+                new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
+                new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
