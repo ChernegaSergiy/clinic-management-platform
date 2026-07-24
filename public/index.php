@@ -24,7 +24,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Infrastructure\DI\ContainerFactory;
 
 use App\Controller\InstallController;
-use App\Controller\PageController;
 use App\Core\Exception\ExitException;
 use App\Core\Exception\RedirectException;
 use App\Core\Http\Router;
@@ -94,15 +93,6 @@ $moduleManager->registerRoutes($router);
 
 \App\Core\Auth\Gate::setPermissionRegistry($permissionRegistry);
 \App\Core\Auth\Gate::setPolicyRegistry($policyRegistry);
-
-$router->add('GET', '/', [PageController::class, 'home']);
-$router->add('GET', '/about', [PageController::class, 'about']);
-$router->add('GET', '/our-team', [PageController::class, 'ourTeam']);
-$router->add('GET', '/contact', [PageController::class, 'contact']);
-$router->add('GET', '/sitemap', [PageController::class, 'sitemap']);
-$router->add('GET', '/privacy', [PageController::class, 'privacy']);
-$router->add('GET', '/departments', [PageController::class, 'departments']);
-$router->add('GET', '/doctors', [PageController::class, 'doctors']);
 
 $router->add('GET', '/install', [InstallController::class, 'check']);
 
