@@ -4,68 +4,71 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance\Repository;
 
-use App\Database\Database;
+use App\Entity\InsuranceCompany;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InsuranceCompanyRepository
+class InsuranceCompanyRepository extends ServiceEntityRepository
 {
-    private \PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, InsuranceCompany::class);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM insurance_companies WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM insurance_companies WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
         return $result ?: null;
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM insurance_companies");
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM insurance_companies";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function create(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): int
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             INSERT INTO insurance_companies (name, contact_person, phone, email, notes, created_at, updated_at)
             VALUES (:name, :contact_person, :phone, :email, :notes, NOW(), NOW())
-        ");
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':contact_person', $contactPerson);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':notes', $notes);
-        $stmt->execute();
-        return (int) $this->pdo->lastInsertId();
+        ";
+        $conn->executeStatement($sql, [
+            'name' => $name,
+            'contact_person' => $contactPerson,
+            'phone' => $phone,
+            'email' => $email,
+            'notes' => $notes,
+        ]);
+        return (int) $conn->lastInsertId();
     }
 
     public function update(int $id, string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): bool
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             UPDATE insurance_companies
             SET name = :name, contact_person = :contact_person, phone = :phone, email = :email, notes = :notes, updated_at = NOW()
             WHERE id = :id
-        ");
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':contact_person', $contactPerson);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':notes', $notes);
-        return $stmt->execute();
+        ";
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'name' => $name,
+            'contact_person' => $contactPerson,
+            'phone' => $phone,
+            'email' => $email,
+            'notes' => $notes,
+        ]) > 0;
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM insurance_companies WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM insurance_companies WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 }

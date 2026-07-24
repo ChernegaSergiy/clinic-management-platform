@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: InsuranceCompanyRepository::class)]
 #[ORM\Table(name: 'insurance_companies')]
 class InsuranceCompany
 {
