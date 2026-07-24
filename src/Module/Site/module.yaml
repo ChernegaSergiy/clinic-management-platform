@@ -1,0 +1,6 @@
+name: Site
+version: 1.0.0
+description: Модуль публічних сторінок сайту
+author: Serhii
+config:
+    enabled: true
