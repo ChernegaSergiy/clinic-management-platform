@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\MedicalRecord\MedicalRecordController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class MedicalRecordModule extends BaseModule
 {
@@ -22,6 +24,21 @@ class MedicalRecordModule extends BaseModule
         $router->add('GET', '/medical-records/attachments/download', [MedicalRecordController::class, 'downloadAttachment']);
         $router->add('GET', '/medical-records/icd-codes', [MedicalRecordController::class, 'getIcdCodes']);
         $router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class)->setPublic(true);
+        $container->register(\App\Module\MedicalRecord\MedicalRecordController::class)
+            ->setArguments([
+                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
+                new Reference(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class),
+                new Reference(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class),
+                new Reference(\App\Core\Service\AttachmentService::class),
+                new Reference(\App\Core\Service\AuditLogger::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
