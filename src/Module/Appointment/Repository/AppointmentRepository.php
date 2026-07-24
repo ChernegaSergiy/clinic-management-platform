@@ -2,24 +2,25 @@
 
 namespace App\Module\Appointment\Repository;
 
+use App\Entity\Appointment;
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Database\Database;
-use PDO;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class AppointmentRepository implements AppointmentRepositoryInterface
+class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Appointment::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.id, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -35,30 +36,47 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             JOIN users u ON a.doctor_id = u.id
             LEFT JOIN rooms r ON a.room_id = r.id
             ORDER BY a.start_time DESC
-        ");
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function save(array $data): int|false
     {
-        $sql = "INSERT INTO appointments (patient_id, doctor_id, start_time, end_time, status, notes, waitlist_id, room_id) 
-                VALUES (:patient_id, :doctor_id, :start_time, :end_time, :status, :notes, :waitlist_id, :room_id)";
+        $appointment = new Appointment();
+        
+        $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+        $appointment->setPatient($patient);
+        
+        $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+        $appointment->setDoctor($doctor);
 
-        $stmt = $this->pdo->prepare($sql);
+        try {
+            $appointment->setStartTime(new \DateTime($data['start_time']));
+            $appointment->setEndTime(new \DateTime($data['end_time']));
+        } catch (\Exception $e) {
+            return false;
+        }
 
-        $result = $stmt->execute([
-            ':patient_id' => $data['patient_id'],
-            ':doctor_id' => $data['doctor_id'],
-            ':start_time' => $data['start_time'],
-            ':end_time' => $data['end_time'],
-            ':status' => $data['status'] ?? 'scheduled', // Встановлюємо статус за замовчуванням
-            ':notes' => $data['notes'] ?? null,
-            ':waitlist_id' => $data['waitlist_id'] ?? null,
-            ':room_id' => $data['room_id'] ?? null,
-        ]);
+        $appointment->setStatus($data['status'] ?? 'scheduled');
+        
+        if (array_key_exists('notes', $data)) {
+            $appointment->setNotes($data['notes']);
+        }
+        
+        if (!empty($data['waitlist_id'])) {
+            $appointment->setWaitlistId($data['waitlist_id']);
+        }
+        
+        if (!empty($data['room_id'])) {
+            $appointment->setRoomId($data['room_id']);
+        }
 
-        if ($result) {
-            $appointmentId = (int)$this->pdo->lastInsertId();
+        try {
+            $this->getEntityManager()->persist($appointment);
+            $this->getEntityManager()->flush();
+
+            $appointmentId = $appointment->getId();
+            
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
             EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -66,15 +84,17 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 'Ваш прийом заплановано на ' . $data['start_time'],
                 ['appointment_id' => $appointmentId]
             ));
+            
             return $appointmentId;
+        } catch (\Exception $e) {
+            return false;
         }
-
-        return false;
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.*, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -85,10 +105,9 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             JOIN users u ON a.doctor_id = u.id
             LEFT JOIN rooms r ON a.room_id = r.id
             WHERE a.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        ";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function update(int $id, array $data): bool
@@ -98,34 +117,49 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             return false;
         }
 
-        $sql = "UPDATE appointments SET 
-                    patient_id = :patient_id, 
-                    doctor_id = :doctor_id, 
-                    start_time = :start_time, 
-                    end_time = :end_time, 
-                    status = :status, 
-                    notes = :notes,
-                    room_id = :room_id
-                WHERE id = :id";
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $result = $stmt->execute([
-            ':id' => $id,
-            ':patient_id' => $data['patient_id'],
-            ':doctor_id' => $data['doctor_id'],
-            ':start_time' => $data['start_time'],
-            ':end_time' => $data['end_time'],
-            ':status' => $data['status'],
-            ':notes' => $data['notes'] ?? null,
-            ':room_id' => $data['room_id'] ?? null,
-        ]);
-
-        if ($result) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, $data));
+        /** @var Appointment|null $appointment */
+        $appointment = $this->find($id);
+        if (!$appointment) {
+            return false;
         }
 
-        return $result;
+        if (isset($data['patient_id'])) {
+            $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+            $appointment->setPatient($patient);
+        }
+        if (isset($data['doctor_id'])) {
+            $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+            $appointment->setDoctor($doctor);
+        }
+
+        if (isset($data['start_time'])) {
+            try {
+                $appointment->setStartTime(new \DateTime($data['start_time']));
+            } catch (\Exception $e) {}
+        }
+        if (isset($data['end_time'])) {
+            try {
+                $appointment->setEndTime(new \DateTime($data['end_time']));
+            } catch (\Exception $e) {}
+        }
+
+        if (isset($data['status'])) {
+            $appointment->setStatus($data['status']);
+        }
+        if (array_key_exists('notes', $data)) {
+            $appointment->setNotes($data['notes']);
+        }
+        if (array_key_exists('room_id', $data)) {
+            $appointment->setRoomId(empty($data['room_id']) ? null : $data['room_id']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, $data));
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function updateStatus(int $id, string $status): bool
@@ -135,19 +169,29 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             return false;
         }
 
-        $stmt = $this->pdo->prepare("UPDATE appointments SET status = :status WHERE id = :id");
-        $result = $stmt->execute([':status' => $status, ':id' => $id]);
-
-        if ($result && $oldAppointment['status'] !== $status) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, ['status' => $status]));
+        /** @var Appointment|null $appointment */
+        $appointment = $this->find($id);
+        if (!$appointment) {
+            return false;
         }
 
-        return $result;
+        $appointment->setStatus($status);
+
+        try {
+            $this->getEntityManager()->flush();
+            if ($oldAppointment['status'] !== $status) {
+                EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, ['status' => $status]));
+            }
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function findWaitlistById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 wl.*,
                 COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name,
@@ -156,21 +200,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             LEFT JOIN patients p ON wl.patient_id = p.id
             LEFT JOIN users u ON wl.desired_doctor_id = u.id
             WHERE wl.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        ";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function updateWaitlistStatus(int $id, string $status): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE waitlists SET status = :status WHERE id = :id");
-        return $stmt->execute([':status' => $status, ':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        return $conn->executeStatement("UPDATE waitlists SET status = :status WHERE id = :id", ['status' => $status, 'id' => $id]) > 0;
     }
 
     public function findByPatientId(int $patientId): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.*, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -180,14 +224,14 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             LEFT JOIN users u ON a.doctor_id = u.id
             WHERE a.patient_id = :patient_id
             ORDER BY a.start_time DESC
-        ");
-        $stmt->execute([':patient_id' => $patientId]);
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
     }
 
     public function findByDateRange(string $start, string $end): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.id, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -205,17 +249,15 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             LEFT JOIN rooms r ON a.room_id = r.id
             WHERE a.start_time >= :start_time AND a.end_time <= :end_time
             ORDER BY a.start_time ASC
-        ");
-        $stmt->execute([
-            ':start_time' => $start,
-            ':end_time' => $end,
-        ]);
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql, ['start_time' => $start, 'end_time' => $end]);
     }
 
     public function addToWaitlist(array $data): bool
     {
         $ticket = $data['ticket_number'] ?? $this->generateWaitlistTicket();
+        $conn = $this->getEntityManager()->getConnection();
+        
         $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, 
                                     desired_start_time, desired_end_time, notes, 
                                     contact_phone, contact_email) 
@@ -223,22 +265,21 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                         :desired_start_time, :desired_end_time, :notes, 
                         :contact_phone, :contact_email)";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        return $stmt->execute([
-            ':ticket_number' => $ticket,
-            ':patient_id' => $data['patient_id'],
-            ':desired_doctor_id' => $data['desired_doctor_id'] ?? null,
-            ':desired_start_time' => $data['desired_start_time'] ?? null,
-            ':desired_end_time' => $data['desired_end_time'] ?? null,
-            ':notes' => $data['notes'] ?? null,
-            ':contact_phone' => $data['contact_phone'] ?? null,
-            ':contact_email' => $data['contact_email'] ?? null,
-        ]);
+        return $conn->executeStatement($sql, [
+            'ticket_number' => $ticket,
+            'patient_id' => $data['patient_id'],
+            'desired_doctor_id' => $data['desired_doctor_id'] ?? null,
+            'desired_start_time' => $data['desired_start_time'] ?? null,
+            'desired_end_time' => $data['desired_end_time'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'contact_phone' => $data['contact_phone'] ?? null,
+            'contact_email' => $data['contact_email'] ?? null,
+        ]) > 0;
     }
 
     public function getWaitlistEntries(?string $status = 'pending'): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT 
                     wl.id,
                     wl.ticket_number,
@@ -260,54 +301,34 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 WHERE (:status IS NULL OR wl.status = :status)
                 ORDER BY wl.created_at ASC";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':status' => $status]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['status' => $status]);
     }
 
     public function generateWaitlistTicket(): string
     {
+        $conn = $this->getEntityManager()->getConnection();
         $year = date('Y');
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM waitlists WHERE YEAR(created_at) = :year");
-        $stmt->execute([':year' => $year]);
-        $count = (int)$stmt->fetchColumn() + 1;
+        $count = (int)$conn->fetchOne("SELECT COUNT(*) FROM waitlists WHERE YEAR(created_at) = :year", ['year' => $year]) + 1;
         return sprintf('WL-%s-%05d', $year, $count);
     }
 
     public function isPatientAssignedToDoctor(int $patientId, int $doctorId): bool
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 1 
-            FROM appointments 
-            WHERE patient_id = :patient_id AND doctor_id = :doctor_id
-            LIMIT 1
-        ");
-        $stmt->execute([
-            ':patient_id' => $patientId,
-            ':doctor_id' => $doctorId,
-        ]);
-
-        return (bool)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT 1 FROM appointments WHERE patient_id = :patient_id AND doctor_id = :doctor_id LIMIT 1";
+        return (bool)$conn->fetchOne($sql, ['patient_id' => $patientId, 'doctor_id' => $doctorId]);
     }
 
     public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId): bool
     {
-        $stmt = $this->pdo->prepare("
-            SELECT 1 
-            FROM appointments 
-            WHERE id = :appointment_id AND doctor_id = :doctor_id
-            LIMIT 1
-        ");
-        $stmt->execute([
-            ':appointment_id' => $appointmentId,
-            ':doctor_id' => $doctorId,
-        ]);
-
-        return (bool)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT 1 FROM appointments WHERE id = :appointment_id AND doctor_id = :doctor_id LIMIT 1";
+        return (bool)$conn->fetchOne($sql, ['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
     }
 
     public function findAppointmentsForReminder(int $minutesBefore): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 a.id, 
@@ -323,15 +344,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE a.status = 'scheduled' 
               AND a.start_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL :minutes_before MINUTE)
         ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':minutes_before' => $minutesBefore]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['minutes_before' => $minutesBefore]);
     }
 
     public function findByDoctorId(int $doctorId): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.*, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -341,14 +360,14 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             JOIN users u ON a.doctor_id = u.id
             WHERE a.doctor_id = :doctor_id
             ORDER BY a.start_time DESC
-        ");
-        $stmt->execute([':doctor_id' => $doctorId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ";
+        return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId]);
     }
 
     public function findByDoctorIdAndDateRange(int $doctorId, string $start, string $end): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.id, 
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -364,96 +383,57 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE a.doctor_id = :doctor_id
               AND a.start_time >= :start_time AND a.start_time <= :end_time
             ORDER BY a.start_time ASC
-        ");
-        $stmt->execute([
-            ':doctor_id' => $doctorId,
-            ':start_time' => $start,
-            ':end_time' => $end,
-        ]);
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId, 'start_time' => $start, 'end_time' => $end]);
     }
 
     public function findPatientIdsByDoctor(int $doctorId): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT DISTINCT patient_id
-            FROM appointments
-            WHERE doctor_id = :doctor_id
-        ");
-        $stmt->execute([':doctor_id' => $doctorId]);
-        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = :doctor_id";
+        $results = $conn->fetchFirstColumn($sql, ['doctor_id' => $doctorId]);
+        return array_map('intval', $results);
     }
 
     public function countScheduledByDate(string $date): int
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COUNT(*) 
-            FROM appointments 
-            WHERE status = 'scheduled' AND DATE(start_time) = :date
-        ");
-        $stmt->execute([':date' => $date]);
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) = :date";
+        return (int)$conn->fetchOne($sql, ['date' => $date]);
     }
 
     public function countScheduledByRange(string $from, string $to): int
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COUNT(*) 
-            FROM appointments 
-            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
-        ");
-        $stmt->execute([
-            ':from' => $from,
-            ':to' => $to,
-        ]);
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
+        return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
     public function sumBookedHoursByRange(string $from, string $to): float
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COALESCE(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600, 0) as hours
-            FROM appointments
-            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
-        ");
-        $stmt->execute([
-            ':from' => $from,
-            ':to' => $to,
-        ]);
-        return (float)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COALESCE(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600, 0) as hours FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
+        return (float)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
     public function countDistinctDoctorsByRange(string $from, string $to): int
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COUNT(DISTINCT doctor_id)
-            FROM appointments
-            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
-        ");
-        $stmt->execute([
-            ':from' => $from,
-            ':to' => $to,
-        ]);
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(DISTINCT doctor_id) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
+        return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
     public function countDistinctPatientsByRange(string $from, string $to): int
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COUNT(DISTINCT patient_id)
-            FROM appointments
-            WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to
-        ");
-        $stmt->execute([
-            ':from' => $from,
-            ':to' => $to,
-        ]);
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(DISTINCT patient_id) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
+        return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
     public function countReadmittedPatients(string $from, string $to): int
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT COUNT(*) FROM (
                 SELECT patient_id, COUNT(*) as cnt
                 FROM appointments
@@ -461,16 +441,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 GROUP BY patient_id
                 HAVING cnt > 1
             ) t
-        ");
-        $stmt->execute([
-            ':from' => $from,
-            ':to' => $to,
-        ]);
-        return (int)$stmt->fetchColumn();
+        ";
+        return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
     public function getDoctorDailyLoad(string $date): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT
                 u.id as doctor_id,
@@ -483,51 +460,43 @@ class AppointmentRepository implements AppointmentRepositoryInterface
                 AND a.status = 'scheduled'
             WHERE u.role_id = (SELECT id FROM roles WHERE name = 'doctor')
             GROUP BY u.id, u.first_name, u.last_name
-            ORDER BY total_appointments DESC;
+            ORDER BY total_appointments DESC
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':date' => $date]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['date' => $date]);
     }
 
     public function findUpcoming(): array
     {
-        $stmt = $this->pdo->prepare(
-            "SELECT "
-            . "a.id, "
-            . "CONCAT(p.last_name, ' ', p.first_name) as patient_name, "
-            . "CONCAT(u.last_name, ' ', u.first_name) as doctor_name, "
-            . "a.start_time, "
-            . "a.end_time, "
-            . "a.status, "
-            . "a.doctor_id "
-            . "FROM appointments a "
-            . "JOIN patients p ON a.patient_id = p.id "
-            . "JOIN users u ON a.doctor_id = u.id "
-            . "WHERE a.start_time > NOW() AND a.status = 'scheduled' "
-            . "ORDER BY a.start_time ASC "
-            . "LIMIT 10" // Limit to next 10 upcoming appointments for dashboard
-        );
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT 
+                a.id, 
+                CONCAT(p.last_name, ' ', p.first_name) as patient_name, 
+                CONCAT(u.last_name, ' ', u.first_name) as doctor_name, 
+                a.start_time, 
+                a.end_time, 
+                a.status, 
+                a.doctor_id 
+            FROM appointments a 
+            JOIN patients p ON a.patient_id = p.id 
+            JOIN users u ON a.doctor_id = u.id 
+            WHERE a.start_time > NOW() AND a.status = 'scheduled' 
+            ORDER BY a.start_time ASC 
+            LIMIT 10
+        ";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function countAppointmentsByDate(string $date): int
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM appointments WHERE DATE(start_time) = :date";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':date' => $date]);
-        return (int)$stmt->fetchColumn();
+        return (int)$conn->fetchOne($sql, ['date' => $date]);
     }
 
-    /**
-     * Retrieves the sum of durations of completed appointments for each doctor on a given date.
-     *
-     * @param string $date The date in 'YYYY-MM-DD' format.
-     * @return array An associative array with doctor_id as key and total duration in seconds as value.
-     */
     public function getSumOfCompletedAppointmentDurationsForDate(string $date): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT
                 doctor_id,
@@ -536,21 +505,13 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE DATE(start_time) = :date AND status = 'completed'
             GROUP BY doctor_id
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':date' => $date]);
-        $results = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Fetches as [doctor_id => total_duration_seconds]
-        return array_map('intval', $results); // Ensure values are integers
+        $results = $conn->fetchAllKeyValue($sql, ['date' => $date]);
+        return array_map('intval', $results);
     }
 
-    /**
-     * Retrieves completed appointments for a given date, including associated medical record and ICD codes.
-     * These appointments serve as "discharge events" for readmission tracking.
-     *
-     * @param string $date The date in 'YYYY-MM-DD' format.
-     * @return array An array of associative arrays, each representing a completed appointment.
-     */
     public function getCompletedAppointmentsWithIcdCodes(string $date): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT
                 a.id as appointment_id,
@@ -563,22 +524,12 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE DATE(a.end_time) = :date AND a.status = 'completed'
             GROUP BY a.id, a.patient_id, mr.id
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':date' => $date]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $conn->fetchAllAssociative($sql, ['date' => $date]);
     }
 
-    /**
-     * Finds subsequent appointments for a specific patient after a given date and within a timeframe.
-     * Used to detect potential readmissions.
-     *
-     * @param int $patientId The ID of the patient.
-     * @param string $afterDate The date (YYYY-MM-DD) after which to search for appointments.
-     * @param int $timeframeDays The number of days after $afterDate to consider.
-     * @return array An array of subsequent appointments.
-     */
     public function findPatientSubsequentAppointments(int $patientId, string $afterDate, int $timeframeDays): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT
                 a.id as appointment_id,
@@ -592,18 +543,17 @@ class AppointmentRepository implements AppointmentRepositoryInterface
               AND a.start_time <= DATE_ADD(:after_date, INTERVAL :timeframe_days DAY)
             ORDER BY a.start_time ASC
         ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':patient_id' => $patientId,
-            ':after_date' => $afterDate,
-            ':timeframe_days' => $timeframeDays,
+        return $conn->fetchAllAssociative($sql, [
+            'patient_id' => $patientId,
+            'after_date' => $afterDate,
+            'timeframe_days' => $timeframeDays,
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findByRoomIdAndDateRange(int $roomId, string $start, string $end): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 a.id, 
                 a.start_time, 
@@ -614,12 +564,11 @@ class AppointmentRepository implements AppointmentRepositoryInterface
             WHERE a.room_id = :room_id
             AND a.start_time < :end_time AND a.end_time > :start_time
             ORDER BY a.start_time ASC
-        ");
-        $stmt->execute([
-            ':room_id' => $roomId,
-            ':start_time' => $start,
-            ':end_time' => $end,
+        ";
+        return $conn->fetchAllAssociative($sql, [
+            'room_id' => $roomId,
+            'start_time' => $start,
+            'end_time' => $end,
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
