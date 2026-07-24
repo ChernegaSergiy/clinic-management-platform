@@ -2,60 +2,102 @@
 
 namespace App\Module\User\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\UserOAuthIdentity;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class UserOAuthIdentityRepository
+class UserOAuthIdentityRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, UserOAuthIdentity::class);
     }
 
     public function findByProviderAndProviderId(string $provider, string $providerId): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM user_oauth_identities WHERE provider = :provider AND provider_id = :provider_id");
-        $stmt->execute([':provider' => $provider, ':provider_id' => $providerId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('uoi')
+            ->where('uoi.provider = :provider')
+            ->andWhere('uoi.provider_id = :provider_id')
+            ->setParameter('provider', $provider)
+            ->setParameter('provider_id', $providerId);
+            
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        return $result ?: null;
     }
 
     public function findByUserIdAndProvider(int $userId, string $provider): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM user_oauth_identities WHERE user_id = :user_id AND provider = :provider");
-        $stmt->execute([':user_id' => $userId, ':provider' => $provider]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('uoi')
+            ->where('uoi.user = :user_id')
+            ->andWhere('uoi.provider = :provider')
+            ->setParameter('user_id', $userId)
+            ->setParameter('provider', $provider);
+            
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        return $result ?: null;
     }
 
     public function create(int $userId, string $provider, string $providerId): bool
     {
-        $stmt = $this->pdo->prepare("INSERT INTO user_oauth_identities (user_id, provider, provider_id, created_at, updated_at) VALUES (:user_id, :provider, :provider_id, NOW(), NOW())");
-        return $stmt->execute([
-            ':user_id' => $userId,
-            ':provider' => $provider,
-            ':provider_id' => $providerId,
-        ]);
+        $identity = new UserOAuthIdentity();
+        
+        $user = $this->getEntityManager()->getReference(\App\Entity\User::class, $userId);
+        $identity->setUser($user);
+        
+        $identity->setProvider($provider);
+        $identity->setProviderId($providerId);
+        $identity->setCreatedAt(new \DateTime());
+
+        try {
+            $this->getEntityManager()->persist($identity);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM user_oauth_identities WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $identity = $this->find($id);
+        
+        if (!$identity) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($identity);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function deleteByUserIdAndProvider(int $userId, string $provider): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM user_oauth_identities WHERE user_id = :user_id AND provider = :provider");
-        return $stmt->execute([':user_id' => $userId, ':provider' => $provider]);
+        $qb = $this->createQueryBuilder('uoi')
+            ->delete()
+            ->where('uoi.user = :user_id')
+            ->andWhere('uoi.provider = :provider')
+            ->setParameter('user_id', $userId)
+            ->setParameter('provider', $provider);
+
+        try {
+            $qb->getQuery()->execute();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function findAllByUserId(int $userId): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM user_oauth_identities WHERE user_id = :user_id");
-        $stmt->execute([':user_id' => $userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $qb = $this->createQueryBuilder('uoi')
+            ->where('uoi.user = :user_id')
+            ->setParameter('user_id', $userId);
+            
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 }
