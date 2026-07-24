@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Dashboard\DashboardController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DashboardModule extends BaseModule
 {
@@ -19,6 +21,15 @@ class DashboardModule extends BaseModule
             $router->add('GET', '/dashboard/export-pdf', [DashboardController::class, 'exportPdf']);
             $router->add('GET', '/dashboard/export-excel', [DashboardController::class, 'exportExcel']);
         }
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Dashboard\Service\DashboardService::class)->setPublic(true);
+        $container->register(\App\Module\Dashboard\DashboardController::class)
+            ->setArguments([
+                new Reference(\App\Module\Dashboard\Service\DashboardService::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
