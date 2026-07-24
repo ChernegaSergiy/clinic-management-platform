@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\News\NewsController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class NewsModule extends BaseModule
 {
@@ -20,6 +22,16 @@ class NewsModule extends BaseModule
         $router->add('GET', '/admin/news/edit/{id}', [NewsController::class, 'edit']);
         $router->add('POST', '/admin/news/edit/{id}', [NewsController::class, 'update']);
         $router->add('POST', '/admin/news/delete/{id}', [NewsController::class, 'delete']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\News\Repository\NewsRepository::class)->setPublic(true);
+        $container->register(\App\Module\News\NewsController::class)
+            ->setArguments([
+                new Reference(\App\Module\News\Repository\NewsRepository::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
