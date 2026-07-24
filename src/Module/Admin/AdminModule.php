@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Admin\AdminController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AdminModule extends BaseModule
 {
@@ -65,6 +67,26 @@ class AdminModule extends BaseModule
 
         $router->add('GET', '/admin/settings', [AdminController::class, 'showSettings']);
         $router->add('POST', '/admin/settings', [AdminController::class, 'updateSettings']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Admin\Repository\AuthConfigRepository::class)->setPublic(true);
+        $container->register(\App\Module\Admin\Repository\BackupPolicyRepository::class)->setPublic(true);
+        $container->register(\App\Module\Admin\Repository\DictionaryRepository::class)->setPublic(true);
+
+        $container->register(\App\Module\Admin\AdminController::class)
+            ->setArguments([
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Module\User\Repository\RoleRepository::class),
+                new Reference(\App\Module\Admin\Repository\DictionaryRepository::class),
+                new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+                new Reference(\App\Module\Admin\Repository\BackupPolicyRepository::class),
+                new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+                new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+                new Reference(\App\Core\Repository\SettingsRepository::class),
+                new Reference(\App\Module\User\MfaService::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
