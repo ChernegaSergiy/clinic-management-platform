@@ -2,35 +2,39 @@
 
 namespace App\Module\ClinicalReference\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\IcdCode;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class IcdCodeRepository
+class IcdCodeRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, IcdCode::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT id, code, description FROM icd_codes ORDER BY code ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT id, code, description FROM icd_codes ORDER BY code ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function countAll(): int
     {
-        return (int)$this->pdo->query("SELECT COUNT(*) FROM icd_codes")->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        return (int)$conn->fetchOne("SELECT COUNT(*) FROM icd_codes");
     }
 
     public function replaceAll(array $rows): int
     {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
         try {
-            $this->pdo->exec("DELETE FROM icd_codes");
-            $stmt = $this->pdo->prepare("INSERT INTO icd_codes (code, description) VALUES (:code, :description)");
+            $conn->executeStatement("DELETE FROM icd_codes");
+            
+            $sql = "INSERT INTO icd_codes (code, description) VALUES (:code, :description)";
+            
             $count = 0;
             $seen = [];
             foreach ($rows as $row) {
@@ -42,28 +46,29 @@ class IcdCodeRepository
                     continue; // уникаємо дублювання
                 }
                 $description = $row['description'] ?? '';
-                $stmt->execute([
-                    ':code' => $code,
-                    ':description' => $description,
+                
+                $conn->executeStatement($sql, [
+                    'code' => $code,
+                    'description' => $description,
                 ]);
                 $seen[$code] = true;
                 $count++;
             }
-            $this->pdo->commit();
+            $conn->commit();
             return $count;
         } catch (\Throwable $e) {
-            $this->pdo->rollBack();
+            $conn->rollBack();
             throw $e;
         }
     }
 
     public function searchByCodeOrDescription(string $searchTerm): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, code, description FROM icd_codes 
                 WHERE code LIKE :term OR description LIKE :term 
                 ORDER BY code ASC LIMIT 20";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':term' => '%' . $searchTerm . '%']);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+        return $conn->fetchAllAssociative($sql, ['term' => '%' . $searchTerm . '%']);
     }
 }

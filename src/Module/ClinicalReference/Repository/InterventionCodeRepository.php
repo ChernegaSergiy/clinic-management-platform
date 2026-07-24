@@ -2,36 +2,39 @@
 
 namespace App\Module\ClinicalReference\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\InterventionCode;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InterventionCodeRepository
+class InterventionCodeRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, InterventionCode::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT id, code, description FROM intervention_codes ORDER BY code ASC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT id, code, description FROM intervention_codes ORDER BY code ASC";
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function countAll(): int
     {
-        return (int)$this->pdo->query("SELECT COUNT(*) FROM intervention_codes")->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        return (int)$conn->fetchOne("SELECT COUNT(*) FROM intervention_codes");
     }
 
     public function replaceAll(array $rows): int
     {
-        $this->pdo->beginTransaction();
+        $conn = $this->getEntityManager()->getConnection();
+        $conn->beginTransaction();
         try {
-            $this->pdo->exec("DELETE FROM intervention_codes");
-            $stmt = $this->pdo->prepare("INSERT INTO intervention_codes (code, description) 
-                                        VALUES (:code, :description)");
+            $conn->executeStatement("DELETE FROM intervention_codes");
+            
+            $sql = "INSERT INTO intervention_codes (code, description) VALUES (:code, :description)";
+            
             $count = 0;
             $seen = [];
             foreach ($rows as $row) {
@@ -43,28 +46,29 @@ class InterventionCodeRepository
                     continue; // уникаємо дублювання
                 }
                 $description = $row['description'] ?? '';
-                $stmt->execute([
-                    ':code' => $code,
-                    ':description' => $description,
+                
+                $conn->executeStatement($sql, [
+                    'code' => $code,
+                    'description' => $description,
                 ]);
                 $seen[$code] = true;
                 $count++;
             }
-            $this->pdo->commit();
+            $conn->commit();
             return $count;
         } catch (\Throwable $e) {
-            $this->pdo->rollBack();
+            $conn->rollBack();
             throw $e;
         }
     }
 
     public function searchByCodeOrDescription(string $searchTerm): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, code, description FROM intervention_codes 
                 WHERE code LIKE :term OR description LIKE :term 
                 ORDER BY code ASC LIMIT 20";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':term' => '%' . $searchTerm . '%']);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+        return $conn->fetchAllAssociative($sql, ['term' => '%' . $searchTerm . '%']);
     }
 }
