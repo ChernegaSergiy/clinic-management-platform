@@ -1,6 +1,6 @@
 {
     "name": "medcore-ua/medcore",
-    "description": "A Clinic Management Platform",
+    "description": "A comprehensive web platform for clinic and medical data management.",
     "type": "project",
     "license": "MIT",
     "authors": [
