@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\ClinicalReference\ClinicalReferenceController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ClinicalReferenceModule extends BaseModule
 {
@@ -17,6 +19,17 @@ class ClinicalReferenceModule extends BaseModule
         $router->add('POST', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportRun']);
         $router->add('GET', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportForm']);
         $router->add('POST', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportRun']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class)->setPublic(true);
+        $container->register(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class)->setPublic(true);
+        $container->register(\App\Module\ClinicalReference\ClinicalReferenceController::class)
+            ->setArguments([
+                new Reference(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class),
+                new Reference(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
