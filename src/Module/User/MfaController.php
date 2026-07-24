@@ -5,24 +5,27 @@ namespace App\Module\User;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\MfaGuard;
 use App\Core\Http\View;
-use App\Module\User\Repository\UserRepository;
+use App\Core\Repository\SettingsRepository;
+use App\Module\User\Repository\RoleRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class MfaController
 {
     private MfaService $mfaService;
-    private \App\Module\User\Repository\UserRepository $userRepository;
-    private \App\Core\Repository\SettingsRepository $settingsRepository;
-    private \App\Module\User\Repository\RoleRepository $roleRepository;
+    private UserRepositoryInterface $userRepository;
+    private SettingsRepository $settingsRepository;
+    private RoleRepositoryInterface $roleRepository;
+
     public function __construct(
-        ?MfaService $mfaService = null,
-        ?\App\Module\User\Repository\UserRepository $userRepository = null,
-        ?\App\Core\Repository\SettingsRepository $settingsRepository = null,
-        ?\App\Module\User\Repository\RoleRepository $roleRepository = null
+        MfaService $mfaService,
+        UserRepositoryInterface $userRepository,
+        SettingsRepository $settingsRepository,
+        RoleRepositoryInterface $roleRepository
     ) {
-        $this->mfaService = $mfaService ?? new MfaService();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->settingsRepository = $settingsRepository ?? new \App\Core\Repository\SettingsRepository();
-        $this->roleRepository = $roleRepository ?? new \App\Module\User\Repository\RoleRepository();
+        $this->mfaService = $mfaService;
+        $this->userRepository = $userRepository;
+        $this->settingsRepository = $settingsRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode): void
