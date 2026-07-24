@@ -78,8 +78,6 @@ $moduleManager = $container->get(ModuleManager::class);
 if ($eventDispatcher === null) {
     $eventDispatcher = new EventDispatcher();
 }
-$moduleLoader = new ModuleLoader($moduleManager);
-$moduleLoader->loadAll();
 
 $moduleManager->bootstrapAll();
 
