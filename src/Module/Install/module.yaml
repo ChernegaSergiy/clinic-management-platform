@@ -1,0 +1,6 @@
+name: Install
+version: 1.0.0
+description: Модуль інсталятора та перевірки стану
+author: Serhii
+config:
+    enabled: true
