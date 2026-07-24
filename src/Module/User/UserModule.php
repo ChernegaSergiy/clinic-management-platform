@@ -81,6 +81,15 @@ class UserModule extends BaseModule
                 new Reference(\App\Module\User\Repository\UserRepository::class),
                 new Reference(\App\Module\User\Repository\UserOAuthIdentityRepository::class),
             ])->setPublic(true);
+            
+        $container->register(\App\Module\User\UserController::class)
+            ->setArguments([
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
+                new Reference(\App\Module\User\Repository\UserOAuthIdentityRepository::class),
+                new Reference(\App\Module\Hrm\Repository\HrmRepository::class),
+                new Reference(\App\Core\Repository\SettingsRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
