@@ -4,19 +4,21 @@ namespace App\Module\Patient;
 
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
 
 class PatientPolicy implements Policy
 {
-    private AppointmentRepository $appointmentRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
     /** @phpstan-ignore property.onlyWritten */
-    private PatientRepository $patientRepository;
+    private PatientRepositoryInterface $patientRepository;
 
-    public function __construct(?AppointmentRepository $appointmentRepository = null, ?PatientRepository $patientRepository = null)
-    {
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
+    public function __construct(
+        AppointmentRepositoryInterface $appointmentRepository,
+        PatientRepositoryInterface $patientRepository
+    ) {
+        $this->appointmentRepository = $appointmentRepository;
+        $this->patientRepository = $patientRepository;
     }
 
     public function view(User $user, array $context): bool
