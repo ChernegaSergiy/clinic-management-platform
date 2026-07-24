@@ -4,8 +4,9 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Department\Repository\DepartmentRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: DepartmentRepository::class)]
 #[ORM\Table(name: 'departments')]
 class Department
 {

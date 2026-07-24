@@ -2,149 +2,170 @@
 
 namespace App\Module\Department\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Department;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class DepartmentRepository implements DepartmentRepositoryInterface
+class DepartmentRepository extends ServiceEntityRepository implements DepartmentRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Department::class);
     }
 
     public function findAll(): array
     {
-        $sql = "
-            SELECT d.*, dp.name as parent_name 
-            FROM departments d 
-            LEFT JOIN departments dp ON d.parent_id = dp.id 
-            ORDER BY d.sort_order ASC, d.name ASC
-        ";
+        $qb = $this->createQueryBuilder('d')
+            ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
+            ->leftJoin('d.parent', 'dp')
+            ->orderBy('d.sort_order', 'ASC')
+            ->addOrderBy('d.name', 'ASC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findAllActive(): array
     {
-        $sql = "
-            SELECT d.*, dp.name as parent_name 
-            FROM departments d 
-            LEFT JOIN departments dp ON d.parent_id = dp.id 
-            WHERE d.is_active = 1 
-            ORDER BY d.sort_order ASC, d.name ASC
-        ";
+        $qb = $this->createQueryBuilder('d')
+            ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
+            ->leftJoin('d.parent', 'dp')
+            ->where('d.is_active = 1')
+            ->orderBy('d.sort_order', 'ASC')
+            ->addOrderBy('d.name', 'ASC');
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findById(int $id): ?array
     {
-        $sql = "
-            SELECT d.*, dp.name as parent_name 
-            FROM departments d 
-            LEFT JOIN departments dp ON d.parent_id = dp.id 
-            WHERE d.id = :id
-        ";
+        $qb = $this->createQueryBuilder('d')
+            ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
+            ->leftJoin('d.parent', 'dp')
+            ->where('d.id = :id')
+            ->setParameter('id', $id);
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        return $result ?: null;
     }
 
     public function save(array $data): bool
     {
-        $sql = "
-            INSERT INTO departments (name, description, parent_id, is_active, sort_order) 
-            VALUES (:name, :description, :parent_id, :is_active, :sort_order)
-        ";
+        $department = new Department();
+        $department->setName($data['name']);
+        
+        if (array_key_exists('description', $data)) {
+            $department->setDescription($data['description']);
+        }
+        
+        if (!empty($data['parent_id'])) {
+            $parent = $this->getEntityManager()->getReference(Department::class, $data['parent_id']);
+            $department->setParent($parent);
+        }
 
-        $stmt = $this->pdo->prepare($sql);
+        if (array_key_exists('is_active', $data)) {
+            $department->setIsActive((bool)$data['is_active']);
+        }
+        
+        if (array_key_exists('sort_order', $data)) {
+            $department->setSortOrder((int)$data['sort_order']);
+        }
 
-        return $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':parent_id' => empty($data['parent_id']) ? null : $data['parent_id'],
-            ':is_active' => $data['is_active'] ?? true,
-            ':sort_order' => $data['sort_order'] ?? 0,
-        ]);
+        try {
+            $this->getEntityManager()->persist($department);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function update(int $id, array $data): bool
     {
-        $sql = "
-            UPDATE departments SET
-                name = :name,
-                description = :description,
-                parent_id = :parent_id,
-                is_active = :is_active,
-                sort_order = :sort_order
-            WHERE id = :id
-        ";
+        /** @var Department|null $department */
+        $department = $this->find($id);
+        if (!$department) {
+            return false;
+        }
 
-        $stmt = $this->pdo->prepare($sql);
+        if (isset($data['name'])) {
+            $department->setName($data['name']);
+        }
+        
+        if (array_key_exists('description', $data)) {
+            $department->setDescription($data['description']);
+        }
 
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-            ':parent_id' => empty($data['parent_id']) ? null : $data['parent_id'],
-            ':is_active' => $data['is_active'] ?? true,
-            ':sort_order' => $data['sort_order'] ?? 0,
-        ]);
+        if (array_key_exists('parent_id', $data)) {
+            if (!empty($data['parent_id'])) {
+                $parent = $this->getEntityManager()->getReference(Department::class, $data['parent_id']);
+                $department->setParent($parent);
+            } else {
+                $department->setParent(null);
+            }
+        }
+
+        if (array_key_exists('is_active', $data)) {
+            $department->setIsActive((bool)$data['is_active']);
+        }
+        
+        if (array_key_exists('sort_order', $data)) {
+            $department->setSortOrder((int)$data['sort_order']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id): bool
     {
-        // Перевірка чи немає дочірніх відділень
-        $checkSql = "SELECT COUNT(*) as count FROM departments WHERE parent_id = :id";
-        $checkStmt = $this->pdo->prepare($checkSql);
-        $checkStmt->execute([':id' => $id]);
-        $hasChildren = $checkStmt->fetch()['count'] > 0;
+        $count = $this->createQueryBuilder('d')
+            ->select('COUNT(d.id)')
+            ->where('d.parent = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        if ($hasChildren) {
+        if ($count > 0) {
             return false;
         }
 
-        $sql = "DELETE FROM departments WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':id' => $id]);
+        $department = $this->find($id);
+        if (!$department) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($department);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function findByName(string $name): ?array
     {
-        $sql = "SELECT * FROM departments WHERE name = :name";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':name' => $name]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('d')
+            ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
+            ->leftJoin('d.parent', 'dp')
+            ->where('d.name = :name')
+            ->setParameter('name', $name);
+
+        return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
     public function getHierarchy(): array
     {
-        $sql = "
-            SELECT d.*, dp.name as parent_name 
-            FROM departments d 
-            LEFT JOIN departments dp ON d.parent_id = dp.id 
-            WHERE d.is_active = 1 
-            ORDER BY d.sort_order ASC, d.name ASC
-        ";
+        $departments = $this->findAllActive();
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        $departments = $stmt->fetchAll();
-
-        // Побудова ієрархії
         $hierarchy = [];
         $parentMap = [];
 
-        // Спочатку групуємо за parent_id
         foreach ($departments as $department) {
             $parentId = $department['parent_id'];
             if ($parentId === null) {
@@ -154,7 +175,6 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             }
         }
 
-        // Потім додаємо дочірні елементи
         foreach ($hierarchy as &$parent) {
             $this->addChildren($parent, $parentMap);
         }
