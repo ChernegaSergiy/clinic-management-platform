@@ -2,63 +2,61 @@
 
 namespace App\Module\Hrm\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Employee;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class HrmRepository implements HrmRepositoryInterface
+class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Employee::class);
     }
 
     public function findAll(): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT e.*, d.name as department_name 
                 FROM employees e
                 LEFT JOIN departments d ON e.department_id = d.id
                 ORDER BY e.last_name, e.first_name";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return $conn->fetchAllAssociative($sql);
     }
 
     public function save(array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO employees (first_name, last_name, middle_name, position, department_id, hire_date, salary, contact_phone, status, user_id) 
                 VALUES (:first_name, :last_name, :middle_name, :position, :department_id, :hire_date, :salary, :contact_phone, :status, :user_id)";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        return $stmt->execute([
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':middle_name' => $data['middle_name'] ?? null,
-            ':position' => $data['position'],
-            ':department_id' => $data['department_id'] ?? null,
-            ':hire_date' => $data['hire_date'],
-            ':salary' => $data['salary'] ?: null,
-            ':contact_phone' => $data['contact_phone'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-            ':user_id' => $data['user_id'] ?: null,
-        ]);
+        return $conn->executeStatement($sql, [
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'middle_name' => $data['middle_name'] ?? null,
+            'position' => $data['position'],
+            'department_id' => $data['department_id'] ?? null,
+            'hire_date' => $data['hire_date'],
+            'salary' => $data['salary'] ?: null,
+            'contact_phone' => $data['contact_phone'] ?? null,
+            'status' => $data['status'] ?? 'active',
+            'user_id' => $data['user_id'] ?: null,
+        ]) > 0;
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT e.*, d.name as department_name 
-                                       FROM employees e 
-                                       LEFT JOIN departments d ON e.department_id = d.id 
-                                       WHERE e.id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT e.*, d.name as department_name 
+                FROM employees e 
+                LEFT JOIN departments d ON e.department_id = d.id 
+                WHERE e.id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function update(int $id, array $data): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE employees SET
                     first_name = :first_name,
                     last_name = :last_name,
@@ -73,40 +71,40 @@ class HrmRepository implements HrmRepositoryInterface
                     user_id = :user_id
                 WHERE id = :id";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        return $stmt->execute([
-            ':id' => $id,
-            ':first_name' => $data['first_name'],
-            ':last_name' => $data['last_name'],
-            ':middle_name' => $data['middle_name'] ?? null,
-            ':position' => $data['position'],
-            ':department_id' => $data['department_id'] ?? null,
-            ':hire_date' => $data['hire_date'],
-            ':fire_date' => empty($data['fire_date']) ? null : $data['fire_date'],
-            ':salary' => $data['salary'] ?: null,
-            ':contact_phone' => $data['contact_phone'] ?? null,
-            ':status' => $data['status'] ?? 'active',
-            ':user_id' => $data['user_id'] ?: null,
-        ]);
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'middle_name' => $data['middle_name'] ?? null,
+            'position' => $data['position'],
+            'department_id' => $data['department_id'] ?? null,
+            'hire_date' => $data['hire_date'],
+            'fire_date' => empty($data['fire_date']) ? null : $data['fire_date'],
+            'salary' => $data['salary'] ?: null,
+            'contact_phone' => $data['contact_phone'] ?? null,
+            'status' => $data['status'] ?? 'active',
+            'user_id' => $data['user_id'] ?: null,
+        ]) > 0;
     }
 
     public function updateStatus(int $id, string $status): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE employees SET status = :status WHERE id = :id");
-        return $stmt->execute([':status' => $status, ':id' => $id]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "UPDATE employees SET status = :status WHERE id = :id";
+        return $conn->executeStatement($sql, ['status' => $status, 'id' => $id]) > 0;
     }
 
     public function findByUserId(int $userId): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM employees WHERE user_id = :user_id");
-        $stmt->execute([':user_id' => $userId]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM employees WHERE user_id = :user_id";
+        $result = $conn->fetchAssociative($sql, ['user_id' => $userId]);
+        return $result ?: null;
     }
 
     public function findByDepartment(int $departmentId): array
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT 
                 e.*, 
@@ -121,8 +119,6 @@ class HrmRepository implements HrmRepositoryInterface
             ORDER BY e.last_name, e.first_name
         ";
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':department_id' => $departmentId]);
-        return $stmt->fetchAll();
+        return $conn->fetchAllAssociative($sql, ['department_id' => $departmentId]);
     }
 }
