@@ -10,9 +10,9 @@ class NotificationController
 {
     private NotificationRepository $notificationRepository;
 
-    public function __construct(?NotificationRepository $notificationRepository = null)
+    public function __construct(NotificationRepository $notificationRepository)
     {
-        $this->notificationRepository = $notificationRepository ?? new NotificationRepository();
+        $this->notificationRepository = $notificationRepository;
     }
 
     /**
