@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Hrm\HrmController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class HrmModule extends BaseModule
 {
@@ -19,6 +21,11 @@ class HrmModule extends BaseModule
         $router->add('GET', '/hrm/edit', [HrmController::class, 'edit']);
         $router->add('POST', '/hrm/edit', [HrmController::class, 'update']);
         $router->add('POST', '/hrm/toggle-status', [HrmController::class, 'toggleStatus']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Hrm\Repository\HrmRepository::class)->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
