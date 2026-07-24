@@ -16,7 +16,6 @@ use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\Schedule\Service\SchedulingService;
 use App\Module\User\Repository\UserRepositoryInterface;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AppointmentController
