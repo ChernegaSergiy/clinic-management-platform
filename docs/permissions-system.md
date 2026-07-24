@@ -103,21 +103,30 @@ if (Gate::allows('hrm.write')) {
 Gate::authorize('patients.read', ['patient_id' => $id]);
 ```
 
-## Initialization in index.php
+## Initialization in Request Lifecycle
+
+In the new architecture, initialization is handled through the DI container and `public/index.php`:
 
 ```php
-$permissionRegistry = new PermissionRegistry();
-$policyRegistry = new PolicyRegistry();
+// 1. Container creation (App\Infrastructure\DI\ContainerFactory)
+// The factory registers core services, loads modules, and calls registerServices() on each module.
+$container = ContainerFactory::createContainer();
 
-$moduleManager = new ModuleManager();
-$moduleLoader = new ModuleLoader($moduleManager);
-$moduleLoader->loadAll();
+// 2. Resolve core services from DI
+$permissionRegistry = $container->get(PermissionRegistry::class);
+$policyRegistry = $container->get(PolicyRegistry::class);
+$moduleManager = $container->get(ModuleManager::class);
+$router = $container->get(Router::class);
 
+// 3. Bootstrap modules
 $moduleManager->bootstrapAll();
+
+// 4. Register module components in strict order
 $moduleManager->registerPermissions($permissionRegistry);
 $moduleManager->registerPolicies($policyRegistry);
 $moduleManager->registerRoutes($router);
 
+// 5. Configure Gate
 Gate::setPermissionRegistry($permissionRegistry);
 Gate::setPolicyRegistry($policyRegistry);
 ```
