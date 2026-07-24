@@ -5,26 +5,31 @@ namespace App\Module\User;
 use App\Core\Auth\AuthGuard;
 use App\Core\Http\View;
 use App\Module\Admin\Repository\AuthConfigRepository;
-use App\Module\Hrm\Repository\HrmRepository;
+use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 
 class UserController
 {
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
     private AuthConfigRepository $authConfigRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
-    private HrmRepository $hrmRepository;
+    private HrmRepositoryInterface $hrmRepository;
     private SettingsRepository $settingsRepository;
 
-    public function __construct(?UserRepository $userRepository = null, ?AuthConfigRepository $authConfigRepository = null, ?UserOAuthIdentityRepository $userOAuthIdentityRepository = null, ?HrmRepository $hrmRepository = null, ?SettingsRepository $settingsRepository = null)
-    {
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->authConfigRepository = $authConfigRepository ?? new AuthConfigRepository();
-        $this->userOAuthIdentityRepository = $userOAuthIdentityRepository ?? new UserOAuthIdentityRepository();
-        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
-        $this->settingsRepository = $settingsRepository ?? new SettingsRepository();
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthConfigRepository $authConfigRepository,
+        UserOAuthIdentityRepository $userOAuthIdentityRepository,
+        HrmRepositoryInterface $hrmRepository,
+        SettingsRepository $settingsRepository
+    ) {
+        $this->userRepository = $userRepository;
+        $this->authConfigRepository = $authConfigRepository;
+        $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
+        $this->hrmRepository = $hrmRepository;
+        $this->settingsRepository = $settingsRepository;
     }
 
     public function profile(): void
