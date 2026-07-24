@@ -6,6 +6,8 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DepartmentModule extends BaseModule
 {
@@ -19,6 +21,16 @@ class DepartmentModule extends BaseModule
         $router->add('POST', '/admin/departments/edit', [DepartmentController::class, 'update']);
         $router->add('POST', '/admin/departments/delete', [DepartmentController::class, 'delete']);
         $router->add('POST', '/admin/departments/toggle-status', [DepartmentController::class, 'toggleStatus']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Department\Repository\DepartmentRepository::class)->setPublic(true);
+        $container->register(\App\Module\Department\DepartmentController::class)
+            ->setArguments([
+                new Reference(\App\Module\Department\Repository\DepartmentRepository::class),
+                new Reference(\App\Module\Hrm\Repository\HrmRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
