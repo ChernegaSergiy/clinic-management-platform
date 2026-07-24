@@ -9,34 +9,35 @@ use App\Core\Http\View;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
-use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Module\LabOrder\Service\LabImportService;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
-use App\Module\User\Repository\UserRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class LabOrderController
 {
-    private MedicalRecordRepository $medicalRecordRepository;
-    private LabOrderRepository $labOrderRepository;
-    private UserRepository $userRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private LabOrderRepositoryInterface $labOrderRepository;
+    private UserRepositoryInterface $userRepository;
     private NotificationService $notificationService;
     private QrCodeGenerator $qrCodeGenerator;
     private LabImportService $labImportService;
+
     public function __construct(
-        ?MedicalRecordRepository $medicalRecordRepository = null,
-        ?LabOrderRepository $labOrderRepository = null,
-        ?UserRepository $userRepository = null,
-        ?NotificationService $notificationService = null,
-        ?QrCodeGenerator $qrCodeGenerator = null,
-        ?LabImportService $labImportService = null
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        LabOrderRepositoryInterface $labOrderRepository,
+        UserRepositoryInterface $userRepository,
+        NotificationService $notificationService,
+        QrCodeGenerator $qrCodeGenerator,
+        LabImportService $labImportService
     ) {
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
-        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->notificationService = $notificationService ?? new NotificationService();
-        $this->qrCodeGenerator = $qrCodeGenerator ?? new QrCodeGenerator();
-        $this->labImportService = $labImportService ?? new LabImportService();
+        $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->labOrderRepository = $labOrderRepository;
+        $this->userRepository = $userRepository;
+        $this->notificationService = $notificationService;
+        $this->qrCodeGenerator = $qrCodeGenerator;
+        $this->labImportService = $labImportService;
     }
 
     public function create(): void
