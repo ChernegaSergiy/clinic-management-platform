@@ -6,15 +6,15 @@ use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
-use App\Module\Inventory\Repository\InventoryItemRepository;
+use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 
 class InventoryController
 {
-    private InventoryItemRepository $inventoryItemRepository;
+    private InventoryItemRepositoryInterface $inventoryItemRepository;
 
-    public function __construct(?InventoryItemRepository $inventoryItemRepository = null)
+    public function __construct(InventoryItemRepositoryInterface $inventoryItemRepository)
     {
-        $this->inventoryItemRepository = $inventoryItemRepository ?? new InventoryItemRepository();
+        $this->inventoryItemRepository = $inventoryItemRepository;
     }
 
     public function index(): void
