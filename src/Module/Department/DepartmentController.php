@@ -7,17 +7,17 @@ use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Department\Repository\DepartmentRepository;
-use App\Module\Hrm\Repository\HrmRepository;
+use App\Module\Hrm\Repository\HrmRepositoryInterface;
 
 class DepartmentController
 {
     private DepartmentRepository $departmentRepository;
-    private HrmRepository $hrmRepository;
+    private HrmRepositoryInterface $hrmRepository;
 
-    public function __construct(?DepartmentRepository $departmentRepository = null, ?HrmRepository $hrmRepository = null)
+    public function __construct(DepartmentRepository $departmentRepository, HrmRepositoryInterface $hrmRepository)
     {
-        $this->departmentRepository = $departmentRepository ?? new DepartmentRepository();
-        $this->hrmRepository = $hrmRepository ?? new HrmRepository();
+        $this->departmentRepository = $departmentRepository;
+        $this->hrmRepository = $hrmRepository;
     }
 
     public function index(): void
