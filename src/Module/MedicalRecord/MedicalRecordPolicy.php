@@ -4,15 +4,15 @@ namespace App\Module\MedicalRecord;
 
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 
 class MedicalRecordPolicy implements Policy
 {
-    private MedicalRecordRepository $medicalRecordRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
 
-    public function __construct(?MedicalRecordRepository $medicalRecordRepository = null)
+    public function __construct(MedicalRecordRepositoryInterface $medicalRecordRepository)
     {
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
+        $this->medicalRecordRepository = $medicalRecordRepository;
     }
 
     public function view(User $user, array $context): bool
