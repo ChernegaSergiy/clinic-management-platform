@@ -2,16 +2,16 @@
 
 namespace App\Module\LabOrder\Service;
 
-use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use Exception;
 
 class LabImportService
 {
-    private LabOrderRepository $labOrderRepository;
+    private LabOrderRepositoryInterface $labOrderRepository;
 
-    public function __construct(?LabOrderRepository $labOrderRepository = null)
+    public function __construct(LabOrderRepositoryInterface $labOrderRepository)
     {
-        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
+        $this->labOrderRepository = $labOrderRepository;
     }
 
     /**
