@@ -8,6 +8,7 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DepartmentController
 {
@@ -20,6 +21,7 @@ class DepartmentController
         $this->hrmRepository = $hrmRepository;
     }
 
+    #[Route('/admin/departments', name: 'admin_departments_index', methods: ['GET'])]
     public function index(): void
     {
         AuthGuard::check();
@@ -32,6 +34,7 @@ class DepartmentController
         ]);
     }
 
+    #[Route('/admin/departments/new', name: 'admin_departments_new', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -45,6 +48,7 @@ class DepartmentController
         ]);
     }
 
+    #[Route('/admin/departments/new', name: 'admin_departments_new_post', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -81,6 +85,7 @@ class DepartmentController
         exit();
     }
 
+    #[Route('/admin/departments/show', name: 'admin_departments_show', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -104,6 +109,7 @@ class DepartmentController
         ]);
     }
 
+    #[Route('/admin/departments/edit', name: 'admin_departments_edit', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -127,6 +133,7 @@ class DepartmentController
         ]);
     }
 
+    #[Route('/admin/departments/edit', name: 'admin_departments_edit_post', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
@@ -172,6 +179,7 @@ class DepartmentController
         exit();
     }
 
+    #[Route('/admin/departments/delete', name: 'admin_departments_delete', methods: ['POST'])]
     public function delete(): void
     {
         AuthGuard::check();
@@ -192,6 +200,7 @@ class DepartmentController
         exit();
     }
 
+    #[Route('/admin/departments/toggle-status', name: 'admin_departments_toggle_status', methods: ['POST'])]
     public function toggleStatus(): void
     {
         AuthGuard::check();
