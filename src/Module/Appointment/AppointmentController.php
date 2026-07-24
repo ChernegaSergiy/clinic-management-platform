@@ -8,60 +8,47 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Service\NotificationService;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\ServiceRepository;
-use App\Module\Patient\Repository\PatientRepository;
+use App\Module\Patient\Repository\PatientRepositoryInterface;
+use App\Module\Room\Repository\RoomRepository;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\Schedule\Service\SchedulingService;
-use App\Module\User\Repository\UserRepository;
+use App\Module\User\Repository\UserRepositoryInterface;
 
 class AppointmentController
 {
-    private AppointmentRepository $appointmentRepository;
-    private PatientRepository $patientRepository;
-    private UserRepository $userRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private PatientRepositoryInterface $patientRepository;
+    private UserRepositoryInterface $userRepository;
     private NotificationService $notificationService;
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
-    private \App\Module\Room\Repository\RoomRepository $roomRepository;
+    private RoomRepository $roomRepository;
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
 
     public function __construct(
-        ?AppointmentRepository $appointmentRepository = null,
-        ?PatientRepository $patientRepository = null,
-        ?UserRepository $userRepository = null,
-        ?NotificationService $notificationService = null,
-        ?SchedulingService $schedulingService = null,
-        ?DoctorScheduleRepository $doctorScheduleRepository = null,
-        ?ScheduleExceptionRepository $scheduleExceptionRepository = null,
-        ?ServiceRepository $serviceRepository = null,
-        ?\App\Module\Room\Repository\RoomRepository $roomRepository = null
+        AppointmentRepositoryInterface $appointmentRepository,
+        PatientRepositoryInterface $patientRepository,
+        UserRepositoryInterface $userRepository,
+        NotificationService $notificationService,
+        SchedulingService $schedulingService,
+        DoctorScheduleRepository $doctorScheduleRepository,
+        ScheduleExceptionRepository $scheduleExceptionRepository,
+        ServiceRepository $serviceRepository,
+        RoomRepository $roomRepository
     ) {
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->patientRepository = $patientRepository ?? new PatientRepository();
-        $this->userRepository = $userRepository ?? new UserRepository();
-        $this->notificationService = $notificationService ?? new NotificationService();
-
-        // Scheduling dependencies (allow injecting composed SchedulingService)
-        $this->serviceRepository = $serviceRepository ?? new ServiceRepository();
-        $this->roomRepository = $roomRepository ?? new \App\Module\Room\Repository\RoomRepository();
-
-        $this->doctorScheduleRepository = $doctorScheduleRepository ?? new DoctorScheduleRepository();
-        $this->scheduleExceptionRepository = $scheduleExceptionRepository ?? new ScheduleExceptionRepository();
-
-        if ($schedulingService !== null) {
-            $this->schedulingService = $schedulingService;
-        } else {
-            $this->schedulingService = new SchedulingService(
-                $this->doctorScheduleRepository,
-                $this->scheduleExceptionRepository,
-                $this->appointmentRepository,
-                $this->serviceRepository,
-                $this->roomRepository
-            );
-        }
+        $this->appointmentRepository = $appointmentRepository;
+        $this->patientRepository = $patientRepository;
+        $this->userRepository = $userRepository;
+        $this->notificationService = $notificationService;
+        $this->schedulingService = $schedulingService;
+        $this->doctorScheduleRepository = $doctorScheduleRepository;
+        $this->scheduleExceptionRepository = $scheduleExceptionRepository;
+        $this->serviceRepository = $serviceRepository;
+        $this->roomRepository = $roomRepository;
     }
 
     public function index(): void
