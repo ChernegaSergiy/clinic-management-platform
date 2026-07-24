@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Kpi\KpiController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class KpiModule extends BaseModule
 {
@@ -20,6 +22,17 @@ class KpiModule extends BaseModule
         $router->add('POST', '/kpi/definitions/delete', [KpiController::class, 'deleteDefinition']);
         $router->add('GET', '/kpi/results', [KpiController::class, 'listResults']);
         $router->add('POST', '/kpi/calculate', [KpiController::class, 'calculateResults']);
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Kpi\Repository\KpiRepository::class)->setPublic(true);
+        $container->register(\App\Module\Kpi\KpiController::class)
+            ->setArguments([
+                new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+                new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
