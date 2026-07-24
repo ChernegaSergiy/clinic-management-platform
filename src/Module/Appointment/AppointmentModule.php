@@ -7,6 +7,8 @@ use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
 use App\Module\Appointment\AppointmentController;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AppointmentModule extends BaseModule
 {
@@ -33,6 +35,23 @@ class AppointmentModule extends BaseModule
             $router->add('GET', '/api/appointments', [AppointmentController::class, 'json']);
             $router->add('GET', '/api/appointments/available-slots', [AppointmentController::class, 'getAvailableSlotsApi']);
         }
+    }
+
+    public function registerServices(ContainerBuilder $container): void
+    {
+        $container->register(\App\Module\Appointment\Repository\AppointmentRepository::class)->setPublic(true);
+        $container->register(\App\Module\Appointment\AppointmentController::class)
+            ->setArguments([
+                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Module\Patient\Repository\PatientRepository::class),
+                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Core\Service\NotificationService::class),
+                new Reference(\App\Module\Schedule\Service\SchedulingService::class),
+                new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
+                new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
+                new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
+                new Reference(\App\Module\Room\Repository\RoomRepository::class),
+            ])->setPublic(true);
     }
 
     public function registerPermissions(PermissionRegistry $registry): void
