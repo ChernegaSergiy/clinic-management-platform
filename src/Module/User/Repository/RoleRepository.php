@@ -2,56 +2,95 @@
 
 namespace App\Module\User\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Role;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
-class RoleRepository implements RoleRepositoryInterface
+class RoleRepository extends ServiceEntityRepository implements RoleRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Role::class);
     }
 
     public function findAll(): array
     {
-        $stmt = $this->pdo->query("SELECT id, name FROM roles ORDER BY name");
-        return $stmt->fetchAll();
+        $qb = $this->createQueryBuilder('r')
+            ->select('r.id', 'r.name')
+            ->orderBy('r.name', 'ASC');
+            
+        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT id, name FROM roles WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        $qb = $this->createQueryBuilder('r')
+            ->select('r.id', 'r.name')
+            ->where('r.id = :id')
+            ->setParameter('id', $id);
+            
+        $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+        return $result ?: null;
     }
 
     public function save(array $data): bool
     {
-        $sql = "INSERT INTO roles (name, description) VALUES (:name, :description)";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-        ]);
+        $role = new Role();
+        $role->setName($data['name']);
+        
+        if (array_key_exists('description', $data)) {
+            $role->setDescription($data['description']);
+        }
+
+        try {
+            $this->getEntityManager()->persist($role);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function update(int $id, array $data): bool
     {
-        $sql = "UPDATE roles SET name = :name, description = :description WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id,
-            ':name' => $data['name'],
-            ':description' => $data['description'] ?? null,
-        ]);
+        /** @var Role|null $role */
+        $role = $this->find($id);
+        
+        if (!$role) {
+            return false;
+        }
+
+        if (array_key_exists('name', $data)) {
+            $role->setName($data['name']);
+        }
+        
+        if (array_key_exists('description', $data)) {
+            $role->setDescription($data['description']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM roles WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $role = $this->find($id);
+        
+        if (!$role) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($role);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

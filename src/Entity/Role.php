@@ -4,8 +4,9 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\User\Repository\RoleRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: RoleRepository::class)]
 #[ORM\Table(name: 'roles')]
 class Role
 {
