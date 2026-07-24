@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ScheduleExceptionRepository::class)]
 #[ORM\Table(name: 'schedule_exceptions')]
 class ScheduleException
 {
