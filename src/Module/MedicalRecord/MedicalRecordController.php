@@ -8,38 +8,38 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
-use App\Module\LabOrder\Repository\LabOrderRepository;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
+use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 
 class MedicalRecordController
 {
-    private MedicalRecordRepository $medicalRecordRepository;
-    private AppointmentRepository $appointmentRepository;
-    private LabOrderRepository $labOrderRepository;
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private LabOrderRepositoryInterface $labOrderRepository;
     private IcdCodeRepository $icdCodeRepository;
     private InterventionCodeRepository $interventionCodeRepository;
     private AttachmentService $attachmentService;
     private AuditLogger $auditLogger;
 
     public function __construct(
-        ?MedicalRecordRepository $medicalRecordRepository = null,
-        ?AppointmentRepository $appointmentRepository = null,
-        ?LabOrderRepository $labOrderRepository = null,
-        ?IcdCodeRepository $icdCodeRepository = null,
-        ?InterventionCodeRepository $interventionCodeRepository = null,
-        ?AttachmentService $attachmentService = null,
-        ?AuditLogger $auditLogger = null
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        LabOrderRepositoryInterface $labOrderRepository,
+        IcdCodeRepository $icdCodeRepository,
+        InterventionCodeRepository $interventionCodeRepository,
+        AttachmentService $attachmentService,
+        AuditLogger $auditLogger
     ) {
-        $this->medicalRecordRepository = $medicalRecordRepository ?? new MedicalRecordRepository();
-        $this->appointmentRepository = $appointmentRepository ?? new AppointmentRepository();
-        $this->labOrderRepository = $labOrderRepository ?? new LabOrderRepository();
-        $this->icdCodeRepository = $icdCodeRepository ?? new IcdCodeRepository();
-        $this->interventionCodeRepository = $interventionCodeRepository ?? new InterventionCodeRepository();
-        $this->attachmentService = $attachmentService ?? new AttachmentService();
-        $this->auditLogger = $auditLogger ?? new AuditLogger();
+        $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->labOrderRepository = $labOrderRepository;
+        $this->icdCodeRepository = $icdCodeRepository;
+        $this->interventionCodeRepository = $interventionCodeRepository;
+        $this->attachmentService = $attachmentService;
+        $this->auditLogger = $auditLogger;
     }
 
     public function create(): void
