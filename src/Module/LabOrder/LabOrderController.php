@@ -14,6 +14,7 @@ use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Module\LabOrder\Service\LabImportService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class LabOrderController
 {
@@ -40,6 +41,7 @@ class LabOrderController
         $this->labImportService = $labImportService;
     }
 
+    #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
     public function create(): void
     {
         AuthGuard::check();
@@ -66,6 +68,7 @@ class LabOrderController
         ]);
     }
 
+    #[Route('/lab-orders/new', name: 'lab_orders_new_post', methods: ['POST'])]
     public function store(): void
     {
         AuthGuard::check();
@@ -123,6 +126,7 @@ class LabOrderController
         exit();
     }
 
+    #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
     public function show(): void
     {
         AuthGuard::check();
@@ -147,6 +151,7 @@ class LabOrderController
         ]);
     }
 
+    #[Route('/lab-orders/edit', name: 'lab_orders_edit_get', methods: ['GET'])]
     public function edit(): void
     {
         AuthGuard::check();
@@ -174,6 +179,7 @@ class LabOrderController
         ]);
     }
 
+    #[Route('/lab-orders/edit', name: 'lab_orders_edit_post', methods: ['POST'])]
     public function update(): void
     {
         AuthGuard::check();
