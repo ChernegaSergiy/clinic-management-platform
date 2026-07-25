@@ -11,6 +11,9 @@ use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use Symfony\Component\Routing\Attribute\Route;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 class InsuranceController extends \App\Core\Controller\AbstractController
 {
     private InsuranceService $insuranceService;
@@ -23,20 +26,20 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/insurance/companies', name: 'insurance_companies_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage'); // Reuse billing permission for now
 
         $companies = $this->insuranceService->getAllInsuranceCompanies();
 
-        $this->render('@modules/Insurance/templates/companies/index.html.twig', [
+        return $this->render('@modules/Insurance/templates/companies/index.html.twig', [
             'companies' => $companies,
         ]);
     }
 
     #[Route('/insurance/companies/show', name: 'insurance_companies_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read'); // Reusing billing read permission
@@ -45,31 +48,30 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $company = $this->insuranceService->getInsuranceCompany($id);
 
         if (!$company) {
-            http_response_code(404);
-            $this->render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.']);
-            return;
+            return $this->render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.'], new Response('', 404));
         }
 
-        $this->render('@modules/Insurance/templates/companies/show.html.twig', [
+        return $this->render('@modules/Insurance/templates/companies/show.html.twig', [
             'company' => $company,
         ]);
     }
 
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_get', methods: ['GET'])]
-    public function create(): void
+    public function create(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
 
-        $this->render('@modules/Insurance/templates/companies/new.html.twig', [
+        $response = $this->render('@modules/Insurance/templates/companies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_post', methods: ['POST'])]
-    public function store(): void
+    public function store(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -82,8 +84,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($_POST, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /insurance/companies/new');
-            exit();
+            return new RedirectResponse('/insurance/companies/new');
         }
 
         $this->insuranceService->addInsuranceCompany(
@@ -94,12 +95,11 @@ class InsuranceController extends \App\Core\Controller\AbstractController
             $_POST['notes'] ?? null
         );
 
-        header('Location: /insurance/companies');
-        exit();
+        return new RedirectResponse('/insurance/companies');
     }
 
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_get', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -108,20 +108,19 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $company = $this->insuranceService->getInsuranceCompany($id);
 
         if (!$company) {
-            http_response_code(404);
-            echo "Компанію не знайдено";
-            return;
+            return new Response("Компанію не знайдено", 404);
         }
 
-        $this->render('@modules/Insurance/templates/companies/edit.html.twig', [
+        $response = $this->render('@modules/Insurance/templates/companies/edit.html.twig', [
             'company' => $company,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_post', methods: ['POST'])]
-    public function update(): void
+    public function update(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -130,9 +129,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $company = $this->insuranceService->getInsuranceCompany($id);
 
         if (!$company) {
-            http_response_code(404);
-            echo "Компанію не знайдено";
-            return;
+            return new Response("Компанію не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -143,8 +140,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($_POST, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             // Redirect back to edit form
-            header('Location: /insurance/companies/edit?id=' . $id);
-            exit();
+            return new RedirectResponse('/insurance/companies/edit?id=' . $id);
         }
 
         $this->insuranceService->updateInsuranceCompany(
@@ -156,12 +152,11 @@ class InsuranceController extends \App\Core\Controller\AbstractController
             $_POST['notes'] ?? null
         );
 
-        header('Location: /insurance/companies');
-        exit();
+        return new RedirectResponse('/insurance/companies');
     }
 
     #[Route('/insurance/companies/delete', name: 'insurance_companies_delete', methods: ['POST'])]
-    public function delete(): void
+    public function delete(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -169,25 +164,24 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->insuranceService->deleteInsuranceCompany($id);
 
-        header('Location: /insurance/companies');
-        exit();
+        return new RedirectResponse('/insurance/companies');
     }
 
     #[Route('/insurance/claims', name: 'insurance_claims_index', methods: ['GET'])]
-    public function listClaims(): void
+    public function listClaims(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read'); // Reuse billing permission
 
         $claims = $this->insuranceService->getAllClaims();
 
-        $this->render('@modules/Insurance/templates/claims/index.html.twig', [
+        return $this->render('@modules/Insurance/templates/claims/index.html.twig', [
             'claims' => $claims,
         ]);
     }
 
     #[Route('/insurance/claims/show', name: 'insurance_claims_show', methods: ['GET'])]
-    public function showClaim(): void
+    public function showClaim(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
@@ -196,18 +190,16 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $claim = $this->insuranceService->getClaimWithDetails($id);
 
         if (!$claim) {
-            http_response_code(404);
-            echo "Кейс не знайдено";
-            return;
+            return new Response("Кейс не знайдено", 404);
         }
 
-        $this->render('@modules/Insurance/templates/claims/show.html.twig', [
+        return $this->render('@modules/Insurance/templates/claims/show.html.twig', [
             'claim' => $claim,
         ]);
     }
 
     #[Route('/insurance/claims/update-status', name: 'insurance_claims_update_status', methods: ['POST'])]
-    public function updateClaimStatus(): void
+    public function updateClaimStatus(): Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -219,7 +211,6 @@ class InsuranceController extends \App\Core\Controller\AbstractController
 
         $this->insuranceService->updateClaimStatus($id, $status, $submittedAt, $totalPaid);
 
-        header('Location: /insurance/claims/show?id=' . $id);
-        exit();
+        return new RedirectResponse('/insurance/claims/show?id=' . $id);
     }
 }
