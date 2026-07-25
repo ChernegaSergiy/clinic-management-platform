@@ -3,9 +3,7 @@
 namespace App\Module\Prescription;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
@@ -13,7 +11,7 @@ use App\Module\Patient\Repository\PatientRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 
-class PrescriptionController
+class PrescriptionController extends \App\Core\Controller\AbstractController
 {
     private PrescriptionRepository $prescriptionRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -40,7 +38,7 @@ class PrescriptionController
 
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
         $user = Gate::getUser();
         $prescriptions = [];
@@ -53,7 +51,7 @@ class PrescriptionController
             }
         }
 
-        View::render('@modules/Prescription/templates/index.html.twig', [
+        $this->render('@modules/Prescription/templates/index.html.twig', [
             'prescriptions' => $prescriptions,
             'searchTerm' => $searchTerm,
         ]);
@@ -61,7 +59,7 @@ class PrescriptionController
 
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('prescription.create', ['doctor_id' => Gate::getUser()->getId()]); // Check if current user can create prescriptions
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
@@ -81,7 +79,7 @@ class PrescriptionController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('@modules/Prescription/templates/new.html.twig', [
+        $this->render('@modules/Prescription/templates/new.html.twig', [
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
@@ -91,7 +89,7 @@ class PrescriptionController
 
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
         $validator = $this->validator;
@@ -115,7 +113,7 @@ class PrescriptionController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('@modules/Prescription/templates/new.html.twig', [
+            $this->render('@modules/Prescription/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -152,7 +150,7 @@ class PrescriptionController
 
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('prescription.view', ['id' => $id]);
 
@@ -164,7 +162,7 @@ class PrescriptionController
             return;
         }
 
-        View::render('@modules/Prescription/templates/show.html.twig', [
+        $this->render('@modules/Prescription/templates/show.html.twig', [
             'prescription' => $prescription,
         ]);
     }
