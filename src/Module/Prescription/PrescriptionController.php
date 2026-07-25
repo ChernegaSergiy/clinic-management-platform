@@ -10,6 +10,9 @@ use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PrescriptionController extends \App\Core\Controller\AbstractController
 {
@@ -36,7 +39,8 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    public function index(): void
+    #[Route('/prescriptions', name: 'prescription_index', methods: ['GET'])]
+    public function index(): Response
     {
         $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
@@ -51,13 +55,14 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
             }
         }
 
-        $this->render('@modules/Prescription/templates/index.html.twig', [
+        return $this->render('@modules/Prescription/templates/index.html.twig', [
             'prescriptions' => $prescriptions,
             'searchTerm' => $searchTerm,
         ]);
     }
 
-    public function create(): void
+    #[Route('/prescriptions/new', name: 'prescription_new', methods: ['GET'])]
+    public function create(): Response
     {
         $this->checkAuth();
         Gate::authorize('prescription.create', ['doctor_id' => Gate::getUser()->getId()]); // Check if current user can create prescriptions
@@ -66,9 +71,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
         $patient = $this->patientRepository->findById($patientId);
 
         if (!$patient) {
-            http_response_code(404);
-            echo "Пацієнта не знайдено";
-            return;
+            return new Response("Пацієнта не знайдено", 404);
         }
 
         $doctors = $this->userRepository->findAllDoctors();
@@ -79,7 +82,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        $this->render('@modules/Prescription/templates/new.html.twig', [
+        return $this->render('@modules/Prescription/templates/new.html.twig', [
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
@@ -87,7 +90,8 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    public function store(): void
+    #[Route('/prescriptions/new', name: 'prescription_store', methods: ['POST'])]
+    public function store(): Response
     {
         $this->checkAuth();
         Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
@@ -113,7 +117,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            $this->render('@modules/Prescription/templates/new.html.twig', [
+            return $this->render('@modules/Prescription/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -121,7 +125,6 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                 'medicalRecords' => $medicalRecords,
                 'currentDoctorId' => Gate::getUser()->getId(),
             ]);
-            return;
         }
 
         $prescriptionId = $this->prescriptionRepository->save($_POST);
@@ -144,11 +147,11 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                 }
             }
         }
-        header('Location: /patients/show?id=' . $_POST['patient_id']);
-        exit();
+        return new RedirectResponse('/patients/show?id=' . $_POST['patient_id']);
     }
 
-    public function show(): void
+    #[Route('/prescriptions/show', name: 'prescription_show', methods: ['GET'])]
+    public function show(): Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -157,12 +160,10 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
         $prescription = $this->prescriptionRepository->findById($id);
 
         if (!$prescription) {
-            http_response_code(404);
-            echo "Рецепт не знайдено";
-            return;
+            return new Response("Рецепт не знайдено", 404);
         }
 
-        $this->render('@modules/Prescription/templates/show.html.twig', [
+        return $this->render('@modules/Prescription/templates/show.html.twig', [
             'prescription' => $prescription,
         ]);
     }
