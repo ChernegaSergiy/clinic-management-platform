@@ -7,13 +7,14 @@ use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
-
-// To get author info
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class NewsController extends \App\Core\Controller\AbstractController
 {
     private NewsRepository $newsRepository;
-    private UserRepositoryInterface $userRepository; // For author selection in admin forms
+    private UserRepositoryInterface $userRepository;
     private Validator $validator;
 
     public function __construct(NewsRepository $newsRepository, UserRepositoryInterface $userRepository, Validator $validator)
@@ -23,48 +24,47 @@ class NewsController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    // Public listing of news articles
-    public function index(): void
+    #[Route('/news', name: 'news_index', methods: ['GET'])]
+    public function index(): Response
     {
         $newsArticles = $this->newsRepository->findAll();
-        $this->render('news/index.html.twig', [
+        return $this->render('news/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
 
-    // Public view of a single news article
-    public function show(array $args): void
+    #[Route('/news/{id}', name: 'news_show', methods: ['GET'])]
+    public function show(array $args): Response
     {
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle || !$newsArticle['is_published']) {
-            $this->render('errors/error.html.twig', [
+            return $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена або не опублікована.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
-            return;
         }
 
-        $this->render('news/show.html.twig', [
+        return $this->render('news/show.html.twig', [
             'newsArticle' => $newsArticle,
         ]);
     }
 
-    // Admin: List all news articles
-    public function adminIndex(): void
+    #[Route('/admin/news', name: 'admin_news_index', methods: ['GET'])]
+    public function adminIndex(): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
 
         $newsArticles = $this->newsRepository->findAll();
-        $this->render('@modules/News/templates/admin/index.html.twig', [
+        return $this->render('@modules/News/templates/admin/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
 
-    // Admin: Show form to create a new news article
-    public function create(): void
+    #[Route('/admin/news/new', name: 'admin_news_new', methods: ['GET'])]
+    public function create(): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
@@ -75,16 +75,17 @@ class NewsController extends \App\Core\Controller\AbstractController
             return $acc;
         }, []);
 
-        $this->render('@modules/News/templates/admin/new.html.twig', [
+        $response = $this->render('@modules/News/templates/admin/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'authors' => $authors,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    // Admin: Store a new news article
-    public function store(): void
+    #[Route('/admin/news/new', name: 'admin_news_store', methods: ['POST'])]
+    public function store(): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
@@ -102,17 +103,15 @@ class NewsController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/news/new');
-            exit();
+            return new RedirectResponse('/admin/news/new');
         }
 
         $this->newsRepository->create($_POST);
-        header('Location: /admin/news');
-        exit();
+        return new RedirectResponse('/admin/news');
     }
 
-    // Admin: Show form to edit a news article
-    public function edit(array $args): void
+    #[Route('/admin/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
+    public function edit(array $args): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
@@ -121,11 +120,10 @@ class NewsController extends \App\Core\Controller\AbstractController
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
-            $this->render('errors/error.html.twig', [
+            return $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
-            return;
         }
 
         $authorsRaw = $this->userRepository->findAllByRole('admin');
@@ -134,17 +132,18 @@ class NewsController extends \App\Core\Controller\AbstractController
             return $acc;
         }, []);
 
-        $this->render('@modules/News/templates/admin/edit.html.twig', [
+        $response = $this->render('@modules/News/templates/admin/edit.html.twig', [
             'newsArticle' => $newsArticle,
             'old' => $_SESSION['old'] ?? $newsArticle,
             'errors' => $_SESSION['errors'] ?? [],
             'authors' => $authors,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    // Admin: Update a news article
-    public function update(array $args): void
+    #[Route('/admin/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
+    public function update(array $args): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
@@ -153,11 +152,10 @@ class NewsController extends \App\Core\Controller\AbstractController
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
-            $this->render('errors/error.html.twig', [
+            return $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
-            return;
         }
 
         $validator = $this->validator;
@@ -173,17 +171,15 @@ class NewsController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header("Location: /admin/news/edit/{$id}");
-            exit();
+            return new RedirectResponse("/admin/news/edit/{$id}");
         }
 
         $this->newsRepository->update($id, $_POST);
-        header('Location: /admin/news');
-        exit();
+        return new RedirectResponse('/admin/news');
     }
 
-    // Admin: Delete a news article
-    public function delete(array $args): void
+    #[Route('/admin/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
+    public function delete(array $args): Response
     {
         $this->checkAuth();
         Gate::authorize('news.manage');
@@ -191,7 +187,6 @@ class NewsController extends \App\Core\Controller\AbstractController
         $id = (int)($args['id'] ?? 0);
         $this->newsRepository->delete($id);
 
-        header('Location: /admin/news');
-        exit();
+        return new RedirectResponse('/admin/news');
     }
 }
