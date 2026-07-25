@@ -119,4 +119,15 @@ class View
     {
         return $this->getTwig()->render($template, $data);
     }
+
+    public function clearCache(): void
+    {
+        $this->twig = null;
+        $this->twigGlobals = [];
+    }
+
+    public function getTranslationService(): TranslationService
+    {
+        return $this->translationService;
+    }
 }
