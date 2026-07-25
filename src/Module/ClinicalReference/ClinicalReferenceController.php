@@ -7,6 +7,9 @@ use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
 use MedCore\Nk0262021Parser\Parser as Nk026Parser;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ClinicalReferenceController extends \App\Core\Controller\AbstractController
 {
@@ -19,21 +22,24 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         $this->interventionCodeRepository = new InterventionCodeRepository();
     }
 
-    public function icdImportForm(): void
+    #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_form', methods: ['GET'])]
+    public function icdImportForm(): Response
     {
         $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $count = $this->icdCodeRepository->countAll();
-        $this->render('@modules/ClinicalReference/templates/icd_import.html.twig', [
+        $response = $this->render('@modules/ClinicalReference/templates/icd_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
         unset($_SESSION['errors'], $_SESSION['success_message']);
+        return $response;
     }
 
-    public function icdImportRun(): void
+    #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_run', methods: ['POST'])]
+    public function icdImportRun(): Response
     {
         $this->checkAuth();
         Gate::authorize('clinical.manage');
@@ -64,25 +70,27 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        header('Location: /admin/clinical');
-        exit();
+        return new RedirectResponse('/admin/clinical');
     }
 
-    public function interventionImportForm(): void
+    #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_form', methods: ['GET'])]
+    public function interventionImportForm(): Response
     {
         $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $count = $this->interventionCodeRepository->countAll();
-        $this->render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
+        $response = $this->render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
         unset($_SESSION['errors'], $_SESSION['success_message']);
+        return $response;
     }
 
-    public function interventionImportRun(): void
+    #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_run', methods: ['POST'])]
+    public function interventionImportRun(): Response
     {
         $this->checkAuth();
         Gate::authorize('clinical.manage');
@@ -114,11 +122,11 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        header('Location: /admin/clinical');
-        exit();
+        return new RedirectResponse('/admin/clinical');
     }
 
-    public function clinicalIndex(): void
+    #[Route('/admin/clinical', name: 'clinical_index', methods: ['GET'])]
+    public function clinicalIndex(): Response
     {
         $this->checkAuth();
         Gate::authorize('clinical.manage');
@@ -126,7 +134,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();
 
-        $this->render('@modules/ClinicalReference/templates/index.html.twig', [
+        return $this->render('@modules/ClinicalReference/templates/index.html.twig', [
             'icdCount' => $icdCount,
             'interventionCount' => $interventionCount,
         ]);
