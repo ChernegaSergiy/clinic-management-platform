@@ -916,6 +916,9 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createKpiDefinition(): \Symfony\Component\HttpFoundation\Response
+    {
+        $this->authorizeAdmin();
+        $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -953,6 +956,11 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
     public function editKpiDefinition(): \Symfony\Component\HttpFoundation\Response
+    {
+        $this->authorizeAdmin();
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
             return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
@@ -969,6 +977,19 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit_post', methods: ['POST'])]
     public function updateKpiDefinition(): \Symfony\Component\HttpFoundation\Response
+    {
+        $this->authorizeAdmin();
+
+        $id = (int)($_GET['id'] ?? 0);
+        $definition = $this->kpiRepository->findKpiDefinitionById($id);
+
+        if (!$definition) {
+            return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
+        }
+
+        $validator = $this->validator;
+        $validator->validate($_POST, [
+            'name' => ['required', 'unique:kpi_definitions,name,' . $id],
             'kpi_type' => ['required'],
         ]);
 
@@ -991,6 +1012,11 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     #[Route('/admin/kpi_definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
     public function deleteKpiDefinition(): \Symfony\Component\HttpFoundation\Response
+    {
+        $this->authorizeAdmin();
+
+        $id = (int)($_POST['id'] ?? 0);
+        $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
