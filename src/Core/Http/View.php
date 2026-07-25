@@ -7,75 +7,66 @@ use App\Core\Service\TranslationService;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Doctrine\Persistence\ManagerRegistry;
 
 class View
 {
-    private static ?Environment $twig = null;
-    private static array $twigGlobals = [];
-    private static ?TranslationService $translationService = null;
+    private ?Environment $twig = null;
+    private array $twigGlobals = [];
+    private TranslationService $translationService;
+    private ManagerRegistry $registry;
+    private MfaGuard $mfaGuard;
 
-    public static function setTranslationService(TranslationService $service): void
+    public function __construct(TranslationService $translationService, ManagerRegistry $registry, MfaGuard $mfaGuard)
     {
-        self::$translationService = $service;
-        // Ensure globals are loaded so locale detection can use system settings
-        self::loadTwigGlobals();
-
-        $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
-        $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
-        $finalLocale = 'uk';
-        if (in_array($preferredLocale, $rawAvailableLocales)) {
-            $finalLocale = $preferredLocale;
-        }
-        self::$translationService->setLocale($finalLocale);
+        $this->translationService = $translationService;
+        $this->registry = $registry;
+        $this->mfaGuard = $mfaGuard;
     }
 
-    public static function getTranslationService(): TranslationService
+    private function loadTwigGlobals(): void
     {
-        if (self::$translationService === null) {
-            self::$translationService = new TranslationService();
-            // If setTranslationService wasn't used, preserve old behavior
-            self::loadTwigGlobals();
-            $preferredLocale = (self::$twigGlobals['system_locale'] ?? null) ?? self::detectBrowserLanguage() ?? 'uk';
-            $rawAvailableLocales = array_keys(self::$translationService->getAvailableLocales());
-            $finalLocale = 'uk';
-            if (in_array($preferredLocale, $rawAvailableLocales)) {
-                $finalLocale = $preferredLocale;
-            }
-            self::$translationService->setLocale($finalLocale);
-        }
-        return self::$translationService;
-    }
-
-    private static function loadTwigGlobals(): void
-    {
-        if (!empty(self::$twigGlobals)) {
+        if (!empty($this->twigGlobals)) {
             return;
         }
 
-        self::$twigGlobals = [
+        $this->twigGlobals = [
             'clinic_name' => 'Міська клінічна лікарня №1',
         ];
 
         try {
-            $conn = \App\Kernel::$staticContainer->get(\Doctrine\Persistence\ManagerRegistry::class)->getConnection();
+            $conn = $this->registry->getConnection();
             $sql = "SELECT `key`, value FROM settings";
             $result = $conn->executeQuery($sql);
             while ($row = $result->fetchAssociative()) {
-                self::$twigGlobals[$row['key']] = $row['value'];
+                $this->twigGlobals[$row['key']] = $row['value'];
             }
         } catch (\Exception $e) {
             // DB not available
         }
     }
 
-    private static function detectBrowserLanguage(): ?string
+    private function setupLocale(): void
+    {
+        $this->loadTwigGlobals();
+
+        $preferredLocale = ($this->twigGlobals['system_locale'] ?? null) ?? $this->detectBrowserLanguage() ?? 'uk';
+        $rawAvailableLocales = array_keys($this->translationService->getAvailableLocales());
+        $finalLocale = 'uk';
+        if (in_array($preferredLocale, $rawAvailableLocales)) {
+            $finalLocale = $preferredLocale;
+        }
+        $this->translationService->setLocale($finalLocale);
+    }
+
+    private function detectBrowserLanguage(): ?string
     {
         $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
         if (empty($acceptLang)) {
             return null;
         }
 
-        $supportedLocales = array_keys(self::getTranslationService()->getAvailableLocales());
+        $supportedLocales = array_keys($this->translationService->getAvailableLocales());
 
         // Parse Accept-Language header
         $languages = explode(',', $acceptLang);
@@ -92,50 +83,40 @@ class View
         return null;
     }
 
-    private static function getTwig(): Environment
+    private function getTwig(): Environment
     {
-        if (self::$twig === null) {
-            self::loadTwigGlobals();
-
-            // Initialize translation service
-            $translationService = self::getTranslationService();
+        if ($this->twig === null) {
+            $this->setupLocale();
 
             $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
             $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
-            self::$twig = new Environment($loader, []);
-            self::$twig->addGlobal('session', $_SESSION);
+            $this->twig = new Environment($loader, []);
+            $this->twig->addGlobal('session', $_SESSION);
 
             // Add translation extension
-            self::$twig->addExtension(new TranslationExtension(self::$translationService->getTranslator()));
+            $this->twig->addExtension(new TranslationExtension($this->translationService->getTranslator()));
 
-            foreach (self::$twigGlobals as $key => $value) {
-                self::$twig->addGlobal($key, $value);
+            foreach ($this->twigGlobals as $key => $value) {
+                $this->twig->addGlobal($key, $value);
             }
         }
-        return self::$twig;
+        return $this->twig;
     }
 
-    public static function render(string $template, array $data = []): void
+    public function render(string $template, array $data = []): void
     {
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
-        if (MfaGuard::isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
+        if ($this->mfaGuard->isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
             header('Location: /user/mfa/required');
             exit();
         }
 
-        echo self::getTwig()->render($template, $data);
+        echo $this->getTwig()->render($template, $data);
     }
 
-    public static function renderToString(string $template, array $data = []): string
+    public function renderToString(string $template, array $data = []): string
     {
-        return self::getTwig()->render($template, $data);
-    }
-
-    public static function clearCache(): void
-    {
-        self::$twig = null;
-        self::$twigGlobals = [];
-        self::$translationService = null;
+        return $this->getTwig()->render($template, $data);
     }
 }
