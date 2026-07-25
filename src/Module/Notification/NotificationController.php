@@ -2,11 +2,10 @@
 
 namespace App\Module\Notification;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Module\Notification\Repository\NotificationRepository;
 
-class NotificationController
+class NotificationController extends \App\Core\Controller\AbstractController
 {
     private NotificationRepository $notificationRepository;
 
@@ -21,9 +20,9 @@ class NotificationController
      */
     public function getUnread(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('notifications.read');
-        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if $this->checkAuth() passes
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -51,9 +50,9 @@ class NotificationController
      */
     public function markAllRead(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('notifications.read');
-        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if $this->checkAuth() passes
 
         $success = $this->notificationRepository->markAllAsReadByUserId($userId);
 
@@ -66,9 +65,9 @@ class NotificationController
      */
     public function delete(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('notifications.read');
-        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if AuthGuard::check() passes
+        $userId = (int)($_SESSION['user']['id'] ?? 0); // userId is guaranteed to be set if $this->checkAuth() passes
 
         $id = (int)($_POST['id'] ?? 0);
         $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);
