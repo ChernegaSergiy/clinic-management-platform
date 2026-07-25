@@ -5,50 +5,48 @@ namespace App\Module\LabOrder\Repository;
 use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Database\Database;
-use PDO;
+use App\Entity\LabOrder;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class LabOrderRepository implements LabOrderRepositoryInterface
+class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepositoryInterface
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, LabOrder::class);
     }
 
     public function findByMedicalRecordId(int $medicalRecordId): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT *
             FROM lab_orders
             WHERE medical_record_id = :medical_record_id
             ORDER BY created_at DESC
-        ");
-        $stmt->execute([':medical_record_id' => $medicalRecordId]);
-        return $stmt->fetchAll();
+        ";
+        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
     }
 
     public function save(array $data): int|false
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, 
                                         order_code, results, status) 
                 VALUES (:patient_id, :doctor_id, :medical_record_id, 
                         :order_code, :results, :status)";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        $success = $stmt->execute([
-            ':patient_id' => $data['patient_id'],
-            ':doctor_id' => $data['doctor_id'],
-            ':medical_record_id' => $data['medical_record_id'],
-            ':order_code' => $data['order_code'],
-            ':results' => $data['results'] ?? null,
-            ':status' => $data['status'] ?? 'ordered',
-        ]);
+        $success = $conn->executeStatement($sql, [
+            'patient_id' => $data['patient_id'],
+            'doctor_id' => $data['doctor_id'],
+            'medical_record_id' => $data['medical_record_id'],
+            'order_code' => $data['order_code'],
+            'results' => $data['results'] ?? null,
+            'status' => $data['status'] ?? 'ordered',
+        ]) > 0;
 
         if ($success) {
-            $labOrderId = (int)$this->pdo->lastInsertId();
+            $labOrderId = (int)$conn->lastInsertId();
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
             EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -63,7 +61,8 @@ class LabOrderRepository implements LabOrderRepositoryInterface
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT 
                 lo.*,
                 CONCAT(p.last_name, ' ', p.first_name) as patient_name,
@@ -72,10 +71,9 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             JOIN patients p ON lo.patient_id = p.id
             JOIN users u ON lo.doctor_id = u.id
             WHERE lo.id = :id
-        ");
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
-        return $result === false ? null : $result;
+        ";
+        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        return $result ?: null;
     }
 
     public function update(int $id, array $data): bool
@@ -85,6 +83,7 @@ class LabOrderRepository implements LabOrderRepositoryInterface
             return false;
         }
 
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE lab_orders SET 
                     order_code = :order_code, 
                     status = :status, 
@@ -92,15 +91,13 @@ class LabOrderRepository implements LabOrderRepositoryInterface
                     notes = :notes 
                 WHERE id = :id";
 
-        $stmt = $this->pdo->prepare($sql);
-
-        $result = $stmt->execute([
-            ':id' => $id,
-            ':order_code' => $data['order_code'],
-            ':status' => $data['status'],
-            ':results' => $data['results'] ?? null,
-            ':notes' => $data['notes'] ?? null,
-        ]);
+        $result = $conn->executeStatement($sql, [
+            'id' => $id,
+            'order_code' => $data['order_code'],
+            'status' => $data['status'],
+            'results' => $data['results'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ]) > 0;
 
         if ($result) {
             EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
@@ -111,12 +108,12 @@ class LabOrderRepository implements LabOrderRepositoryInterface
 
     public function updateQrCodeHash(int $id, string $qrCodeHash): bool
     {
+        $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE lab_orders SET qr_code_hash = :qr_code_hash WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':qr_code_hash' => $qrCodeHash,
-            ':id' => $id,
-        ]);
+        return $conn->executeStatement($sql, [
+            'qr_code_hash' => $qrCodeHash,
+            'id' => $id,
+        ]) > 0;
     }
 
     public function countByStatus(array $statuses): int
@@ -124,10 +121,12 @@ class LabOrderRepository implements LabOrderRepositoryInterface
         if (empty($statuses)) {
             return 0;
         }
+        $conn = $this->getEntityManager()->getConnection();
+        
         $placeholders = implode(',', array_fill(0, count($statuses), '?'));
         $sql = "SELECT COUNT(*) FROM lab_orders WHERE status IN ($placeholders)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($statuses);
-        return (int)$stmt->fetchColumn();
+        
+        $stmt = $conn->executeQuery($sql, $statuses);
+        return (int)$stmt->fetchOne();
     }
 }

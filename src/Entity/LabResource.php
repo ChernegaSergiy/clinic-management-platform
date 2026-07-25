@@ -2,8 +2,9 @@
 namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Module\LabOrder\Repository\LabResourceRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LabResourceRepository::class)]
 #[ORM\Table(name: 'lab_resources')]
 class LabResource
 {
