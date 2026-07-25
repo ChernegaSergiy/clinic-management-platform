@@ -21,9 +21,10 @@ abstract class AbstractController
         $this->view = $view;
     }
 
-    protected function render(string $template, array $data = []): void
+    protected function render(string $template, array $data = []): \Symfony\Component\HttpFoundation\Response
     {
-        $this->view->render($template, $data);
+        $content = $this->view->renderToString($template, $data);
+        return new \Symfony\Component\HttpFoundation\Response($content);
     }
 
     protected function checkAuth(): void
