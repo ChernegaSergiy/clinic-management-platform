@@ -2,10 +2,9 @@
 
 namespace App\Module\Install;
 
-use App\Core\Http\View;
 use PDO;
 
-class InstallController
+class InstallController extends \App\Core\Controller\AbstractController
 {
     public function check(): void
     {
@@ -59,7 +58,7 @@ class InstallController
             exit;
         }
 
-        View::render('@modules/Install/templates/install/index.html.twig', [
+        $this->render('@modules/Install/templates/install/index.html.twig', [
             'checks' => $checks,
             'allOk' => $allOk,
         ]);
