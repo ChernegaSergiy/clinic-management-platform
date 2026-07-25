@@ -3,7 +3,7 @@
 namespace App\Module\Appointment;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Service\NotificationService;
 use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
@@ -57,15 +57,15 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
         $appointments = [];
 
-        if (Gate::allows('appointment.view.any')) {
+        if ($this->gate->allows('appointment.view.any')) {
             $appointments = $this->appointmentRepository->findAll();
-        } elseif (Gate::allows('appointment.view.own')) {
+        } elseif ($this->gate->allows('appointment.view.own')) {
             if ($user && $user->getId()) {
                 $appointments = $this->appointmentRepository->findByDoctorId($user->getId());
             }
@@ -74,8 +74,8 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $calendarDoctors = [];
         foreach ($doctors as $doctor) {
             if (
-                Gate::allows('appointment.view.any') ||
-                (Gate::allows('appointment.view.own') && (int)$doctor['id'] === $user->getId())
+                $this->gate->allows('appointment.view.any') ||
+                ($this->gate->allows('appointment.view.own') && (int)$doctor['id'] === $user->getId())
             ) {
                 $calendarDoctors[] = [
                     'id' => $doctor['id'],
@@ -209,7 +209,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function rejectWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.edit.any');
+        $this->gate->authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
@@ -223,9 +223,9 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.create');
+        $this->gate->authorize('appointment.create');
 
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
@@ -315,9 +315,9 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.create');
+        $this->gate->authorize('appointment.create');
 
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
         if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any') && $user->getId() !== $submittedDoctorId) {
@@ -463,18 +463,18 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function json(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
         $appointments = [];
 
-        if (Gate::allows('appointment.view.any')) {
+        if ($this->gate->allows('appointment.view.any')) {
             if ($start && $end) {
                 $appointments = $this->appointmentRepository->findByDateRange($start, $end);
             } else {
                 $appointments = $this->appointmentRepository->findAll();
             }
-        } elseif (Gate::allows('appointment.view.own')) {
+        } elseif ($this->gate->allows('appointment.view.own')) {
             if ($user && $user->getId()) {
                 if ($start && $end) {
                     $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($user->getId(), $start, $end);
@@ -523,7 +523,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('appointment.view', ['id' => $id]);
+        $this->gate->authorize('appointment.view', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -539,7 +539,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('appointment.edit', ['id' => $id]);
+        $this->gate->authorize('appointment.edit', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -547,7 +547,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
         }
 
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $rooms = $this->roomRepository->findAll();
@@ -589,7 +589,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
-        Gate::authorize('appointment.edit', ['id' => $id]);
+        $this->gate->authorize('appointment.edit', ['id' => $id]);
 
         $rawInput = $_POST;
 
@@ -707,7 +707,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
-        Gate::authorize('appointment.cancel', ['id' => $id]);
+        $this->gate->authorize('appointment.cancel', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -743,7 +743,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function showWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.view.any');
+        $this->gate->authorize('appointment.view.any');
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -770,7 +770,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function addPatientToWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.create');
+        $this->gate->authorize('appointment.create');
 
         $validator = $this->validator;
         $rules = [
@@ -809,7 +809,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function showLoadAnalytics(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.view.any');
+        $this->gate->authorize('appointment.view.any');
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
@@ -856,7 +856,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function fulfillWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.create');
+        $this->gate->authorize('appointment.create');
         $id = (int)($_GET['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
@@ -910,7 +910,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     public function cancelWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('appointment.edit.any');
+        $this->gate->authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {

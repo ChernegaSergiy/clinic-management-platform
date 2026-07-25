@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance;
 
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\Billing\Repository\InvoiceRepository;
@@ -29,7 +29,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function index(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage'); // Reuse billing permission for now
+        $this->gate->authorize('billing.manage'); // Reuse billing permission for now
 
         $companies = $this->insuranceService->getAllInsuranceCompanies();
 
@@ -42,7 +42,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function show(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read'); // Reusing billing read permission
+        $this->gate->authorize('billing.read'); // Reusing billing read permission
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -60,7 +60,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $response = $this->render('@modules/Insurance/templates/companies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -74,7 +74,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $validator = $this->validator;
         $rules = [
@@ -102,7 +102,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function edit(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -123,7 +123,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function update(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -159,7 +159,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function delete(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->insuranceService->deleteInsuranceCompany($id);
@@ -171,7 +171,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function listClaims(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read'); // Reuse billing permission
+        $this->gate->authorize('billing.read'); // Reuse billing permission
 
         $claims = $this->insuranceService->getAllClaims();
 
@@ -184,7 +184,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function showClaim(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
 
         $id = (int)($_GET['id'] ?? 0);
         $claim = $this->insuranceService->getClaimWithDetails($id);
@@ -202,7 +202,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     public function updateClaimStatus(): Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $status = $_POST['status'] ?? 'draft';

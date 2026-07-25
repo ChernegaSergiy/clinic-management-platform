@@ -3,7 +3,7 @@
 namespace App\Module\Kpi;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
@@ -37,7 +37,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function listDefinitions(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
         return $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
@@ -46,7 +46,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function createDefinition(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
         $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -59,7 +59,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function storeDefinition(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -84,7 +84,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function editDefinition(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -106,7 +106,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function updateDefinition(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -138,7 +138,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function deleteDefinition(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.manage');
+        $this->gate->authorize('kpi.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
@@ -151,7 +151,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     public function listResults(): Response
     {
         $this->checkAuth();
-        Gate::authorize('kpi.read');
+        $this->gate->authorize('kpi.read');
         $results = [];
         if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) {
             // Перевірка, чи користувач є адміністратором
@@ -260,6 +260,6 @@ class KpiController extends \App\Core\Controller\AbstractController
             return;
         }
         $this->checkAuth();
-        Gate::authorize('admin.manage');
+        $this->gate->authorize('admin.manage');
     }
 }

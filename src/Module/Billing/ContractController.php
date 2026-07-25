@@ -3,7 +3,7 @@
 namespace App\Module\Billing;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Billing\Repository\ContractRepository;
@@ -25,7 +25,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $contracts = $this->contractRepository->findAll();
         return $this->render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
     }
@@ -34,7 +34,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $response = $this->render('@modules/Billing/templates/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -47,7 +47,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -97,7 +97,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -113,7 +113,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -135,7 +135,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -184,7 +184,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function delete(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
@@ -207,7 +207,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     public function downloadFile(int $id = 0): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         // Accept ID from route parameter or query string fallback
         if ($id === 0) {

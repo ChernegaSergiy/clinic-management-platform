@@ -4,7 +4,7 @@ namespace App\Module\Room;
 
 use Symfony\Component\Routing\Attribute\Route;
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use App\Module\Room\Repository\RoomRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -187,6 +187,6 @@ class RoomController extends \App\Core\Controller\AbstractController
     private function authorizeAdmin(): void
     {
         $this->checkAuth();
-        Gate::authorize('rooms.manage');
+        $this->gate->authorize('rooms.manage');
     }
 }

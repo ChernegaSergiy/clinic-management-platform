@@ -2,7 +2,7 @@
 
 namespace App\Module\ClinicalReference;
 
-use App\Core\Auth\Gate;
+
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
@@ -26,7 +26,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     public function icdImportForm(): Response
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         $count = $this->icdCodeRepository->countAll();
         $response = $this->render('@modules/ClinicalReference/templates/icd_import.html.twig', [
@@ -42,7 +42,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     public function icdImportRun(): Response
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         try {
             $parser = new Parser();
@@ -77,7 +77,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     public function interventionImportForm(): Response
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         $count = $this->interventionCodeRepository->countAll();
         $response = $this->render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
@@ -93,7 +93,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     public function interventionImportRun(): Response
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         try {
             $parser = new Nk026Parser();
@@ -129,7 +129,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     public function clinicalIndex(): Response
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();

@@ -3,7 +3,7 @@
 namespace App\Module\Department;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,7 +28,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('department.read');
+        $this->gate->authorize('department.read');
 
         $departments = $this->departmentRepository->findAll();
 
@@ -41,7 +41,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('department.write');
+        $this->gate->authorize('department.write');
 
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn($dept) => $dept['parent_id'] === null);
@@ -55,7 +55,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('department.write');
+        $this->gate->authorize('department.write');
 
         $validator = $this->validator;
         $rules = [
@@ -91,7 +91,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('department.read');
+        $this->gate->authorize('department.read');
 
         $department = $this->departmentRepository->findById($id);
 
@@ -113,7 +113,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('department.write');
+        $this->gate->authorize('department.write');
 
         $department = $this->departmentRepository->findById($id);
 
@@ -135,7 +135,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('department.write');
+        $this->gate->authorize('department.write');
 
         $department = $this->departmentRepository->findById($id);
 
@@ -176,7 +176,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     public function delete(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('department.delete');
+        $this->gate->authorize('department.delete');
 
         $id = (int)($_POST['id'] ?? 0);
         $department = $this->departmentRepository->findById($id);
@@ -196,7 +196,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     public function toggleStatus(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('department.manage');
+        $this->gate->authorize('department.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $department = $this->departmentRepository->findById($id);

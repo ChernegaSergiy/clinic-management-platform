@@ -2,7 +2,7 @@
 
 namespace App\Module\Schedule;
 
-use App\Core\Auth\Gate;
+
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
@@ -27,7 +27,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     public function index(): Response
     {
         // Personal schedule for doctors
-        Gate::authorize('schedules.manage_own');
+        $this->gate->authorize('schedules.manage_own');
 
         $userId = (int)$_SESSION['user']['id'];
         $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
@@ -52,7 +52,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     public function adminIndex(): Response
     {
         // Admin schedule management for all doctors
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $allDoctors = $this->userRepository->findAllDoctors();
 
@@ -64,7 +64,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/admin/schedules/show', name: 'admin_schedules_show', methods: ['GET'])]
     public function adminShow(): Response
     {
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
@@ -91,13 +91,13 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if (Gate::allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->gate->allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -131,13 +131,13 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if (Gate::allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->gate->allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         $exceptionData = [
@@ -173,11 +173,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== $sessionUserId) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         // Final check that exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === $sessionUserId || Gate::allows('schedules.manage_all')) { // Double check for safety
+        if ($targetDoctorId === $sessionUserId || $this->gate->allows('schedules.manage_all')) { // Double check for safety
             $this->scheduleExceptionRepository->delete($exceptionId);
             // TODO: Add flash message
         } else {
@@ -192,13 +192,13 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/admin/schedules/update', name: 'admin_schedules_update', methods: ['POST'])]
     public function adminUpdate(): Response
     {
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $targetDoctorId = (int)$_POST['doctor_id'];
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -227,13 +227,13 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/admin/schedules/exceptions/add', name: 'admin_schedules_exceptions_add', methods: ['POST'])]
     public function adminAddException(): Response
     {
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $targetDoctorId = (int)$_POST['doctor_id'];
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         $exceptionData = [
@@ -253,7 +253,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/admin/schedules/exceptions/delete', name: 'admin_schedules_exceptions_delete', methods: ['POST'])]
     public function adminDeleteException(): Response
     {
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $exceptionId = (int)$_POST['exception_id'];
 
@@ -267,11 +267,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== (int)$_SESSION['user']['id']) {
-            Gate::authorize('schedules.manage_all');
+            $this->gate->authorize('schedules.manage_all');
         }
 
         // Final check that exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === (int)$_SESSION['user']['id'] || Gate::allows('schedules.manage_all')) { // Double check for safety
+        if ($targetDoctorId === (int)$_SESSION['user']['id'] || $this->gate->allows('schedules.manage_all')) { // Double check for safety
             $this->scheduleExceptionRepository->delete($exceptionId);
         }
 
@@ -281,7 +281,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/admin/schedules/edit', name: 'admin_schedules_edit', methods: ['GET'])]
     public function adminEdit(): Response
     {
-        Gate::authorize('schedules.manage_all');
+        $this->gate->authorize('schedules.manage_all');
 
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);

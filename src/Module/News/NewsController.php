@@ -2,7 +2,7 @@
 
 namespace App\Module\News;
 
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
@@ -55,7 +55,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function adminIndex(): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $newsArticles = $this->newsRepository->findAll();
         return $this->render('@modules/News/templates/admin/index.html.twig', [
@@ -67,7 +67,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $authorsRaw = $this->userRepository->findAllByRole('admin');
         $authors = array_reduce($authorsRaw, function ($acc, $author) {
@@ -88,7 +88,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -114,7 +114,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function edit(array $args): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
@@ -146,7 +146,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function update(array $args): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
@@ -182,7 +182,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function delete(array $args): Response
     {
         $this->checkAuth();
-        Gate::authorize('news.manage');
+        $this->gate->authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
         $this->newsRepository->delete($id);

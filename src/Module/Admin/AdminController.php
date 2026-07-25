@@ -3,7 +3,7 @@
 namespace App\Module\Admin;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Repository\SettingsRepository;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Admin\Repository\AuthConfigRepository;
@@ -1026,7 +1026,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function listServices(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services'); // Specific permission for service management
+        $this->gate->authorize('admin.manage_services'); // Specific permission for service management
         $services = $this->serviceRepository->findAll();
         return $this->render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
     }
@@ -1035,7 +1035,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function createService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services');
+        $this->gate->authorize('admin.manage_services');
         $categories = $this->serviceRepository->findCategories();
         $categoryOptions = [];
         foreach ($categories as $category) {
@@ -1055,7 +1055,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function storeService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services');
+        $this->gate->authorize('admin.manage_services');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -1082,7 +1082,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function editService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services');
+        $this->gate->authorize('admin.manage_services');
 
         $id = (int)($_GET['id'] ?? 0);
         $service = $this->serviceRepository->findById($id);
@@ -1111,7 +1111,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function updateService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services');
+        $this->gate->authorize('admin.manage_services');
 
         $id = (int)($_GET['id'] ?? 0);
         $service = $this->serviceRepository->findById($id);
@@ -1145,7 +1145,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function deleteService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_services');
+        $this->gate->authorize('admin.manage_services');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->serviceRepository->delete($id);
@@ -1158,7 +1158,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function listServiceCategories(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
         $categories = $this->serviceRepository->findCategories();
         return $this->render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
     }
@@ -1167,7 +1167,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function createServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
         $response = $this->render('@modules/Admin/templates/service_categories/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -1180,7 +1180,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function storeServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -1203,7 +1203,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function editServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
 
         $id = (int)($_GET['id'] ?? 0);
         $category = $this->serviceRepository->findCategoryById($id);
@@ -1225,7 +1225,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function updateServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
 
         $id = (int)($_GET['id'] ?? 0);
         $category = $this->serviceRepository->findCategoryById($id);
@@ -1255,7 +1255,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function deleteServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        Gate::authorize('admin.manage_service_categories');
+        $this->gate->authorize('admin.manage_service_categories');
 
         $id = (int)($_POST['id'] ?? 0);
         if ($this->serviceRepository->categoryHasServices($id)) {
@@ -1270,6 +1270,6 @@ class AdminController extends \App\Core\Controller\AbstractController
     private function authorizeAdmin(): void
     {
         $this->checkAuth();
-        Gate::authorize('system.manage');
+        $this->gate->authorize('system.manage');
     }
 }

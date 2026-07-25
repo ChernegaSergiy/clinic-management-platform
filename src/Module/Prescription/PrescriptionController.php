@@ -3,7 +3,7 @@
 namespace App\Module\Prescription;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Validation\Validator;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
@@ -44,12 +44,12 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $prescriptions = [];
 
-        if (Gate::allows('prescription.view.any')) {
+        if ($this->gate->allows('prescription.view.any')) {
             $prescriptions = $this->prescriptionRepository->findAll($searchTerm);
-        } elseif (Gate::allows('prescription.view.own')) {
+        } elseif ($this->gate->allows('prescription.view.own')) {
             if ($user && $user->getId()) {
                 $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);
             }
@@ -65,7 +65,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('prescription.create', ['doctor_id' => Gate::getUser()->getId()]); // Check if current user can create prescriptions
+        $this->gate->authorize('prescription.create', ['doctor_id' => $this->gate->getUser()->getId()]); // Check if current user can create prescriptions
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -86,7 +86,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
-            'currentDoctorId' => Gate::getUser()->getId(),
+            'currentDoctorId' => $this->gate->getUser()->getId(),
         ]);
     }
 
@@ -94,7 +94,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
+        $this->gate->authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
         $validator = $this->validator;
         $rules = [
@@ -123,7 +123,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                 'patient' => $patient,
                 'doctors' => $doctorOptions,
                 'medicalRecords' => $medicalRecords,
-                'currentDoctorId' => Gate::getUser()->getId(),
+                'currentDoctorId' => $this->gate->getUser()->getId(),
             ]);
         }
 
@@ -140,7 +140,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                         $this->inventoryItemRepository->decreaseQuantity(
                             $inventoryItem['id'],
                             $quantityToDeduct,
-                            Gate::getUser()->getId(),
+                            $this->gate->getUser()->getId(),
                             'Виконання рецепту #' . $prescriptionId
                         );
                     }
@@ -155,7 +155,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('prescription.view', ['id' => $id]);
+        $this->gate->authorize('prescription.view', ['id' => $id]);
 
         $prescription = $this->prescriptionRepository->findById($id);
 

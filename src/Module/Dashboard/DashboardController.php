@@ -2,7 +2,7 @@
 
 namespace App\Module\Dashboard;
 
-use App\Core\Auth\Gate;
+
 use App\Module\Dashboard\Service\DashboardService;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,11 +19,11 @@ class DashboardController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth(); // Ensure user is authenticated
-        Gate::authorize('dashboard.view');
+        $this->gate->authorize('dashboard.view');
 
-        $canSeeFinance = Gate::allows('billing.read');
-        $canSeeKpi = Gate::allows('kpi.read');
-        $canExport = Gate::allows('dashboard.export');
+        $canSeeFinance = $this->gate->allows('billing.read');
+        $canSeeKpi = $this->gate->allows('kpi.read');
+        $canExport = $this->gate->allows('dashboard.export');
 
         $dashboardData = $this->dashboardService->getDashboardData();
 
@@ -39,7 +39,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     public function exportCsv(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('dashboard.export');
+        $this->gate->authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
@@ -63,7 +63,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     public function exportPdf(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('dashboard.export');
+        $this->gate->authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         // Render the Twig template into an HTML string
@@ -82,7 +82,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     public function exportExcel(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('dashboard.export');
+        $this->gate->authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];

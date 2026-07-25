@@ -3,7 +3,7 @@
 namespace App\Module\Hrm;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
@@ -33,7 +33,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('hrm.read');
+        $this->gate->authorize('hrm.read');
 
         $employees = $this->hrmRepository->findAll();
 
@@ -46,7 +46,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('hrm.write');
+        $this->gate->authorize('hrm.write');
 
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
@@ -61,7 +61,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('hrm.write');
+        $this->gate->authorize('hrm.write');
 
         $validator = $this->validator;
         $rules = [
@@ -95,7 +95,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('hrm.read');
+        $this->gate->authorize('hrm.read');
 
         $employee = $this->hrmRepository->findById($id);
 
@@ -113,7 +113,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('hrm.write');
+        $this->gate->authorize('hrm.write');
 
         $employee = $this->hrmRepository->findById($id);
 
@@ -136,7 +136,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('hrm.write');
+        $this->gate->authorize('hrm.write');
 
         $employee = $this->hrmRepository->findById($id);
 
@@ -175,7 +175,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     public function toggleStatus(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('hrm.manage');
+        $this->gate->authorize('hrm.manage');
 
         $id = (int)($_POST['id'] ?? 0);
         $employee = $this->hrmRepository->findById($id);

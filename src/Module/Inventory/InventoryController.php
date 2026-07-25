@@ -3,7 +3,7 @@
 namespace App\Module\Inventory;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Core\Validation\Validator;
@@ -25,7 +25,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function index(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
         $searchTerm = $_GET['search'] ?? '';
         $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
@@ -43,7 +43,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
@@ -61,7 +61,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -85,7 +85,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function show(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -106,7 +106,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function edit(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -133,7 +133,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     public function update(): Response
     {
         $this->checkAuth();
-        Gate::authorize('inventory.manage');
+        $this->gate->authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);

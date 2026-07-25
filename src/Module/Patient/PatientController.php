@@ -3,7 +3,7 @@
 namespace App\Module\Patient;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
@@ -60,12 +60,12 @@ class PatientController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $patients = [];
 
-        if (Gate::allows('patient.view.any')) {
+        if ($this->gate->allows('patient.view.any')) {
             $patients = $this->patientRepository->findAll($searchTerm);
-        } elseif (Gate::allows('patient.view.own')) {
+        } elseif ($this->gate->allows('patient.view.own')) {
             if ($user && $user->getId()) {
                 $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($user->getId());
                 $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
@@ -82,7 +82,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.create');
+        $this->gate->authorize('patient.create');
         return $this->render('@modules/Patient/templates/new.html.twig');
     }
 
@@ -90,7 +90,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.create');
+        $this->gate->authorize('patient.create');
 
         $validator = $this->validator;
         $rules = [
@@ -132,7 +132,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patient.view', ['id' => $id]);
+        $this->gate->authorize('patient.view', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -155,7 +155,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patient.edit', ['id' => $id]);
+        $this->gate->authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -171,7 +171,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        Gate::authorize('patient.edit', ['id' => $id]);
+        $this->gate->authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -216,7 +216,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function exportCsv(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.view.any');
+        $this->gate->authorize('patient.view.any');
 
         $patients = $this->patientRepository->findAll();
 
@@ -235,7 +235,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function exportPatientsToJson(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.view.any');
+        $this->gate->authorize('patient.view.any');
 
         $patients = $this->patientRepository->findAll();
 
@@ -254,7 +254,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function importPatientsFromJson(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.create');
+        $this->gate->authorize('patient.create');
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $response = $this->render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
@@ -348,7 +348,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function toggleStatus(): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit.any');
+        $this->gate->authorize('patient.edit.any');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -365,7 +365,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function addPolicy(int $patientId): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit', ['id' => $patientId]);
+        $this->gate->authorize('patient.edit', ['id' => $patientId]);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -384,7 +384,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function storePolicy(int $patientId): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit', ['id' => $patientId]);
+        $this->gate->authorize('patient.edit', ['id' => $patientId]);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -427,7 +427,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function editPolicy(int $patientId): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit', ['id' => $patientId]);
+        $this->gate->authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -450,7 +450,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function updatePolicy(int $patientId): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit', ['id' => $patientId]);
+        $this->gate->authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -498,7 +498,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     public function deletePolicy(int $patientId): Response
     {
         $this->checkAuth();
-        Gate::authorize('patient.edit', ['id' => $patientId]);
+        $this->gate->authorize('patient.edit', ['id' => $patientId]);
 
         $policyId = (int)($_POST['id'] ?? 0);
         $policy = $this->insuranceService->getPatientPolicy($policyId);

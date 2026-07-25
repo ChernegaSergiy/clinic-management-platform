@@ -3,7 +3,7 @@
 namespace App\Module\Billing;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
 use App\Core\Validation\Validator;
@@ -63,7 +63,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
         $searchTerm = $_GET['search'] ?? '';
         $invoices = $this->invoiceRepository->findAll($searchTerm);
         return $this->render('@modules/Billing/templates/index.html.twig', [
@@ -76,7 +76,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function listServices(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
         return $this->render('@modules/Billing/templates/services/index.html.twig', ['services' => $services]);
     }
@@ -84,7 +84,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function createService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $categories = $this->serviceRepository->findCategories();
         $response = $this->render('@modules/Billing/templates/services/new.html.twig', [
             'categories' => $categories,
@@ -98,7 +98,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function storeService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -121,7 +121,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function listServiceBundles(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $bundles = $this->serviceBundleRepository->findAll();
         return $this->render('@modules/Billing/templates/bundles/index.html.twig', ['bundles' => $bundles]);
     }
@@ -129,7 +129,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function createServiceBundle(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
         $response = $this->render('@modules/Billing/templates/bundles/new.html.twig', [
             'services' => $services,
@@ -143,7 +143,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function storeServiceBundle(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -167,7 +167,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $patientId = $_GET['patient_id'] ?? null;
 
@@ -214,7 +214,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -265,7 +265,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -286,7 +286,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function addPayment(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $invoiceId = (int)($_POST['invoice_id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($invoiceId);
@@ -323,7 +323,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -378,7 +378,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.manage');
+        $this->gate->authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
@@ -411,7 +411,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function exportInvoicesToCsv(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
 
         // Fetch all invoices
         $invoices = $this->invoiceRepository->findAll();
@@ -448,7 +448,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function exportInvoicesToPdf(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
 
         $invoices = $this->invoiceRepository->findAll();
 
@@ -470,7 +470,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     public function exportInvoicesToExcel(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        Gate::authorize('billing.read');
+        $this->gate->authorize('billing.read');
 
         $invoices = $this->invoiceRepository->findAll();
 

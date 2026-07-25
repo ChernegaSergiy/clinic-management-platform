@@ -3,7 +3,7 @@
 namespace App\Module\MedicalRecord;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
@@ -53,7 +53,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('medical_record.create');
+        $this->gate->authorize('medical_record.create');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -75,13 +75,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     public function index(): Response
     {
         $this->checkAuth();
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $searchTerm = $_GET['search'] ?? '';
         $records = [];
 
-        if (Gate::allows('medical_record.view.any')) {
+        if ($this->gate->allows('medical_record.view.any')) {
             $records = $this->medicalRecordRepository->findAll($searchTerm);
-        } elseif (Gate::allows('medical_record.view.own')) {
+        } elseif ($this->gate->allows('medical_record.view.own')) {
             if ($user && $user->getId()) {
                 $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);
             }
@@ -97,7 +97,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('medical_record.create');
+        $this->gate->authorize('medical_record.create');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -147,7 +147,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        Gate::getUser()->getId()
+                        $this->gate->getUser()->getId()
                     );
                 }
             }
@@ -169,7 +169,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        Gate::authorize('medical_record.view', ['id' => $id]);
+        $this->gate->authorize('medical_record.view', ['id' => $id]);
 
         $this->auditLogger->log(
             'medical_record',
@@ -177,7 +177,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             'view',
             null,
             null,
-            Gate::getUser()->getId()
+            $this->gate->getUser()->getId()
         );
 
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
@@ -194,7 +194,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     public function getIcdCodes(): JsonResponse
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -206,7 +206,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     public function getInterventionCodes(): JsonResponse
     {
         $this->checkAuth();
-        Gate::authorize('clinical.manage');
+        $this->gate->authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -225,7 +225,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        Gate::authorize('medical_record.edit', ['id' => $id]);
+        $this->gate->authorize('medical_record.edit', ['id' => $id]);
 
         $response = $this->render('@modules/MedicalRecord/templates/edit.html.twig', [
             'record' => $record,
@@ -247,7 +247,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        Gate::authorize('medical_record.edit', ['id' => $id]);
+        $this->gate->authorize('medical_record.edit', ['id' => $id]);
 
         if (!empty($_POST['visit_date'])) {
             try {
@@ -298,7 +298,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        Gate::authorize('medical_record.edit', ['id' => $medicalRecordId]);
+        $this->gate->authorize('medical_record.edit', ['id' => $medicalRecordId]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
@@ -314,7 +314,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        Gate::getUser()->getId()
+                        $this->gate->getUser()->getId()
                     );
                 }
             }
@@ -341,7 +341,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис, пов'язаний із вкладенням, не знайдено", 404);
         }
 
-        Gate::authorize('medical_record.view', ['id' => $medicalRecordId]);
+        $this->gate->authorize('medical_record.view', ['id' => $medicalRecordId]);
 
         $uploadBase = dirname(__DIR__, 3) . '/uploads/';
         $candidates = [];

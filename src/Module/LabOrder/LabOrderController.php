@@ -3,7 +3,7 @@
 namespace App\Module\LabOrder;
 
 use App\Database\Database;
-use App\Core\Auth\Gate;
+
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
@@ -48,7 +48,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function create(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.create');
+        $this->gate->authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -73,7 +73,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function store(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.create');
+        $this->gate->authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -135,7 +135,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        Gate::authorize('lab_order.view', ['id' => $id]);
+        $this->gate->authorize('lab_order.view', ['id' => $id]);
 
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
@@ -158,7 +158,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        Gate::authorize('lab_order.edit', ['id' => $id]);
+        $this->gate->authorize('lab_order.edit', ['id' => $id]);
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -184,7 +184,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        Gate::authorize('lab_order.edit', ['id' => $id]);
+        $this->gate->authorize('lab_order.edit', ['id' => $id]);
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -207,7 +207,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function import(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.edit.any');
+        $this->gate->authorize('lab_order.edit.any');
 
         $response = $this->render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -221,7 +221,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function processImport(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.edit.any');
+        $this->gate->authorize('lab_order.edit.any');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -265,7 +265,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function confirmImport(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.edit.any');
+        $this->gate->authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -284,7 +284,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     public function finalizeImport(): Response
     {
         $this->checkAuth();
-        Gate::authorize('lab_order.edit.any');
+        $this->gate->authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
