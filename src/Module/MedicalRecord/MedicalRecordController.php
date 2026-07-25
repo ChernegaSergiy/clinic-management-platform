@@ -13,6 +13,7 @@ use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
+use App\Core\Validation\Validator;
 use Symfony\Component\Routing\Attribute\Route;
 
 class MedicalRecordController
@@ -24,6 +25,7 @@ class MedicalRecordController
     private InterventionCodeRepository $interventionCodeRepository;
     private AttachmentService $attachmentService;
     private AuditLogger $auditLogger;
+    private Validator $validator;
 
     public function __construct(
         MedicalRecordRepositoryInterface $medicalRecordRepository,
@@ -32,7 +34,8 @@ class MedicalRecordController
         IcdCodeRepository $icdCodeRepository,
         InterventionCodeRepository $interventionCodeRepository,
         AttachmentService $attachmentService,
-        AuditLogger $auditLogger
+        AuditLogger $auditLogger,
+        Validator $validator
     ) {
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->appointmentRepository = $appointmentRepository;
@@ -41,6 +44,7 @@ class MedicalRecordController
         $this->interventionCodeRepository = $interventionCodeRepository;
         $this->attachmentService = $attachmentService;
         $this->auditLogger = $auditLogger;
+        $this->validator = $validator;
     }
 
     #[Route('/medical-records/new', name: 'medical_records_new_get', methods: ['GET'])]
@@ -111,7 +115,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'diagnosis_code' => ['required'],
             'visit_date' => ['required', 'datetime'],
@@ -263,7 +267,7 @@ class MedicalRecordController
             }
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate(
             $_POST,
             [
