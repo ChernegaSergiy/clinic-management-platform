@@ -3,9 +3,7 @@
 namespace App\Module\Admin;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Admin\Repository\AuthConfigRepository;
@@ -16,7 +14,7 @@ use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 
-class AdminController
+class AdminController extends \App\Core\Controller\AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private RoleRepositoryInterface $roleRepository;
@@ -67,9 +65,9 @@ class AdminController
             'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
 
-        $availableLocales = View::getTranslationService()->getAvailableLocales();
+        $availableLocales = \App\Core\Http\View::getTranslationService()->getAvailableLocales();
 
-        View::render('@modules/Admin/templates/settings.html.twig', [
+        $this->render('@modules/Admin/templates/settings.html.twig', [
             'settings' => $settings,
             'roles' => $roles,
             'availableLocales' => $availableLocales,
@@ -97,7 +95,7 @@ class AdminController
         $this->settingsRepository->set('system_locale', $locale);
 
         // Clear View cache to force re-initialization with new locale
-        View::clearCache();
+        \App\Core\Http\View::clearCache();
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
         header('Location: /admin/settings');
@@ -121,7 +119,7 @@ class AdminController
         }
         unset($user); // Break the reference with the last element
 
-        View::render('@modules/Admin/templates/users.html.twig', [
+        $this->render('@modules/Admin/templates/users.html.twig', [
             'users' => $users,
             'searchTerm' => $searchTerm,
         ]);
@@ -139,7 +137,7 @@ class AdminController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Admin/templates/new_user.html.twig', [
+        $this->render('@modules/Admin/templates/new_user.html.twig', [
             'roles' => $roleOptions,
             'old' => $old,
             'errors' => $errors,
@@ -194,7 +192,7 @@ class AdminController
         $role = $this->roleRepository->findById($user['role_id']);
         $user['role_name'] = $role['name'] ?? 'Невідома';
 
-        View::render('@modules/Admin/templates/show_user.html.twig', ['user' => $user]);
+        $this->render('@modules/Admin/templates/show_user.html.twig', ['user' => $user]);
     }
 
     #[Route('/admin/users/edit', name: 'admin_users_edit', methods: ['GET'])]
@@ -218,7 +216,7 @@ class AdminController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Admin/templates/edit_user.html.twig', [
+        $this->render('@modules/Admin/templates/edit_user.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
             'old' => $old,
@@ -357,14 +355,14 @@ class AdminController
     {
         $this->authorizeAdmin();
         $roles = $this->roleRepository->findAll();
-        View::render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
+        $this->render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
     }
 
     #[Route('/admin/roles/new', name: 'admin_roles_new', methods: ['GET'])]
     public function createRole(): void
     {
         $this->authorizeAdmin();
-        View::render('@modules/Admin/templates/new_role.html.twig', [
+        $this->render('@modules/Admin/templates/new_role.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -409,7 +407,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/edit_role.html.twig', [
+        $this->render('@modules/Admin/templates/edit_role.html.twig', [
             'role' => $role,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -476,7 +474,7 @@ class AdminController
     {
         $this->authorizeAdmin();
         $dictionaries = $this->dictionaryRepository->findAll();
-        View::render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
+        $this->render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
     #[Route('/admin/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
@@ -493,7 +491,7 @@ class AdminController
         }
 
         $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
-        View::render('@modules/Admin/templates/dictionaries/show.html.twig', [
+        $this->render('@modules/Admin/templates/dictionaries/show.html.twig', [
             'dictionary' => $dictionary,
             'values' => $values,
         ]);
@@ -503,7 +501,7 @@ class AdminController
     public function createDictionary(): void
     {
         $this->authorizeAdmin();
-        View::render('@modules/Admin/templates/dictionaries/new.html.twig', [
+        $this->render('@modules/Admin/templates/dictionaries/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -548,7 +546,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/dictionaries/edit.html.twig', [
+        $this->render('@modules/Admin/templates/dictionaries/edit.html.twig', [
             'dictionary' => $dictionary,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -607,7 +605,7 @@ class AdminController
     {
         $this->authorizeAdmin();
         $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        View::render('@modules/Admin/templates/dictionaries/values/new.html.twig', [
+        $this->render('@modules/Admin/templates/dictionaries/values/new.html.twig', [
             'dictionary_id' => $dictionaryId,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -655,7 +653,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/dictionaries/values/edit.html.twig', [
+        $this->render('@modules/Admin/templates/dictionaries/values/edit.html.twig', [
             'value' => $value,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -713,7 +711,7 @@ class AdminController
     {
         $this->authorizeAdmin();
         $configs = $this->authConfigRepository->findAll();
-        View::render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
+        $this->render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
     #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
@@ -722,7 +720,7 @@ class AdminController
         $this->authorizeAdmin();
         $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
-        View::render('@modules/Admin/templates/auth_configs/new.html.twig', [
+        $this->render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'supportedProviders' => $supportedProviders,
@@ -771,7 +769,7 @@ class AdminController
         }
         $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
-        View::render('@modules/Admin/templates/auth_configs/edit.html.twig', [
+        $this->render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -843,7 +841,7 @@ class AdminController
 
         $redirectUri = $_ENV['APP_BASE_URL'] . '/oauth/callback/' . $config['provider'];
 
-        View::render('@modules/Admin/templates/auth_configs/show.html.twig', [
+        $this->render('@modules/Admin/templates/auth_configs/show.html.twig', [
             'config' => $config,
             'redirectUri' => $redirectUri,
         ]);
@@ -854,13 +852,13 @@ class AdminController
     {
         $this->authorizeAdmin();
         $policies = $this->backupPolicyRepository->findAll();
-        View::render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
+        $this->render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
     public function createBackupPolicy(): void
     {
         $this->authorizeAdmin();
-        View::render('@modules/Admin/templates/backup_policies/new.html.twig', [
+        $this->render('@modules/Admin/templates/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -905,7 +903,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/backup_policies/edit.html.twig', [
+        $this->render('@modules/Admin/templates/backup_policies/edit.html.twig', [
             'policy' => $policy,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -963,13 +961,13 @@ class AdminController
     {
         $this->authorizeAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
+        $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createKpiDefinition(): void
     {
         $this->authorizeAdmin();
-        View::render('@modules/Kpi/templates/definitions/new.html.twig', [
+        $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -1018,7 +1016,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Kpi/templates/definitions/edit.html.twig', [
+        $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -1082,7 +1080,7 @@ class AdminController
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services'); // Specific permission for service management
         $services = $this->serviceRepository->findAll();
-        View::render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
+        $this->render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
     }
 
     #[Route('/admin/services/new', name: 'admin_services_new', methods: ['GET'])]
@@ -1096,7 +1094,7 @@ class AdminController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        View::render('@modules/Admin/templates/services/new.html.twig', [
+        $this->render('@modules/Admin/templates/services/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'categories' => $categoryOptions,
@@ -1154,7 +1152,7 @@ class AdminController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        View::render('@modules/Admin/templates/services/edit.html.twig', [
+        $this->render('@modules/Admin/templates/services/edit.html.twig', [
             'service' => $service,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -1221,7 +1219,7 @@ class AdminController
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
         $categories = $this->serviceRepository->findCategories();
-        View::render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
+        $this->render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
     #[Route('/admin/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
@@ -1229,7 +1227,7 @@ class AdminController
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
-        View::render('@modules/Admin/templates/service_categories/new.html.twig', [
+        $this->render('@modules/Admin/templates/service_categories/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -1276,7 +1274,7 @@ class AdminController
             return;
         }
 
-        View::render('@modules/Admin/templates/service_categories/edit.html.twig', [
+        $this->render('@modules/Admin/templates/service_categories/edit.html.twig', [
             'category' => $category,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -1333,7 +1331,7 @@ class AdminController
 
     private function authorizeAdmin(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('system.manage');
     }
 }
