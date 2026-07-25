@@ -2,7 +2,7 @@
 
 namespace App\Core\Validation;
 
-use PDO;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Legacy Validator class - now uses SymfonyValidator internally for backward compatibility
@@ -12,10 +12,10 @@ class Validator
 {
     private SymfonyValidator $symfonyValidator;
 
-    public function __construct(PDO $pdo)
+    public function __construct(ManagerRegistry $registry)
     {
-        // Pass PDO to SymfonyValidator for database-dependent validation (e.g., unique rule)
-        $this->symfonyValidator = new SymfonyValidator($pdo);
+        // Pass Registry to SymfonyValidator for database-dependent validation (e.g., unique rule)
+        $this->symfonyValidator = new SymfonyValidator($registry);
     }
 
     public function validate(array $data, array $rules): bool

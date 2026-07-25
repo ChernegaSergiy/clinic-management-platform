@@ -2,19 +2,18 @@
 
 namespace App\Core\Validation\Constraint;
 
-use App\Database\Database;
-use PDO;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UniqueValidator extends ConstraintValidator
 {
-    private ?PDO $pdo;
+    private ManagerRegistry $registry;
 
-    public function __construct(?PDO $pdo = null)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = $pdo;
+        $this->registry = $registry;
     }
 
     public function validate($value, Constraint $constraint): void
@@ -28,25 +27,24 @@ class UniqueValidator extends ConstraintValidator
         }
 
         try {
-            $pdo = $this->pdo ?? Database::getInstance();
+            $conn = $this->registry->getConnection();
 
             $sql = "SELECT COUNT(*) FROM `{$constraint->table}` WHERE `{$constraint->column}` = :value";
-            $queryParams = [':value' => $value];
+            $queryParams = ['value' => $value];
 
             if ($constraint->ignoreId !== null) {
                 $sql .= " AND `id` != :ignore_id";
-                $queryParams[':ignore_id'] = $constraint->ignoreId;
+                $queryParams['ignore_id'] = $constraint->ignoreId;
             }
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($queryParams);
+            $result = $conn->executeQuery($sql, $queryParams);
 
-            if ($stmt->fetchColumn() > 0) {
+            if ($result->fetchOne() > 0) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ field }}', $constraint->column)
                     ->addViolation();
             }
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // In test environments, skip the unique validation rather than failing
             // In production, rethrow the exception to surface database issues
             if (getenv('APP_ENV') === 'testing') {

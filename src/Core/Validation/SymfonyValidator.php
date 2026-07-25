@@ -2,7 +2,7 @@
 
 namespace App\Core\Validation;
 
-use App\Database\Database;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -10,12 +10,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SymfonyValidator
 {
     private ValidatorInterface $validator;
-    private \PDO $pdo;
+    private ManagerRegistry $registry;
     private array $errors = [];
 
-    public function __construct(\PDO $pdo)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = $pdo;
+        $this->registry = $registry;
         $this->validator = Validation::createValidator();
     }
 
@@ -95,22 +95,21 @@ class SymfonyValidator
         $ignoreId = $params[2] ?? null;
 
         try {
-            $pdo = $this->pdo;
+            $conn = $this->registry->getConnection();
             $sql = "SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` = :value";
-            $queryParams = [':value' => $value];
+            $queryParams = ['value' => $value];
 
             if ($ignoreId !== null) {
                 $sql .= " AND `id` != :ignore_id";
-                $queryParams[':ignore_id'] = $ignoreId;
+                $queryParams['ignore_id'] = $ignoreId;
             }
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($queryParams);
+            $result = $conn->executeQuery($sql, $queryParams);
 
-            if ($stmt->fetchColumn() > 0) {
+            if ($result->fetchOne() > 0) {
                 $this->errors[$field][] = "Значення поля '{$field}' вже існує.";
             }
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             // In testing environment, re-throw the exception for proper testing
             throw $e;
         }
