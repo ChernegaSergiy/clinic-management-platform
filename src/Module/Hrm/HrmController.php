@@ -10,21 +10,25 @@ use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Core\Validation\Validator;
 
 class HrmController
 {
     private HrmRepositoryInterface $hrmRepository;
     private UserRepositoryInterface $userRepository;
     private DepartmentRepository $departmentRepository;
+    private Validator $validator;
 
     public function __construct(
         HrmRepositoryInterface $hrmRepository,
         UserRepositoryInterface $userRepository,
-        DepartmentRepository $departmentRepository
+        DepartmentRepository $departmentRepository,
+        Validator $validator
     ) {
         $this->hrmRepository = $hrmRepository;
         $this->userRepository = $userRepository;
         $this->departmentRepository = $departmentRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
@@ -61,7 +65,7 @@ class HrmController
         AuthGuard::check();
         Gate::authorize('hrm.write');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -150,7 +154,7 @@ class HrmController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
