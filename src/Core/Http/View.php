@@ -57,9 +57,10 @@ class View
         ];
 
         try {
-            $db = \App\Database\Database::getInstance();
-            $stmt = $db->query("SELECT `key`, value FROM settings");
-            while ($row = $stmt->fetch()) {
+            $conn = \App\Kernel::$staticContainer->get(\Doctrine\Persistence\ManagerRegistry::class)->getConnection();
+            $sql = "SELECT `key`, value FROM settings";
+            $result = $conn->executeQuery($sql);
+            while ($row = $result->fetchAssociative()) {
                 self::$twigGlobals[$row['key']] = $row['value'];
             }
         } catch (\Exception $e) {
