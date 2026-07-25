@@ -7,15 +7,18 @@ use App\Database\Database;
 use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
 use App\Core\Http\View;
+use App\Core\Validation\Validator;
 use App\Module\Room\Repository\RoomRepository;
 
 class RoomController
 {
     private RoomRepository $roomRepository;
+    private Validator $validator;
 
-    public function __construct(RoomRepository $roomRepository)
+    public function __construct(RoomRepository $roomRepository, Validator $validator)
     {
         $this->roomRepository = $roomRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/admin/rooms', name: 'admin_rooms_index', methods: ['GET'])]
@@ -52,7 +55,7 @@ class RoomController
     {
         $this->authorizeAdmin();
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],
@@ -131,7 +134,7 @@ class RoomController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'type' => ['required'],
