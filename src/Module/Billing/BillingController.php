@@ -60,41 +60,42 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing', name: 'billing_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
         $searchTerm = $_GET['search'] ?? '';
         $invoices = $this->invoiceRepository->findAll($searchTerm);
-        $this->render('@modules/Billing/templates/index.html.twig', [
+        return $this->render('@modules/Billing/templates/index.html.twig', [
             'invoices' => $invoices,
             'searchTerm' => $searchTerm,
         ]);
     }
 
     // --- Service Management ---
-    public function listServices(): void
+    public function listServices(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
-        $this->render('@modules/Billing/templates/services/index.html.twig', ['services' => $services]);
+        return $this->render('@modules/Billing/templates/services/index.html.twig', ['services' => $services]);
     }
 
-    public function createService(): void
+    public function createService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
         $categories = $this->serviceRepository->findCategories();
-        $this->render('@modules/Billing/templates/services/new.html.twig', [
+        $response = $this->render('@modules/Billing/templates/services/new.html.twig', [
             'categories' => $categories,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function storeService(): void
+    public function storeService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -108,39 +109,38 @@ class BillingController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /billing/services/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/services/new');
         }
 
         $this->serviceRepository->save($_POST);
         $_SESSION['success_message'] = "Послугу успішно додано.";
-        header('Location: /billing/services');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/services');
     }
 
     // --- Service Bundle Management ---
-    public function listServiceBundles(): void
+    public function listServiceBundles(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
         $bundles = $this->serviceBundleRepository->findAll();
-        $this->render('@modules/Billing/templates/bundles/index.html.twig', ['bundles' => $bundles]);
+        return $this->render('@modules/Billing/templates/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
-    public function createServiceBundle(): void
+    public function createServiceBundle(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
         $services = $this->serviceRepository->findAll();
-        $this->render('@modules/Billing/templates/bundles/new.html.twig', [
+        $response = $this->render('@modules/Billing/templates/bundles/new.html.twig', [
             'services' => $services,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function storeServiceBundle(): void
+    public function storeServiceBundle(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -155,18 +155,16 @@ class BillingController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /billing/bundles/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/bundles/new');
         }
 
         $this->serviceBundleRepository->save($_POST);
         $_SESSION['success_message'] = "Пакет послуг успішно додано.";
-        header('Location: /billing/bundles');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/bundles');
     }
 
     #[Route('/billing/new', name: 'billing_new', methods: ['GET'])]
-    public function create(): void
+    public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -203,7 +201,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Billing/templates/new.html.twig', [
+        return $this->render('@modules/Billing/templates/new.html.twig', [
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
             'medical_records' => $medicalRecordOptions,
@@ -213,7 +211,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/new', name: 'billing_store', methods: ['POST'])]
-    public function store(): void
+    public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -228,8 +226,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /billing/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/new');
         }
 
         $invoiceId = $this->invoiceRepository->save($_POST);
@@ -261,12 +258,11 @@ class BillingController extends \App\Core\Controller\AbstractController
         }
 
         $_SESSION['success_message'] = "Рахунок успішно створено.";
-        header('Location: /billing');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
     }
 
     #[Route('/billing/show', name: 'billing_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
@@ -275,20 +271,19 @@ class BillingController extends \App\Core\Controller\AbstractController
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            http_response_code(404);
-            echo "Рахунок не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
         }
 
-        $this->render('@modules/Billing/templates/show.html.twig', [
+        $response = $this->render('@modules/Billing/templates/show.html.twig', [
             'invoice' => $invoice,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/billing/add-payment', name: 'billing_add_payment', methods: ['POST'])]
-    public function addPayment(): void
+    public function addPayment(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -297,9 +292,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $invoice = $this->invoiceRepository->findById($invoiceId);
 
         if (!$invoice) {
-            http_response_code(404);
-            echo "Рахунок не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -311,8 +304,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /billing/show?id=' . $invoiceId);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $invoiceId);
         }
 
         $this->invoiceRepository->addPayment(
@@ -324,12 +316,11 @@ class BillingController extends \App\Core\Controller\AbstractController
         );
 
         $_SESSION['success_message'] = "Оплата успішно додана.";
-        header('Location: /billing/show?id=' . $invoiceId);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $invoiceId);
     }
 
     #[Route('/billing/edit', name: 'billing_edit', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -338,9 +329,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            http_response_code(404);
-            echo "Рахунок не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
         }
 
         $patientId = $invoice['patient_id'];
@@ -375,7 +364,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Billing/templates/edit.html.twig', [
+        return $this->render('@modules/Billing/templates/edit.html.twig', [
             'invoice' => $invoice,
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
@@ -386,7 +375,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/edit', name: 'billing_update', methods: ['POST'])]
-    public function update(): void
+    public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.manage');
@@ -395,9 +384,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            http_response_code(404);
-            echo "Рахунок не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
         }
 
         // TODO: Add validation
@@ -410,20 +397,18 @@ class BillingController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /billing/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/edit?id=' . $id);
         }
 
         $data = $_POST;
         $data['patient_id'] = $invoice['patient_id']; // Patient ID cannot be changed after creation
         $this->invoiceRepository->update($id, $data);
         $_SESSION['success_message'] = "Рахунок успішно оновлено.";
-        header('Location: /billing/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $id);
     }
 
     #[Route('/billing/export-csv', name: 'billing_export_csv', methods: ['GET'])]
-    public function exportInvoicesToCsv(): void
+    public function exportInvoicesToCsv(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
@@ -433,8 +418,7 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         if (empty($invoices)) {
             $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            header('Location: /billing');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
         }
 
         // Prepare data for CSV
@@ -457,10 +441,11 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
         $exporter->download('invoices_export.csv');
+        return new \Symfony\Component\HttpFoundation\Response();
     }
 
     #[Route('/billing/export-pdf', name: 'billing_export_pdf', methods: ['GET'])]
-    public function exportInvoicesToPdf(): void
+    public function exportInvoicesToPdf(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
@@ -469,8 +454,7 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         if (empty($invoices)) {
             $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            header('Location: /billing');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
         }
 
         $html = $this->view->renderToString('@modules/Billing/templates/export_pdf.html.twig', ['invoices' => $invoices]);
@@ -479,10 +463,11 @@ class BillingController extends \App\Core\Controller\AbstractController
         $pdfExporter->loadHtml($html);
         $pdfExporter->render();
         $pdfExporter->download('invoices_export.pdf');
+        return new \Symfony\Component\HttpFoundation\Response();
     }
 
     #[Route('/billing/export-excel', name: 'billing_export_excel', methods: ['GET'])]
-    public function exportInvoicesToExcel(): void
+    public function exportInvoicesToExcel(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('billing.read');
@@ -491,8 +476,7 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         if (empty($invoices)) {
             $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            header('Location: /billing');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
         }
 
         $headers = [
@@ -511,5 +495,6 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         $excelExporter = new ExcelExporter();
         $excelExporter->export($headers, $data, 'invoices_export.xlsx');
+        return new \Symfony\Component\HttpFoundation\Response();
     }
 }
