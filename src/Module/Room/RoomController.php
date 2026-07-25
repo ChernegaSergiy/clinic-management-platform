@@ -4,13 +4,11 @@ namespace App\Module\Room;
 
 use Symfony\Component\Routing\Attribute\Route;
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Module\Room\Repository\RoomRepository;
 
-class RoomController
+class RoomController extends \App\Core\Controller\AbstractController
 {
     private RoomRepository $roomRepository;
     private Validator $validator;
@@ -28,7 +26,7 @@ class RoomController
         $searchTerm = $_GET['search'] ?? '';
         $rooms = $this->roomRepository->findAll();
 
-        View::render('@modules/Room/templates/index.html.twig', [
+        $this->render('@modules/Room/templates/index.html.twig', [
             'rooms' => $rooms,
             'searchTerm' => $searchTerm,
         ]);
@@ -44,7 +42,7 @@ class RoomController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Room/templates/create.html.twig', [
+        $this->render('@modules/Room/templates/create.html.twig', [
             'old' => $old,
             'errors' => $errors,
         ]);
@@ -91,7 +89,7 @@ class RoomController
             return;
         }
 
-        View::render('@modules/Room/templates/show.html.twig', ['room' => $room]);
+        $this->render('@modules/Room/templates/show.html.twig', ['room' => $room]);
     }
 
     #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
@@ -113,7 +111,7 @@ class RoomController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Room/templates/edit.html.twig', [
+        $this->render('@modules/Room/templates/edit.html.twig', [
             'room' => $room,
             'old' => $old,
             'errors' => $errors,
@@ -200,7 +198,7 @@ class RoomController
 
     private function authorizeAdmin(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('rooms.manage');
     }
 }
