@@ -2,16 +2,15 @@
 
 namespace App\Module\Notification\Repository;
 
-use App\Database\Database;
-use PDO;
+use App\Entity\Notification;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class NotificationRepository
+class NotificationRepository extends ServiceEntityRepository
 {
-    private PDO $pdo;
-
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        parent::__construct($registry, Notification::class);
     }
 
     /**
@@ -23,54 +22,57 @@ class NotificationRepository
      */
     public function findUnreadByUserId(int $userId, int $limit = 10): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT id, message, created_at
             FROM notifications
             WHERE user_id = :user_id AND is_read = false
             ORDER BY created_at DESC
             LIMIT :limit
-        ");
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        ";
+        // Ensure limit is cast to int since PDO handles binds differently for limits.
+        // DBAL executes with PDO internally but fetchAllAssociative handles limit well if passed correctly.
+        // Alternatively, using standard query.
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
     }
 
     public function findByUserId(int $userId, int $limit = 10, int $offset = 0): array
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
             SELECT id, message, created_at, is_read
             FROM notifications
             WHERE user_id = :user_id
             ORDER BY created_at DESC
             LIMIT :limit OFFSET :offset
-        ");
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
     }
 
     public function countUnreadByUserId(int $userId): int
     {
-        $stmt = $this->pdo->prepare("
-            SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = false
-        ");
-        $stmt->execute([':user_id' => $userId]);
-        return (int)$stmt->fetchColumn();
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = false";
+        return (int)$conn->fetchOne($sql, ['user_id' => $userId]);
     }
 
     public function deleteByIdAndUser(int $id, int $userId): bool
     {
-        $stmt = $this->pdo->prepare("
-            DELETE FROM notifications
-            WHERE id = :id AND user_id = :user_id
-        ");
-        return $stmt->execute([
-            ':id' => $id,
-            ':user_id' => $userId,
-        ]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "DELETE FROM notifications WHERE id = :id AND user_id = :user_id";
+        return $conn->executeStatement($sql, [
+            'id' => $id,
+            'user_id' => $userId,
+        ]) > 0;
     }
 
     /**
@@ -81,11 +83,8 @@ class NotificationRepository
      */
     public function markAllAsReadByUserId(int $userId): bool
     {
-        $stmt = $this->pdo->prepare("
-            UPDATE notifications
-            SET is_read = true
-            WHERE user_id = :user_id AND is_read = false
-        ");
-        return $stmt->execute([':user_id' => $userId]);
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "UPDATE notifications SET is_read = true WHERE user_id = :user_id AND is_read = false";
+        return $conn->executeStatement($sql, ['user_id' => $userId]) >= 0;
     }
 }
