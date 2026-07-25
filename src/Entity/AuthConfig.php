@@ -14,4 +14,6 @@ class AuthConfig
     #[ORM\Column(length: 255, nullable: true)] private ?string $client_secret = null;
     #[ORM\Column(type: Types::BOOLEAN)] private bool $is_active = true;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $config = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 }

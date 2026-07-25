@@ -16,4 +16,7 @@ class Waitlist
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $notes = null;
     #[ORM\Column(length: 255, nullable: true)] private ?string $contact_phone = null;
     #[ORM\Column(length: 255, nullable: true)] private ?string $contact_email = null;
+    #[ORM\Column(length: 50, nullable: true)] private ?string $status = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 }

@@ -19,4 +19,5 @@ class Employee
     #[ORM\Column(length: 50, nullable: true)] private ?string $contact_phone = null;
     #[ORM\Column(length: 50, nullable: true)] private ?string $status = null;
     #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $user_id = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)] private ?\DateTimeInterface $fire_date = null;
 }

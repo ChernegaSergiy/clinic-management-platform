@@ -17,4 +17,6 @@ class Contract
     #[ORM\Column(length: 255, nullable: true)] private ?string $party_b = null;
     #[ORM\Column(length: 255, nullable: true)] private ?string $file_path = null;
     #[ORM\Column(length: 50, nullable: true)] private ?string $status = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 }

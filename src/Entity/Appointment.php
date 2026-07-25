@@ -41,6 +41,9 @@ class Appointment
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $room_id = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ehealth_episode_id = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $created_at = null;
 

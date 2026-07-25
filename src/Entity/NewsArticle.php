@@ -15,4 +15,6 @@ class NewsArticle
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $published_at = null;
     #[ORM\Column(type: Types::INTEGER)] private ?int $author_id = null;
     #[ORM\Column(type: Types::BOOLEAN)] private bool $is_published = false;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 }

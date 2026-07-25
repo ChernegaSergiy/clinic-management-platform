@@ -14,4 +14,7 @@ class BackupPolicy
     #[ORM\Column(length: 50)] private ?string $frequency = null;
     #[ORM\Column(type: Types::INTEGER)] private ?int $retention_days = null;
     #[ORM\Column(length: 50)] private ?string $status = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $last_run_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 }
