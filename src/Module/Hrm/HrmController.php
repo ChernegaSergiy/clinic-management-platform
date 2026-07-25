@@ -30,20 +30,20 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('hrm.read');
 
         $employees = $this->hrmRepository->findAll();
 
-        $this->render('@modules/Hrm/templates/index.html.twig', [
+        return $this->render('@modules/Hrm/templates/index.html.twig', [
             'employees' => $employees,
         ]);
     }
 
     #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
-    public function create(): void
+    public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('hrm.write');
@@ -51,14 +51,14 @@ class HrmController extends \App\Core\Controller\AbstractController
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        $this->render('@modules/Hrm/templates/new.html.twig', [
+        return $this->render('@modules/Hrm/templates/new.html.twig', [
             'users' => $users,
             'departments' => $departments,
         ]);
     }
 
     #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
-    public function store(): void
+    public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('hrm.write');
@@ -74,12 +74,11 @@ class HrmController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            $this->render('@modules/Hrm/templates/new.html.twig', [
+            return $this->render('@modules/Hrm/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'users' => $users,
             ]);
-            return;
         }
 
         if ($this->hrmRepository->save($_POST)) {
@@ -88,12 +87,11 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося додати співробітника.';
         }
 
-        header('Location: /hrm');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm');
     }
 
     #[Route('/hrm/show', name: 'hrm_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -102,18 +100,16 @@ class HrmController extends \App\Core\Controller\AbstractController
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            http_response_code(404);
-            echo "Співробітника не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
         }
 
-        $this->render('@modules/Hrm/templates/show.html.twig', [
+        return $this->render('@modules/Hrm/templates/show.html.twig', [
             'employee' => $employee,
         ]);
     }
 
     #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -122,15 +118,13 @@ class HrmController extends \App\Core\Controller\AbstractController
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            http_response_code(404);
-            echo "Співробітника не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
         }
 
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        $this->render('@modules/Hrm/templates/edit.html.twig', [
+        return $this->render('@modules/Hrm/templates/edit.html.twig', [
             'employee' => $employee,
             'users' => $users,
             'departments' => $departments,
@@ -138,7 +132,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
-    public function update(): void
+    public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -147,9 +141,7 @@ class HrmController extends \App\Core\Controller\AbstractController
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            http_response_code(404);
-            echo "Співробітника не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -163,12 +155,11 @@ class HrmController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            $this->render('@modules/Hrm/templates/edit.html.twig', [
+            return $this->render('@modules/Hrm/templates/edit.html.twig', [
                     'errors' => $validator->getErrors(),
                     'employee' => array_merge($employee, $_POST),
                     'users' => $users,
                 ]);
-            return;
         }
 
         if ($this->hrmRepository->update($id, $_POST)) {
@@ -177,12 +168,11 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося оновити дані.';
         }
 
-        header('Location: /hrm/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm/show?id=' . $id);
     }
 
     #[Route('/hrm/toggle-status', name: 'hrm_toggle_status', methods: ['POST'])]
-    public function toggleStatus(): void
+    public function toggleStatus(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('hrm.manage');
@@ -196,7 +186,6 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['success_message'] = 'Статус співробітника оновлено.';
         }
 
-        header('Location: /hrm/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm/show?id=' . $id);
     }
 }
