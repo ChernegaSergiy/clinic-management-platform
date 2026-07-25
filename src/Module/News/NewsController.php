@@ -16,11 +16,13 @@ class NewsController
 {
     private NewsRepository $newsRepository;
     private UserRepositoryInterface $userRepository; // For author selection in admin forms
+    private Validator $validator;
 
-    public function __construct(NewsRepository $newsRepository, UserRepositoryInterface $userRepository)
+    public function __construct(NewsRepository $newsRepository, UserRepositoryInterface $userRepository, Validator $validator)
     {
         $this->newsRepository = $newsRepository;
         $this->userRepository = $userRepository;
+        $this->validator = $validator;
     }
 
     // Public listing of news articles
@@ -89,7 +91,7 @@ class NewsController
         AuthGuard::check();
         Gate::authorize('news.manage');
 
-        $validator = new Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'title' => ['required', 'string', 'max:255'],
             'meta' => ['required', 'string', 'max:500'],
@@ -160,7 +162,7 @@ class NewsController
             return;
         }
 
-        $validator = new Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'title' => ['required', 'string', 'max:255'],
             'meta' => ['required', 'string', 'max:500'],
