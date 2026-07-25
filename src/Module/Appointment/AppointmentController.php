@@ -92,7 +92,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/book-appointment', name: 'appointment_public_form', methods: ['GET'])]
-    public function publicForm(): void
+    public function publicForm(): \Symfony\Component\HttpFoundation\Response
     {
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -111,7 +111,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             }
         }
 
-        $this->render('@modules/Appointment/templates/public/book.html.twig', [
+        $response = $this->render('@modules/Appointment/templates/public/book.html.twig', [
             'doctors' => $doctors,
             'services' => $services,
             'availableSlots' => $availableSlots,
@@ -121,10 +121,11 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             'success_message' => $_SESSION['public_success_message'] ?? null,
         ]);
         unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['public_success_message']);
+        return $response;
     }
 
     #[Route('/book-appointment', name: 'appointment_submit_public_form', methods: ['POST'])]
-    public function submitPublicForm(): void
+    public function submitPublicForm(): \Symfony\Component\HttpFoundation\Response
     {
         $rawInput = $_POST;
 
@@ -143,8 +144,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($rawInput, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $rawInput;
-            header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'] ?? '', 'service_id' => $rawInput['service_id'] ?? '', 'date' => $rawInput['date'] ?? '']));
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'] ?? '', 'service_id' => $rawInput['service_id'] ?? '', 'date' => $rawInput['date'] ?? '']));
         }
 
         // Advanced validation: Check if the slot is still available
@@ -165,8 +165,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         if (!$isSlotAvailable) {
             $_SESSION['errors'] = ['start_time' => ['The selected time slot is no longer available. Please choose another one.']];
             $_SESSION['old'] = $rawInput;
-            header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
         }
 
         // Find or create patient
@@ -184,8 +183,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             if (!$patientId) {
                 $_SESSION['errors'] = ['patient' => ['Could not create a new patient record.']];
                 $_SESSION['old'] = $rawInput;
-                header('Location: /book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
             }
         } else {
             $patientId = $patient['id'];
@@ -204,8 +202,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $result = $this->appointmentRepository->addToWaitlist($waitlistData);
 
         $_SESSION['public_success_message'] = 'Вашу заявку успішно додано до списку очікування! Ми зв\'яжемося з вами найближчим часом для підтвердження запису.';
-        header('Location: /book-appointment');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment');
     }
 
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
