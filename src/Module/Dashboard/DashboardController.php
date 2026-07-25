@@ -2,12 +2,10 @@
 
 namespace App\Module\Dashboard;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Module\Dashboard\Service\DashboardService;
 
-class DashboardController
+class DashboardController extends \App\Core\Controller\AbstractController
 {
     private DashboardService $dashboardService;
 
@@ -18,7 +16,7 @@ class DashboardController
 
     public function index(): void
     {
-        AuthGuard::check(); // Ensure user is authenticated
+        $this->checkAuth(); // Ensure user is authenticated
         Gate::authorize('dashboard.view');
 
         $canSeeFinance = Gate::allows('billing.read');
@@ -27,7 +25,7 @@ class DashboardController
 
         $dashboardData = $this->dashboardService->getDashboardData();
 
-        View::render('dashboard/index.html.twig', [
+        $this->render('dashboard/index.html.twig', [
             'dashboardData' => $dashboardData,
             'canSeeFinance' => $canSeeFinance,
             'canSeeKpi' => $canSeeKpi,
@@ -37,7 +35,7 @@ class DashboardController
 
     public function exportCsv(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
@@ -59,12 +57,12 @@ class DashboardController
 
     public function exportPdf(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         // Render the Twig template into an HTML string
-        $html = \App\Core\Http\View::renderToString('dashboard/pdf_report.html.twig', [
+        $html = $this->view->renderToString('dashboard/pdf_report.html.twig', [
             'dashboardData' => $dashboardData,
         ]);
 
@@ -76,7 +74,7 @@ class DashboardController
 
     public function exportExcel(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('dashboard.export');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
