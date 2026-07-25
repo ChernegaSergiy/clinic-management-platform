@@ -9,22 +9,25 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\Facebook;
 use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
+use Symfony\Component\Routing\Attribute\Route;
 
-class OAuthController
+class OAuthController extends \App\Core\Controller\AbstractController
 {
     private AuthConfigRepository $authConfigRepository;
     private UserRepository $userRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
 
-    public function __construct()
-    {
-        $this->authConfigRepository = new AuthConfigRepository();
-        $this->userRepository = new UserRepository();
-        $this->userOAuthIdentityRepository = new UserOAuthIdentityRepository();
-        // no deps currently; keep constructor for DI compatibility
+    public function __construct(
+        AuthConfigRepository $authConfigRepository,
+        UserRepository $userRepository,
+        UserOAuthIdentityRepository $userOAuthIdentityRepository
+    ) {
+        $this->authConfigRepository = $authConfigRepository;
+        $this->userRepository = $userRepository;
+        $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
     }
 
-    public function redirect(string $provider): void
+    public function redirect(string $provider): \Symfony\Component\HttpFoundation\Response
     {
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
@@ -38,11 +41,11 @@ class OAuthController
         $authUrl = $providerObj->getAuthorizationUrl();
         $_SESSION['oauth2state'] = $providerObj->getState();
 
-        header('Location: ' . $authUrl);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse($authUrl);
     }
 
-    public function callback(string $provider): void
+    #[Route('/oauth/callback/{provider}', name: 'oauth_callback', methods: ['GET'])]
+    public function callback(string $provider): \Symfony\Component\HttpFoundation\Response
     {
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
@@ -79,8 +82,7 @@ class OAuthController
                     $anotherUserIdentity = $this->userOAuthIdentityRepository->findByProviderAndProviderId($provider, $providerId);
                     if ($anotherUserIdentity && $anotherUserIdentity['user_id'] != $userId) {
                         $_SESSION['errors'] = ['oauth' => sprintf('Цей акаунт %s вже прив\'язано до іншого користувача.', ucfirst($provider))];
-                        header('Location: /user/profile');
-                        exit();
+                        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
                     }
 
                     // Link the account
@@ -88,8 +90,7 @@ class OAuthController
                     $_SESSION['success_message'] = sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider));
                 }
 
-                header('Location: /user/profile'); // Assuming a /user/profile route exists
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile'); // Assuming a /user/profile route exists
             }
 
             // 2. User is not logged in - try to find or create user based on OAuth identity
@@ -110,8 +111,7 @@ class OAuthController
                     ];
                     $redirect = $_SESSION['intended_url'] ?? '/dashboard';
                     unset($_SESSION['intended_url']);
-                    header('Location: ' . $redirect);
-                    exit();
+                    return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
                 }
             }
 
@@ -130,18 +130,15 @@ class OAuthController
                 ];
                 $redirect = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
-                header('Location: ' . $redirect);
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
             }
 
             // No user found or linked, redirect to login with an error or to a registration page
             $_SESSION['errors'] = ['login' => sprintf('Жодного користувача, пов\'язаного з цим акаунтом %s, не знайдено. Спершу зареєструйтеся або увійдіть в існуючий акаунт і прив\'яжіть його.', ucfirst($provider))];
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         } catch (IdentityProviderException $e) {
             $_SESSION['errors'] = ['oauth' => 'Помилка автентифікації: ' . $e->getMessage()];
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
     }
 
