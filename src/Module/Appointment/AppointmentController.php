@@ -29,6 +29,7 @@ class AppointmentController
     private RoomRepository $roomRepository;
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
+    private \App\Core\Validation\Validator $validator;
 
     public function __construct(
         AppointmentRepositoryInterface $appointmentRepository,
@@ -39,7 +40,8 @@ class AppointmentController
         DoctorScheduleRepository $doctorScheduleRepository,
         ScheduleExceptionRepository $scheduleExceptionRepository,
         ServiceRepository $serviceRepository,
-        RoomRepository $roomRepository
+        RoomRepository $roomRepository,
+        \App\Core\Validation\Validator $validator
     ) {
         $this->appointmentRepository = $appointmentRepository;
         $this->patientRepository = $patientRepository;
@@ -50,6 +52,7 @@ class AppointmentController
         $this->scheduleExceptionRepository = $scheduleExceptionRepository;
         $this->serviceRepository = $serviceRepository;
         $this->roomRepository = $roomRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
@@ -127,7 +130,7 @@ class AppointmentController
     {
         $rawInput = $_POST;
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'first_name' => ['required'],
             'last_name' => ['required'],
@@ -335,7 +338,7 @@ class AppointmentController
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
         $errors = null;
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -630,7 +633,7 @@ class AppointmentController
         }
 
         $errors = null;
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'patient_id' => ['required', 'numeric'],
             'doctor_id' => ['required', 'numeric'],
@@ -794,7 +797,7 @@ class AppointmentController
         AuthGuard::check();
         Gate::authorize('appointment.create');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'patient_id' => ['required'],
         ];
