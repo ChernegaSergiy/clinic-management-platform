@@ -2,15 +2,13 @@
 
 namespace App\Module\ClinicalReference;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
 use MedCore\Nk0262021Parser\Parser as Nk026Parser;
 
-class ClinicalReferenceController
+class ClinicalReferenceController extends \App\Core\Controller\AbstractController
 {
     private IcdCodeRepository $icdCodeRepository;
     private InterventionCodeRepository $interventionCodeRepository;
@@ -23,11 +21,11 @@ class ClinicalReferenceController
 
     public function icdImportForm(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $count = $this->icdCodeRepository->countAll();
-        View::render('@modules/ClinicalReference/templates/icd_import.html.twig', [
+        $this->render('@modules/ClinicalReference/templates/icd_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
@@ -37,7 +35,7 @@ class ClinicalReferenceController
 
     public function icdImportRun(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         try {
@@ -72,11 +70,11 @@ class ClinicalReferenceController
 
     public function interventionImportForm(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $count = $this->interventionCodeRepository->countAll();
-        View::render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
+        $this->render('@modules/ClinicalReference/templates/intervention_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
@@ -86,7 +84,7 @@ class ClinicalReferenceController
 
     public function interventionImportRun(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         try {
@@ -122,13 +120,13 @@ class ClinicalReferenceController
 
     public function clinicalIndex(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();
 
-        View::render('@modules/ClinicalReference/templates/index.html.twig', [
+        $this->render('@modules/ClinicalReference/templates/index.html.twig', [
             'icdCount' => $icdCount,
             'interventionCount' => $interventionCount,
         ]);
