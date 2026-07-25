@@ -798,6 +798,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Backup Policy Management ---
+    #[Route('/admin/backup_policies', name: 'admin_backup_policies', methods: ['GET'])]
     public function listBackupPolicies(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -805,6 +806,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
+    #[Route('/admin/backup_policies/new', name: 'admin_backup_policies_new', methods: ['GET'])]
     public function createBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -816,6 +818,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
+    #[Route('/admin/backup_policies/new', name: 'admin_backup_policies_new_post', methods: ['POST'])]
     public function storeBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -839,6 +842,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
+    #[Route('/admin/backup_policies/edit', name: 'admin_backup_policies_edit', methods: ['GET'])]
     public function editBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -859,6 +863,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
+    #[Route('/admin/backup_policies/edit', name: 'admin_backup_policies_edit_post', methods: ['POST'])]
     public function updateBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -889,6 +894,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
+    #[Route('/admin/backup_policies/delete', name: 'admin_backup_policies_delete', methods: ['POST'])]
     public function deleteBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -900,6 +906,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- KPI Definition Management ---
+    #[Route('/admin/kpi_definitions', name: 'admin_kpi_definitions', methods: ['GET'])]
     public function listKpiDefinitions(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -907,10 +914,8 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
+    #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createKpiDefinition(): \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -918,6 +923,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
+    #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new_post', methods: ['POST'])]
     public function storeKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -945,12 +951,8 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
+    #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
     public function editKpiDefinition(): \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
             return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
@@ -965,20 +967,8 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
+    #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit_post', methods: ['POST'])]
     public function updateKpiDefinition(): \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $definition = $this->kpiRepository->findKpiDefinitionById($id);
-
-        if (!$definition) {
-            return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:kpi_definitions,name,' . $id],
             'kpi_type' => ['required'],
         ]);
 
@@ -999,12 +989,8 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
+    #[Route('/admin/kpi_definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
     public function deleteKpiDefinition(): \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
