@@ -2,23 +2,22 @@
 
 namespace App\Core\Repository;
 
-use App\Database\Database;
-use PDO;
+use Doctrine\Persistence\ManagerRegistry;
 
 class SettingsRepository
 {
-    private PDO $pdo;
+    private ManagerRegistry $registry;
 
-    public function __construct()
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->pdo = Database::getInstance();
+        $this->registry = $registry;
     }
 
     public function get(string $key, mixed $default = null): mixed
     {
-        $stmt = $this->pdo->prepare("SELECT value FROM settings WHERE `key` = :key");
-        $stmt->execute([':key' => $key]);
-        $result = $stmt->fetch();
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT value FROM settings WHERE `key` = :key";
+        $result = $conn->fetchAssociative($sql, ['key' => $key]);
 
         if ($result === false) {
             return $default;
@@ -35,23 +34,26 @@ class SettingsRepository
 
     public function set(string $key, mixed $value): bool
     {
-        $stmt = $this->pdo->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             INSERT INTO settings (`key`, value, updated_at)
             VALUES (:key, :value, NOW())
             ON DUPLICATE KEY UPDATE value = :value2, updated_at = NOW()
-        ");
+        ";
 
-        return $stmt->execute([
-            ':key' => $key,
-            ':value' => is_array($value) || is_object($value) ? json_encode($value) : $value,
-            ':value2' => is_array($value) || is_object($value) ? json_encode($value) : $value,
-        ]);
+        $val = is_array($value) || is_object($value) ? json_encode($value) : $value;
+        return $conn->executeStatement($sql, [
+            'key' => $key,
+            'value' => $val,
+            'value2' => $val,
+        ]) > 0;
     }
 
     public function delete(string $key): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM settings WHERE `key` = :key");
-        return $stmt->execute([':key' => $key]);
+        $conn = $this->registry->getConnection();
+        $sql = "DELETE FROM settings WHERE `key` = :key";
+        return $conn->executeStatement($sql, ['key' => $key]) > 0;
     }
 
     public function getMfaPolicy(): string
