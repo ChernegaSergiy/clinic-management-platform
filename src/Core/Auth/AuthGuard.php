@@ -23,7 +23,7 @@ class AuthGuard
     private static function roles(): RoleRepository
     {
         if (!self::$roleRepository) {
-            self::$roleRepository = new RoleRepository();
+            self::$roleRepository = \App\Kernel::$staticContainer->get(\App\Module\User\Repository\RoleRepositoryInterface::class);
         }
         return self::$roleRepository;
     }
