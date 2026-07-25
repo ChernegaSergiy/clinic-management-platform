@@ -6,6 +6,8 @@ use App\Core\Auth\Gate;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ScheduleController extends \App\Core\Controller\AbstractController
@@ -22,7 +24,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/doctor/schedule', name: 'doctor_schedule_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): Response
     {
         // Personal schedule for doctors
         Gate::authorize('schedules.manage_own');
@@ -40,27 +42,27 @@ class ScheduleController extends \App\Core\Controller\AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        $this->render('@modules/Schedule/templates/personal.html.twig', [
+        return $this->render('@modules/Schedule/templates/personal.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
         ]);
     }
 
     #[Route('/admin/schedules', name: 'admin_schedules_index', methods: ['GET'])]
-    public function adminIndex(): void
+    public function adminIndex(): Response
     {
         // Admin schedule management for all doctors
         Gate::authorize('schedules.manage_all');
 
         $allDoctors = $this->userRepository->findAllDoctors();
 
-        $this->render('@modules/Schedule/templates/admin.html.twig', [
+        return $this->render('@modules/Schedule/templates/admin.html.twig', [
             'allDoctors' => $allDoctors,
         ]);
     }
 
     #[Route('/admin/schedules/show', name: 'admin_schedules_show', methods: ['GET'])]
-    public function adminShow(): void
+    public function adminShow(): Response
     {
         Gate::authorize('schedules.manage_all');
 
@@ -68,8 +70,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         $doctor = $this->userRepository->findById($doctorId);
 
         if (!$doctor) {
-            header('Location: /admin/schedules');
-            exit;
+            return new RedirectResponse('/admin/schedules');
         }
 
         $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
@@ -78,14 +79,14 @@ class ScheduleController extends \App\Core\Controller\AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        $this->render('@modules/Schedule/templates/show.html.twig', [
+        return $this->render('@modules/Schedule/templates/show.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);
     }
 
     #[Route('/doctor/schedule/update', name: 'doctor_schedule_update', methods: ['POST'])]
-    public function update(): void
+    public function update(): Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
@@ -121,12 +122,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         // TODO: Add flash message for success
         $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
-        header('Location: ' . $redirectUrl);
-        exit;
+        return new RedirectResponse($redirectUrl);
     }
 
     #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
-    public function addException(): void
+    public function addException(): Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
@@ -153,12 +153,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         // TODO: Add flash message
         $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
-        header('Location: ' . $redirectUrl);
-        exit;
+        return new RedirectResponse($redirectUrl);
     }
 
     #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
-    public function deleteException(): void
+    public function deleteException(): Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $exceptionId = (int)$_POST['exception_id'];
@@ -167,9 +166,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         if (!$exception) {
             // TODO: Add error flash message (exception not found)
-            $redirectUrl = '/doctor/schedule';
-            header('Location: ' . $redirectUrl);
-            exit;
+            return new RedirectResponse('/doctor/schedule');
         }
 
         $targetDoctorId = (int)$exception['doctor_id'];
@@ -188,13 +185,12 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         }
 
         $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/doctor/schedule';
-        header('Location: ' . $redirectUrl);
-        exit;
+        return new RedirectResponse($redirectUrl);
     }
 
     // Admin schedule management methods
     #[Route('/admin/schedules/update', name: 'admin_schedules_update', methods: ['POST'])]
-    public function adminUpdate(): void
+    public function adminUpdate(): Response
     {
         Gate::authorize('schedules.manage_all');
 
@@ -225,12 +221,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
             }
         }
 
-        header('Location: /admin/schedules/show?id=' . $targetDoctorId);
-        exit;
+        return new RedirectResponse('/admin/schedules/show?id=' . $targetDoctorId);
     }
 
     #[Route('/admin/schedules/exceptions/add', name: 'admin_schedules_exceptions_add', methods: ['POST'])]
-    public function adminAddException(): void
+    public function adminAddException(): Response
     {
         Gate::authorize('schedules.manage_all');
 
@@ -252,12 +247,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
         $this->scheduleExceptionRepository->create($exceptionData);
 
-        header('Location: /admin/schedules');
-        exit;
+        return new RedirectResponse('/admin/schedules');
     }
 
     #[Route('/admin/schedules/exceptions/delete', name: 'admin_schedules_exceptions_delete', methods: ['POST'])]
-    public function adminDeleteException(): void
+    public function adminDeleteException(): Response
     {
         Gate::authorize('schedules.manage_all');
 
@@ -266,8 +260,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
 
         if (!$exception) {
-            header('Location: /admin/schedules');
-            exit;
+            return new RedirectResponse('/admin/schedules');
         }
 
         $targetDoctorId = (int)$exception['doctor_id'];
@@ -282,12 +275,11 @@ class ScheduleController extends \App\Core\Controller\AbstractController
             $this->scheduleExceptionRepository->delete($exceptionId);
         }
 
-        header('Location: /admin/schedules');
-        exit;
+        return new RedirectResponse('/admin/schedules');
     }
 
     #[Route('/admin/schedules/edit', name: 'admin_schedules_edit', methods: ['GET'])]
-    public function adminEdit(): void
+    public function adminEdit(): Response
     {
         Gate::authorize('schedules.manage_all');
 
@@ -295,8 +287,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
         $doctor = $this->userRepository->findById($doctorId);
 
         if (!$doctor) {
-            header('Location: /admin/schedules');
-            exit;
+            return new RedirectResponse('/admin/schedules');
         }
 
         $schedules = $this->doctorScheduleRepository->findByDoctor($doctorId);
@@ -305,7 +296,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        $this->render('@modules/Schedule/templates/edit.html.twig', [
+        return $this->render('@modules/Schedule/templates/edit.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);
