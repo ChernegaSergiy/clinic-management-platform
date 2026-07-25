@@ -8,6 +8,10 @@ use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class KpiController extends \App\Core\Controller\AbstractController
 {
@@ -29,26 +33,30 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     // --- KPI Definitions ---
-    public function listDefinitions(): void
+    #[Route('/kpi/definitions', name: 'kpi_definitions_index', methods: ['GET'])]
+    public function listDefinitions(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
+        return $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
-    public function createDefinition(): void
+    #[Route('/kpi/definitions/new', name: 'kpi_definitions_new', methods: ['GET'])]
+    public function createDefinition(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
-        $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
+        $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function storeDefinition(): void
+    #[Route('/kpi/definitions/new', name: 'kpi_definitions_store', methods: ['POST'])]
+    public function storeDefinition(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
@@ -64,17 +72,16 @@ class KpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /kpi/definitions/new');
-            exit();
+            return new RedirectResponse('/kpi/definitions/new');
         }
 
         $this->kpiRepository->saveKpiDefinition($_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно додано.";
-        header('Location: /kpi/definitions');
-        exit();
+        return new RedirectResponse('/kpi/definitions');
     }
 
-    public function editDefinition(): void
+    #[Route('/kpi/definitions/edit', name: 'kpi_definitions_edit', methods: ['GET'])]
+    public function editDefinition(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
@@ -83,20 +90,20 @@ class KpiController extends \App\Core\Controller\AbstractController
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
-            http_response_code(404);
-            echo "Визначення KPI не знайдено";
-            return;
+            return new Response("Визначення KPI не знайдено", 404);
         }
 
-        $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
+        $response = $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function updateDefinition(): void
+    #[Route('/kpi/definitions/edit', name: 'kpi_definitions_update', methods: ['POST'])]
+    public function updateDefinition(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
@@ -105,9 +112,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
-            http_response_code(404);
-            echo "Визначення KPI не знайдено";
-            return;
+            return new Response("Визначення KPI не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -121,17 +126,16 @@ class KpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /kpi/definitions/edit?id=' . $id);
-            exit();
+            return new RedirectResponse('/kpi/definitions/edit?id=' . $id);
         }
 
         $this->kpiRepository->updateKpiDefinition($id, $_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
-        header('Location: /kpi/definitions');
-        exit();
+        return new RedirectResponse('/kpi/definitions');
     }
 
-    public function deleteDefinition(): void
+    #[Route('/kpi/definitions/delete', name: 'kpi_definitions_delete', methods: ['POST'])]
+    public function deleteDefinition(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.manage');
@@ -139,12 +143,12 @@ class KpiController extends \App\Core\Controller\AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
-        header('Location: /kpi/definitions');
-        exit();
+        return new RedirectResponse('/kpi/definitions');
     }
 
     // --- KPI Results ---
-    public function listResults(): void
+    #[Route('/kpi/results', name: 'kpi_results_index', methods: ['GET'])]
+    public function listResults(): Response
     {
         $this->checkAuth();
         Gate::authorize('kpi.read');
@@ -156,11 +160,12 @@ class KpiController extends \App\Core\Controller\AbstractController
             $userId = $_SESSION['user']['id'];
             $results = $this->kpiRepository->findKpiResultsForUser($userId);
         }
-        $this->render('@modules/Kpi/templates/results/index.html.twig', ['results' => $results]);
+        return $this->render('@modules/Kpi/templates/results/index.html.twig', ['results' => $results]);
     }
 
     // This would be called by a cron job or background process
-    public function calculateResults(): void
+    #[Route('/kpi/calculate', name: 'kpi_calculate', methods: ['POST'])]
+    public function calculateResults(): Response
     {
         $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
@@ -186,8 +191,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         }
 
         $_SESSION['success_message'] = "KPI перераховано за " . $today->format('Y-m-d');
-        header('Location: /dashboard');
-        exit();
+        return new RedirectResponse('/dashboard');
     }
 
     private function calculateKpiValue(string $type, string $from, string $to): ?float
