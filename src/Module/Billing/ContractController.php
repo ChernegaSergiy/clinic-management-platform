@@ -3,14 +3,12 @@
 namespace App\Module\Billing;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Billing\Repository\ContractRepository;
 
-class ContractController
+class ContractController extends \App\Core\Controller\AbstractController
 {
     private ContractRepository $contractRepository;
     private \App\Core\Validation\Validator $validator;
@@ -26,18 +24,18 @@ class ContractController
     #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
         $contracts = $this->contractRepository->findAll();
-        View::render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
+        $this->render('@modules/Billing/templates/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
-        View::render('@modules/Billing/templates/contracts/new.html.twig', [
+        $this->render('@modules/Billing/templates/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -47,7 +45,7 @@ class ContractController
     #[Route('/billing/contracts/new', name: 'billing_contracts_store', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $validator = $this->validator;
@@ -99,7 +97,7 @@ class ContractController
     #[Route('/billing/contracts/show', name: 'billing_contracts_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -111,13 +109,13 @@ class ContractController
             return;
         }
 
-        View::render('@modules/Billing/templates/contracts/show.html.twig', ['contract' => $contract]);
+        $this->render('@modules/Billing/templates/contracts/show.html.twig', ['contract' => $contract]);
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -129,7 +127,7 @@ class ContractController
             return;
         }
 
-        View::render('@modules/Billing/templates/contracts/edit.html.twig', [
+        $this->render('@modules/Billing/templates/contracts/edit.html.twig', [
             'contract' => $contract,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -140,7 +138,7 @@ class ContractController
     #[Route('/billing/contracts/edit', name: 'billing_contracts_update', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -193,7 +191,7 @@ class ContractController
     #[Route('/billing/contracts/delete', name: 'billing_contracts_delete', methods: ['POST'])]
     public function delete(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -219,7 +217,7 @@ class ContractController
     #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
     public function downloadFile(int $id = 0): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         // Accept ID from route parameter or query string fallback
