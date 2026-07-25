@@ -54,7 +54,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $user = Gate::getUser();
@@ -84,7 +84,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             }
         }
 
-        $this->render('@modules/Appointment/templates/index.html.twig', [
+        return $this->render('@modules/Appointment/templates/index.html.twig', [
             'doctors' => $calendarDoctors,
             'waitlist' => $waitlist,
             'appointments' => $appointments,
@@ -206,24 +206,21 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
-    public function rejectWaitlist(): void
+    public function rejectWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            http_response_code(404);
-            echo "Заявку не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
         }
         $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
-        header('Location: /appointments');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments');
     }
 
     #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
-    public function create(): void
+    public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.create');
@@ -315,7 +312,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
-    public function store(): void
+    public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.create');
@@ -324,9 +321,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
         if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any') && $user->getId() !== $submittedDoctorId) {
-            http_response_code(403);
-            echo "Доступ заборонено: Ви можете створювати записи лише для себе.";
-            exit();
+            return new \Symfony\Component\HttpFoundation\Response("Доступ заборонено: Ви можете створювати записи лише для себе.", 403);
         }
 
         $rawInput = $_POST;
@@ -346,8 +341,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         if (!$validator->validate($rawInput, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $rawInput;
-            header('Location: /appointments/new?' . http_build_query($rawInput));
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/new?' . http_build_query($rawInput));
         }
 
         $selectedDoctorId = (int)$rawInput['doctor_id'];
@@ -409,7 +403,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
             }
 
-            $this->render('@modules/Appointment/templates/new.html.twig', [
+            return $this->render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
                 'old' => $rawInput,
                 'patients' => $patientOptions,
@@ -420,7 +414,6 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 'availableSlots' => $availableSlots,
                 'selectedDate' => $selectedDateStr,
             ]);
-            return;
         }
 
         $dataToSave = $rawInput;
@@ -444,8 +437,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $this->notificationService->createNotification($doctor['id'], $message);
         }
 
-        header('Location: /appointments');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments');
     }
 
     private function normalizeDateTime(string $value): \DateTime
@@ -468,7 +460,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/json', name: 'appointment_json', methods: ['GET'])]
-    public function json(): void
+    public function json(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $user = Gate::getUser();
@@ -523,12 +515,11 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             }
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($events);
+        return new \Symfony\Component\HttpFoundation\JsonResponse($events);
     }
 
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -537,16 +528,14 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            http_response_code(404);
-            echo "Запис не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
         }
 
-        $this->render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
+        return $this->render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -555,9 +544,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            http_response_code(404);
-            echo "Запис не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
         }
 
         $user = Gate::getUser();
@@ -589,7 +576,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        $this->render('@modules/Appointment/templates/edit.html.twig', [
+        return $this->render('@modules/Appointment/templates/edit.html.twig', [
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -598,7 +585,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
-    public function update(): void
+    public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
@@ -622,9 +609,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            http_response_code(404);
-            echo "Запис не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
         }
 
         $errors = null;
@@ -700,7 +685,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            $this->render('@modules/Appointment/templates/edit.html.twig', [
+            return $this->render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -711,16 +696,14 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 'doctors' => $doctorOptions,
                 'rooms' => $roomOptions,
             ]);
-            return;
         }
 
         $this->appointmentRepository->update($id, $_POST);
-        header('Location: /appointments/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/show?id=' . $id);
     }
 
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
-    public function cancel(): void
+    public function cancel(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
@@ -729,9 +712,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            http_response_code(404);
-            echo "Запис не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
         }
 
         $this->appointmentRepository->updateStatus($id, 'cancelled');
@@ -755,12 +736,11 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $this->notificationService->createNotification($doctor['id'], $messageDoctor);
         }
 
-        header('Location: /appointments/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/show?id=' . $id);
     }
 
     #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
-    public function showWaitlist(): void
+    public function showWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.view.any');
@@ -779,7 +759,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        $this->render('@modules/Appointment/templates/waitlist.html.twig', [
+        return $this->render('@modules/Appointment/templates/waitlist.html.twig', [
             'waitlistEntries' => $waitlistEntries,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -787,7 +767,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/add', name: 'appointment_add_waitlist', methods: ['POST'])]
-    public function addPatientToWaitlist(): void
+    public function addPatientToWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.create');
@@ -812,22 +792,20 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            $this->render('@modules/Appointment/templates/waitlist.html.twig', [
+            return $this->render('@modules/Appointment/templates/waitlist.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'waitlistEntries' => $waitlistEntries,
                 'patients' => $patientOptions,
                 'doctors' => $doctorOptions,
             ]);
-            return;
         }
 
         $this->appointmentRepository->addToWaitlist($_POST);
-        header('Location: /appointments/waitlist');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/waitlist');
     }
 
-    public function showLoadAnalytics(): void
+    public function showLoadAnalytics(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.view.any');
@@ -835,13 +813,13 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
 
-        $this->render('@modules/Appointment/templates/load_analytics.html.twig', [
+        return $this->render('@modules/Appointment/templates/load_analytics.html.twig', [
             'date' => $date,
             'doctorLoad' => $doctorLoad,
         ]);
     }
 
-    public function getAvailableSlotsApi(): void
+    public function getAvailableSlotsApi(): \Symfony\Component\HttpFoundation\Response
     {
         header('Content-Type: application/json');
 
@@ -850,8 +828,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $selectedServiceId = (int)($_GET['service_id'] ?? 0);
 
         if (!$selectedDoctorId || !$selectedDateStr || !$selectedServiceId) {
-            echo json_encode(['error' => 'Doctor, service, and date are required.']);
-            return;
+            return new \Symfony\Component\HttpFoundation\JsonResponse(['error' => 'Doctor, service, and date are required.']);
         }
 
         try {
@@ -869,23 +846,20 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 ];
             }
 
-            echo json_encode($formattedSlots);
+            return new \Symfony\Component\HttpFoundation\JsonResponse($formattedSlots);
         } catch (\Exception $e) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid date format.']);
+            return new \Symfony\Component\HttpFoundation\JsonResponse(['error' => 'Invalid date format.'], 400);
         }
     }
 
-    public function fulfillWaitlist(): void
+    public function fulfillWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.create');
         $id = (int)($_GET['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            http_response_code(404);
-            echo "Заявку не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
         }
 
         $patients = $this->patientRepository->findAllActive();
@@ -919,7 +893,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             'waitlist_id' => $id,
         ];
 
-        $this->render('@modules/Appointment/templates/new.html.twig', [
+        return $this->render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
@@ -931,19 +905,16 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    public function cancelWaitlist(): void
+    public function cancelWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            http_response_code(404);
-            echo "Заявку не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
         }
         $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
-        header('Location: /appointments/waitlist');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/waitlist');
     }
 }
