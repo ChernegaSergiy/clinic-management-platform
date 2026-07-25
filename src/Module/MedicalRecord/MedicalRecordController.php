@@ -3,9 +3,7 @@
 namespace App\Module\MedicalRecord;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
@@ -16,7 +14,7 @@ use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Core\Validation\Validator;
 use Symfony\Component\Routing\Attribute\Route;
 
-class MedicalRecordController
+class MedicalRecordController extends \App\Core\Controller\AbstractController
 {
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
@@ -50,7 +48,7 @@ class MedicalRecordController
     #[Route('/medical-records/new', name: 'medical_records_new_get', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('medical_record.create');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
@@ -62,7 +60,7 @@ class MedicalRecordController
             return;
         }
 
-        View::render('@modules/MedicalRecord/templates/new.html.twig', [
+        $this->render('@modules/MedicalRecord/templates/new.html.twig', [
             'appointment' => $appointment,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -73,7 +71,7 @@ class MedicalRecordController
     #[Route('/medical-records', name: 'medical_records_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $user = Gate::getUser();
         $searchTerm = $_GET['search'] ?? '';
         $records = [];
@@ -86,7 +84,7 @@ class MedicalRecordController
             }
         }
 
-        View::render('@modules/MedicalRecord/templates/index.html.twig', [
+        $this->render('@modules/MedicalRecord/templates/index.html.twig', [
             'records' => $records,
             'searchTerm' => $searchTerm,
         ]);
@@ -95,7 +93,7 @@ class MedicalRecordController
     #[Route('/medical-records/new', name: 'medical_records_new_post', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('medical_record.create');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
@@ -164,7 +162,7 @@ class MedicalRecordController
     #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
@@ -188,7 +186,7 @@ class MedicalRecordController
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
         $attachments = $this->attachmentService->getAttachmentsForEntity('medical_record', $id);
 
-        View::render('@modules/MedicalRecord/templates/show.html.twig', [
+        $this->render('@modules/MedicalRecord/templates/show.html.twig', [
             'record' => $record,
             'lab_orders' => $labOrders,
             'attachments' => $attachments,
@@ -198,7 +196,7 @@ class MedicalRecordController
     #[Route('/medical-records/icd-codes', name: 'medical_records_icd_codes', methods: ['GET'])]
     public function getIcdCodes(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
@@ -211,7 +209,7 @@ class MedicalRecordController
     #[Route('/medical-records/intervention-codes', name: 'medical_records_intervention_codes', methods: ['GET'])]
     public function getInterventionCodes(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('clinical.manage');
 
         $searchTerm = $_GET['search'] ?? '';
@@ -224,7 +222,7 @@ class MedicalRecordController
     #[Route('/medical-records/edit', name: 'medical_records_edit_get', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
@@ -236,7 +234,7 @@ class MedicalRecordController
 
         Gate::authorize('medical_record.edit', ['id' => $id]);
 
-        View::render('@modules/MedicalRecord/templates/edit.html.twig', [
+        $this->render('@modules/MedicalRecord/templates/edit.html.twig', [
             'record' => $record,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -247,7 +245,7 @@ class MedicalRecordController
     #[Route('/medical-records/edit', name: 'medical_records_edit_post', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
@@ -302,7 +300,7 @@ class MedicalRecordController
     #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
     public function uploadAttachment(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
@@ -341,7 +339,7 @@ class MedicalRecordController
     #[Route('/medical-records/attachments/download', name: 'medical_records_attachments_download', methods: ['GET'])]
     public function downloadAttachment(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $attachmentId = (int)($_GET['attachment_id'] ?? 0);
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
