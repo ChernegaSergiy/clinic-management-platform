@@ -65,7 +65,7 @@ class AdminController extends \App\Core\Controller\AbstractController
             'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
 
-        $availableLocales = \App\Core\Http\View::getTranslationService()->getAvailableLocales();
+        $availableLocales = $this->view->getTranslationService()->getAvailableLocales();
 
         $this->render('@modules/Admin/templates/settings.html.twig', [
             'settings' => $settings,
@@ -95,7 +95,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->settingsRepository->set('system_locale', $locale);
 
         // Clear View cache to force re-initialization with new locale
-        \App\Core\Http\View::clearCache();
+        $this->view->clearCache();
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
         header('Location: /admin/settings');
