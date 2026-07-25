@@ -214,46 +214,6 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $this->count([]);
     }
 
-    public function ensureDefaultAdminExists(): void
-    {
-        if ($this->countUsers() > 0) {
-            return;
-        }
-
-        $email = getenv('ADMIN_EMAIL') ?: 'admin@clinic.ua';
-        $password = getenv('ADMIN_PASSWORD') ?: 'password';
-        $firstName = getenv('ADMIN_FIRST_NAME') ?: 'Адмін';
-        $lastName = getenv('ADMIN_LAST_NAME') ?: 'Адміненко';
-
-        $user = new User();
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
-        $user->setEmail($email);
-        $user->setUsername('admin');
-        $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
-
-        $roleQb = $this->getEntityManager()->createQueryBuilder();
-        $roleQb->select('r')
-               ->from(\App\Entity\Role::class, 'r')
-               ->where('r.name = :name')
-               ->setParameter('name', 'admin')
-               ->setMaxResults(1);
-               
-        $role = $roleQb->getQuery()->getOneOrNullResult();
-
-        if (!$role) {
-            $role = new \App\Entity\Role();
-            $role->setName('admin');
-            $role->setDescription('Administrator');
-            $this->getEntityManager()->persist($role);
-        }
-
-        $user->setRole($role);
-
-        $this->getEntityManager()->persist($user);
-        $this->getEntityManager()->flush();
-    }
-
     public function updateProfilePhotoPath(int $userId, ?string $path): bool
     {
         /** @var User|null $user */

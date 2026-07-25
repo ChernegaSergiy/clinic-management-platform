@@ -13,6 +13,5 @@ interface UserRepositoryInterface
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;
     public function countUsers(): int;
-    public function ensureDefaultAdminExists(): void;
     public function updateProfilePhotoPath(int $userId, ?string $path): bool;
 }
