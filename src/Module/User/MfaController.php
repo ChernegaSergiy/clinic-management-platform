@@ -2,14 +2,12 @@
 
 namespace App\Module\User;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\MfaGuard;
-use App\Core\Http\View;
 use App\Core\Repository\SettingsRepository;
 use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 
-class MfaController
+class MfaController extends \App\Core\Controller\AbstractController
 {
     private MfaService $mfaService;
     private UserRepositoryInterface $userRepository;
@@ -63,7 +61,7 @@ class MfaController
         }
 
         if (isset($_SESSION['user'])) {
-            AuthGuard::check();
+            $this->checkAuth();
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
@@ -103,7 +101,7 @@ class MfaController
             $qrCode = '';
             $this->prepareHotpSetup($userId, $secret, $backupCodes, $counter, $qrCode);
 
-            View::render('@modules/User/templates/hotp_setup.html.twig', [
+            $this->render('@modules/User/templates/hotp_setup.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -118,7 +116,7 @@ class MfaController
             $this->prepareTotpSetup($userId, $secret, $backupCodes, $qrCode);
             $_SESSION['mfa_setup_is_reset'] = $isReset;
 
-            View::render('@modules/User/templates/mfa_setup.html.twig', [
+            $this->render('@modules/User/templates/mfa_setup.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -145,7 +143,7 @@ class MfaController
             exit();
         }
 
-        View::render('@modules/User/templates/mfa_required_choice.html.twig', [
+        $this->render('@modules/User/templates/mfa_required_choice.html.twig', [
             'user' => $user,
         ]);
     }
@@ -186,7 +184,7 @@ class MfaController
                 $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
             }
 
-            View::render('@modules/User/templates/hotp_required.html.twig', [
+            $this->render('@modules/User/templates/hotp_required.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -205,7 +203,7 @@ class MfaController
                 $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
             }
 
-            View::render('@modules/User/templates/totp_required.html.twig', [
+            $this->render('@modules/User/templates/totp_required.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -221,7 +219,7 @@ class MfaController
         }
 
         if (isset($_SESSION['user'])) {
-            AuthGuard::check();
+            $this->checkAuth();
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
@@ -471,7 +469,7 @@ class MfaController
 
     public function disableMfa(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $userId = $_SESSION['user']['id'];
         $password = $_POST['password'] ?? '';
@@ -513,7 +511,7 @@ class MfaController
 
         $mfaType = $_SESSION['mfa_type'] ?? $this->mfaService->getUserMfaStatus($userId)['type'] ?? 'totp';
 
-        View::render('@modules/User/templates/mfa_verify.html.twig', [
+        $this->render('@modules/User/templates/mfa_verify.html.twig', [
             'user' => $user,
             'errorMessage' => $errorMessage,
             'mfaType' => $mfaType,
@@ -567,7 +565,7 @@ class MfaController
 
     public function regenerateBackupCodes(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $userId = $_SESSION['user']['id'];
         $password = $_POST['password'] ?? '';
