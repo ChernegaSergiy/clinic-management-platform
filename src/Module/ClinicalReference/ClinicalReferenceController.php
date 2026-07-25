@@ -16,10 +16,12 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     private IcdCodeRepository $icdCodeRepository;
     private InterventionCodeRepository $interventionCodeRepository;
 
-    public function __construct()
-    {
-        $this->icdCodeRepository = new IcdCodeRepository();
-        $this->interventionCodeRepository = new InterventionCodeRepository();
+    public function __construct(
+        IcdCodeRepository $icdCodeRepository,
+        InterventionCodeRepository $interventionCodeRepository
+    ) {
+        $this->icdCodeRepository = $icdCodeRepository;
+        $this->interventionCodeRepository = $interventionCodeRepository;
     }
 
     #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_form', methods: ['GET'])]
