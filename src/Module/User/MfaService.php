@@ -2,20 +2,19 @@
 
 namespace App\Module\User;
 
-use App\Database\Database;
+use Doctrine\Persistence\ManagerRegistry;
 use OTPHP\TOTP;
 use OTPHP\HOTP;
 use App\Core\Service\QrCodeGenerator;
-use PDO;
 
 class MfaService
 {
-    private PDO $db;
+    private ManagerRegistry $registry;
     private QrCodeGenerator $qrCodeGenerator;
     private string $issuerName;
-    public function __construct(PDO $db, QrCodeGenerator $qrCodeGenerator, string $issuerName = 'Clinic')
+    public function __construct(ManagerRegistry $registry, QrCodeGenerator $qrCodeGenerator, string $issuerName = 'Clinic')
     {
-        $this->db = $db;
+        $this->registry = $registry;
         $this->qrCodeGenerator = $qrCodeGenerator;
         $this->issuerName = $issuerName;
     }
@@ -108,7 +107,8 @@ class MfaService
     {
         $mfaType = in_array($mfaType, ['totp', 'hotp', 'sms', 'email'], true) ? $mfaType : 'totp';
 
-        $stmt = $this->db->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             UPDATE users
             SET mfa_enabled = 1,
                 mfa_type = :mfa_type,
@@ -118,19 +118,20 @@ class MfaService
                 mfa_pending = 0,
                 updated_at = NOW()
             WHERE id = :id
-        ");
+        ";
 
-        return $stmt->execute([
+        return $conn->executeStatement($sql, [
             'id' => $userId,
             'mfa_type' => $mfaType,
             'secret' => $secret,
             'backup_codes' => json_encode($backupCodes),
-        ]);
+        ]) > 0;
     }
 
     public function enableHotpForUser(int $userId, string $secret, array $backupCodes, int $counter = 0): bool
     {
-        $stmt = $this->db->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             UPDATE users
             SET mfa_enabled = 1,
                 mfa_type = 'hotp',
@@ -142,20 +143,21 @@ class MfaService
                 mfa_pending = 0,
                 updated_at = NOW()
             WHERE id = :id
-        ");
+        ";
 
-        return $stmt->execute([
+        return $conn->executeStatement($sql, [
             'id' => $userId,
             'secret' => $secret,
             'backup_codes' => json_encode($backupCodes),
             'counter' => $counter,
             'last_counter' => $counter > 0 ? $counter - 1 : 0,
-        ]);
+        ]) > 0;
     }
 
     public function disableMfaForUser(int $userId): bool
     {
-        $stmt = $this->db->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             UPDATE users
             SET mfa_enabled = 0,
                 mfa_type = 'totp',
@@ -166,16 +168,16 @@ class MfaService
                 mfa_pending = 0,
                 updated_at = NOW()
             WHERE id = :id
-        ");
+        ";
 
-        return $stmt->execute(['id' => $userId]);
+        return $conn->executeStatement($sql, ['id' => $userId]) > 0;
     }
 
     public function verifyUserMfa(int $userId, string $code): bool
     {
-        $stmt = $this->db->prepare("SELECT mfa_secret, mfa_type, mfa_counter, mfa_last_counter, mfa_backup_codes FROM users WHERE id = :id");
-        $stmt->execute(['id' => $userId]);
-        $user = $stmt->fetch();
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT mfa_secret, mfa_type, mfa_counter, mfa_last_counter, mfa_backup_codes FROM users WHERE id = :id";
+        $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
         if (!$user || empty($user['mfa_secret'])) {
             return false;
@@ -210,15 +212,16 @@ class MfaService
 
     private function updateHotpCounter(int $userId, int $counter): void
     {
-        $stmt = $this->db->prepare("UPDATE users SET mfa_counter = :next_counter, mfa_last_counter = :last_counter WHERE id = :id");
-        $stmt->execute(['id' => $userId, 'next_counter' => $counter + 1, 'last_counter' => $counter]);
+        $conn = $this->registry->getConnection();
+        $sql = "UPDATE users SET mfa_counter = :next_counter, mfa_last_counter = :last_counter WHERE id = :id";
+        $conn->executeStatement($sql, ['id' => $userId, 'next_counter' => $counter + 1, 'last_counter' => $counter]);
     }
 
     private function removeUsedBackupCode(int $userId, string $code): void
     {
-        $stmt = $this->db->prepare("SELECT mfa_backup_codes FROM users WHERE id = :id");
-        $stmt->execute(['id' => $userId]);
-        $user = $stmt->fetch();
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT mfa_backup_codes FROM users WHERE id = :id";
+        $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
         if (!$user) {
             return;
@@ -227,42 +230,43 @@ class MfaService
         $backupCodes = json_decode($user['mfa_backup_codes'] ?? '[]', true);
         $backupCodes = array_filter($backupCodes, fn($c) => strtoupper($c) !== strtoupper($code));
 
-        $stmt = $this->db->prepare("UPDATE users SET mfa_backup_codes = :codes WHERE id = :id");
-        $stmt->execute(['id' => $userId, 'codes' => json_encode(array_values($backupCodes))]);
+        $sql = "UPDATE users SET mfa_backup_codes = :codes WHERE id = :id";
+        $conn->executeStatement($sql, ['id' => $userId, 'codes' => json_encode(array_values($backupCodes))]);
     }
 
     public function isMfaEnabled(int $userId): bool
     {
-        $stmt = $this->db->prepare("SELECT mfa_enabled FROM users WHERE id = :id");
-        $stmt->execute(['id' => $userId]);
-        $user = $stmt->fetch();
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT mfa_enabled FROM users WHERE id = :id";
+        $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
         return $user && $user['mfa_enabled'] == 1;
     }
 
     public function isMfaPending(int $userId): bool
     {
-        $stmt = $this->db->prepare("SELECT mfa_pending FROM users WHERE id = :id");
-        $stmt->execute(['id' => $userId]);
-        $user = $stmt->fetch();
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT mfa_pending FROM users WHERE id = :id";
+        $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
         return $user && $user['mfa_pending'] == 1;
     }
 
     public function setMfaPending(int $userId, bool $pending): bool
     {
-        $stmt = $this->db->prepare("UPDATE users SET mfa_pending = :pending WHERE id = :id");
-        return $stmt->execute(['id' => $userId, 'pending' => $pending ? 1 : 0]);
+        $conn = $this->registry->getConnection();
+        $sql = "UPDATE users SET mfa_pending = :pending WHERE id = :id";
+        return $conn->executeStatement($sql, ['id' => $userId, 'pending' => $pending ? 1 : 0]) > 0;
     }
 
     public function getUserMfaStatus(int $userId): array
     {
-        $stmt = $this->db->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             SELECT mfa_enabled, mfa_type, mfa_verified_at, mfa_pending
             FROM users WHERE id = :id
-        ");
-        $stmt->execute(['id' => $userId]);
-        $user = $stmt->fetch();
+        ";
+        $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
         return [
             'enabled' => (bool)($user['mfa_enabled'] ?? false),
