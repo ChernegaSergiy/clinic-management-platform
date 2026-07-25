@@ -2,9 +2,7 @@
 
 namespace App\Module\User;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Event\EventDispatcherService;
-use App\Core\Http\View;
 use App\Database\Database;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
@@ -14,7 +12,7 @@ use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\OAuthController;
 use App\Core\Validation\Validator;
 
-class AuthController
+class AuthController extends \App\Core\Controller\AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private AuthConfigRepository $authConfigRepository;
@@ -49,7 +47,7 @@ class AuthController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/User/templates/login.html.twig', [
+        $this->render('@modules/User/templates/login.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'authConfigs' => $this->authConfigRepository->findActive(),
@@ -168,7 +166,7 @@ class AuthController
 
     public function dashboard(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         header('Location: /dashboard');
         exit();
     }
