@@ -232,8 +232,22 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->setUsername('admin');
         $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
 
-        // Assuming Role ID 1 is Admin
-        $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, 1);
+        $roleQb = $this->getEntityManager()->createQueryBuilder();
+        $roleQb->select('r')
+               ->from(\App\Entity\Role::class, 'r')
+               ->where('r.name = :name')
+               ->setParameter('name', 'admin')
+               ->setMaxResults(1);
+               
+        $role = $roleQb->getQuery()->getOneOrNullResult();
+
+        if (!$role) {
+            $role = new \App\Entity\Role();
+            $role->setName('admin');
+            $role->setDescription('Administrator');
+            $this->getEntityManager()->persist($role);
+        }
+
         $user->setRole($role);
 
         $this->getEntityManager()->persist($user);
