@@ -1,16 +1,13 @@
 <?php
 
 namespace App\Module\User;
-
-use App\Core\Auth\AuthGuard;
-use App\Core\Http\View;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 
-class UserController
+class UserController extends \App\Core\Controller\AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private AuthConfigRepository $authConfigRepository;
@@ -34,7 +31,7 @@ class UserController
 
     public function profile(): void
     {
-        AuthGuard::check(); // Ensure user is logged in
+        $this->checkAuth(); // Ensure user is logged in
 
         $user = $this->userRepository->findById($_SESSION['user']['id']);
 
@@ -54,7 +51,7 @@ class UserController
 
         $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
-        View::render('@modules/User/templates/profile.html.twig', [
+        $this->render('@modules/User/templates/profile.html.twig', [
             'user' => $user,
             'employee' => $employee,
             'successMessage' => $successMessage,
@@ -66,7 +63,7 @@ class UserController
 
     public function unlinkProvider(string $provider): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $userId = $_SESSION['user']['id'];
         $this->userOAuthIdentityRepository->deleteByUserIdAndProvider($userId, $provider);
@@ -78,7 +75,7 @@ class UserController
 
     public function uploadPhoto(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $userId = $_SESSION['user']['id'];
         $uploadDir = __DIR__ . '/../../../public/uploads/avatars/';
