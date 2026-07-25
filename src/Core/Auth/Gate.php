@@ -2,43 +2,47 @@
 
 namespace App\Core\Auth;
 
-use App\Core\Auth\PermissionRegistry;
-use App\Core\Auth\PolicyRegistry;
 use App\Core\Exception\ExitException;
 use App\Core\Model\User;
 
 class Gate
 {
-    private static ?PermissionRegistry $permissionRegistry = null;
-    private static ?PolicyRegistry $policyRegistry = null;
+    private PermissionRegistry $permissionRegistry;
+    private PolicyRegistry $policyRegistry;
 
-    public static function getUser(): ?User
+    public function __construct(PermissionRegistry $permissionRegistry, PolicyRegistry $policyRegistry)
+    {
+        $this->permissionRegistry = $permissionRegistry;
+        $this->policyRegistry = $policyRegistry;
+    }
+
+    public function getUser(): ?User
     {
         if (!isset($_SESSION['user'])) {
             return null;
         }
-        $permissions = $_SESSION['user']['permissions'] ?? self::$permissionRegistry->getRolePermissions($_SESSION['user']['role_name']);
+        $permissions = $_SESSION['user']['permissions'] ?? $this->permissionRegistry->getRolePermissions($_SESSION['user']['role_name']);
         return new User($_SESSION['user'], $permissions);
     }
 
-    public static function authorize(string $ability, $context = []): void
+    public function authorize(string $ability, $context = []): void
     {
-        $user = self::getUser();
+        $user = $this->getUser();
 
         if (!$user) {
             throw new ExitException("Доступ заборонено (не автентифіковано)", 403);
         }
 
-        if (self::allows($ability, $context)) {
+        if ($this->allows($ability, $context)) {
             return;
         }
 
         throw new ExitException("Доступ заборонено", 403);
     }
 
-    public static function allows(string $ability, $context = []): bool
+    public function allows(string $ability, $context = []): bool
     {
-        $user = self::getUser();
+        $user = $this->getUser();
 
         if (!$user) {
             return false;
@@ -54,7 +58,7 @@ class Gate
             $resourceKey = $parts[0];
             $verb = $parts[1];
 
-            if ($policy = self::$policyRegistry->get($resourceKey)) {
+            if ($policy = $this->policyRegistry->get($resourceKey)) {
                 if (method_exists($policy, $verb)) {
                     return $policy->$verb($user, $context);
                 }
@@ -66,15 +70,5 @@ class Gate
         }
 
         return false;
-    }
-
-    public static function setPermissionRegistry(PermissionRegistry $registry): void
-    {
-        self::$permissionRegistry = $registry;
-    }
-
-    public static function setPolicyRegistry(PolicyRegistry $registry): void
-    {
-        self::$policyRegistry = $registry;
     }
 }
