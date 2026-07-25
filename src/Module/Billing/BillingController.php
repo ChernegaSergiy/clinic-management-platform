@@ -34,6 +34,7 @@ class BillingController
     private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
     private ClaimRepository $claimRepository;
+    private \App\Core\Validation\Validator $validator;
 
     public function __construct(
         InvoiceRepository $invoiceRepository,
@@ -45,7 +46,8 @@ class BillingController
         InsuranceService $insuranceService,
         InsuranceCompanyRepository $insuranceCompanyRepository,
         PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
-        ClaimRepository $claimRepository
+        ClaimRepository $claimRepository,
+        \App\Core\Validation\Validator $validator
     ) {
         $this->invoiceRepository = $invoiceRepository;
         $this->patientRepository = $patientRepository;
@@ -57,6 +59,7 @@ class BillingController
         $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
         $this->claimRepository = $claimRepository;
         $this->insuranceService = $insuranceService;
+        $this->validator = $validator;
     }
 
     #[Route('/billing', name: 'billing_index', methods: ['GET'])]
@@ -99,7 +102,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -145,7 +148,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -218,7 +221,7 @@ class BillingController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'patient_id' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'min:0'],
@@ -302,7 +305,7 @@ class BillingController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'payment_method' => ['required'],
@@ -401,7 +404,7 @@ class BillingController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'amount' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'in:pending,paid,cancelled'],
