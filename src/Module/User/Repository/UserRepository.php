@@ -19,7 +19,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     public function findByEmail(string $email): ?array
     {
         $qb = $this->createQueryBuilder('u')
-            ->select('u', 'IDENTITY(u.role) as role_id')
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.password_hash', 'IDENTITY(u.role) as role_id', 'u.mfa_enabled', 'u.mfa_type', 'u.mfa_verified_at', 'u.mfa_pending', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
             ->where('u.email = :email')
             ->setParameter('email', $email);
 
