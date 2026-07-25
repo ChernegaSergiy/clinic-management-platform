@@ -24,6 +24,7 @@ class LabOrderController
     private NotificationService $notificationService;
     private QrCodeGenerator $qrCodeGenerator;
     private LabImportService $labImportService;
+    private Validator $validator;
 
     public function __construct(
         MedicalRecordRepositoryInterface $medicalRecordRepository,
@@ -31,7 +32,8 @@ class LabOrderController
         UserRepositoryInterface $userRepository,
         NotificationService $notificationService,
         QrCodeGenerator $qrCodeGenerator,
-        LabImportService $labImportService
+        LabImportService $labImportService,
+        Validator $validator
     ) {
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->labOrderRepository = $labOrderRepository;
@@ -39,6 +41,7 @@ class LabOrderController
         $this->notificationService = $notificationService;
         $this->qrCodeGenerator = $qrCodeGenerator;
         $this->labImportService = $labImportService;
+        $this->validator = $validator;
     }
 
     #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
@@ -83,7 +86,7 @@ class LabOrderController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'order_code' => ['required'],
         ]);
@@ -195,7 +198,7 @@ class LabOrderController
 
         Gate::authorize('lab_order.edit', ['id' => $id]);
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'order_code' => ['required'],
             'status' => ['required', 'in:ordered,in_progress,completed,cancelled'],
