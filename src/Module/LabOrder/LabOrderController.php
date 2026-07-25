@@ -13,6 +13,8 @@ use App\Module\LabOrder\Service\LabImportService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class LabOrderController extends \App\Core\Controller\AbstractController
 {
@@ -43,7 +45,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
-    public function create(): void
+    public function create(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.create');
@@ -52,9 +54,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
 
         if (!$medicalRecord) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
+            return new Response("Медичний запис не знайдено", 404);
         }
 
         $old = $_SESSION['old'] ?? [];
@@ -62,7 +62,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/LabOrder/templates/new.html.twig', [
+        return $this->render('@modules/LabOrder/templates/new.html.twig', [
             'medical_record' => $medicalRecord,
             'old' => $old,
             'errors' => $errors,
@@ -70,7 +70,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/new', name: 'lab_orders_new_post', methods: ['POST'])]
-    public function store(): void
+    public function store(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.create');
@@ -79,9 +79,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
 
         if (!$medicalRecord) {
-            http_response_code(404);
-            echo "Медичний запис не знайдено";
-            return;
+            return new Response("Медичний запис не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -92,8 +90,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /lab-orders/new?record_id=' . $recordId);
-            exit();
+            return new RedirectResponse('/lab-orders/new?record_id=' . $recordId);
         }
 
         $data = $_POST;
@@ -123,12 +120,11 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         }
 
         $_SESSION['success_message'] = "Лабораторне замовлення успішно створено.";
-        header('Location: /medical-records/show?id=' . $recordId);
-        exit();
+        return new RedirectResponse('/medical-records/show?id=' . $recordId);
     }
 
     #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
-    public function show(): void
+    public function show(): Response
     {
         $this->checkAuth();
 
@@ -136,9 +132,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $order = $this->labOrderRepository->findById($id);
 
         if (!$order) {
-            http_response_code(404);
-            echo "Лабораторне замовлення не знайдено";
-            return;
+            return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
         Gate::authorize('lab_order.view', ['id' => $id]);
@@ -146,14 +140,14 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
-        $this->render('@modules/LabOrder/templates/show.html.twig', [
+        return $this->render('@modules/LabOrder/templates/show.html.twig', [
             'order' => $order,
             'qrCodeImage' => $qrCodeImage,
         ]);
     }
 
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_get', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): Response
     {
         $this->checkAuth();
 
@@ -161,9 +155,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $order = $this->labOrderRepository->findById($id);
 
         if (!$order) {
-            http_response_code(404);
-            echo "Лабораторне замовлення не знайдено";
-            return;
+            return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
         Gate::authorize('lab_order.edit', ['id' => $id]);
@@ -173,7 +165,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/LabOrder/templates/edit.html.twig', [
+        return $this->render('@modules/LabOrder/templates/edit.html.twig', [
             'order' => $order,
             'old' => $old,
             'errors' => $errors,
@@ -181,7 +173,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_post', methods: ['POST'])]
-    public function update(): void
+    public function update(): Response
     {
         $this->checkAuth();
 
@@ -189,9 +181,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         $order = $this->labOrderRepository->findById($id);
 
         if (!$order) {
-            http_response_code(404);
-            echo "Лабораторне замовлення не знайдено";
-            return;
+            return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
         Gate::authorize('lab_order.edit', ['id' => $id]);
@@ -205,45 +195,44 @@ class LabOrderController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /lab-orders/edit?id=' . $id);
-            exit();
+            return new RedirectResponse('/lab-orders/edit?id=' . $id);
         }
 
         $this->labOrderRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Лабораторне замовлення успішно оновлено.";
-        header('Location: /lab-orders/show?id=' . $id);
-        exit();
+        return new RedirectResponse('/lab-orders/show?id=' . $id);
     }
 
-    public function import(): void
+    #[Route('/lab-orders/import', name: 'lab_orders_import', methods: ['GET'])]
+    public function import(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
-        $this->render('@modules/LabOrder/templates/import.html.twig', [
+        $response = $this->render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
         unset($_SESSION['errors'], $_SESSION['success_message']);
+        return $response;
     }
 
-    public function processImport(): void
+    #[Route('/lab-orders/import', name: 'lab_orders_import_post', methods: ['POST'])]
+    public function processImport(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
 
         $file = $_FILES['hl7_dicom_file'];
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
 
         $tempDir = dirname(__DIR__, 3) . '/uploads/temp/';
@@ -255,8 +244,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
 
         if (!move_uploaded_file($file['tmp_name'], $tempPath)) {
             $_SESSION['errors']['file'] = 'Не вдалося зберегти завантажений файл для обробки.';
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
 
         try {
@@ -265,43 +253,42 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             $_SESSION['hl7_dicom_temp_path'] = $tempPath;
             $_SESSION['success_message'] = 'Файл успішно завантажено та пройшов структурну валідацію. '
                                            . 'Будь ласка, перегляньте дані перед імпортом.';
-            header('Location: /lab-orders/import/confirm');
-            exit();
+            return new RedirectResponse('/lab-orders/import/confirm');
         } catch (\Exception $e) {
             unlink($tempPath);
             $_SESSION['errors']['file'] = 'Помилка структурної валідації: ' . $e->getMessage();
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
     }
 
-    public function confirmImport(): void
+    #[Route('/lab-orders/import/confirm', name: 'lab_orders_import_confirm', methods: ['GET'])]
+    public function confirmImport(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
 
-        $this->render('@modules/LabOrder/templates/confirm_import.html.twig', [
+        $response = $this->render('@modules/LabOrder/templates/confirm_import.html.twig', [
             'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['errors']);
+        return $response;
     }
 
-    public function finalizeImport(): void
+    #[Route('/lab-orders/import/finalize', name: 'lab_orders_import_finalize', methods: ['POST'])]
+    public function finalizeImport(): Response
     {
         $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
-            header('Location: /lab-orders/import');
-            exit();
+            return new RedirectResponse('/lab-orders/import');
         }
 
         $parsedData = $_SESSION['hl7_dicom_parsed_data'];
@@ -316,12 +303,10 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             unlink($tempPath);
 
             $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
-            header('Location: /lab-orders/show?id=' . $orderId);
-            exit();
+            return new RedirectResponse('/lab-orders/show?id=' . $orderId);
         } catch (\Exception $e) {
             $_SESSION['errors']['import'] = 'Помилка логічної валідації або імпорту: ' . $e->getMessage();
-            header('Location: /lab-orders/import/confirm');
-            exit();
+            return new RedirectResponse('/lab-orders/import/confirm');
         }
     }
 }
