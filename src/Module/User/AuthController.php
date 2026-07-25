@@ -2,7 +2,6 @@
 
 namespace App\Module\User;
 
-use App\Core\Event\EventDispatcherService;
 use App\Database\Database;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
@@ -11,6 +10,7 @@ use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\OAuthController;
 use App\Core\Validation\Validator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends \App\Core\Controller\AbstractController
@@ -22,6 +22,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     private OAuthController $oauthController;
     private \App\Core\Repository\SettingsRepository $settingsRepository;
     private Validator $validator;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -30,7 +31,8 @@ class AuthController extends \App\Core\Controller\AbstractController
         MfaService $mfaService,
         \App\Core\Repository\SettingsRepository $settingsRepository,
         OAuthController $oauthController,
-        Validator $validator
+        Validator $validator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->userRepository = $userRepository;
         $this->authConfigRepository = $authConfigRepository;
@@ -39,6 +41,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         $this->settingsRepository = $settingsRepository;
         $this->oauthController = $oauthController;
         $this->validator = $validator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
@@ -93,7 +96,7 @@ class AuthController extends \App\Core\Controller\AbstractController
                     'role_id' => $user['role_id'],
                     'role_name' => $role['name'] ?? null,
                 ];
-                EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
+                $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
                 $redirect = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
                 return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
@@ -126,7 +129,7 @@ class AuthController extends \App\Core\Controller\AbstractController
                 'role_id' => $user['role_id'],
                 'role_name' => $role['name'] ?? null,
             ];
-            EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
+            $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
             $redirect = $_SESSION['intended_url'] ?? '/dashboard';
             unset($_SESSION['intended_url']);
             return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
@@ -155,7 +158,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         $userId = $_SESSION['user']['id'] ?? null;
         $userEmail = $_SESSION['user']['email'] ?? null;
         if ($userId && $userEmail) {
-            EventDispatcherService::getDispatcher()->dispatch(new UserLoggedOutEvent($userId, $userEmail));
+            $this->eventDispatcher->dispatch(new UserLoggedOutEvent($userId, $userEmail));
         }
         session_destroy();
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/');
