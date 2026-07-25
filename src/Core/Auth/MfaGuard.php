@@ -7,66 +7,71 @@ use App\Module\User\MfaService;
 
 class MfaGuard
 {
-    public static function check(): void
+    private MfaService $mfaService;
+
+    public function __construct(MfaService $mfaService)
+    {
+        $this->mfaService = $mfaService;
+    }
+
+    public function check(): void
     {
         $step = AuthStep::current();
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
         if ($step->requiresMfaVerify()) {
             $userId = $_SESSION['mfa_pending_user_id'] ?? null;
-            $mfaService = \App\Kernel::$staticContainer->get(\App\Module\User\MfaService::class);
 
-            if ($mfaService->isMfaEnabled($userId)) {
+            if ($this->mfaService->isMfaEnabled($userId)) {
                 throw new RedirectException('/user/mfa/verify');
             } else {
-                self::clearPending();
+                $this->clearPending();
             }
         } elseif ($step->requiresMfaSetup()) {
-            if (self::isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
+            if ($this->isRequired() && !str_starts_with($requestUri, '/user/mfa/')) {
                 throw new RedirectException('/user/mfa/required');
             }
         }
     }
 
-    public static function isPending(): bool
+    public function isPending(): bool
     {
         return isset($_SESSION['mfa_pending_user_id']);
     }
 
-    public static function getPendingUserId(): ?int
+    public function getPendingUserId(): ?int
     {
         return $_SESSION['mfa_pending_user_id'] ?? null;
     }
 
-    public static function clearPending(): void
+    public function clearPending(): void
     {
         unset($_SESSION['mfa_pending_user_id']);
     }
 
-    public static function isRequired(): bool
+    public function isRequired(): bool
     {
         return isset($_SESSION['mfa_required']) && $_SESSION['mfa_required'] === true;
     }
 
-    public static function setRequired(): void
+    public function setRequired(): void
     {
         $_SESSION['mfa_required'] = true;
     }
 
-    public static function clearRequired(): void
+    public function clearRequired(): void
     {
         unset($_SESSION['mfa_required']);
     }
 
-    public static function getUserMfaType(int $userId): ?string
+    public function getUserMfaType(int $userId): ?string
     {
-        $mfaService = \App\Kernel::$staticContainer->get(\App\Module\User\MfaService::class);
-        $status = $mfaService->getUserMfaStatus($userId);
+        $status = $this->mfaService->getUserMfaStatus($userId);
         return $status['type'] ?? null;
     }
 
-    public static function isHotpEnabled(int $userId): bool
+    public function isHotpEnabled(int $userId): bool
     {
-        return self::getUserMfaType($userId) === 'hotp';
+        return $this->getUserMfaType($userId) === 'hotp';
     }
 }
