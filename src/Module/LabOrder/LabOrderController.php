@@ -3,9 +3,7 @@
 namespace App\Module\LabOrder;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
@@ -16,7 +14,7 @@ use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-class LabOrderController
+class LabOrderController extends \App\Core\Controller\AbstractController
 {
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private LabOrderRepositoryInterface $labOrderRepository;
@@ -47,7 +45,7 @@ class LabOrderController
     #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
@@ -64,7 +62,7 @@ class LabOrderController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/LabOrder/templates/new.html.twig', [
+        $this->render('@modules/LabOrder/templates/new.html.twig', [
             'medical_record' => $medicalRecord,
             'old' => $old,
             'errors' => $errors,
@@ -74,7 +72,7 @@ class LabOrderController
     #[Route('/lab-orders/new', name: 'lab_orders_new_post', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.create');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
@@ -132,7 +130,7 @@ class LabOrderController
     #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -148,7 +146,7 @@ class LabOrderController
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
-        View::render('@modules/LabOrder/templates/show.html.twig', [
+        $this->render('@modules/LabOrder/templates/show.html.twig', [
             'order' => $order,
             'qrCodeImage' => $qrCodeImage,
         ]);
@@ -157,7 +155,7 @@ class LabOrderController
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_get', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -175,7 +173,7 @@ class LabOrderController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/LabOrder/templates/edit.html.twig', [
+        $this->render('@modules/LabOrder/templates/edit.html.twig', [
             'order' => $order,
             'old' => $old,
             'errors' => $errors,
@@ -185,7 +183,7 @@ class LabOrderController
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_post', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
 
         $id = (int)($_POST['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
@@ -219,10 +217,10 @@ class LabOrderController
 
     public function import(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
-        View::render('@modules/LabOrder/templates/import.html.twig', [
+        $this->render('@modules/LabOrder/templates/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
@@ -231,7 +229,7 @@ class LabOrderController
 
     public function processImport(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_FILES['hl7_dicom_file'])) {
@@ -279,7 +277,7 @@ class LabOrderController
 
     public function confirmImport(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
@@ -288,7 +286,7 @@ class LabOrderController
             exit();
         }
 
-        View::render('@modules/LabOrder/templates/confirm_import.html.twig', [
+        $this->render('@modules/LabOrder/templates/confirm_import.html.twig', [
             'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -297,7 +295,7 @@ class LabOrderController
 
     public function finalizeImport(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('lab_order.edit.any');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
