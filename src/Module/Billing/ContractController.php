@@ -13,10 +13,14 @@ use App\Module\Billing\Repository\ContractRepository;
 class ContractController
 {
     private ContractRepository $contractRepository;
+    private \App\Core\Validation\Validator $validator;
 
-    public function __construct(ContractRepository $contractRepository)
-    {
+    public function __construct(
+        ContractRepository $contractRepository,
+        \App\Core\Validation\Validator $validator
+    ) {
         $this->contractRepository = $contractRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
@@ -46,7 +50,7 @@ class ContractController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],
@@ -148,7 +152,7 @@ class ContractController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'title' => ['required'],
             'start_date' => ['required', 'date'],
