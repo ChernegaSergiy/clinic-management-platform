@@ -74,9 +74,6 @@
         "cs": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
         "cs-check": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
         "stan": "phpstan analyse",
-        "db:migrate": "phinx migrate",
-        "db:rollback": "phinx rollback",
-        "db:create": "phinx create",
         "db:seed": "phinx seed:run"
     },
     "config": {
