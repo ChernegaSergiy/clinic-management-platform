@@ -2,28 +2,27 @@
 
 namespace App\Core\Repository;
 
-use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Settings;
+use Doctrine\ORM\EntityManagerInterface;
 
 class SettingsRepository
 {
-    private ManagerRegistry $registry;
+    private EntityManagerInterface $em;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(EntityManagerInterface $em)
     {
-        $this->registry = $registry;
+        $this->em = $em;
     }
 
     public function get(string $key, mixed $default = null): mixed
     {
-        $conn = $this->registry->getConnection();
-        $sql = "SELECT value FROM settings WHERE `key` = :key";
-        $result = $conn->fetchAssociative($sql, ['key' => $key]);
+        $setting = $this->em->find(Settings::class, $key);
 
-        if ($result === false) {
+        if ($setting === null) {
             return $default;
         }
 
-        $value = $result['value'];
+        $value = $setting->getValue();
 
         if ($value === null || $value === '') {
             return $default;
@@ -34,26 +33,34 @@ class SettingsRepository
 
     public function set(string $key, mixed $value): bool
     {
-        $conn = $this->registry->getConnection();
-        $sql = "
-            INSERT INTO settings (`key`, value, updated_at)
-            VALUES (:key, :value, NOW())
-            ON DUPLICATE KEY UPDATE value = :value2, updated_at = NOW()
-        ";
+        $setting = $this->em->find(Settings::class, $key);
+
+        if ($setting === null) {
+            $setting = new Settings();
+            $setting->setKey($key);
+            $setting->setCreatedAt(new \DateTimeImmutable());
+            $this->em->persist($setting);
+        }
 
         $val = is_array($value) || is_object($value) ? json_encode($value) : $value;
-        return $conn->executeStatement($sql, [
-            'key' => $key,
-            'value' => $val,
-            'value2' => $val,
-        ]) > 0;
+        $setting->setValue($val);
+        $setting->setUpdatedAt(new \DateTimeImmutable());
+
+        $this->em->flush();
+        return true;
     }
 
     public function delete(string $key): bool
     {
-        $conn = $this->registry->getConnection();
-        $sql = "DELETE FROM settings WHERE `key` = :key";
-        return $conn->executeStatement($sql, ['key' => $key]) > 0;
+        $setting = $this->em->find(Settings::class, $key);
+
+        if ($setting === null) {
+            return false;
+        }
+
+        $this->em->remove($setting);
+        $this->em->flush();
+        return true;
     }
 
     public function getMfaPolicy(): string
