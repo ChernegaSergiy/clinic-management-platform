@@ -3,9 +3,7 @@
 namespace App\Module\Appointment;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Service\NotificationService;
 use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
@@ -18,7 +16,7 @@ use App\Module\Schedule\Service\SchedulingService;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AppointmentController
+class AppointmentController extends \App\Core\Controller\AbstractController
 {
     private AppointmentRepositoryInterface $appointmentRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -58,7 +56,7 @@ class AppointmentController
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $user = Gate::getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -86,7 +84,7 @@ class AppointmentController
             }
         }
 
-        View::render('@modules/Appointment/templates/index.html.twig', [
+        $this->render('@modules/Appointment/templates/index.html.twig', [
             'doctors' => $calendarDoctors,
             'waitlist' => $waitlist,
             'appointments' => $appointments,
@@ -113,7 +111,7 @@ class AppointmentController
             }
         }
 
-        View::render('@modules/Appointment/templates/public/book.html.twig', [
+        $this->render('@modules/Appointment/templates/public/book.html.twig', [
             'doctors' => $doctors,
             'services' => $services,
             'availableSlots' => $availableSlots,
@@ -213,7 +211,7 @@ class AppointmentController
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
     public function rejectWaitlist(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
@@ -230,7 +228,7 @@ class AppointmentController
     #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.create');
 
         $user = Gate::getUser();
@@ -307,7 +305,7 @@ class AppointmentController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        View::render('@modules/Appointment/templates/new.html.twig', [
+        $this->render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
@@ -322,7 +320,7 @@ class AppointmentController
     #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.create');
 
         $user = Gate::getUser();
@@ -414,7 +412,7 @@ class AppointmentController
                 $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
             }
 
-            View::render('@modules/Appointment/templates/new.html.twig', [
+            $this->render('@modules/Appointment/templates/new.html.twig', [
                 'errors' => $errors,
                 'old' => $rawInput,
                 'patients' => $patientOptions,
@@ -475,7 +473,7 @@ class AppointmentController
     #[Route('/appointments/json', name: 'appointment_json', methods: ['GET'])]
     public function json(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $user = Gate::getUser();
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
@@ -535,7 +533,7 @@ class AppointmentController
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('appointment.view', ['id' => $id]);
 
@@ -547,13 +545,13 @@ class AppointmentController
             return;
         }
 
-        View::render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
+        $this->render('@modules/Appointment/templates/show.html.twig', ['appointment' => $appointment]);
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('appointment.edit', ['id' => $id]);
 
@@ -594,7 +592,7 @@ class AppointmentController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        View::render('@modules/Appointment/templates/edit.html.twig', [
+        $this->render('@modules/Appointment/templates/edit.html.twig', [
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -605,7 +603,7 @@ class AppointmentController
     #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
         Gate::authorize('appointment.edit', ['id' => $id]);
 
@@ -705,7 +703,7 @@ class AppointmentController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            View::render('@modules/Appointment/templates/edit.html.twig', [
+            $this->render('@modules/Appointment/templates/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -727,7 +725,7 @@ class AppointmentController
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
     public function cancel(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
         Gate::authorize('appointment.cancel', ['id' => $id]);
 
@@ -767,7 +765,7 @@ class AppointmentController
     #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
     public function showWaitlist(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.view.any');
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
@@ -784,7 +782,7 @@ class AppointmentController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        View::render('@modules/Appointment/templates/waitlist.html.twig', [
+        $this->render('@modules/Appointment/templates/waitlist.html.twig', [
             'waitlistEntries' => $waitlistEntries,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -794,7 +792,7 @@ class AppointmentController
     #[Route('/appointments/waitlist/add', name: 'appointment_add_waitlist', methods: ['POST'])]
     public function addPatientToWaitlist(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.create');
 
         $validator = $this->validator;
@@ -817,7 +815,7 @@ class AppointmentController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            View::render('@modules/Appointment/templates/waitlist.html.twig', [
+            $this->render('@modules/Appointment/templates/waitlist.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'waitlistEntries' => $waitlistEntries,
@@ -834,13 +832,13 @@ class AppointmentController
 
     public function showLoadAnalytics(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.view.any');
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
 
-        View::render('@modules/Appointment/templates/load_analytics.html.twig', [
+        $this->render('@modules/Appointment/templates/load_analytics.html.twig', [
             'date' => $date,
             'doctorLoad' => $doctorLoad,
         ]);
@@ -883,7 +881,7 @@ class AppointmentController
 
     public function fulfillWaitlist(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.create');
         $id = (int)($_GET['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
@@ -924,7 +922,7 @@ class AppointmentController
             'waitlist_id' => $id,
         ];
 
-        View::render('@modules/Appointment/templates/new.html.twig', [
+        $this->render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
@@ -938,7 +936,7 @@ class AppointmentController
 
     public function cancelWaitlist(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('appointment.edit.any');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
