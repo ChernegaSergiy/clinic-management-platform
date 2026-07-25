@@ -40,21 +40,21 @@ class AuthController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    public function showLoginForm(): void
+    public function showLoginForm(): \Symfony\Component\HttpFoundation\Response
     {
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/User/templates/login.html.twig', [
+        return $this->render('@modules/User/templates/login.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'authConfigs' => $this->authConfigRepository->findActive(),
         ]);
     }
 
-    public function login(): void
+    public function login(): \Symfony\Component\HttpFoundation\Response
     {
         // Ensure at least one admin exists (useful for fresh installs without seeding)
         $this->userRepository->ensureDefaultAdminExists();
@@ -68,8 +68,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $email = $_POST['email'];
@@ -95,8 +94,7 @@ class AuthController extends \App\Core\Controller\AbstractController
                 EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
                 $redirect = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
-                header('Location: ' . $redirect);
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
             }
 
             $roleRequiresMfa = in_array((int)$user['role_id'], $mfaForceRoles, true);
@@ -107,8 +105,7 @@ class AuthController extends \App\Core\Controller\AbstractController
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
                 $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
-                header('Location: /user/mfa/required');
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
             }
 
             if ($mfaService->isMfaEnabled($user['id'])) {
@@ -116,8 +113,7 @@ class AuthController extends \App\Core\Controller\AbstractController
                 $_SESSION['mfa_type'] = $mfaService->getUserMfaStatus($user['id'])['type'];
                 $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
                 unset($_SESSION['intended_url']);
-                header('Location: /user/mfa/verify');
-                exit();
+                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/verify');
             }
 
             $_SESSION['user'] = [
@@ -131,13 +127,11 @@ class AuthController extends \App\Core\Controller\AbstractController
             EventDispatcherService::getDispatcher()->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
             $redirect = $_SESSION['intended_url'] ?? '/dashboard';
             unset($_SESSION['intended_url']);
-            header('Location: ' . $redirect);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
         } else {
             $_SESSION['errors'] = ['login' => 'Невірний email або пароль.'];
             $_SESSION['old'] = $_POST;
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
     }
 
@@ -147,12 +141,12 @@ class AuthController extends \App\Core\Controller\AbstractController
      * @param string $provider
      * @return void
      */
-    public function redirectToProvider(string $provider): void
+    public function redirectToProvider(string $provider): \Symfony\Component\HttpFoundation\Response
     {
-        $this->oauthController->redirect($provider);
+        return $this->oauthController->redirect($provider);
     }
 
-    public function logout(): void
+    public function logout(): \Symfony\Component\HttpFoundation\Response
     {
         $userId = $_SESSION['user']['id'] ?? null;
         $userEmail = $_SESSION['user']['email'] ?? null;
@@ -160,14 +154,12 @@ class AuthController extends \App\Core\Controller\AbstractController
             EventDispatcherService::getDispatcher()->dispatch(new UserLoggedOutEvent($userId, $userEmail));
         }
         session_destroy();
-        header('Location: /');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/');
     }
 
-    public function dashboard(): void
+    public function dashboard(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
-        header('Location: /dashboard');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/dashboard');
     }
 }
