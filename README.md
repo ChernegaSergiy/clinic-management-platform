@@ -25,8 +25,8 @@ The platform provides a comprehensive suite of tools for healthcare providers, c
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/clinic-management-platform.git
-   cd clinic-management-platform/www
+   git clone https://github.com/medcore-ua/medcore.git
+   cd medcore
    ```
 
 2. **Install dependencies:**
