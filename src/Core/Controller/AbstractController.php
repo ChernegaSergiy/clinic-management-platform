@@ -3,22 +3,25 @@
 namespace App\Core\Controller;
 
 use App\Core\Auth\AuthGuard;
+use App\Core\Auth\Gate;
 use App\Core\Http\View;
 
 abstract class AbstractController
 {
     protected AuthGuard $authGuard;
     protected View $view;
+    protected Gate $gate;
 
     /**
      * Set dependencies required by the base controller.
      * This avoids forcing child classes to call parent::__construct with all dependencies.
      */
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setBaseDependencies(AuthGuard $authGuard, View $view): void
+    public function setBaseDependencies(AuthGuard $authGuard, View $view, Gate $gate): void
     {
         $this->authGuard = $authGuard;
         $this->view = $view;
+        $this->gate = $gate;
     }
 
     protected function render(string $template, array $data = []): \Symfony\Component\HttpFoundation\Response
