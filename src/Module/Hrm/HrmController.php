@@ -3,16 +3,14 @@
 namespace App\Module\Hrm;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Core\Validation\Validator;
 
-class HrmController
+class HrmController extends \App\Core\Controller\AbstractController
 {
     private HrmRepositoryInterface $hrmRepository;
     private UserRepositoryInterface $userRepository;
@@ -34,12 +32,12 @@ class HrmController
     #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('hrm.read');
 
         $employees = $this->hrmRepository->findAll();
 
-        View::render('@modules/Hrm/templates/index.html.twig', [
+        $this->render('@modules/Hrm/templates/index.html.twig', [
             'employees' => $employees,
         ]);
     }
@@ -47,13 +45,13 @@ class HrmController
     #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('hrm.write');
 
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        View::render('@modules/Hrm/templates/new.html.twig', [
+        $this->render('@modules/Hrm/templates/new.html.twig', [
             'users' => $users,
             'departments' => $departments,
         ]);
@@ -62,7 +60,7 @@ class HrmController
     #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('hrm.write');
 
         $validator = $this->validator;
@@ -76,7 +74,7 @@ class HrmController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            View::render('@modules/Hrm/templates/new.html.twig', [
+            $this->render('@modules/Hrm/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'users' => $users,
@@ -97,7 +95,7 @@ class HrmController
     #[Route('/hrm/show', name: 'hrm_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('hrm.read');
 
@@ -109,7 +107,7 @@ class HrmController
             return;
         }
 
-        View::render('@modules/Hrm/templates/show.html.twig', [
+        $this->render('@modules/Hrm/templates/show.html.twig', [
             'employee' => $employee,
         ]);
     }
@@ -117,7 +115,7 @@ class HrmController
     #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('hrm.write');
 
@@ -132,7 +130,7 @@ class HrmController
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        View::render('@modules/Hrm/templates/edit.html.twig', [
+        $this->render('@modules/Hrm/templates/edit.html.twig', [
             'employee' => $employee,
             'users' => $users,
             'departments' => $departments,
@@ -142,7 +140,7 @@ class HrmController
     #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
         Gate::authorize('hrm.write');
 
@@ -165,7 +163,7 @@ class HrmController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            View::render('@modules/Hrm/templates/edit.html.twig', [
+            $this->render('@modules/Hrm/templates/edit.html.twig', [
                     'errors' => $validator->getErrors(),
                     'employee' => array_merge($employee, $_POST),
                     'users' => $users,
@@ -186,7 +184,7 @@ class HrmController
     #[Route('/hrm/toggle-status', name: 'hrm_toggle_status', methods: ['POST'])]
     public function toggleStatus(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('hrm.manage');
 
         $id = (int)($_POST['id'] ?? 0);
