@@ -59,8 +59,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     #[Route('/login', name: 'login_post', methods: ['POST'])]
     public function login(): \Symfony\Component\HttpFoundation\Response
     {
-        // Ensure at least one admin exists (useful for fresh installs without seeding)
-        $this->userRepository->ensureDefaultAdminExists();
+        // Admin creation should be done via CLI commands or fixtures in Symfony
 
         $validator = $this->validator;
         $validator->validate($_POST, [
