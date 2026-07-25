@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Module\Insurance;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use Symfony\Component\Routing\Attribute\Route;
 
-class InsuranceController
+class InsuranceController extends \App\Core\Controller\AbstractController
 {
     private InsuranceService $insuranceService;
     private Validator $validator;
@@ -27,12 +25,12 @@ class InsuranceController
     #[Route('/insurance/companies', name: 'insurance_companies_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage'); // Reuse billing permission for now
 
         $companies = $this->insuranceService->getAllInsuranceCompanies();
 
-        View::render('@modules/Insurance/templates/companies/index.html.twig', [
+        $this->render('@modules/Insurance/templates/companies/index.html.twig', [
             'companies' => $companies,
         ]);
     }
@@ -40,7 +38,7 @@ class InsuranceController
     #[Route('/insurance/companies/show', name: 'insurance_companies_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.read'); // Reusing billing read permission
 
         $id = (int)($_GET['id'] ?? 0);
@@ -48,11 +46,11 @@ class InsuranceController
 
         if (!$company) {
             http_response_code(404);
-            View::render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.']);
+            $this->render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.']);
             return;
         }
 
-        View::render('@modules/Insurance/templates/companies/show.html.twig', [
+        $this->render('@modules/Insurance/templates/companies/show.html.twig', [
             'company' => $company,
         ]);
     }
@@ -60,10 +58,10 @@ class InsuranceController
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_get', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
-        View::render('@modules/Insurance/templates/companies/new.html.twig', [
+        $this->render('@modules/Insurance/templates/companies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -73,7 +71,7 @@ class InsuranceController
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_post', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $validator = $this->validator;
@@ -103,7 +101,7 @@ class InsuranceController
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_get', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -115,7 +113,7 @@ class InsuranceController
             return;
         }
 
-        View::render('@modules/Insurance/templates/companies/edit.html.twig', [
+        $this->render('@modules/Insurance/templates/companies/edit.html.twig', [
             'company' => $company,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -125,7 +123,7 @@ class InsuranceController
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_post', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -165,7 +163,7 @@ class InsuranceController
     #[Route('/insurance/companies/delete', name: 'insurance_companies_delete', methods: ['POST'])]
     public function delete(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_POST['id'] ?? 0);
@@ -178,12 +176,12 @@ class InsuranceController
     #[Route('/insurance/claims', name: 'insurance_claims_index', methods: ['GET'])]
     public function listClaims(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.read'); // Reuse billing permission
 
         $claims = $this->insuranceService->getAllClaims();
 
-        View::render('@modules/Insurance/templates/claims/index.html.twig', [
+        $this->render('@modules/Insurance/templates/claims/index.html.twig', [
             'claims' => $claims,
         ]);
     }
@@ -191,7 +189,7 @@ class InsuranceController
     #[Route('/insurance/claims/show', name: 'insurance_claims_show', methods: ['GET'])]
     public function showClaim(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.read');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -203,7 +201,7 @@ class InsuranceController
             return;
         }
 
-        View::render('@modules/Insurance/templates/claims/show.html.twig', [
+        $this->render('@modules/Insurance/templates/claims/show.html.twig', [
             'claim' => $claim,
         ]);
     }
@@ -211,7 +209,7 @@ class InsuranceController
     #[Route('/insurance/claims/update-status', name: 'insurance_claims_update_status', methods: ['POST'])]
     public function updateClaimStatus(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('billing.manage');
 
         $id = (int)($_POST['id'] ?? 0);
