@@ -12,6 +12,7 @@ use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\OAuthController;
+use App\Core\Validation\Validator;
 
 class AuthController
 {
@@ -21,6 +22,7 @@ class AuthController
     private MfaService $mfaService;
     private OAuthController $oauthController;
     private \App\Core\Repository\SettingsRepository $settingsRepository;
+    private Validator $validator;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -28,7 +30,8 @@ class AuthController
         RoleRepositoryInterface $roleRepository,
         MfaService $mfaService,
         \App\Core\Repository\SettingsRepository $settingsRepository,
-        OAuthController $oauthController
+        OAuthController $oauthController,
+        Validator $validator
     ) {
         $this->userRepository = $userRepository;
         $this->authConfigRepository = $authConfigRepository;
@@ -36,6 +39,7 @@ class AuthController
         $this->mfaService = $mfaService;
         $this->settingsRepository = $settingsRepository;
         $this->oauthController = $oauthController;
+        $this->validator = $validator;
     }
 
     public function showLoginForm(): void
@@ -57,7 +61,7 @@ class AuthController
         // Ensure at least one admin exists (useful for fresh installs without seeding)
         $this->userRepository->ensureDefaultAdminExists();
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'email' => ['required', 'email'],
             'password' => ['required'],
