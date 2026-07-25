@@ -6,6 +6,7 @@ use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends \App\Core\Controller\AbstractController
 {
@@ -29,7 +30,8 @@ class UserController extends \App\Core\Controller\AbstractController
         $this->settingsRepository = $settingsRepository;
     }
 
-    public function profile(): void
+    #[Route('/user/profile', name: 'user_profile', methods: ['GET'])]
+    public function profile(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth(); // Ensure user is logged in
 
@@ -38,8 +40,7 @@ class UserController extends \App\Core\Controller\AbstractController
         if (!$user) {
             // This should not happen if user is logged in
             session_destroy();
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $employee = $this->hrmRepository->findByUserId($user['id']);
@@ -51,7 +52,7 @@ class UserController extends \App\Core\Controller\AbstractController
 
         $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
-        $this->render('@modules/User/templates/profile.html.twig', [
+        return $this->render('@modules/User/templates/profile.html.twig', [
             'user' => $user,
             'employee' => $employee,
             'successMessage' => $successMessage,
@@ -61,7 +62,8 @@ class UserController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    public function unlinkProvider(string $provider): void
+    #[Route('/user/profile/unlink/{provider}', name: 'user_profile_unlink', methods: ['POST'])]
+    public function unlinkProvider(string $provider): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
 
@@ -69,11 +71,11 @@ class UserController extends \App\Core\Controller\AbstractController
         $this->userOAuthIdentityRepository->deleteByUserIdAndProvider($userId, $provider);
 
         $_SESSION['success_message'] = sprintf('Ваш акаунт %s було успішно відв\'язано.', ucfirst($provider));
-        header('Location: /user/profile');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
     }
 
-    public function uploadPhoto(): void
+    #[Route('/user/profile/photo', name: 'user_profile_photo', methods: ['POST'])]
+    public function uploadPhoto(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
 
@@ -87,8 +89,7 @@ class UserController extends \App\Core\Controller\AbstractController
 
         if (empty($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['error_message'] = 'Будь ласка, виберіть файл для завантаження.';
-            header('Location: /user/profile');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
         }
 
         $file = $_FILES['profile_photo'];
@@ -97,14 +98,12 @@ class UserController extends \App\Core\Controller\AbstractController
 
         if (!in_array($file['type'], $allowedTypes)) {
             $_SESSION['error_message'] = 'Дозволені лише файли зображень (JPG, PNG, GIF).';
-            header('Location: /user/profile');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
         }
 
         if ($file['size'] > $maxFileSize) {
             $_SESSION['error_message'] = 'Розмір файлу не повинен перевищувати 2MB.';
-            header('Location: /user/profile');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
         }
 
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -120,14 +119,13 @@ class UserController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося завантажити файл. Спробуйте ще раз.';
         }
 
-        header('Location: /user/profile');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
     }
 
-    public function clearMessages(): void
+    #[Route('/user/messages/clear', name: 'user_messages_clear', methods: ['POST'])]
+    public function clearMessages(): \Symfony\Component\HttpFoundation\Response
     {
         unset($_SESSION['success_message'], $_SESSION['error_message']);
-        http_response_code(200);
-        exit();
+        return new \Symfony\Component\HttpFoundation\Response('', 200);
     }
 }
