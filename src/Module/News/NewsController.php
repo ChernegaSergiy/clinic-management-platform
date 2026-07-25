@@ -2,9 +2,7 @@
 
 namespace App\Module\News;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
@@ -12,7 +10,7 @@ use App\Module\User\Repository\UserRepositoryInterface;
 
 // To get author info
 
-class NewsController
+class NewsController extends \App\Core\Controller\AbstractController
 {
     private NewsRepository $newsRepository;
     private UserRepositoryInterface $userRepository; // For author selection in admin forms
@@ -29,7 +27,7 @@ class NewsController
     public function index(): void
     {
         $newsArticles = $this->newsRepository->findAll();
-        View::render('news/index.html.twig', [
+        $this->render('news/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
@@ -41,14 +39,14 @@ class NewsController
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle || !$newsArticle['is_published']) {
-            View::render('errors/error.html.twig', [
+            $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена або не опублікована.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
             return;
         }
 
-        View::render('news/show.html.twig', [
+        $this->render('news/show.html.twig', [
             'newsArticle' => $newsArticle,
         ]);
     }
@@ -56,11 +54,11 @@ class NewsController
     // Admin: List all news articles
     public function adminIndex(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $newsArticles = $this->newsRepository->findAll();
-        View::render('@modules/News/templates/admin/index.html.twig', [
+        $this->render('@modules/News/templates/admin/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
@@ -68,7 +66,7 @@ class NewsController
     // Admin: Show form to create a new news article
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $authorsRaw = $this->userRepository->findAllByRole('admin');
@@ -77,7 +75,7 @@ class NewsController
             return $acc;
         }, []);
 
-        View::render('@modules/News/templates/admin/new.html.twig', [
+        $this->render('@modules/News/templates/admin/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'authors' => $authors,
@@ -88,7 +86,7 @@ class NewsController
     // Admin: Store a new news article
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $validator = $this->validator;
@@ -116,14 +114,14 @@ class NewsController
     // Admin: Show form to edit a news article
     public function edit(array $args): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
-            View::render('errors/error.html.twig', [
+            $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
@@ -136,7 +134,7 @@ class NewsController
             return $acc;
         }, []);
 
-        View::render('@modules/News/templates/admin/edit.html.twig', [
+        $this->render('@modules/News/templates/admin/edit.html.twig', [
             'newsArticle' => $newsArticle,
             'old' => $_SESSION['old'] ?? $newsArticle,
             'errors' => $_SESSION['errors'] ?? [],
@@ -148,14 +146,14 @@ class NewsController
     // Admin: Update a news article
     public function update(array $args): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
-            View::render('errors/error.html.twig', [
+            $this->render('errors/error.html.twig', [
                 'message' => 'Новина не знайдена.',
                 'detail' => 'Немає статті за вказаним ідентифікатором.'
             ]);
@@ -187,7 +185,7 @@ class NewsController
     // Admin: Delete a news article
     public function delete(array $args): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('news.manage');
 
         $id = (int)($args['id'] ?? 0);
