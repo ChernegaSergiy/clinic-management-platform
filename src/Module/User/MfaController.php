@@ -149,23 +149,20 @@ class MfaController extends \App\Core\Controller\AbstractController
     public function showMfaRequired(string $type = 'totp'): \Symfony\Component\HttpFoundation\Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
-            header('Location: /user/mfa/required');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         if ($type === 'hotp') {
@@ -231,8 +228,7 @@ class MfaController extends \App\Core\Controller\AbstractController
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
 
         if (!$userId) {
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $isReset = isset($_GET['reset']) && $_GET['reset'] === '1';
@@ -347,15 +343,13 @@ class MfaController extends \App\Core\Controller\AbstractController
     public function verifyMfaRequired(string $type = 'totp'): \Symfony\Component\HttpFoundation\Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
-            header('Location: /user/mfa/required');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         if ($type === 'hotp') {
@@ -478,16 +472,14 @@ class MfaController extends \App\Core\Controller\AbstractController
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $errorMessage = $_SESSION['mfa_error'] ?? null;
@@ -508,8 +500,7 @@ class MfaController extends \App\Core\Controller\AbstractController
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            header('Location: /login');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
         }
 
         $code = $_POST['code'] ?? '';
