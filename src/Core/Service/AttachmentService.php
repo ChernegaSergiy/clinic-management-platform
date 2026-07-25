@@ -2,16 +2,15 @@
 
 namespace App\Core\Service;
 
-use App\Database\Database;
-use PDO;
+use Doctrine\Persistence\ManagerRegistry;
 
 class AttachmentService
 {
-    private PDO $pdo;
+    private ManagerRegistry $registry;
     private string $uploadDir = __DIR__ . '/../../../uploads';
-    public function __construct(?PDO $pdo = null, ?string $uploadDir = null)
+    public function __construct(ManagerRegistry $registry, ?string $uploadDir = null)
     {
-        $this->pdo = $pdo ?? Database::getInstance();
+        $this->registry = $registry;
         if ($uploadDir !== null) {
             $this->uploadDir = $uploadDir;
         }
@@ -44,33 +43,34 @@ class AttachmentService
             return false;
         }
 
-        $this->pdo->beginTransaction();
+        $conn = $this->registry->getConnection();
+        $conn->beginTransaction();
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO attachments (entity_type, entity_id, filename, filepath, mime_type, size, created_by) VALUES (:entity_type, :entity_id, :filename, :filepath, :mime_type, :size, :created_by)");
-            $stmt->execute([
-                ':entity_type' => $entityType,
-                ':entity_id' => $entityId,
-                ':filename' => $filename,
-                ':filepath' => $relativePath,
-                ':mime_type' => $mimeType,
-                ':size' => $size,
-                ':created_by' => $userId,
+            $sql = "INSERT INTO attachments (entity_type, entity_id, filename, filepath, mime_type, size, created_by) VALUES (:entity_type, :entity_id, :filename, :filepath, :mime_type, :size, :created_by)";
+            $conn->executeStatement($sql, [
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'filename' => $filename,
+                'filepath' => $relativePath,
+                'mime_type' => $mimeType,
+                'size' => $size,
+                'created_by' => $userId,
             ]);
-            $attachmentId = $this->pdo->lastInsertId();
+            $attachmentId = $conn->lastInsertId();
 
-            $stmt = $this->pdo->prepare("INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, 1, :filepath, :filename, :size, :created_by)");
-            $stmt->execute([
-                ':attachment_id' => $attachmentId,
-                ':filepath' => $relativePath,
-                ':filename' => $filename,
-                ':size' => $size,
-                ':created_by' => $userId,
+            $sql = "INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, 1, :filepath, :filename, :size, :created_by)";
+            $conn->executeStatement($sql, [
+                'attachment_id' => $attachmentId,
+                'filepath' => $relativePath,
+                'filename' => $filename,
+                'size' => $size,
+                'created_by' => $userId,
             ]);
 
-            $this->pdo->commit();
+            $conn->commit();
             return (int)$attachmentId;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
+        } catch (\Exception $e) {
+            $conn->rollBack();
             unlink($targetPath);
             return false;
         }
@@ -101,35 +101,35 @@ class AttachmentService
             return false;
         }
 
-        $this->pdo->beginTransaction();
+        $conn = $this->registry->getConnection();
+        $conn->beginTransaction();
         try {
-            $stmt = $this->pdo->prepare("SELECT MAX(version_number) FROM attachment_versions WHERE attachment_id = :attachment_id");
-            $stmt->execute([':attachment_id' => $attachmentId]);
-            $nextVersionNumber = $stmt->fetchColumn() + 1;
+            $sql = "SELECT MAX(version_number) FROM attachment_versions WHERE attachment_id = :attachment_id";
+            $nextVersionNumber = $conn->fetchOne($sql, ['attachment_id' => $attachmentId]) + 1;
 
-            $stmt = $this->pdo->prepare("INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, :version_number, :filepath, :filename, :size, :created_by)");
-            $stmt->execute([
-                ':attachment_id' => $attachmentId,
-                ':version_number' => $nextVersionNumber,
-                ':filepath' => $relativePath,
-                ':filename' => $filename,
-                ':size' => $size,
-                ':created_by' => $userId,
+            $sql = "INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, :version_number, :filepath, :filename, :size, :created_by)";
+            $conn->executeStatement($sql, [
+                'attachment_id' => $attachmentId,
+                'version_number' => $nextVersionNumber,
+                'filepath' => $relativePath,
+                'filename' => $filename,
+                'size' => $size,
+                'created_by' => $userId,
             ]);
 
-            $stmt = $this->pdo->prepare("UPDATE attachments SET filepath = :filepath, filename = :filename, mime_type = :mime_type, size = :size, updated_at = NOW() WHERE id = :attachment_id");
-            $stmt->execute([
-                ':filepath' => $relativePath,
-                ':filename' => $filename,
-                ':mime_type' => $mimeType,
-                ':size' => $size,
-                ':attachment_id' => $attachmentId,
+            $sql = "UPDATE attachments SET filepath = :filepath, filename = :filename, mime_type = :mime_type, size = :size, updated_at = NOW() WHERE id = :attachment_id";
+            $conn->executeStatement($sql, [
+                'filepath' => $relativePath,
+                'filename' => $filename,
+                'mime_type' => $mimeType,
+                'size' => $size,
+                'attachment_id' => $attachmentId,
             ]);
 
-            $this->pdo->commit();
+            $conn->commit();
             return (int)$nextVersionNumber;
-        } catch (\PDOException $e) {
-            $this->pdo->rollBack();
+        } catch (\Exception $e) {
+            $conn->rollBack();
             unlink($targetPath);
             return false;
         }
@@ -137,57 +137,56 @@ class AttachmentService
 
     public function getAttachmentById(int $attachmentId): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM attachments WHERE id = :id");
-        $stmt->execute([':id' => $attachmentId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT * FROM attachments WHERE id = :id";
+        $result = $conn->fetchAssociative($sql, ['id' => $attachmentId]);
+        return $result ?: null;
     }
 
     public function getAttachmentsForEntity(string $entityType, int $entityId): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM attachments WHERE entity_type = :entity_type AND entity_id = :entity_id ORDER BY created_at DESC");
-        $stmt->execute([
-            ':entity_type' => $entityType,
-            ':entity_id' => $entityId,
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT * FROM attachments WHERE entity_type = :entity_type AND entity_id = :entity_id ORDER BY created_at DESC";
+        return $conn->fetchAllAssociative($sql, [
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getAttachmentVersions(int $attachmentId): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id ORDER BY version_number DESC");
-        $stmt->execute([':attachment_id' => $attachmentId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id ORDER BY version_number DESC";
+        return $conn->fetchAllAssociative($sql, ['attachment_id' => $attachmentId]);
     }
 
     public function getAttachmentVersion(int $attachmentId, int $versionNumber): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id AND version_number = :version_number");
-        $stmt->execute([
-            ':attachment_id' => $attachmentId,
-            ':version_number' => $versionNumber,
+        $conn = $this->registry->getConnection();
+        $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id AND version_number = :version_number";
+        $result = $conn->fetchAssociative($sql, [
+            'attachment_id' => $attachmentId,
+            'version_number' => $versionNumber,
         ]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result === false ? null : $result;
+        return $result ?: null;
     }
 
     public function checkViewAccess(int $attachmentId, int $userId, int $userRoleId): bool
     {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND user_id = :user_id AND can_view = TRUE");
-        $stmt->execute([':attachment_id' => $attachmentId, ':user_id' => $userId]);
-        if ($stmt->fetchColumn() > 0) {
+        $conn = $this->registry->getConnection();
+        
+        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND user_id = :user_id AND can_view = TRUE";
+        if ($conn->fetchOne($sql, ['attachment_id' => $attachmentId, 'user_id' => $userId]) > 0) {
             return true;
         }
 
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND role_id = :role_id AND can_view = TRUE");
-        $stmt->execute([':attachment_id' => $attachmentId, ':role_id' => $userRoleId]);
-        if ($stmt->fetchColumn() > 0) {
+        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND role_id = :role_id AND can_view = TRUE";
+        if ($conn->fetchOne($sql, ['attachment_id' => $attachmentId, 'role_id' => $userRoleId]) > 0) {
             return true;
         }
 
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id");
-        $stmt->execute([':attachment_id' => $attachmentId]);
-        $hasAclEntries = $stmt->fetchColumn() > 0;
+        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id";
+        $hasAclEntries = $conn->fetchOne($sql, ['attachment_id' => $attachmentId]) > 0;
 
         if (!$hasAclEntries) {
             return false;
@@ -202,17 +201,18 @@ class AttachmentService
             return false;
         }
 
-        $stmt = $this->pdo->prepare("
+        $conn = $this->registry->getConnection();
+        $sql = "
             INSERT INTO attachment_acl (attachment_id, user_id, role_id, can_view, can_edit)
             VALUES (:attachment_id, :user_id, :role_id, :can_view, :can_edit)
             ON DUPLICATE KEY UPDATE can_view = :can_view, can_edit = :can_edit
-        ");
-        return $stmt->execute([
-            ':attachment_id' => $attachmentId,
-            ':user_id' => $userId,
-            ':role_id' => $roleId,
-            ':can_view' => $canView,
-            ':can_edit' => $canEdit,
-        ]);
+        ";
+        return $conn->executeStatement($sql, [
+            'attachment_id' => $attachmentId,
+            'user_id' => $userId,
+            'role_id' => $roleId,
+            'can_view' => $canView ? 1 : 0,
+            'can_edit' => $canEdit ? 1 : 0,
+        ]) > 0;
     }
 }
