@@ -14,11 +14,16 @@ class DepartmentController
 {
     private DepartmentRepository $departmentRepository;
     private HrmRepositoryInterface $hrmRepository;
+    private \App\Core\Validation\Validator $validator;
 
-    public function __construct(DepartmentRepository $departmentRepository, HrmRepositoryInterface $hrmRepository)
-    {
+    public function __construct(
+        DepartmentRepository $departmentRepository,
+        HrmRepositoryInterface $hrmRepository,
+        \App\Core\Validation\Validator $validator
+    ) {
         $this->departmentRepository = $departmentRepository;
         $this->hrmRepository = $hrmRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/admin/departments', name: 'admin_departments_index', methods: ['GET'])]
@@ -54,7 +59,7 @@ class DepartmentController
         AuthGuard::check();
         Gate::authorize('department.write');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'name' => ['required'],
             'description' => [],
@@ -148,7 +153,7 @@ class DepartmentController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'name' => ['required'],
             'description' => [],
