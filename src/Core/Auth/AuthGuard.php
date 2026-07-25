@@ -4,31 +4,20 @@ namespace App\Core\Auth;
 
 use App\Core\Exception\ExitException;
 use App\Core\Exception\RedirectException;
-use App\Module\User\Repository\RoleRepository;
+use App\Module\User\Repository\RoleRepositoryInterface;
 
 class AuthGuard
 {
-    private static ?RoleRepository $roleRepository = null;
+    private RoleRepositoryInterface $roleRepository;
+    private MfaGuard $mfaGuard;
 
-    public static function setRoleRepository(RoleRepository $repository): void
+    public function __construct(RoleRepositoryInterface $roleRepository, MfaGuard $mfaGuard)
     {
-        self::$roleRepository = $repository;
+        $this->roleRepository = $roleRepository;
+        $this->mfaGuard = $mfaGuard;
     }
 
-    public static function resetRoleRepository(): void
-    {
-        self::$roleRepository = null;
-    }
-
-    private static function roles(): RoleRepository
-    {
-        if (!self::$roleRepository) {
-            self::$roleRepository = \App\Kernel::$staticContainer->get(\App\Module\User\Repository\RoleRepositoryInterface::class);
-        }
-        return self::$roleRepository;
-    }
-
-    private static function hydrateRoleName(): void
+    private function hydrateRoleName(): void
     {
         if (empty($_SESSION['user']) || !empty($_SESSION['user']['role_name'])) {
             return;
@@ -36,18 +25,18 @@ class AuthGuard
 
         $roleId = $_SESSION['user']['role_id'] ?? null;
         if ($roleId) {
-            $role = self::roles()->findById((int)$roleId);
+            $role = $this->roleRepository->findById((int)$roleId);
             $_SESSION['user']['role_name'] = $role['name'] ?? null;
         }
     }
 
-    public static function check(): void
+    public function check(): void
     {
         $step = AuthStep::current();
 
         if ($step->isAuthorized()) {
-            MfaGuard::check();
-            self::hydrateRoleName();
+            $this->mfaGuard->check();
+            $this->hydrateRoleName();
             return;
         }
 
@@ -55,7 +44,7 @@ class AuthGuard
         throw new RedirectException('/login');
     }
 
-    public static function requireMfaSetup(): void
+    public function requireMfaSetup(): void
     {
         $step = AuthStep::current();
 
@@ -64,9 +53,9 @@ class AuthGuard
         }
     }
 
-    public static function isAdmin(): void
+    public function isAdmin(): void
     {
-        self::check();
+        $this->check();
         if ($_SESSION['user']['role_id'] !== 1) {
             throw new ExitException("Доступ заборонено", 403);
         }
