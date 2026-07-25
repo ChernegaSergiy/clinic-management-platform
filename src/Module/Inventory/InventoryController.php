@@ -7,6 +7,8 @@ use App\Core\Auth\Gate;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Core\Validation\Validator;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class InventoryController extends \App\Core\Controller\AbstractController
 {
@@ -20,7 +22,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -29,7 +31,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
 
-        $this->render('@modules/Inventory/templates/index.html.twig', [
+        return $this->render('@modules/Inventory/templates/index.html.twig', [
             'items' => $items,
             'lowStockItems' => $lowStockItems,
             'overStockedItems' => $overStockedItems,
@@ -38,7 +40,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
-    public function create(): void
+    public function create(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -47,7 +49,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Inventory/templates/new.html.twig', [
+        return $this->render('@modules/Inventory/templates/new.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'min_stock_level' => $old['min_stock_level'] ?? 0,
@@ -56,7 +58,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
-    public function store(): void
+    public function store(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -71,18 +73,16 @@ class InventoryController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /inventory/new');
-            exit();
+            return new RedirectResponse('/inventory/new');
         }
 
         $this->inventoryItemRepository->save($_POST);
         $_SESSION['success_message'] = "Позицію складу успішно додано.";
-        header('Location: /inventory');
-        exit();
+        return new RedirectResponse('/inventory');
     }
 
     #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -91,21 +91,19 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $item = $this->inventoryItemRepository->findById($id);
 
         if (!$item) {
-            http_response_code(404);
-            echo "Позицію складу не знайдено";
-            return;
+            return new Response("Позицію складу не знайдено", 404);
         }
 
         $movementHistory = $this->inventoryItemRepository->getMovementHistory($id);
 
-        $this->render('@modules/Inventory/templates/show.html.twig', [
+        return $this->render('@modules/Inventory/templates/show.html.twig', [
             'item' => $item,
             'movementHistory' => $movementHistory,
         ]);
     }
 
     #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -114,9 +112,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $item = $this->inventoryItemRepository->findById($id);
 
         if (!$item) {
-            http_response_code(404);
-            echo "Позицію складу не знайдено";
-            return;
+            return new Response("Позицію складу не знайдено", 404);
         }
 
         $old = $_SESSION['old'] ?? [];
@@ -124,7 +120,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Inventory/templates/edit.html.twig', [
+        return $this->render('@modules/Inventory/templates/edit.html.twig', [
             'item' => $item,
             'old' => $old,
             'errors' => $errors,
@@ -134,7 +130,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
-    public function update(): void
+    public function update(): Response
     {
         $this->checkAuth();
         Gate::authorize('inventory.manage');
@@ -143,12 +139,9 @@ class InventoryController extends \App\Core\Controller\AbstractController
         $item = $this->inventoryItemRepository->findById($id);
 
         if (!$item) {
-            http_response_code(404);
-            echo "Позицію складу не знайдено";
-            return;
+            return new Response("Позицію складу не знайдено", 404);
         }
 
-        // TODO: Add validation
         $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
@@ -159,13 +152,11 @@ class InventoryController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /inventory/edit?id=' . $id);
-            exit();
+            return new RedirectResponse('/inventory/edit?id=' . $id);
         }
 
         $this->inventoryItemRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Позицію складу успішно оновлено.";
-        header('Location: /inventory/show?id=' . $id);
-        exit();
+        return new RedirectResponse('/inventory/show?id=' . $id);
     }
 }
