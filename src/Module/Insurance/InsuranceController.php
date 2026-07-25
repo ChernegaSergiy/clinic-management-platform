@@ -16,10 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class InsuranceController
 {
     private InsuranceService $insuranceService;
+    private Validator $validator;
 
-    public function __construct(InsuranceService $insuranceService)
+    public function __construct(InsuranceService $insuranceService, Validator $validator)
     {
         $this->insuranceService = $insuranceService;
+        $this->validator = $validator;
     }
 
     #[Route('/insurance/companies', name: 'insurance_companies_index', methods: ['GET'])]
@@ -74,7 +76,7 @@ class InsuranceController
         AuthGuard::check();
         Gate::authorize('billing.manage');
 
-        $validator = new Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'name' => ['required'],
         ];
@@ -135,7 +137,7 @@ class InsuranceController
             return;
         }
 
-        $validator = new Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'name' => ['required'],
         ];
