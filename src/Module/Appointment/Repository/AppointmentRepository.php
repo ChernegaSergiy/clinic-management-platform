@@ -3,18 +3,21 @@
 namespace App\Module\Appointment\Repository;
 
 use App\Entity\Appointment;
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, Appointment::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findAll(): array
@@ -77,8 +80,8 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
             $appointmentId = $appointment->getId();
             
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
-            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
                 'appointment_scheduled',
                 'Ваш прийом заплановано на ' . $data['start_time'],
@@ -155,7 +158,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         try {
             $this->getEntityManager()->flush();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, $data));
             return true;
         } catch (\Exception $e) {
             return false;
@@ -180,7 +183,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         try {
             $this->getEntityManager()->flush();
             if ($oldAppointment['status'] !== $status) {
-                EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, ['status' => $status]));
+                $this->eventDispatcher->dispatch(new EntityChangedEvent('appointment', $id, 'update', $oldAppointment, ['status' => $status]));
             }
             return true;
         } catch (\Exception $e) {

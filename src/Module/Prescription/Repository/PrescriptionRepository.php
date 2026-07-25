@@ -2,18 +2,21 @@
 
 namespace App\Module\Prescription\Repository;
 
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use App\Entity\Prescription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PrescriptionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, Prescription::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findAll(string $searchTerm = ''): array
@@ -75,8 +78,8 @@ class PrescriptionRepository extends ServiceEntityRepository
 
             $conn->commit();
             
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('prescription', $prescriptionId, 'create', null, $data));
-            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('prescription', $prescriptionId, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
                 'prescription_created',
                 'Виписано новий рецепт',

@@ -2,18 +2,21 @@
 
 namespace App\Module\LabOrder\Repository;
 
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use App\Entity\LabOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, LabOrder::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findByMedicalRecordId(int $medicalRecordId): array
@@ -47,8 +50,8 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
 
         if ($success) {
             $labOrderId = (int)$conn->lastInsertId();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
-            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
                 'lab_order_created',
                 'Створено замовлення на лабораторні дослідження',
@@ -100,7 +103,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         ]) > 0;
 
         if ($result) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
         }
 
         return $result;

@@ -3,22 +3,24 @@
 namespace App\Module\Patient\Repository;
 
 use App\Entity\Patient;
-use App\Core\Event\EventDispatcherService;
 use App\Core\Service\AuditLogger as CoreAuditLogger;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PatientRepository extends ServiceEntityRepository implements PatientRepositoryInterface
 {
     private CoreAuditLogger $auditLogger;
     private ?string $lastError = null;
+    private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(ManagerRegistry $registry, CoreAuditLogger $auditLogger)
+    public function __construct(ManagerRegistry $registry, CoreAuditLogger $auditLogger, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, Patient::class);
         $this->auditLogger = $auditLogger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findAll(string $searchTerm = ''): array
@@ -97,7 +99,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
             $this->getEntityManager()->flush();
 
             $id = $patient->getId();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('patient', $id, 'create', null, $data));
             return $id;
         } catch (\Exception $e) {
             if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
@@ -195,7 +197,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
             $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $newStatus);
         }
 
-        EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, $data));
+        $this->eventDispatcher->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, $data));
 
         return true;
     }
@@ -233,7 +235,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
 
         if ($oldStatus !== $status) {
             $this->auditLogger->log('patient', $id, 'status_change', $oldStatus, $status);
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, ['status' => $status]));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('patient', $id, 'update', $oldPatientArray, ['status' => $status]));
         }
         return true;
     }

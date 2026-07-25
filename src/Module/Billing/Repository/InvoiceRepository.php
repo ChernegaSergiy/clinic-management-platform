@@ -3,17 +3,20 @@
 namespace App\Module\Billing\Repository;
 
 use App\Entity\Invoice;
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class InvoiceRepository extends ServiceEntityRepository implements InvoiceRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, Invoice::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findAll(string $searchTerm = ''): array
@@ -65,8 +68,8 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         
         $invoiceId = (int)$conn->lastInsertId();
         
-        EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
-        EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+        $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
+        $this->eventDispatcher->dispatch(new PatientNotificationEvent(
             $data['patient_id'],
             'invoice_created',
             sprintf('Створено рахунок на суму %.2f грн', $data['amount']),
@@ -143,7 +146,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         ]);
 
         if ($result > 0) {
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
             return true;
         }
 

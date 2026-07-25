@@ -3,19 +3,22 @@
 namespace App\Module\MedicalRecord\Repository;
 
 use App\Entity\MedicalRecord;
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use PDO;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MedicalRecordRepository extends ServiceEntityRepository implements MedicalRecordRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, MedicalRecord::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findByPatientId(int $patientId): array
@@ -138,8 +141,8 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
                 $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
             
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
-            EventDispatcherService::getDispatcher()->dispatch(new PatientNotificationEvent(
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
                 'medical_record_created',
                 'Створено новий медичний запис після візиту',
@@ -212,7 +215,7 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
                 $this->attachInterventionCodes($id, $data['intervention_codes']);
             }
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('medical_record', $id, 'update', $oldMedicalRecord, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('medical_record', $id, 'update', $oldMedicalRecord, $data));
             return true;
         } catch (\Exception $e) {
             return false;

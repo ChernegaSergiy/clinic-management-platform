@@ -3,17 +3,20 @@
 namespace App\Module\User\Repository;
 
 use App\Entity\User;
-use App\Core\Event\EventDispatcherService;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
     {
         parent::__construct($registry, User::class);
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function findByEmail(string $email): ?array
@@ -141,7 +144,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             $this->getEntityManager()->flush();
 
             $id = $user->getId();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'create', null, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('user', $id, 'create', null, $data));
             return $id;
         } catch (\Exception $e) {
             return false;
@@ -180,7 +183,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         try {
             $this->getEntityManager()->flush();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'update', $oldData, $data));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('user', $id, 'update', $oldData, $data));
             return true;
         } catch (\Exception $e) {
             return false;
@@ -203,7 +206,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         try {
             $this->getEntityManager()->remove($user);
             $this->getEntityManager()->flush();
-            EventDispatcherService::getDispatcher()->dispatch(new EntityChangedEvent('user', $id, 'delete', $oldData, null));
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('user', $id, 'delete', $oldData, null));
             return true;
         } catch (\Exception $e) {
             return false;
