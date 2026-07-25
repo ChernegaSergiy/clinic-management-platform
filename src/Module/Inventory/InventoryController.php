@@ -3,14 +3,12 @@
 namespace App\Module\Inventory;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Core\Validation\Validator;
 
-class InventoryController
+class InventoryController extends \App\Core\Controller\AbstractController
 {
     private InventoryItemRepositoryInterface $inventoryItemRepository;
     private Validator $validator;
@@ -24,14 +22,14 @@ class InventoryController
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
     public function index(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
         $searchTerm = $_GET['search'] ?? '';
         $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
 
-        View::render('@modules/Inventory/templates/index.html.twig', [
+        $this->render('@modules/Inventory/templates/index.html.twig', [
             'items' => $items,
             'lowStockItems' => $lowStockItems,
             'overStockedItems' => $overStockedItems,
@@ -42,14 +40,14 @@ class InventoryController
     #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
     public function create(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Inventory/templates/new.html.twig', [
+        $this->render('@modules/Inventory/templates/new.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'min_stock_level' => $old['min_stock_level'] ?? 0,
@@ -60,7 +58,7 @@ class InventoryController
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
     public function store(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
 
         $validator = $this->validator;
@@ -86,7 +84,7 @@ class InventoryController
     #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
     public function show(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -100,7 +98,7 @@ class InventoryController
 
         $movementHistory = $this->inventoryItemRepository->getMovementHistory($id);
 
-        View::render('@modules/Inventory/templates/show.html.twig', [
+        $this->render('@modules/Inventory/templates/show.html.twig', [
             'item' => $item,
             'movementHistory' => $movementHistory,
         ]);
@@ -109,7 +107,7 @@ class InventoryController
     #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
     public function edit(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -126,7 +124,7 @@ class InventoryController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        View::render('@modules/Inventory/templates/edit.html.twig', [
+        $this->render('@modules/Inventory/templates/edit.html.twig', [
             'item' => $item,
             'old' => $old,
             'errors' => $errors,
@@ -138,7 +136,7 @@ class InventoryController
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
     public function update(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('inventory.manage');
 
         $id = (int)($_GET['id'] ?? 0);
