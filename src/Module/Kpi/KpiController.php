@@ -16,15 +16,18 @@ class KpiController
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
+    private Validator $validator;
 
     public function __construct(
         KpiRepository $kpiRepository,
         InvoiceRepository $invoiceRepository,
-        AppointmentRepositoryInterface $appointmentRepository
+        AppointmentRepositoryInterface $appointmentRepository,
+        Validator $validator
     ) {
         $this->kpiRepository = $kpiRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->appointmentRepository = $appointmentRepository;
+        $this->validator = $validator;
     }
 
     // --- KPI Definitions ---
@@ -52,7 +55,7 @@ class KpiController
         AuthGuard::check();
         Gate::authorize('kpi.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
@@ -109,7 +112,7 @@ class KpiController
             return;
         }
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'kpi_type' => ['required', 'in:appointments_count,revenue_generated,patient_satisfaction'],
