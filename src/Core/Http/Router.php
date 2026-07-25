@@ -50,7 +50,12 @@ class Router
                         $callback = [$controller, $handler[1]];
                     } catch (\Throwable $e) {
                         $detail = $e->getMessage() . "\n\n" . $e->getTraceAsString();
-                        $content = View::renderToString('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
+                        if ($this->container && $this->container->has(View::class)) {
+                            $view = $this->container->get(View::class);
+                            $content = $view->renderToString('errors/error.html.twig', ['message' => 'Internal Server Error', 'detail' => $detail]);
+                        } else {
+                            $content = "Internal Server Error: " . htmlspecialchars($e->getMessage());
+                        }
                         $response = new Response($content, 500);
                         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
                         return $response;
@@ -75,7 +80,12 @@ class Router
             }
         }
 
-        $content = View::renderToString('errors/error.html.twig', ['message' => '404 Not Found']);
+        if ($this->container && $this->container->has(View::class)) {
+            $view = $this->container->get(View::class);
+            $content = $view->renderToString('errors/error.html.twig', ['message' => '404 Not Found']);
+        } else {
+            $content = "404 Not Found";
+        }
         $response = new Response($content, 404);
         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
         return $response;
