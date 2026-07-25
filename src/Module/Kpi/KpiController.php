@@ -3,15 +3,13 @@
 namespace App\Module\Kpi;
 
 use App\Database\Database;
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
 
-class KpiController
+class KpiController extends \App\Core\Controller\AbstractController
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
@@ -33,17 +31,17 @@ class KpiController
     // --- KPI Definitions ---
     public function listDefinitions(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        View::render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
+        $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     public function createDefinition(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
-        View::render('@modules/Kpi/templates/definitions/new.html.twig', [
+        $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -52,7 +50,7 @@ class KpiController
 
     public function storeDefinition(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
 
         $validator = $this->validator;
@@ -78,7 +76,7 @@ class KpiController
 
     public function editDefinition(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -90,7 +88,7 @@ class KpiController
             return;
         }
 
-        View::render('@modules/Kpi/templates/definitions/edit.html.twig', [
+        $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -100,7 +98,7 @@ class KpiController
 
     public function updateDefinition(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
 
         $id = (int)($_GET['id'] ?? 0);
@@ -135,7 +133,7 @@ class KpiController
 
     public function deleteDefinition(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.manage');
 
         $id = (int)($_POST['id'] ?? 0);
@@ -148,7 +146,7 @@ class KpiController
     // --- KPI Results ---
     public function listResults(): void
     {
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('kpi.read');
         $results = [];
         if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) {
@@ -158,7 +156,7 @@ class KpiController
             $userId = $_SESSION['user']['id'];
             $results = $this->kpiRepository->findKpiResultsForUser($userId);
         }
-        View::render('@modules/Kpi/templates/results/index.html.twig', ['results' => $results]);
+        $this->render('@modules/Kpi/templates/results/index.html.twig', ['results' => $results]);
     }
 
     // This would be called by a cron job or background process
@@ -257,7 +255,7 @@ class KpiController
         if (PHP_SAPI === 'cli') {
             return;
         }
-        AuthGuard::check();
+        $this->checkAuth();
         Gate::authorize('admin.manage');
     }
 }
