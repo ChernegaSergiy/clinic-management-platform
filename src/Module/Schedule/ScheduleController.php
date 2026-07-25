@@ -2,15 +2,13 @@
 
 namespace App\Module\Schedule;
 
-use App\Core\Auth\AuthGuard;
 use App\Core\Auth\Gate;
-use App\Core\Http\View;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ScheduleController
+class ScheduleController extends \App\Core\Controller\AbstractController
 {
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
@@ -42,7 +40,7 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        View::render('@modules/Schedule/templates/personal.html.twig', [
+        $this->render('@modules/Schedule/templates/personal.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
         ]);
@@ -56,7 +54,7 @@ class ScheduleController
 
         $allDoctors = $this->userRepository->findAllDoctors();
 
-        View::render('@modules/Schedule/templates/admin.html.twig', [
+        $this->render('@modules/Schedule/templates/admin.html.twig', [
             'allDoctors' => $allDoctors,
         ]);
     }
@@ -80,7 +78,7 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        View::render('@modules/Schedule/templates/show.html.twig', [
+        $this->render('@modules/Schedule/templates/show.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);
@@ -307,7 +305,7 @@ class ScheduleController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        View::render('@modules/Schedule/templates/edit.html.twig', [
+        $this->render('@modules/Schedule/templates/edit.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);
