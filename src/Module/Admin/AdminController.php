@@ -52,7 +52,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/settings', name: 'admin_settings', methods: ['GET'])]
-    public function showSettings(): void
+    public function showSettings(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -67,7 +67,7 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $availableLocales = $this->view->getTranslationService()->getAvailableLocales();
 
-        $this->render('@modules/Admin/templates/settings.html.twig', [
+        return $this->render('@modules/Admin/templates/settings.html.twig', [
             'settings' => $settings,
             'roles' => $roles,
             'availableLocales' => $availableLocales,
@@ -75,7 +75,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/settings', name: 'admin_settings_post', methods: ['POST'])]
-    public function updateSettings(): void
+    public function updateSettings(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -98,12 +98,11 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->view->clearCache();
 
         $_SESSION['success_message'] = 'Налаштування збережено.';
-        header('Location: /admin/settings');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
 
     #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
-    public function users(): void
+    public function users(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $searchTerm = $_GET['search'] ?? '';
@@ -119,14 +118,14 @@ class AdminController extends \App\Core\Controller\AbstractController
         }
         unset($user); // Break the reference with the last element
 
-        $this->render('@modules/Admin/templates/users.html.twig', [
+        return $this->render('@modules/Admin/templates/users.html.twig', [
             'users' => $users,
             'searchTerm' => $searchTerm,
         ]);
     }
 
     #[Route('/admin/users/new', name: 'admin_users_new', methods: ['GET'])]
-    public function createUser(): void
+    public function createUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -137,7 +136,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Admin/templates/new_user.html.twig', [
+        return $this->render('@modules/Admin/templates/new_user.html.twig', [
             'roles' => $roleOptions,
             'old' => $old,
             'errors' => $errors,
@@ -145,7 +144,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/users/new', name: 'admin_users_new_post', methods: ['POST'])]
-    public function storeUser(): void
+    public function storeUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -165,18 +164,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/users/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/new');
         }
 
         $this->userRepository->save($_POST);
         $_SESSION['success_message'] = "Користувача успішно створено.";
-        header('Location: /admin/users');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
     }
 
     #[Route('/admin/users/show', name: 'admin_users_show', methods: ['GET'])]
-    public function showUser(): void
+    public function showUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -184,19 +181,17 @@ class AdminController extends \App\Core\Controller\AbstractController
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            http_response_code(404);
-            echo "Користувача не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
         }
 
         $role = $this->roleRepository->findById($user['role_id']);
         $user['role_name'] = $role['name'] ?? 'Невідома';
 
-        $this->render('@modules/Admin/templates/show_user.html.twig', ['user' => $user]);
+        return $this->render('@modules/Admin/templates/show_user.html.twig', ['user' => $user]);
     }
 
     #[Route('/admin/users/edit', name: 'admin_users_edit', methods: ['GET'])]
-    public function editUser(): void
+    public function editUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -204,9 +199,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            http_response_code(404);
-            echo "Користувача не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
         }
 
         $roleOptions = $this->buildRoleOptionsByPriority();
@@ -216,7 +209,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        $this->render('@modules/Admin/templates/edit_user.html.twig', [
+        return $this->render('@modules/Admin/templates/edit_user.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
             'old' => $old,
@@ -256,7 +249,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/users/edit', name: 'admin_users_edit_post', methods: ['POST'])]
-    public function updateUser(): void
+    public function updateUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -264,9 +257,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            http_response_code(404);
-            echo "Користувача не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
         }
 
         // TODO: Add validation
@@ -291,18 +282,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/users/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/edit?id=' . $id);
         }
 
         $this->userRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Дані користувача успішно оновлено.";
-        header('Location: /admin/users/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/show?id=' . $id);
     }
 
     #[Route('/admin/users/delete', name: 'admin_users_delete', methods: ['POST'])]
-    public function deleteUser(): void
+    public function deleteUser(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -310,26 +299,22 @@ class AdminController extends \App\Core\Controller\AbstractController
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            http_response_code(404);
-            echo "Користувача не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
         }
 
         // Prevent admin from deleting themselves
         if ($user['id'] === $_SESSION['user']['id']) {
             $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
-            header('Location: /admin/users');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
         }
 
         $this->userRepository->delete($id);
         $_SESSION['success_message'] = "Користувача успішно видалено.";
-        header('Location: /admin/users');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
     }
 
     #[Route('/admin/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
-    public function disableUserMfa(): void
+    public function disableUserMfa(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -337,40 +322,38 @@ class AdminController extends \App\Core\Controller\AbstractController
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            http_response_code(404);
-            echo "Користувача не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
         }
 
         $this->mfaService->disableMfaForUser($id);
 
         $_SESSION['success_message'] = "2FA для користувача " . $user['email'] . " успішно вимкнено.";
-        header('Location: /admin/users');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
     }
 
     // --- Role Management ---
     #[Route('/admin/roles', name: 'admin_roles', methods: ['GET'])]
-    public function listRoles(): void
+    public function listRoles(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $roles = $this->roleRepository->findAll();
-        $this->render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
+        return $this->render('@modules/Admin/templates/roles.html.twig', ['roles' => $roles]);
     }
 
     #[Route('/admin/roles/new', name: 'admin_roles_new', methods: ['GET'])]
-    public function createRole(): void
+    public function createRole(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $this->render('@modules/Admin/templates/new_role.html.twig', [
+        $response = $this->render('@modules/Admin/templates/new_role.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/roles/new', name: 'admin_roles_new_post', methods: ['POST'])]
-    public function storeRole(): void
+    public function storeRole(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -383,18 +366,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/roles/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles/new');
         }
 
         $this->roleRepository->save($_POST);
         $_SESSION['success_message'] = "Роль успішно створено.";
-        header('Location: /admin/roles');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles');
     }
 
     #[Route('/admin/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
-    public function editRole(): void
+    public function editRole(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -402,21 +383,20 @@ class AdminController extends \App\Core\Controller\AbstractController
         $role = $this->roleRepository->findById($id);
 
         if (!$role) {
-            http_response_code(404);
-            echo "Роль не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Роль не знайдено", 404);
         }
 
-        $this->render('@modules/Admin/templates/edit_role.html.twig', [
+        $response = $this->render('@modules/Admin/templates/edit_role.html.twig', [
             'role' => $role,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/roles/edit', name: 'admin_roles_edit_post', methods: ['POST'])]
-    public function updateRole(): void
+    public function updateRole(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -424,9 +404,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $role = $this->roleRepository->findById($id);
 
         if (!$role) {
-            http_response_code(404);
-            echo "Роль не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Роль не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -438,18 +416,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/roles/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles/edit?id=' . $id);
         }
 
         $this->roleRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Роль успішно оновлено.";
-        header('Location: /admin/roles');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles');
     }
 
     #[Route('/admin/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
-    public function deleteRole(): void
+    public function deleteRole(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -457,59 +433,55 @@ class AdminController extends \App\Core\Controller\AbstractController
         $role = $this->roleRepository->findById($id);
 
         if (!$role) {
-            http_response_code(404);
-            echo "Роль не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Роль не знайдено", 404);
         }
 
         $this->roleRepository->delete($id);
         $_SESSION['success_message'] = "Роль успішно видалено.";
-        header('Location: /admin/roles');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles');
     }
 
     // --- Dictionary Management ---
     #[Route('/admin/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
-    public function listDictionaries(): void
+    public function listDictionaries(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $dictionaries = $this->dictionaryRepository->findAll();
-        $this->render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
+        return $this->render('@modules/Admin/templates/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
     #[Route('/admin/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
-    public function showDictionary(): void
+    public function showDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $id = (int)($_GET['id'] ?? 0);
         $dictionary = $this->dictionaryRepository->findById($id);
 
         if (!$dictionary) {
-            http_response_code(404);
-            echo "Словник не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
         }
 
         $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
-        $this->render('@modules/Admin/templates/dictionaries/show.html.twig', [
+        return $this->render('@modules/Admin/templates/dictionaries/show.html.twig', [
             'dictionary' => $dictionary,
             'values' => $values,
         ]);
     }
 
     #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new', methods: ['GET'])]
-    public function createDictionary(): void
+    public function createDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $this->render('@modules/Admin/templates/dictionaries/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/dictionaries/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new_post', methods: ['POST'])]
-    public function storeDictionary(): void
+    public function storeDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -522,18 +494,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/new');
         }
 
         $this->dictionaryRepository->save($_POST);
         $_SESSION['success_message'] = "Словник успішно створено.";
-        header('Location: /admin/dictionaries');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
     }
 
     #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
-    public function editDictionary(): void
+    public function editDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -541,21 +511,20 @@ class AdminController extends \App\Core\Controller\AbstractController
         $dictionary = $this->dictionaryRepository->findById($id);
 
         if (!$dictionary) {
-            http_response_code(404);
-            echo "Словник не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
         }
 
-        $this->render('@modules/Admin/templates/dictionaries/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/dictionaries/edit.html.twig', [
             'dictionary' => $dictionary,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit_post', methods: ['POST'])]
-    public function updateDictionary(): void
+    public function updateDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -563,9 +532,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $dictionary = $this->dictionaryRepository->findById($id);
 
         if (!$dictionary) {
-            http_response_code(404);
-            echo "Словник не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -577,44 +544,42 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/edit?id=' . $id);
         }
 
         $this->dictionaryRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Словник успішно оновлено.";
-        header('Location: /admin/dictionaries');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
     }
 
     #[Route('/admin/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
-    public function deleteDictionary(): void
+    public function deleteDictionary(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->dictionaryRepository->delete($id);
         $_SESSION['success_message'] = "Словник успішно видалено.";
-        header('Location: /admin/dictionaries');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
     }
 
     // --- Dictionary Value Management ---
     #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new', methods: ['GET'])]
-    public function createDictionaryValue(): void
+    public function createDictionaryValue(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        $this->render('@modules/Admin/templates/dictionaries/values/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/dictionaries/values/new.html.twig', [
             'dictionary_id' => $dictionaryId,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new_post', methods: ['POST'])]
-    public function storeDictionaryValue(): void
+    public function storeDictionaryValue(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -629,18 +594,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
         }
 
         $this->dictionaryRepository->saveValue($_POST);
         $_SESSION['success_message'] = "Значення словника успішно створено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
     }
 
     #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
-    public function editDictionaryValue(): void
+    public function editDictionaryValue(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -648,21 +611,20 @@ class AdminController extends \App\Core\Controller\AbstractController
         $value = $this->dictionaryRepository->findValueById($id);
 
         if (!$value) {
-            http_response_code(404);
-            echo "Значення словника не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Значення словника не знайдено", 404);
         }
 
-        $this->render('@modules/Admin/templates/dictionaries/values/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/dictionaries/values/edit.html.twig', [
             'value' => $value,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit_post', methods: ['POST'])]
-    public function updateDictionaryValue(): void
+    public function updateDictionaryValue(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -680,18 +642,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/dictionaries/values/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/values/edit?id=' . $id);
         }
 
         $this->dictionaryRepository->updateValue($id, $_POST);
         $_SESSION['success_message'] = "Значення словника успішно оновлено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
     }
 
     #[Route('/admin/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
-    public function deleteDictionaryValue(): void
+    public function deleteDictionaryValue(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -701,35 +661,35 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $this->dictionaryRepository->deleteValue($id);
         $_SESSION['success_message'] = "Значення словника успішно видалено.";
-        header('Location: /admin/dictionaries/show?id=' . $dictionaryId);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
     }
 
     // --- Auth Configuration Management ---
     #[Route('/admin/auth_configs', name: 'admin_auth_configs', methods: ['GET'])]
-    public function listAuthConfigs(): void
+    public function listAuthConfigs(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $configs = $this->authConfigRepository->findAll();
-        $this->render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
+        return $this->render('@modules/Admin/templates/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
     #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
-    public function createAuthConfig(): void
+    public function createAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
-        $this->render('@modules/Admin/templates/auth_configs/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'supportedProviders' => $supportedProviders,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new_post', methods: ['POST'])]
-    public function storeAuthConfig(): void
+    public function storeAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -741,8 +701,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/auth_configs/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs/new');
         }
 
         $data = $_POST;
@@ -750,12 +709,11 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $this->authConfigRepository->save($data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно створено.";
-        header('Location: /admin/auth_configs');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
     #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
-    public function editAuthConfig(): void
+    public function editAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -763,23 +721,22 @@ class AdminController extends \App\Core\Controller\AbstractController
         $config = $this->authConfigRepository->findById($id);
 
         if (!$config) {
-            http_response_code(404);
-            echo "Конфігурацію аутентифікації не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
         }
         $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
 
-        $this->render('@modules/Admin/templates/auth_configs/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'supportedProviders' => $supportedProviders,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit_post', methods: ['POST'])]
-    public function updateAuthConfig(): void
+    public function updateAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -787,9 +744,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $config = $this->authConfigRepository->findById($id);
 
         if (!$config) {
-            http_response_code(404);
-            echo "Конфігурацію аутентифікації не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -800,8 +755,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/auth_configs/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs/edit?id=' . $id);
         }
 
         $data = $_POST;
@@ -809,24 +763,22 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $this->authConfigRepository->update($id, $data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно оновлено.";
-        header('Location: /admin/auth_configs');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
     #[Route('/admin/auth_configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
-    public function deleteAuthConfig(): void
+    public function deleteAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->authConfigRepository->delete($id);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
-        header('Location: /admin/auth_configs');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
     #[Route('/admin/auth_configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
-    public function showAuthConfig(): void
+    public function showAuthConfig(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -834,38 +786,37 @@ class AdminController extends \App\Core\Controller\AbstractController
         $config = $this->authConfigRepository->findById($id);
 
         if (!$config) {
-            http_response_code(404);
-            echo "Конфігурацію аутентифікації не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
         }
 
         $redirectUri = $_ENV['APP_BASE_URL'] . '/oauth/callback/' . $config['provider'];
 
-        $this->render('@modules/Admin/templates/auth_configs/show.html.twig', [
+        return $this->render('@modules/Admin/templates/auth_configs/show.html.twig', [
             'config' => $config,
             'redirectUri' => $redirectUri,
         ]);
     }
 
     // --- Backup Policy Management ---
-    public function listBackupPolicies(): void
+    public function listBackupPolicies(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $policies = $this->backupPolicyRepository->findAll();
-        $this->render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
+        return $this->render('@modules/Admin/templates/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
-    public function createBackupPolicy(): void
+    public function createBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $this->render('@modules/Admin/templates/backup_policies/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function storeBackupPolicy(): void
+    public function storeBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -880,17 +831,15 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/backup_policies/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies/new');
         }
 
         $this->backupPolicyRepository->save($_POST);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно створено.";
-        header('Location: /admin/backup_policies');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
-    public function editBackupPolicy(): void
+    public function editBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -898,20 +847,19 @@ class AdminController extends \App\Core\Controller\AbstractController
         $policy = $this->backupPolicyRepository->findById($id);
 
         if (!$policy) {
-            http_response_code(404);
-            echo "Політику резервного копіювання не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Політику резервного копіювання не знайдено", 404);
         }
 
-        $this->render('@modules/Admin/templates/backup_policies/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/backup_policies/edit.html.twig', [
             'policy' => $policy,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function updateBackupPolicy(): void
+    public function updateBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -919,9 +867,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $policy = $this->backupPolicyRepository->findById($id);
 
         if (!$policy) {
-            http_response_code(404);
-            echo "Політику резервного копіювання не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Політику резервного копіювання не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -935,46 +881,44 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/backup_policies/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies/edit?id=' . $id);
         }
 
         $this->backupPolicyRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно оновлено.";
-        header('Location: /admin/backup_policies');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
-    public function deleteBackupPolicy(): void
+    public function deleteBackupPolicy(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->backupPolicyRepository->delete($id);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
-        header('Location: /admin/backup_policies');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
     // --- KPI Definition Management ---
-    public function listKpiDefinitions(): void
+    public function listKpiDefinitions(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
+        return $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
-    public function createKpiDefinition(): void
+    public function createKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
+        $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function storeKpiDefinition(): void
+    public function storeKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -993,17 +937,15 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/kpi_definitions/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions/new');
         }
 
         $this->kpiRepository->saveKpiDefinition($_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно створено.";
-        header('Location: /admin/kpi_definitions');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
-    public function editKpiDefinition(): void
+    public function editKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -1011,20 +953,19 @@ class AdminController extends \App\Core\Controller\AbstractController
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
-            http_response_code(404);
-            echo "Визначення KPI не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
         }
 
-        $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
+        $response = $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    public function updateKpiDefinition(): void
+    public function updateKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
@@ -1032,9 +973,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
 
         if (!$definition) {
-            http_response_code(404);
-            echo "Визначення KPI не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -1052,39 +991,36 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/kpi_definitions/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions/edit?id=' . $id);
         }
 
         $this->kpiRepository->updateKpiDefinition($id, $_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
-        header('Location: /admin/kpi_definitions');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
-    public function deleteKpiDefinition(): void
+    public function deleteKpiDefinition(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
 
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
-        header('Location: /admin/kpi_definitions');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
     // --- Service Management ---
     #[Route('/admin/services', name: 'admin_services', methods: ['GET'])]
-    public function listServices(): void
+    public function listServices(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services'); // Specific permission for service management
         $services = $this->serviceRepository->findAll();
-        $this->render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
+        return $this->render('@modules/Admin/templates/services/index.html.twig', ['services' => $services]);
     }
 
     #[Route('/admin/services/new', name: 'admin_services_new', methods: ['GET'])]
-    public function createService(): void
+    public function createService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
@@ -1094,16 +1030,17 @@ class AdminController extends \App\Core\Controller\AbstractController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        $this->render('@modules/Admin/templates/services/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/services/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'categories' => $categoryOptions,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/services/new', name: 'admin_services_new_post', methods: ['POST'])]
-    public function storeService(): void
+    public function storeService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
@@ -1118,8 +1055,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/services/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services/new');
         }
 
         // Normalize is_active checkbox value
@@ -1127,12 +1063,11 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $this->serviceRepository->save($_POST);
         $_SESSION['success_message'] = "Послугу успішно створено.";
-        header('Location: /admin/services');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
     }
 
     #[Route('/admin/services/edit', name: 'admin_services_edit', methods: ['GET'])]
-    public function editService(): void
+    public function editService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
@@ -1141,9 +1076,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $service = $this->serviceRepository->findById($id);
 
         if (!$service) {
-            http_response_code(404);
-            echo "Послугу не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Послугу не знайдено", 404);
         }
 
         $categories = $this->serviceRepository->findCategories();
@@ -1152,17 +1085,18 @@ class AdminController extends \App\Core\Controller\AbstractController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        $this->render('@modules/Admin/templates/services/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/services/edit.html.twig', [
             'service' => $service,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'categories' => $categoryOptions,
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
     #[Route('/admin/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
-    public function updateService(): void
+    public function updateService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
@@ -1171,9 +1105,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $service = $this->serviceRepository->findById($id);
 
         if (!$service) {
-            http_response_code(404);
-            echo "Послугу не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Послугу не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -1186,8 +1118,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/services/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services/edit?id=' . $id);
         }
 
         // Normalize is_active checkbox value
@@ -1195,12 +1126,11 @@ class AdminController extends \App\Core\Controller\AbstractController
 
         $this->serviceRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Послугу успішно оновлено.";
-        header('Location: /admin/services');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
     }
 
     #[Route('/admin/services/delete', name: 'admin_services_delete', methods: ['POST'])]
-    public function deleteService(): void
+    public function deleteService(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_services');
@@ -1208,34 +1138,34 @@ class AdminController extends \App\Core\Controller\AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->serviceRepository->delete($id);
         $_SESSION['success_message'] = "Послугу успішно видалено.";
-        header('Location: /admin/services');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
     }
 
     // --- Service Category Management ---
-    #[Route('/admin/service-categories', name: 'admin_service_categories', methods: ['GET'])]
-    public function listServiceCategories(): void
+    #[Route('/admin/service_categories', name: 'admin_service_categories', methods: ['GET'])]
+    public function listServiceCategories(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
         $categories = $this->serviceRepository->findCategories();
-        $this->render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
+        return $this->render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
-    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
-    public function createServiceCategory(): void
+    #[Route('/admin/service_categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
+    public function createServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
-        $this->render('@modules/Admin/templates/service_categories/new.html.twig', [
+        $response = $this->render('@modules/Admin/templates/service_categories/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
-    public function storeServiceCategory(): void
+    #[Route('/admin/service_categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
+    public function storeServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
@@ -1249,18 +1179,16 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/service-categories/new');
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories/new');
         }
 
         $this->serviceRepository->saveCategory($_POST);
-        $_SESSION['success_message'] = "Категорію послуг успішно створено.";
-        header('Location: /admin/service-categories');
-        exit();
+        $_SESSION['success_message'] = "Категорію успішно створено.";
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
     }
 
-    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
-    public function editServiceCategory(): void
+    #[Route('/admin/service_categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
+    public function editServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
@@ -1269,21 +1197,20 @@ class AdminController extends \App\Core\Controller\AbstractController
         $category = $this->serviceRepository->findCategoryById($id);
 
         if (!$category) {
-            http_response_code(404);
-            echo "Категорію послуг не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Категорію послуг не знайдено", 404);
         }
 
-        $this->render('@modules/Admin/templates/service_categories/edit.html.twig', [
+        $response = $this->render('@modules/Admin/templates/service_categories/edit.html.twig', [
             'category' => $category,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
         unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
     }
 
-    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
-    public function updateServiceCategory(): void
+    #[Route('/admin/service_categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
+    public function updateServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
@@ -1292,9 +1219,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $category = $this->serviceRepository->findCategoryById($id);
 
         if (!$category) {
-            http_response_code(404);
-            echo "Категорію послуг не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Категорію послуг не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -1306,27 +1231,28 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            header('Location: /admin/service-categories/edit?id=' . $id);
-            exit();
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories/edit?id=' . $id);
         }
 
         $this->serviceRepository->updateCategory($id, $_POST);
-        $_SESSION['success_message'] = "Категорію послуг успішно оновлено.";
-        header('Location: /admin/service-categories');
-        exit();
+        $_SESSION['success_message'] = "Категорію успішно оновлено.";
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
     }
 
-    #[Route('/admin/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
-    public function deleteServiceCategory(): void
+    #[Route('/admin/service_categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
+    public function deleteServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
         Gate::authorize('admin.manage_service_categories');
 
         $id = (int)($_POST['id'] ?? 0);
+        if ($this->serviceRepository->categoryHasServices($id)) {
+            $_SESSION['error_message'] = "Не можна видалити категорію, до якої прив'язані послуги.";
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
+        }
         $this->serviceRepository->deleteCategory($id);
         $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
-        header('Location: /admin/service-categories');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
     }
 
     private function authorizeAdmin(): void
