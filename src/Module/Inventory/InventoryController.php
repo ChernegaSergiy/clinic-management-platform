@@ -8,14 +8,17 @@ use App\Core\Auth\Gate;
 use App\Core\Http\View;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Core\Validation\Validator;
 
 class InventoryController
 {
     private InventoryItemRepositoryInterface $inventoryItemRepository;
+    private Validator $validator;
 
-    public function __construct(InventoryItemRepositoryInterface $inventoryItemRepository)
+    public function __construct(InventoryItemRepositoryInterface $inventoryItemRepository, Validator $validator)
     {
         $this->inventoryItemRepository = $inventoryItemRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
@@ -60,7 +63,7 @@ class InventoryController
         AuthGuard::check();
         Gate::authorize('inventory.manage');
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],
@@ -148,7 +151,7 @@ class InventoryController
         }
 
         // TODO: Add validation
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $validator->validate($_POST, [
             'name' => ['required'],
             'quantity' => ['required', 'numeric', 'min:0'],
