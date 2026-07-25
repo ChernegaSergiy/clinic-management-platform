@@ -15,17 +15,20 @@ class MfaController
     private UserRepositoryInterface $userRepository;
     private SettingsRepository $settingsRepository;
     private RoleRepositoryInterface $roleRepository;
+    private \Doctrine\Persistence\ManagerRegistry $registry;
 
     public function __construct(
         MfaService $mfaService,
         UserRepositoryInterface $userRepository,
         SettingsRepository $settingsRepository,
-        RoleRepositoryInterface $roleRepository
+        RoleRepositoryInterface $roleRepository,
+        \Doctrine\Persistence\ManagerRegistry $registry
     ) {
         $this->mfaService = $mfaService;
         $this->userRepository = $userRepository;
         $this->settingsRepository = $settingsRepository;
         $this->roleRepository = $roleRepository;
+        $this->registry = $registry;
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode): void
@@ -584,10 +587,10 @@ class MfaController
 
         $backupCodes = $this->mfaService->generateBackupCodes();
 
-        $stmt = \App\Database\Database::getInstance()->prepare("
+        $conn = $this->registry->getConnection();
+        $conn->executeStatement("
             UPDATE users SET mfa_backup_codes = :codes WHERE id = :id
-        ");
-        $stmt->execute(['id' => $userId, 'codes' => json_encode($backupCodes)]);
+        ", ['id' => $userId, 'codes' => json_encode($backupCodes)]);
 
         $_SESSION['new_backup_codes'] = $backupCodes;
         header('Location: /user/profile');
