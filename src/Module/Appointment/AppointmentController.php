@@ -299,7 +299,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        $this->render('@modules/Appointment/templates/new.html.twig', [
+        return $this->render('@modules/Appointment/templates/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
@@ -805,6 +805,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/waitlist');
     }
 
+    #[Route('/appointments/load-analytics', name: 'appointment_load_analytics', methods: ['GET'])]
     public function showLoadAnalytics(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -819,10 +820,9 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
+    #[Route('/appointments/available-slots', name: 'appointment_available_slots_api', methods: ['GET'])]
     public function getAvailableSlotsApi(): \Symfony\Component\HttpFoundation\Response
     {
-        header('Content-Type: application/json');
-
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
         $selectedDateStr = $_GET['date'] ?? null;
         $selectedServiceId = (int)($_GET['service_id'] ?? 0);
@@ -852,6 +852,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         }
     }
 
+    #[Route('/appointments/waitlist/fulfill', name: 'appointment_fulfill_waitlist', methods: ['GET'])]
     public function fulfillWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -905,6 +906,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
+    #[Route('/appointments/waitlist/cancel', name: 'appointment_cancel_waitlist', methods: ['POST'])]
     public function cancelWaitlist(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
