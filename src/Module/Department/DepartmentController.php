@@ -25,20 +25,20 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/departments', name: 'admin_departments_index', methods: ['GET'])]
-    public function index(): void
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('department.read');
 
         $departments = $this->departmentRepository->findAll();
 
-        $this->render('@modules/Department/templates/index.html.twig', [
+        return $this->render('@modules/Department/templates/index.html.twig', [
             'departments' => $departments,
         ]);
     }
 
     #[Route('/admin/departments/new', name: 'admin_departments_new', methods: ['GET'])]
-    public function create(): void
+    public function create(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('department.write');
@@ -46,13 +46,13 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn($dept) => $dept['parent_id'] === null);
 
-        $this->render('@modules/Department/templates/new.html.twig', [
+        return $this->render('@modules/Department/templates/new.html.twig', [
             'parentOptions' => $parentOptions,
         ]);
     }
 
     #[Route('/admin/departments/new', name: 'admin_departments_new_post', methods: ['POST'])]
-    public function store(): void
+    public function store(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('department.write');
@@ -70,12 +70,11 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $departments = $this->departmentRepository->findAll();
             $parentOptions = array_filter($departments, fn($dept) => $dept['parent_id'] === null);
 
-            $this->render('@modules/Department/templates/new.html.twig', [
+            return $this->render('@modules/Department/templates/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'parentOptions' => $parentOptions,
             ]);
-            return;
         }
 
         if ($this->departmentRepository->save($_POST)) {
@@ -84,12 +83,11 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося створити відділ.';
         }
 
-        header('Location: /admin/departments');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
     }
 
     #[Route('/admin/departments/show', name: 'admin_departments_show', methods: ['GET'])]
-    public function show(): void
+    public function show(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -98,22 +96,20 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            http_response_code(404);
-            echo "Відділ не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
         }
 
         // Отримуємо співробітників цього відділу
         $employees = $this->hrmRepository->findByDepartment($id);
 
-        $this->render('@modules/Department/templates/show.html.twig', [
+        return $this->render('@modules/Department/templates/show.html.twig', [
             'department' => $department,
             'employees' => $employees,
         ]);
     }
 
     #[Route('/admin/departments/edit', name: 'admin_departments_edit', methods: ['GET'])]
-    public function edit(): void
+    public function edit(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -122,22 +118,20 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            http_response_code(404);
-            echo "Відділ не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
         }
 
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn($dept) => $dept['parent_id'] === null);
 
-        $this->render('@modules/Department/templates/edit.html.twig', [
+        return $this->render('@modules/Department/templates/edit.html.twig', [
             'department' => $department,
             'parentOptions' => $parentOptions,
         ]);
     }
 
     #[Route('/admin/departments/edit', name: 'admin_departments_edit_post', methods: ['POST'])]
-    public function update(): void
+    public function update(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -146,9 +140,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            http_response_code(404);
-            echo "Відділ не знайдено";
-            return;
+            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -164,12 +156,11 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $departments = $this->departmentRepository->findAll();
             $parentOptions = array_filter($departments, fn($dept) => $dept['parent_id'] === null);
 
-            $this->render('@modules/Department/templates/edit.html.twig', [
+            return $this->render('@modules/Department/templates/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'department' => array_merge($department, $_POST),
                 'parentOptions' => $parentOptions,
             ]);
-            return;
         }
 
         if ($this->departmentRepository->update($id, $_POST)) {
@@ -178,12 +169,11 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося оновити дані.';
         }
 
-        header('Location: /admin/departments/show?id=' . $id);
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments/show?id=' . $id);
     }
 
     #[Route('/admin/departments/delete', name: 'admin_departments_delete', methods: ['POST'])]
-    public function delete(): void
+    public function delete(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('department.delete');
@@ -199,12 +189,11 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             }
         }
 
-        header('Location: /admin/departments');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
     }
 
     #[Route('/admin/departments/toggle-status', name: 'admin_departments_toggle_status', methods: ['POST'])]
-    public function toggleStatus(): void
+    public function toggleStatus(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         Gate::authorize('department.manage');
@@ -218,7 +207,6 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['success_message'] = 'Статус відділу оновлено.';
         }
 
-        header('Location: /admin/departments');
-        exit();
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
     }
 }
