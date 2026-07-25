@@ -11,6 +11,7 @@ use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\OAuthController;
 use App\Core\Validation\Validator;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends \App\Core\Controller\AbstractController
 {
@@ -40,6 +41,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
+    #[Route('/login', name: 'login_form', methods: ['GET'])]
     public function showLoginForm(): \Symfony\Component\HttpFoundation\Response
     {
         $old = $_SESSION['old'] ?? [];
@@ -54,6 +56,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         ]);
     }
 
+    #[Route('/login', name: 'login_post', methods: ['POST'])]
     public function login(): \Symfony\Component\HttpFoundation\Response
     {
         // Ensure at least one admin exists (useful for fresh installs without seeding)
@@ -141,11 +144,13 @@ class AuthController extends \App\Core\Controller\AbstractController
      * @param string $provider
      * @return void
      */
+    #[Route('/oauth/{provider}', name: 'oauth_login', methods: ['GET'])]
     public function redirectToProvider(string $provider): \Symfony\Component\HttpFoundation\Response
     {
         return $this->oauthController->redirect($provider);
     }
 
+    #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
     public function logout(): \Symfony\Component\HttpFoundation\Response
     {
         $userId = $_SESSION['user']['id'] ?? null;
@@ -157,6 +162,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/');
     }
 
+    #[Route('/dashboard_redirect', name: 'dashboard_redirect', methods: ['GET'])]
     public function dashboard(): \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
