@@ -1154,7 +1154,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Category Management ---
-    #[Route('/admin/service_categories', name: 'admin_service_categories', methods: ['GET'])]
+    #[Route('/admin/service-categories', name: 'admin_service_categories', methods: ['GET'])]
     public function listServiceCategories(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1163,7 +1163,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@modules/Admin/templates/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
-    #[Route('/admin/service_categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
+    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
     public function createServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1176,7 +1176,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/service_categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
+    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
     public function storeServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1191,15 +1191,15 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories/new');
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories/new');
         }
 
         $this->serviceRepository->saveCategory($_POST);
         $_SESSION['success_message'] = "Категорію успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
-    #[Route('/admin/service_categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
+    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
     public function editServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1221,7 +1221,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/service_categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
+    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
     public function updateServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1243,15 +1243,15 @@ class AdminController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories/edit?id=' . $id);
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories/edit?id=' . $id);
         }
 
         $this->serviceRepository->updateCategory($id, $_POST);
         $_SESSION['success_message'] = "Категорію успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
-    #[Route('/admin/service_categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
+    #[Route('/admin/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
     public function deleteServiceCategory(): \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1260,11 +1260,11 @@ class AdminController extends \App\Core\Controller\AbstractController
         $id = (int)($_POST['id'] ?? 0);
         if ($this->serviceRepository->categoryHasServices($id)) {
             $_SESSION['error_message'] = "Не можна видалити категорію, до якої прив'язані послуги.";
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
         }
         $this->serviceRepository->deleteCategory($id);
         $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service_categories');
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
     private function authorizeAdmin(): void
