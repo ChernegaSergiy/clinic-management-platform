@@ -20,19 +20,22 @@ class PrescriptionController
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private UserRepositoryInterface $userRepository;
     private InventoryItemRepositoryInterface $inventoryItemRepository;
+    private Validator $validator;
 
     public function __construct(
         PrescriptionRepository $prescriptionRepository,
         PatientRepositoryInterface $patientRepository,
         MedicalRecordRepositoryInterface $medicalRecordRepository,
         UserRepositoryInterface $userRepository,
-        InventoryItemRepositoryInterface $inventoryItemRepository
+        InventoryItemRepositoryInterface $inventoryItemRepository,
+        Validator $validator
     ) {
         $this->prescriptionRepository = $prescriptionRepository;
         $this->patientRepository = $patientRepository;
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->userRepository = $userRepository;
         $this->inventoryItemRepository = $inventoryItemRepository;
+        $this->validator = $validator;
     }
 
     public function index(): void
@@ -91,7 +94,7 @@ class PrescriptionController
         AuthGuard::check();
         Gate::authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
-        $validator = new \App\Core\Validation\Validator(Database::getInstance());
+        $validator = $this->validator;
         $rules = [
             'patient_id' => ['required'],
             'doctor_id' => ['required'],
