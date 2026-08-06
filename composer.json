@@ -57,7 +57,8 @@
         "phpstan/phpstan": "^2.1",
         "squizlabs/php_codesniffer": "^4.0",
         "phpunit/phpunit": "^10.5",
-        "doctrine/doctrine-fixtures-bundle": "^4.3"
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "friendsofphp/php-cs-fixer": "^3.95"
     },
     "autoload": {
         "psr-4": {
