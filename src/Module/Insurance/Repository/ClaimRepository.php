@@ -15,7 +15,7 @@ class ClaimRepository extends ServiceEntityRepository
         parent::__construct($registry, Claim::class);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM claims WHERE id = :id";
@@ -23,7 +23,7 @@ class ClaimRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findByIdWithDetails(int $id): ?array
+    public function findByIdWithDetails(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -44,7 +44,7 @@ class ClaimRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findByInvoiceId(int $invoiceId): ?array
+    public function findByInvoiceId(int $invoiceId) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM claims WHERE invoice_id = :invoice_id";
@@ -52,14 +52,14 @@ class ClaimRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findByPatientPolicyId(int $patientPolicyId): array
+    public function findByPatientPolicyId(int $patientPolicyId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM claims WHERE patient_policy_id = :patient_policy_id";
         return $conn->fetchAllAssociative($sql, ['patient_policy_id' => $patientPolicyId]);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -79,7 +79,7 @@ class ClaimRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function create(int $invoiceId, int $patientPolicyId, string $status, float $totalClaimed, ?string $submittedAt = null): int
+    public function create(int $invoiceId, int $patientPolicyId, string $status, float $totalClaimed, ?string $submittedAt = null) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -96,7 +96,7 @@ class ClaimRepository extends ServiceEntityRepository
         return (int) $conn->lastInsertId();
     }
 
-    public function update(int $id, string $status, ?string $submittedAt = null, ?float $totalPaid = null): bool
+    public function update(int $id, string $status, ?string $submittedAt = null, ?float $totalPaid = null) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "

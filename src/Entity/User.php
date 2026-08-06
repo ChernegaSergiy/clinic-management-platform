@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\User\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\User\Repository\UserRepository;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
@@ -55,149 +55,149 @@ class User
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getUsername() : ?string
     {
         return $this->username;
     }
 
-    public function setUsername(string $username): static
+    public function setUsername(string $username) : static
     {
         $this->username = $username;
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail() : ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email) : static
     {
         $this->email = $email;
         return $this;
     }
 
-    public function getPasswordHash(): ?string
+    public function getPasswordHash() : ?string
     {
         return $this->password_hash;
     }
 
-    public function setPasswordHash(?string $passwordHash): static
+    public function setPasswordHash(?string $passwordHash) : static
     {
         $this->password_hash = $passwordHash;
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName() : ?string
     {
         return $this->first_name;
     }
 
-    public function setFirstName(?string $firstName): static
+    public function setFirstName(?string $firstName) : static
     {
         $this->first_name = $firstName;
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName() : ?string
     {
         return $this->last_name;
     }
 
-    public function setLastName(?string $lastName): static
+    public function setLastName(?string $lastName) : static
     {
         $this->last_name = $lastName;
         return $this;
     }
 
-    public function getRole(): ?Role
+    public function getRole() : ?Role
     {
         return $this->role;
     }
 
-    public function setRole(?Role $role): static
+    public function setRole(?Role $role) : static
     {
         $this->role = $role;
         return $this;
     }
 
-    public function getProfilePhotoPath(): ?string
+    public function getProfilePhotoPath() : ?string
     {
         return $this->profile_photo_path;
     }
 
-    public function setProfilePhotoPath(?string $profilePhotoPath): static
+    public function setProfilePhotoPath(?string $profilePhotoPath) : static
     {
         $this->profile_photo_path = $profilePhotoPath;
         return $this;
     }
 
-    public function isMfaEnabled(): bool
+    public function isMfaEnabled() : bool
     {
         return $this->mfa_enabled;
     }
 
-    public function setMfaEnabled(bool $mfaEnabled): static
+    public function setMfaEnabled(bool $mfaEnabled) : static
     {
         $this->mfa_enabled = $mfaEnabled;
         return $this;
     }
 
-    public function getMfaType(): ?string
+    public function getMfaType() : ?string
     {
         return $this->mfa_type;
     }
 
-    public function setMfaType(?string $mfaType): static
+    public function setMfaType(?string $mfaType) : static
     {
         $this->mfa_type = $mfaType;
         return $this;
     }
 
-    public function getMfaVerifiedAt(): ?\DateTimeInterface
+    public function getMfaVerifiedAt() : ?\DateTimeInterface
     {
         return $this->mfa_verified_at;
     }
 
-    public function setMfaVerifiedAt(?\DateTimeInterface $mfaVerifiedAt): static
+    public function setMfaVerifiedAt(?\DateTimeInterface $mfaVerifiedAt) : static
     {
         $this->mfa_verified_at = $mfaVerifiedAt;
         return $this;
     }
 
-    public function isMfaPending(): bool
+    public function isMfaPending() : bool
     {
         return $this->mfa_pending;
     }
 
-    public function setMfaPending(bool $mfaPending): static
+    public function setMfaPending(bool $mfaPending) : static
     {
         $this->mfa_pending = $mfaPending;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt) : static
     {
         $this->updated_at = $updatedAt;
         return $this;

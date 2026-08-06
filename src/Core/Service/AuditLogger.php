@@ -13,10 +13,10 @@ class AuditLogger
         $this->registry = $registry;
     }
 
-    public function log(string $entityType, int $entityId, string $action, ?string $oldValue = null, ?string $newValue = null, ?int $userId = null): bool
+    public function log(string $entityType, int $entityId, string $action, ?string $oldValue = null, ?string $newValue = null, ?int $userId = null) : bool
     {
         $conn = $this->registry->getConnection();
-        
+
         $sql = "INSERT INTO audit_logs (entity_type, entity_id, user_id, action, old_value, new_value) 
                 VALUES (:entity_type, :entity_id, :user_id, :action, :old_value, :new_value)";
 

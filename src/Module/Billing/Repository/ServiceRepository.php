@@ -13,7 +13,7 @@ class ServiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Service::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -25,7 +25,7 @@ class ServiceRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -38,12 +38,12 @@ class ServiceRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO services (name, description, price, category_id, is_active) 
                 VALUES (:name, :description, :price, :category_id, :is_active)";
-        
+
         $success = $conn->executeStatement($sql, [
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
@@ -51,11 +51,11 @@ class ServiceRepository extends ServiceEntityRepository
             'category_id' => $data['category_id'] ?? null,
             'is_active' => $data['is_active'] ?? true,
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE services SET 
@@ -65,7 +65,7 @@ class ServiceRepository extends ServiceEntityRepository
                     category_id = :category_id, 
                     is_active = :is_active 
                 WHERE id = :id";
-                
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'name' => $data['name'],
@@ -76,47 +76,47 @@ class ServiceRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM services WHERE id = :id";
         return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
 
-    public function findCategories(): array
+    public function findCategories() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, name, description FROM service_categories ORDER BY name ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function saveCategory(array $data): ?int
+    public function saveCategory(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO service_categories (name, description) VALUES (:name, :description)";
-        
+
         $success = $conn->executeStatement($sql, [
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function findCategoryById(int $id): ?array
+    public function findCategoryById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM service_categories WHERE id = :id";
-        
+
         $result = $conn->fetchAssociative($sql, ['id' => $id]);
         return $result ?: null;
     }
 
-    public function updateCategory(int $id, array $data): bool
+    public function updateCategory(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE service_categories SET name = :name, description = :description WHERE id = :id";
-        
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'name' => $data['name'],
@@ -124,7 +124,7 @@ class ServiceRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function deleteCategory(int $id): bool
+    public function deleteCategory(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM service_categories WHERE id = :id";

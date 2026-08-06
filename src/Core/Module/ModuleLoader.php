@@ -20,7 +20,7 @@ class ModuleLoader
         $this->namespacePrefix = $namespacePrefix;
     }
 
-    public function loadAll(): void
+    public function loadAll() : void
     {
         $modules = $this->discoverModules();
 
@@ -29,7 +29,7 @@ class ModuleLoader
         }
     }
 
-    public function loadFromConfig(array $config): void
+    public function loadFromConfig(array $config) : void
     {
         foreach ($config as $moduleName => $moduleConfig) {
             if (!($moduleConfig['enabled'] ?? true)) {
@@ -44,7 +44,7 @@ class ModuleLoader
         }
     }
 
-    public function discoverModules(): array
+    public function discoverModules() : array
     {
         $discovery = new ModuleDiscovery($this->modulesPath);
         $moduleNames = $discovery->discover();
@@ -63,7 +63,7 @@ class ModuleLoader
         return $modules;
     }
 
-    public function getModuleManager(): ModuleManager
+    public function getModuleManager() : ModuleManager
     {
         return $this->moduleManager;
     }

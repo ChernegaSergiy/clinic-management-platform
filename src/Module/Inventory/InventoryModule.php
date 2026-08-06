@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Inventory\InventoryController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class InventoryModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/inventory', [InventoryController::class, 'index']);
         $router->add('GET', '/inventory/new', [InventoryController::class, 'create']);
@@ -22,7 +21,7 @@ class InventoryModule extends BaseModule
         $router->add('POST', '/inventory/edit', [InventoryController::class, 'update']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Inventory\Repository\InventoryItemRepository::class)->setPublic(true);
         $container->register(\App\Module\Inventory\InventoryController::class)
@@ -31,7 +30,7 @@ class InventoryModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('inventory.manage', 'Керування складом');
 
@@ -39,7 +38,7 @@ class InventoryModule extends BaseModule
         $registry->addRoleMapping('inventory_manager', ['inventory.manage']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('inventory', InventoryPolicy::class);
     }

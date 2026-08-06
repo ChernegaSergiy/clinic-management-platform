@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Insurance\Repository\ClaimRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Insurance\Repository\ClaimRepository;
 
 #[ORM\Entity(repositoryClass: ClaimRepository::class)]
 #[ORM\Table(name: 'claims')]

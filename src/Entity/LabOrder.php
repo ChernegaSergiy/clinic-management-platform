@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\LabOrder\Repository\LabOrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\LabOrder\Repository\LabOrderRepository;
 
 #[ORM\Entity(repositoryClass: LabOrderRepository::class)]
 #[ORM\Table(name: 'lab_orders')]

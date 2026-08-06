@@ -2,8 +2,8 @@
 
 namespace App\Module\MedicalRecord\Repository;
 
-use PHPUnit\Framework\TestCase;
 use PDO;
+use PHPUnit\Framework\TestCase;
 
 class MedicalRecordRepositoryTest extends TestCase
 {
@@ -11,7 +11,7 @@ class MedicalRecordRepositoryTest extends TestCase
     private PDO $mockPdo;
     private \PDOStatement $mockStmt;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->mockPdo = $this->createMock(PDO::class);
         $this->mockStmt = $this->createMock(\PDOStatement::class);
@@ -25,7 +25,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->repository = $repository;
     }
 
-    public function testFindByPatientIdReturnsRecords(): void
+    public function testFindByPatientIdReturnsRecords() : void
     {
         $expected = [
             ['id' => 1, 'diagnosis_text' => 'Checkup'],
@@ -36,7 +36,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindByDoctorIdReturnsRecords(): void
+    public function testFindByDoctorIdReturnsRecords() : void
     {
         $expected = [
             ['id' => 1, 'patient_name' => 'John Doe'],
@@ -47,7 +47,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindAllReturnsRecords(): void
+    public function testFindAllReturnsRecords() : void
     {
         $expected = [
             ['id' => 1, 'diagnosis_text' => 'Checkup'],
@@ -58,7 +58,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindByIdReturnsNullWhenNotFound(): void
+    public function testFindByIdReturnsNullWhenNotFound() : void
     {
         $this->mockStmt->method('fetch')->willReturn(false);
         $this->mockStmt->method('fetchAll')->willReturn([]);
@@ -66,7 +66,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testFindByIdReturnsRecordWithIcdCodes(): void
+    public function testFindByIdReturnsRecordWithIcdCodes() : void
     {
         $expectedRecord = ['id' => 1, 'diagnosis_text' => 'Checkup'];
         $expectedIcdCodes = [
@@ -81,20 +81,20 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertArrayHasKey('intervention_codes', $result);
     }
 
-    public function testAttachIcdCodesFiltersInvalidIds(): void
+    public function testAttachIcdCodesFiltersInvalidIds() : void
     {
         $this->mockStmt->method('execute')->willReturn(true);
         $result = $this->repository->attachIcdCodes(1, [1, 2, 0, -1, 'abc', 3]);
         $this->assertTrue($result);
     }
 
-    public function testAttachIcdCodesWithEmptyArray(): void
+    public function testAttachIcdCodesWithEmptyArray() : void
     {
         $result = $this->repository->attachIcdCodes(1, []);
         $this->assertTrue($result);
     }
 
-    public function testGetIcdCodesForMedicalRecord(): void
+    public function testGetIcdCodesForMedicalRecord() : void
     {
         $expected = [
             ['id' => 1, 'code' => 'A01', 'description' => 'Typhoid fever'],
@@ -105,7 +105,7 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testGetInterventionCodesForMedicalRecord(): void
+    public function testGetInterventionCodesForMedicalRecord() : void
     {
         $expected = [
             ['id' => 1, 'code' => 'T81.0', 'description' => 'Drainage of wound']
@@ -115,14 +115,14 @@ class MedicalRecordRepositoryTest extends TestCase
         $this->assertCount(1, $result);
     }
 
-    public function testAttachInterventionCodesFiltersInvalidIds(): void
+    public function testAttachInterventionCodesFiltersInvalidIds() : void
     {
         $this->mockStmt->method('execute')->willReturn(true);
         $result = $this->repository->attachInterventionCodes(1, [1, 'invalid', 0, 2]);
         $this->assertTrue($result);
     }
 
-    public function testAttachInterventionCodesWithEmptyArray(): void
+    public function testAttachInterventionCodesWithEmptyArray() : void
     {
         $result = $this->repository->attachInterventionCodes(1, []);
         $this->assertTrue($result);

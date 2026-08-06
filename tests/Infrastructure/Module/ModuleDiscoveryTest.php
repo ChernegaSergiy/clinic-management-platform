@@ -2,31 +2,31 @@
 
 namespace Tests\Infrastructure\Module;
 
-use PHPUnit\Framework\TestCase;
 use App\Infrastructure\Module\ModuleDiscovery;
+use PHPUnit\Framework\TestCase;
 
 class ModuleDiscoveryTest extends TestCase
 {
     private string $tempDir;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->tempDir = sys_get_temp_dir() . '/module_discovery_test_' . uniqid();
         mkdir($this->tempDir, 0777, true);
     }
 
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
         if (is_dir($this->tempDir)) {
             $this->deleteDir($this->tempDir);
         }
     }
 
-    private function deleteDir(string $dir): void
+    private function deleteDir(string $dir) : void
     {
         $items = scandir($dir);
         foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
+            if ('.' === $item || '..' === $item) {
                 continue;
             }
             $path = $dir . DIRECTORY_SEPARATOR . $item;
@@ -39,7 +39,7 @@ class ModuleDiscoveryTest extends TestCase
         rmdir($dir);
     }
 
-    public function test_discovers_valid_modules(): void
+    public function test_discovers_valid_modules() : void
     {
         mkdir($this->tempDir . '/User');
         mkdir($this->tempDir . '/Billing');
@@ -49,7 +49,7 @@ class ModuleDiscoveryTest extends TestCase
         $this->assertSame(['Billing', 'User'], $modules);
     }
 
-    public function test_ignores_invalid_directories(): void
+    public function test_ignores_invalid_directories() : void
     {
         mkdir($this->tempDir . '/ValidModule');
         touch($this->tempDir . '/not_a_dir.txt');

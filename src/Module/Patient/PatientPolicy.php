@@ -21,7 +21,7 @@ class PatientPolicy implements Policy
         $this->patientRepository = $patientRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('patient.view.any')) {
             return true;
@@ -39,7 +39,7 @@ class PatientPolicy implements Policy
         return false;
     }
 
-    public function edit(User $user, array $context): bool
+    public function edit(User $user, array $context) : bool
     {
         if ($user->hasPermission('patient.edit.any')) {
             return true;
@@ -56,12 +56,12 @@ class PatientPolicy implements Policy
         return false;
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         return $user->hasPermission('patient.create');
     }
 
-    private function isUserAssignedToPatient(User $user, int $patientId): bool
+    private function isUserAssignedToPatient(User $user, int $patientId) : bool
     {
         return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
     }

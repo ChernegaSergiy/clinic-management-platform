@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Admin\Repository\BackupPolicyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Admin\Repository\BackupPolicyRepository;
 
 #[ORM\Entity(repositoryClass: BackupPolicyRepository::class)]
 #[ORM\Table(name: 'backup_policies')]

@@ -2,24 +2,20 @@
 
 namespace App\Module\Patient;
 
-use App\Database\Database;
-
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepository;
-use App\Module\Billing\Repository\InvoiceRepository;
+use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
+use App\Module\Billing\Repository\InvoiceRepositoryInterface;
+use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
-use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
-use App\Module\Billing\Repository\InvoiceRepositoryInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PatientController extends \App\Core\Controller\AbstractController
 {
@@ -32,7 +28,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     private ClaimRepository $claimRepository;
     private InvoiceRepositoryInterface $invoiceRepository;
     private Validator $validator;
-    
+
     public function __construct(
         PatientRepositoryInterface $patientRepository,
         MedicalRecordRepositoryInterface $medicalRecordRepository,
@@ -56,7 +52,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients', name: 'patient_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
@@ -79,7 +75,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/new', name: 'patient_create', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.create');
@@ -87,7 +83,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/new', name: 'patient_store', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.create');
@@ -111,9 +107,9 @@ class PatientController extends \App\Core\Controller\AbstractController
         if (!$this->patientRepository->save($_POST)) {
             $errorCode = $this->patientRepository->getLastError();
             $errors = [];
-            if ($errorCode === 'tax_id_exists') {
+            if ('tax_id_exists' === $errorCode) {
                 $errors['tax_id'] = 'РНОКПП вже використовується іншим пацієнтом.';
-            } elseif ($errorCode === 'patient_exists') {
+            } elseif ('patient_exists' === $errorCode) {
                 $errors['duplicate'] = 'Пацієнт з такими ПІБ та датою народження вже існує.';
             } else {
                 $errors['save'] = 'Не вдалося зберегти пацієнта. Спробуйте ще раз.';
@@ -128,7 +124,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/show', name: 'patient_show', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -151,7 +147,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/edit', name: 'patient_edit', methods: ['GET'])]
-    public function edit(): Response
+    public function edit() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -167,7 +163,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/edit', name: 'patient_update', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -198,7 +194,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         if (!$this->patientRepository->update($id, $_POST)) {
             $errorCode = $this->patientRepository->getLastError();
             $errors = [];
-            if ($errorCode === 'tax_id_exists') {
+            if ('tax_id_exists' === $errorCode) {
                 $errors['tax_id'] = 'РНОКПП вже використовується іншим пацієнтом.';
             } else {
                 $errors['update'] = 'Не вдалося оновити дані пацієнта. Спробуйте ще раз.';
@@ -213,7 +209,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/export-csv', name: 'patient_export_csv', methods: ['GET'])]
-    public function exportCsv(): Response
+    public function exportCsv() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.view.any');
@@ -232,7 +228,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/export-json', name: 'patient_export_json', methods: ['GET'])]
-    public function exportPatientsToJson(): Response
+    public function exportPatientsToJson() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.view.any');
@@ -251,11 +247,11 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/import-json', name: 'patient_import_json', methods: ['GET', 'POST'])]
-    public function importPatientsFromJson(): Response
+    public function importPatientsFromJson() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.create');
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ('GET' === $_SERVER['REQUEST_METHOD']) {
             $response = $this->render('@modules/Patient/templates/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
                 'success_message' => $_SESSION['success_message'] ?? null,
@@ -272,7 +268,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $file = $_FILES['json_file'];
 
-        if ($file['error'] !== UPLOAD_ERR_OK) {
+        if (UPLOAD_ERR_OK !== $file['error']) {
             $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
             return new RedirectResponse('/patients/import-json');
         }
@@ -280,7 +276,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         $jsonContent = file_get_contents($file['tmp_name']);
         $patientsData = json_decode($jsonContent, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             $_SESSION['errors']['file'] = 'Помилка парсингу JSON файлу: ' . json_last_error_msg();
             return new RedirectResponse('/patients/import-json');
         }
@@ -345,7 +341,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/toggle-status', name: 'patient_toggle_status', methods: ['POST'])]
-    public function toggleStatus(): Response
+    public function toggleStatus() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit.any');
@@ -354,7 +350,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         $patient = $this->patientRepository->findById($id);
 
         if ($patient) {
-            $newStatus = $patient['status'] === 'active' ? 'archived' : 'active';
+            $newStatus = 'active' === $patient['status'] ? 'archived' : 'active';
             $this->patientRepository->updateStatus($id, $newStatus);
         }
 
@@ -362,7 +358,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/{patientId}/policies/add', name: 'patient_policy_add', methods: ['GET'])]
-    public function addPolicy(int $patientId): Response
+    public function addPolicy(int $patientId) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit', ['id' => $patientId]);
@@ -381,7 +377,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/{patientId}/policies/store', name: 'patient_policy_store', methods: ['POST'])]
-    public function storePolicy(int $patientId): Response
+    public function storePolicy(int $patientId) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit', ['id' => $patientId]);
@@ -424,7 +420,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/{patientId}/policies/edit', name: 'patient_policy_edit', methods: ['GET'])]
-    public function editPolicy(int $patientId): Response
+    public function editPolicy(int $patientId) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit', ['id' => $patientId]);
@@ -447,7 +443,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/{patientId}/policies/update', name: 'patient_policy_update', methods: ['POST'])]
-    public function updatePolicy(int $patientId): Response
+    public function updatePolicy(int $patientId) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit', ['id' => $patientId]);
@@ -495,7 +491,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/patients/{patientId}/policies/delete', name: 'patient_policy_delete', methods: ['POST'])]
-    public function deletePolicy(int $patientId): Response
+    public function deletePolicy(int $patientId) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('patient.edit', ['id' => $patientId]);

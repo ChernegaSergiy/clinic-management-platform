@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Schedule\ScheduleController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ScheduleModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/doctor/schedule', [ScheduleController::class, 'index']);
         $router->add('POST', '/doctor/schedule/update', [ScheduleController::class, 'update']);
@@ -27,7 +26,7 @@ class ScheduleModule extends BaseModule
         $router->add('POST', '/admin/schedules/exceptions/delete', [ScheduleController::class, 'adminDeleteException']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Schedule\Repository\DoctorScheduleRepository::class)->setPublic(true);
         $container->register(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class)->setPublic(true);
@@ -47,7 +46,7 @@ class ScheduleModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('schedules.manage_all', 'Керування всіма розкладами');
         $registry->add('schedules.manage_own', 'Керування власним розкладом');
@@ -57,7 +56,7 @@ class ScheduleModule extends BaseModule
         $registry->addRoleMapping('doctor', ['schedules.manage_own']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('schedules', SchedulePolicy::class);
     }

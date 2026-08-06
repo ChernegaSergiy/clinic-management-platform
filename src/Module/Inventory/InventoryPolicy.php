@@ -7,7 +7,7 @@ use App\Core\Model\User;
 
 class InventoryPolicy implements Policy
 {
-    public function manage(User $user, array $context): bool
+    public function manage(User $user, array $context) : bool
     {
         return $user->hasPermission('inventory.manage');
     }

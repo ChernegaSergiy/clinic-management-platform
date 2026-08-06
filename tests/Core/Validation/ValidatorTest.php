@@ -2,8 +2,8 @@
 
 namespace App\Core\Validation;
 
-use PHPUnit\Framework\TestCase;
 use PDO;
+use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase
 {
@@ -11,7 +11,7 @@ class ValidatorTest extends TestCase
     private \PDOStatement $mockStmt;
     private \PDO $mockPdo;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->mockPdo = $this->createMock(PDO::class);
         $this->mockStmt = $this->createMock(\PDOStatement::class);
@@ -21,164 +21,164 @@ class ValidatorTest extends TestCase
         $this->validator = new Validator($this->mockPdo);
     }
 
-    public function testValidateWithNoRulesReturnsTrue(): void
+    public function testValidateWithNoRulesReturnsTrue() : void
     {
         $result = $this->validator->validate([], []);
         $this->assertTrue($result);
     }
 
-    public function testRequiredRuleFailsWhenFieldEmpty(): void
+    public function testRequiredRuleFailsWhenFieldEmpty() : void
     {
         $result = $this->validator->validate(['name' => ''], ['name' => ['required']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['name']);
     }
 
-    public function testRequiredRuleFailsWhenFieldMissing(): void
+    public function testRequiredRuleFailsWhenFieldMissing() : void
     {
         $result = $this->validator->validate([], ['name' => ['required']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['name']);
     }
 
-    public function testRequiredRulePassesWhenFieldHasValue(): void
+    public function testRequiredRulePassesWhenFieldHasValue() : void
     {
         $result = $this->validator->validate(['name' => 'John'], ['name' => ['required']]);
         $this->assertTrue($result);
         $this->assertEmpty($this->validator->getErrors());
     }
 
-    public function testEmailRuleFailsOnInvalidEmail(): void
+    public function testEmailRuleFailsOnInvalidEmail() : void
     {
         $result = $this->validator->validate(['email' => 'invalid'], ['email' => ['email']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['email']);
     }
 
-    public function testEmailRulePassesOnValidEmail(): void
+    public function testEmailRulePassesOnValidEmail() : void
     {
         $result = $this->validator->validate(['email' => 'test@example.com'], ['email' => ['email']]);
         $this->assertTrue($result);
     }
 
-    public function testEmailRulePassesOnEmptyEmail(): void
+    public function testEmailRulePassesOnEmptyEmail() : void
     {
         $result = $this->validator->validate(['email' => ''], ['email' => ['email']]);
         $this->assertTrue($result);
     }
 
-    public function testMinRuleFailsWhenTooShort(): void
+    public function testMinRuleFailsWhenTooShort() : void
     {
         $result = $this->validator->validate(['password' => '123'], ['password' => ['min:8']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['password']);
     }
 
-    public function testMinRulePassesWhenLongEnough(): void
+    public function testMinRulePassesWhenLongEnough() : void
     {
         $result = $this->validator->validate(['password' => '12345678'], ['password' => ['min:8']]);
         $this->assertTrue($result);
     }
 
-    public function testDateRuleFailsOnInvalidDate(): void
+    public function testDateRuleFailsOnInvalidDate() : void
     {
         $result = $this->validator->validate(['date' => 'not-a-date'], ['date' => ['date']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['date']);
     }
 
-    public function testDateRulePassesOnValidDate(): void
+    public function testDateRulePassesOnValidDate() : void
     {
         $result = $this->validator->validate(['date' => '2024-06-15'], ['date' => ['date']]);
         $this->assertTrue($result);
     }
 
-    public function testDatetimeRulePassesWithSeconds(): void
+    public function testDatetimeRulePassesWithSeconds() : void
     {
         $result = $this->validator->validate(['datetime' => '2024-06-15 10:30:45'], ['datetime' => ['datetime']]);
         $this->assertTrue($result);
     }
 
-    public function testDatetimeRulePassesWithoutSeconds(): void
+    public function testDatetimeRulePassesWithoutSeconds() : void
     {
         $result = $this->validator->validate(['datetime' => '2024-06-15 10:30'], ['datetime' => ['datetime']]);
         $this->assertTrue($result);
     }
 
-    public function testDatetimeRuleFailsOnInvalidFormat(): void
+    public function testDatetimeRuleFailsOnInvalidFormat() : void
     {
         $result = $this->validator->validate(['datetime' => '15-06-2024 10:30'], ['datetime' => ['datetime']]);
         $this->assertFalse($result);
     }
 
-    public function testInRuleFailsWhenValueNotInList(): void
+    public function testInRuleFailsWhenValueNotInList() : void
     {
         $result = $this->validator->validate(['status' => 'unknown'], ['status' => ['in:active,inactive,pending']]);
         $this->assertFalse($result);
         $this->assertNotEmpty($this->validator->getErrors()['status']);
     }
 
-    public function testInRulePassesWhenValueInList(): void
+    public function testInRulePassesWhenValueInList() : void
     {
         $result = $this->validator->validate(['status' => 'active'], ['status' => ['in:active,inactive,pending']]);
         $this->assertTrue($result);
     }
 
-    public function testNumericRuleFailsOnNonNumeric(): void
+    public function testNumericRuleFailsOnNonNumeric() : void
     {
         $result = $this->validator->validate(['age' => 'abc'], ['age' => ['numeric']]);
         $this->assertFalse($result);
     }
 
-    public function testNumericRulePassesOnNumeric(): void
+    public function testNumericRulePassesOnNumeric() : void
     {
         $result = $this->validator->validate(['age' => '25'], ['age' => ['numeric']]);
         $this->assertTrue($result);
     }
 
-    public function testNumericRulePassesOnFloatString(): void
+    public function testNumericRulePassesOnFloatString() : void
     {
         $result = $this->validator->validate(['price' => '19.99'], ['price' => ['numeric']]);
         $this->assertTrue($result);
     }
 
-    public function testMinValueRuleFailsWhenBelowMin(): void
+    public function testMinValueRuleFailsWhenBelowMin() : void
     {
         $result = $this->validator->validate(['quantity' => 5], ['quantity' => ['min_value:10']]);
         $this->assertFalse($result);
     }
 
-    public function testMinValueRulePassesWhenAboveMin(): void
+    public function testMinValueRulePassesWhenAboveMin() : void
     {
         $result = $this->validator->validate(['quantity' => 15], ['quantity' => ['min_value:10']]);
         $this->assertTrue($result);
     }
 
-    public function testMaxValueRuleFailsWhenAboveMax(): void
+    public function testMaxValueRuleFailsWhenAboveMax() : void
     {
         $result = $this->validator->validate(['age' => 150], ['age' => ['max_value:120']]);
         $this->assertFalse($result);
     }
 
-    public function testMaxValueRulePassesWhenBelowMax(): void
+    public function testMaxValueRulePassesWhenBelowMax() : void
     {
         $result = $this->validator->validate(['age' => 30], ['age' => ['max_value:120']]);
         $this->assertTrue($result);
     }
 
-    public function testArrayRuleFailsWhenNotArray(): void
+    public function testArrayRuleFailsWhenNotArray() : void
     {
         $result = $this->validator->validate(['items' => 'not-array'], ['items' => ['array']]);
         $this->assertFalse($result);
     }
 
-    public function testArrayRulePassesWhenArray(): void
+    public function testArrayRulePassesWhenArray() : void
     {
         $result = $this->validator->validate(['items' => [1, 2, 3]], ['items' => ['array']]);
         $this->assertTrue($result);
     }
 
-    public function testUniqueRulePassesWhenNoDuplicate(): void
+    public function testUniqueRulePassesWhenNoDuplicate() : void
     {
         $this->mockStmt->expects($this->once())
             ->method('fetchColumn')
@@ -187,7 +187,7 @@ class ValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testUniqueRuleFailsWhenDuplicateExists(): void
+    public function testUniqueRuleFailsWhenDuplicateExists() : void
     {
         $this->mockStmt->expects($this->once())
             ->method('fetchColumn')
@@ -197,7 +197,7 @@ class ValidatorTest extends TestCase
         $this->assertNotEmpty($this->validator->getErrors()['email']);
     }
 
-    public function testUniqueRulePassesWhenDuplicateIsIgnoredId(): void
+    public function testUniqueRulePassesWhenDuplicateIsIgnoredId() : void
     {
         $this->mockStmt->expects($this->once())
             ->method('fetchColumn')
@@ -206,7 +206,7 @@ class ValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testUniqueRuleValidatesZeroValue(): void
+    public function testUniqueRuleValidatesZeroValue() : void
     {
         $this->mockStmt->expects($this->once())
             ->method('execute')
@@ -218,19 +218,19 @@ class ValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testHasErrorsReturnsTrueWhenErrorsExist(): void
+    public function testHasErrorsReturnsTrueWhenErrorsExist() : void
     {
         $this->validator->validate(['name' => ''], ['name' => ['required']]);
         $this->assertTrue($this->validator->hasErrors());
     }
 
-    public function testHasErrorsReturnsFalseWhenNoErrors(): void
+    public function testHasErrorsReturnsFalseWhenNoErrors() : void
     {
         $this->validator->validate(['name' => 'John'], ['name' => ['required']]);
         $this->assertFalse($this->validator->hasErrors());
     }
 
-    public function testGetErrorsReturnsAllErrors(): void
+    public function testGetErrorsReturnsAllErrors() : void
     {
         $this->validator->validate([
             'email' => 'invalid',
@@ -244,14 +244,14 @@ class ValidatorTest extends TestCase
         $this->assertArrayHasKey('name', $errors);
     }
 
-    public function testAddErrorManually(): void
+    public function testAddErrorManually() : void
     {
         $this->validator->addError('custom', 'Custom error message');
         $this->assertTrue($this->validator->hasErrors());
         $this->assertContains('Custom error message', $this->validator->getErrors()['custom']);
     }
 
-    public function testMultipleRulesOnSameField(): void
+    public function testMultipleRulesOnSameField() : void
     {
         $result = $this->validator->validate([
             'password' => '123'

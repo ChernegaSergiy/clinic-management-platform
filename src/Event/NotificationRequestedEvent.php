@@ -10,6 +10,5 @@ class NotificationRequestedEvent extends Event
         public readonly string $type, // 'email', 'sms', etc.
         public readonly string $recipient,
         public readonly string $message
-    ) {
-    }
+    ) {}
 }

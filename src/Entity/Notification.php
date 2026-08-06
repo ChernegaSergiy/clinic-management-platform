@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\Notification\Repository\NotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Notification\Repository\NotificationRepository;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'notifications')]

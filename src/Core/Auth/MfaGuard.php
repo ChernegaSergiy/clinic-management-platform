@@ -14,7 +14,7 @@ class MfaGuard
         $this->mfaService = $mfaService;
     }
 
-    public function check(): void
+    public function check() : void
     {
         $step = AuthStep::current();
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
@@ -34,44 +34,44 @@ class MfaGuard
         }
     }
 
-    public function isPending(): bool
+    public function isPending() : bool
     {
         return isset($_SESSION['mfa_pending_user_id']);
     }
 
-    public function getPendingUserId(): ?int
+    public function getPendingUserId() : ?int
     {
         return $_SESSION['mfa_pending_user_id'] ?? null;
     }
 
-    public function clearPending(): void
+    public function clearPending() : void
     {
         unset($_SESSION['mfa_pending_user_id']);
     }
 
-    public function isRequired(): bool
+    public function isRequired() : bool
     {
-        return isset($_SESSION['mfa_required']) && $_SESSION['mfa_required'] === true;
+        return isset($_SESSION['mfa_required']) && true === $_SESSION['mfa_required'];
     }
 
-    public function setRequired(): void
+    public function setRequired() : void
     {
         $_SESSION['mfa_required'] = true;
     }
 
-    public function clearRequired(): void
+    public function clearRequired() : void
     {
         unset($_SESSION['mfa_required']);
     }
 
-    public function getUserMfaType(int $userId): ?string
+    public function getUserMfaType(int $userId) : ?string
     {
         $status = $this->mfaService->getUserMfaStatus($userId);
         return $status['type'] ?? null;
     }
 
-    public function isHotpEnabled(int $userId): bool
+    public function isHotpEnabled(int $userId) : bool
     {
-        return $this->getUserMfaType($userId) === 'hotp';
+        return 'hotp' === $this->getUserMfaType($userId);
     }
 }

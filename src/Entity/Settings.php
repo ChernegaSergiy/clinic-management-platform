@@ -23,45 +23,45 @@ class Settings
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getKey(): ?string
+    public function getKey() : ?string
     {
         return $this->key;
     }
 
-    public function setKey(string $key): static
+    public function setKey(string $key) : static
     {
         $this->key = $key;
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getValue() : ?string
     {
         return $this->value;
     }
 
-    public function setValue(?string $value): static
+    public function setValue(?string $value) : static
     {
         $this->value = $value;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt) : static
     {
         $this->updated_at = $updatedAt;
         return $this;

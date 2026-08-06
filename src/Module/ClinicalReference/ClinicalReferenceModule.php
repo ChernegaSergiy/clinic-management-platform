@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\ClinicalReference\ClinicalReferenceController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ClinicalReferenceModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/admin/clinical', [ClinicalReferenceController::class, 'clinicalIndex']);
         $router->add('GET', '/admin/clinical/icd-import', [ClinicalReferenceController::class, 'icdImportForm']);
@@ -21,7 +20,7 @@ class ClinicalReferenceModule extends BaseModule
         $router->add('POST', '/admin/clinical/intervention-import', [ClinicalReferenceController::class, 'interventionImportRun']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class)->setPublic(true);
         $container->register(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class)->setPublic(true);
@@ -32,7 +31,7 @@ class ClinicalReferenceModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('clinical.manage', 'Керування клінічними довідниками');
 
@@ -40,7 +39,7 @@ class ClinicalReferenceModule extends BaseModule
         $registry->addRoleMapping('medical_manager', ['clinical.manage']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('clinical', ClinicalReferencePolicy::class);
     }

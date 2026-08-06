@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251125200000 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'add_waitlist_id_to_appointments';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->getTable('appointments');
         $table->addColumn('waitlist_id', 'integer', ['unsigned' => true, 'notnull' => false]);
@@ -22,7 +22,7 @@ final class Version20251125200000 extends AbstractMigration
         $table->addForeignKeyConstraint('waitlists', ['waitlist_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => 'CASCADE']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $table = $schema->getTable('appointments');
         $table->removeForeignKeyConstraint('waitlist_id');

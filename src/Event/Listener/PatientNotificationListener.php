@@ -7,14 +7,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PatientNotificationListener implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents() : array
     {
         return [
             PatientNotificationEvent::class => 'onPatientNotification',
         ];
     }
 
-    public function onPatientNotification(PatientNotificationEvent $event): void
+    public function onPatientNotification(PatientNotificationEvent $event) : void
     {
         // Логування сповіщення
         error_log(sprintf(

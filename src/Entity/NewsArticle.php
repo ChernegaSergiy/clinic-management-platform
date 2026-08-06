@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\News\Repository\NewsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\News\Repository\NewsRepository;
 
 #[ORM\Entity(repositoryClass: NewsRepository::class)]
 #[ORM\Table(name: 'news_articles')]

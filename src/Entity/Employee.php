@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Hrm\Repository\HrmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Hrm\Repository\HrmRepository;
 
 #[ORM\Entity(repositoryClass: HrmRepository::class)]
 #[ORM\Table(name: 'employees')]

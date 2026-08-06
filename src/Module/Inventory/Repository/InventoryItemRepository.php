@@ -17,7 +17,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         $this->invoiceRepository = $invoiceRepository;
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM inventory_items";
@@ -33,7 +33,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $conn->fetchAllAssociative($sql, $params);
     }
 
-    public function findItemsBelowMinStock(): array
+    public function findItemsBelowMinStock() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -45,14 +45,14 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function countItemsBelowMinStock(): int
+    public function countItemsBelowMinStock() : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM inventory_items WHERE quantity < min_stock_level";
         return (int)$conn->fetchOne($sql);
     }
 
-    public function findItemsAboveMaxStock(): array
+    public function findItemsAboveMaxStock() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -64,7 +64,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function save(array $data): bool
+    public function save(array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
@@ -114,7 +114,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         }
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM inventory_items WHERE id = :id";
@@ -122,7 +122,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $result ?: null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
@@ -198,7 +198,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         int $newQuantity,
         string $reason,
         float $itemCost
-    ): bool {
+    ) : bool {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, 
                                                 quantity_change, new_quantity, reason) 
@@ -215,8 +215,8 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
 
         if ($success > 0) {
             $amount = $quantityChange * $itemCost;
-            $transactionType = $movementType === 'in' ? 'inventory_cost' : 'inventory_revenue';
-            if ($movementType === 'out') {
+            $transactionType = 'in' === $movementType ? 'inventory_cost' : 'inventory_revenue';
+            if ('out' === $movementType) {
                 $amount = -$amount;
             }
 
@@ -232,7 +232,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
                 $transactionType,
                 sprintf(
                     "Рух складу: %s %d одиниць '%s'. Причина: %s",
-                    $movementType === 'in' ? 'Прихід' : 'Вибуття',
+                    'in' === $movementType ? 'Прихід' : 'Вибуття',
                     $quantityChange,
                     $itemDetails['name'],
                     $reason
@@ -243,7 +243,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $success > 0;
     }
 
-    public function getMovementHistory(int $itemId): array
+    public function getMovementHistory(int $itemId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -258,7 +258,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $conn->fetchAllAssociative($sql, ['inventory_item_id' => $itemId]);
     }
 
-    public function findByName(string $name): ?array
+    public function findByName(string $name) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM inventory_items WHERE name = :name";
@@ -266,7 +266,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         return $result ?: null;
     }
 
-    public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту'): bool
+    public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту') : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();

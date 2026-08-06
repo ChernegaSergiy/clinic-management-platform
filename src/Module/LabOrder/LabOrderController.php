@@ -2,19 +2,16 @@
 
 namespace App\Module\LabOrder;
 
-use App\Database\Database;
-
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
-use App\Module\LabOrder\Repository\LabResourceRepository;
 use App\Module\LabOrder\Service\LabImportService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class LabOrderController extends \App\Core\Controller\AbstractController
 {
@@ -45,7 +42,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.create');
@@ -70,7 +67,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/new', name: 'lab_orders_new_post', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.create');
@@ -124,7 +121,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->checkAuth();
 
@@ -147,7 +144,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_get', methods: ['GET'])]
-    public function edit(): Response
+    public function edit() : Response
     {
         $this->checkAuth();
 
@@ -173,7 +170,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_post', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $this->checkAuth();
 
@@ -204,7 +201,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/import', name: 'lab_orders_import', methods: ['GET'])]
-    public function import(): Response
+    public function import() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.edit.any');
@@ -218,7 +215,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/import', name: 'lab_orders_import_post', methods: ['POST'])]
-    public function processImport(): Response
+    public function processImport() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.edit.any');
@@ -230,7 +227,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
 
         $file = $_FILES['hl7_dicom_file'];
 
-        if ($file['error'] !== UPLOAD_ERR_OK) {
+        if (UPLOAD_ERR_OK !== $file['error']) {
             $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
             return new RedirectResponse('/lab-orders/import');
         }
@@ -262,7 +259,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/import/confirm', name: 'lab_orders_import_confirm', methods: ['GET'])]
-    public function confirmImport(): Response
+    public function confirmImport() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.edit.any');
@@ -281,7 +278,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/lab-orders/import/finalize', name: 'lab_orders_import_finalize', methods: ['POST'])]
-    public function finalizeImport(): Response
+    public function finalizeImport() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('lab_order.edit.any');

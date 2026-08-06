@@ -2,10 +2,10 @@
 
 namespace App\Core\Service;
 
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Intl\Locales;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationService
 {
@@ -22,7 +22,7 @@ class TranslationService
         $this->availableLocales = $this->scanTranslationDirectoriesForLocales();
     }
 
-    private function loadTranslations(): void
+    private function loadTranslations() : void
     {
         $baseDir = __DIR__ . '/../../';
 
@@ -37,7 +37,7 @@ class TranslationService
         if (is_dir($modulesDir)) {
             $modules = scandir($modulesDir);
             foreach ($modules as $module) {
-                if ($module === '.' || $module === '..') {
+                if ('.' === $module || '..' === $module) {
                     continue;
                 }
 
@@ -49,13 +49,13 @@ class TranslationService
         }
     }
 
-    private function loadFromDirectory(string $directory): void
+    private function loadFromDirectory(string $directory) : void
     {
         $files = scandir($directory);
         foreach ($files as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) === 'yaml') {
+            if ('yaml' === pathinfo($file, PATHINFO_EXTENSION)) {
                 $locale = pathinfo($file, PATHINFO_FILENAME);
-                if (strpos($locale, 'messages.') === 0) {
+                if (0 === strpos($locale, 'messages.')) {
                     $locale = substr($locale, 9); // Remove 'messages.' prefix
                     $this->translator->addResource('yaml', $directory . '/' . $file, $locale);
                 }
@@ -63,7 +63,7 @@ class TranslationService
         }
     }
 
-    private function scanTranslationDirectoriesForLocales(): array
+    private function scanTranslationDirectoriesForLocales() : array
     {
         $foundLocales = [];
         $baseDir = __DIR__ . '/../../';
@@ -73,8 +73,8 @@ class TranslationService
         if (is_dir($globalTranslationsDir)) {
             $files = scandir($globalTranslationsDir);
             foreach ($files as $file) {
-                if (pathinfo($file, PATHINFO_EXTENSION) === 'yaml') {
-                    if (strpos($file, 'messages.') === 0) {
+                if ('yaml' === pathinfo($file, PATHINFO_EXTENSION)) {
+                    if (0 === strpos($file, 'messages.')) {
                         $foundLocales[] = substr(pathinfo($file, PATHINFO_FILENAME), 9);
                     }
                 }
@@ -86,15 +86,15 @@ class TranslationService
         if (is_dir($modulesDir)) {
             $modules = scandir($modulesDir);
             foreach ($modules as $module) {
-                if ($module === '.' || $module === '..') {
+                if ('.' === $module || '..' === $module) {
                     continue;
                 }
                 $moduleTranslationsDir = $modulesDir . '/' . $module . '/translations';
                 if (is_dir($moduleTranslationsDir)) {
                     $files = scandir($moduleTranslationsDir);
                     foreach ($files as $file) {
-                        if (pathinfo($file, PATHINFO_EXTENSION) === 'yaml') {
-                            if (strpos($file, 'messages.') === 0) {
+                        if ('yaml' === pathinfo($file, PATHINFO_EXTENSION)) {
+                            if (0 === strpos($file, 'messages.')) {
                                 $foundLocales[] = substr(pathinfo($file, PATHINFO_FILENAME), 9);
                             }
                         }
@@ -105,7 +105,7 @@ class TranslationService
         return array_unique($foundLocales);
     }
 
-    public function getAvailableLocales(): array
+    public function getAvailableLocales() : array
     {
         $displayLocales = [];
         foreach ($this->availableLocales as $locale) {
@@ -118,23 +118,23 @@ class TranslationService
         return $displayLocales;
     }
 
-    public function getTranslator(): TranslatorInterface
+    public function getTranslator() : TranslatorInterface
     {
         return $this->translator;
     }
 
-    public function setLocale(string $locale): void
+    public function setLocale(string $locale) : void
     {
         $this->currentLocale = $locale;
         $this->translator->setLocale($locale);
     }
 
-    public function getLocale(): string
+    public function getLocale() : string
     {
         return $this->currentLocale;
     }
 
-    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null) : string
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }

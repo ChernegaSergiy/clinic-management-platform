@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Module\User;
+
+use App\Core\Repository\SettingsRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\User\Repository\UserOAuthIdentityRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
-use App\Core\Repository\SettingsRepository;
 use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends \App\Core\Controller\AbstractController
@@ -31,7 +32,7 @@ class UserController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/profile', name: 'user_profile', methods: ['GET'])]
-    public function profile(): \Symfony\Component\HttpFoundation\Response
+    public function profile() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth(); // Ensure user is logged in
 
@@ -63,7 +64,7 @@ class UserController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/profile/unlink/{provider}', name: 'user_profile_unlink', methods: ['POST'])]
-    public function unlinkProvider(string $provider): \Symfony\Component\HttpFoundation\Response
+    public function unlinkProvider(string $provider) : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
 
@@ -75,7 +76,7 @@ class UserController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/profile/photo', name: 'user_profile_photo', methods: ['POST'])]
-    public function uploadPhoto(): \Symfony\Component\HttpFoundation\Response
+    public function uploadPhoto() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
 
@@ -87,7 +88,7 @@ class UserController extends \App\Core\Controller\AbstractController
             mkdir($uploadDir, 0777, true);
         }
 
-        if (empty($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+        if (empty($_FILES['profile_photo']) || UPLOAD_ERR_OK !== $_FILES['profile_photo']['error']) {
             $_SESSION['error_message'] = 'Будь ласка, виберіть файл для завантаження.';
             return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
         }
@@ -123,7 +124,7 @@ class UserController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/messages/clear', name: 'user_messages_clear', methods: ['POST'])]
-    public function clearMessages(): \Symfony\Component\HttpFoundation\Response
+    public function clearMessages() : \Symfony\Component\HttpFoundation\Response
     {
         unset($_SESSION['success_message'], $_SESSION['error_message']);
         return new \Symfony\Component\HttpFoundation\Response('', 200);

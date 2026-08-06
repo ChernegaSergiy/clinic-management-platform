@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251121123600 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_auth_configs_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->createTable('auth_configs');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
@@ -29,7 +29,7 @@ final class Version20251121123600 extends AbstractMigration
         $table->addUniqueIndex(['provider']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $schema->dropTable('auth_configs');
     }

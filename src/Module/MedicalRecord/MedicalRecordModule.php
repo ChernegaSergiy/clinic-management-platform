@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\MedicalRecord\MedicalRecordController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class MedicalRecordModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/medical-records', [MedicalRecordController::class, 'index']);
         $router->add('GET', '/medical-records/new', [MedicalRecordController::class, 'create']);
@@ -26,7 +25,7 @@ class MedicalRecordModule extends BaseModule
         $router->add('GET', '/medical-records/intervention-codes', [MedicalRecordController::class, 'getInterventionCodes']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class)->setPublic(true);
         $container->register(\App\Module\MedicalRecord\MedicalRecordController::class)
@@ -41,7 +40,7 @@ class MedicalRecordModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('medical_record.view.any', 'Перегляд будь-якого медичного запису');
         $registry->add('medical_record.view.own', 'Перегляд власних медичних записів');
@@ -55,7 +54,7 @@ class MedicalRecordModule extends BaseModule
         $registry->addRoleMapping('nurse', ['medical_record.view.own']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('medical_record', MedicalRecordPolicy::class);
     }

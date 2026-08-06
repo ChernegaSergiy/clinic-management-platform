@@ -2,10 +2,9 @@
 
 namespace App\Module\Notification;
 
-
 use App\Module\Notification\Repository\NotificationRepository;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
 class NotificationController extends \App\Core\Controller\AbstractController
 {
@@ -21,7 +20,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
      * Query params: page (1-based), limit.
      */
     #[Route('/notifications', name: 'notifications_unread', methods: ['GET'])]
-    public function getUnread(): JsonResponse
+    public function getUnread() : JsonResponse
     {
         $this->checkAuth();
         $this->gate->authorize('notifications.read');
@@ -50,7 +49,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
      * API endpoint to mark all notifications for the logged-in user as read.
      */
     #[Route('/notifications/mark-all-read', name: 'notifications_mark_all_read', methods: ['POST'])]
-    public function markAllRead(): JsonResponse
+    public function markAllRead() : JsonResponse
     {
         $this->checkAuth();
         $this->gate->authorize('notifications.read');
@@ -65,7 +64,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
      * API endpoint to delete a notification for the logged-in user.
      */
     #[Route('/notifications/delete', name: 'notifications_delete', methods: ['POST'])]
-    public function delete(): JsonResponse
+    public function delete() : JsonResponse
     {
         $this->checkAuth();
         $this->gate->authorize('notifications.read');

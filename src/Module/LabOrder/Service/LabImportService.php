@@ -18,8 +18,8 @@ class LabImportService
      * Performs structural validation on the uploaded file.
      * This is a placeholder for actual HL7/DICOM parsing and structural checks.
      *
-     * @param string $filePath Path to the uploaded file.
-     * @param string $mimeType Mime type of the uploaded file.
+     * @param  string      $filePath Path to the uploaded file.
+     * @param  string      $mimeType Mime type of the uploaded file.
      * @return array|false Returns parsed data on success, or false on structural validation failure.
      * @throws Exception
      */
@@ -28,7 +28,7 @@ class LabImportService
         // Placeholder for actual HL7/DICOM structural validation logic
         // In a real application, this would involve specific parsers for HL7/DICOM standards.
         $fileContent = file_get_contents($filePath);
-        if ($fileContent === false) {
+        if (false === $fileContent) {
             throw new Exception("Не вдалося прочитати файл.");
         }
 
@@ -65,7 +65,7 @@ class LabImportService
      * Performs logical validation on the parsed data.
      * This is a placeholder for actual business logic validation.
      *
-     * @param array $parsedData Data returned from structural validation.
+     * @param  array       $parsedData Data returned from structural validation.
      * @return array|false Returns processed data on success, or false on logical validation failure.
      * @throws Exception
      */
@@ -88,7 +88,7 @@ class LabImportService
     /**
      * Processes and imports the validated lab order data.
      *
-     * @param array $validatedData
+     * @param  array     $validatedData
      * @return int|false Returns the ID of the new lab order, or false on failure.
      * @throws Exception
      */

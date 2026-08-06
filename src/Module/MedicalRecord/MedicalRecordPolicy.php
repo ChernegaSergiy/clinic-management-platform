@@ -15,7 +15,7 @@ class MedicalRecordPolicy implements Policy
         $this->medicalRecordRepository = $medicalRecordRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('medical_record.view.any')) {
             return true;
@@ -33,7 +33,7 @@ class MedicalRecordPolicy implements Policy
         return false;
     }
 
-    public function edit(User $user, array $context): bool
+    public function edit(User $user, array $context) : bool
     {
         if ($user->hasPermission('medical_record.edit.any')) {
             return true;
@@ -50,12 +50,12 @@ class MedicalRecordPolicy implements Policy
         return false;
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         return $user->hasPermission('medical_record.create');
     }
 
-    private function isOwner(User $user, int $recordId): bool
+    private function isOwner(User $user, int $recordId) : bool
     {
         $userId = $user->getId();
         if (!$userId) {

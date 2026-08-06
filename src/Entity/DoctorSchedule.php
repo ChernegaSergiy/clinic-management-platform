@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Schedule\Repository\DoctorScheduleRepository;
 
 #[ORM\Entity(repositoryClass: DoctorScheduleRepository::class)]
 #[ORM\Table(name: 'doctor_schedules')]

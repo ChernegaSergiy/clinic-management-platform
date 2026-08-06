@@ -17,7 +17,7 @@ class AuthGuard
         $this->mfaGuard = $mfaGuard;
     }
 
-    private function hydrateRoleName(): void
+    private function hydrateRoleName() : void
     {
         if (empty($_SESSION['user']) || !empty($_SESSION['user']['role_name'])) {
             return;
@@ -30,7 +30,7 @@ class AuthGuard
         }
     }
 
-    public function check(): void
+    public function check() : void
     {
         $step = AuthStep::current();
 
@@ -44,7 +44,7 @@ class AuthGuard
         throw new RedirectException('/login');
     }
 
-    public function requireMfaSetup(): void
+    public function requireMfaSetup() : void
     {
         $step = AuthStep::current();
 
@@ -53,10 +53,10 @@ class AuthGuard
         }
     }
 
-    public function isAdmin(): void
+    public function isAdmin() : void
     {
         $this->check();
-        if ($_SESSION['user']['role_id'] !== 1) {
+        if (1 !== $_SESSION['user']['role_id']) {
             throw new ExitException("Доступ заборонено", 403);
         }
     }

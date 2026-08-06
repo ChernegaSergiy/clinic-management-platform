@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251121122400 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_inventory_movements_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $this->addSql('CREATE TABLE inventory_movements (
             id INT UNSIGNED AUTO_INCREMENT NOT NULL,
@@ -34,7 +34,7 @@ final class Version20251121122400 extends AbstractMigration
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $this->addSql('DROP TABLE inventory_movements');
     }

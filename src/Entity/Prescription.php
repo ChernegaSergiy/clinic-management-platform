@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\Prescription\Repository\PrescriptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Prescription\Repository\PrescriptionRepository;
 
 #[ORM\Entity(repositoryClass: PrescriptionRepository::class)]
 #[ORM\Table(name: 'prescriptions')]

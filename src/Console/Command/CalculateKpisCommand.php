@@ -12,7 +12,7 @@ class CalculateKpisCommand extends Command
 {
     protected static $defaultName = 'kpis:calculate';
 
-    protected function configure(): void
+    protected function configure() : void
     {
         $this
             ->setName('kpis:calculate')
@@ -20,7 +20,7 @@ class CalculateKpisCommand extends Command
             ->addArgument('date', InputArgument::OPTIONAL, 'Date for KPI calculation (YYYY-MM-DD), defaults to today');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $dateArg = $input->getArgument('date');
 

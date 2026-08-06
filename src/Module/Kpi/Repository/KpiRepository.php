@@ -14,21 +14,21 @@ class KpiRepository extends ServiceEntityRepository
     }
 
     // --- KPI Definitions ---
-    public function findAllKpiDefinitions(): array
+    public function findAllKpiDefinitions() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM kpi_definitions ORDER BY name ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findActiveKpiDefinitions(): array
+    public function findActiveKpiDefinitions() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM kpi_definitions WHERE is_active = 1 ORDER BY name ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findKpiDefinitionById(int $id): ?array
+    public function findKpiDefinitionById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM kpi_definitions WHERE id = :id";
@@ -36,12 +36,12 @@ class KpiRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function saveKpiDefinition(array $data): ?int
+    public function saveKpiDefinition(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO kpi_definitions (name, description, kpi_type, target_value, unit, is_active, period) 
                 VALUES (:name, :description, :kpi_type, :target_value, :unit, :is_active, :period)";
-        
+
         $success = $conn->executeStatement($sql, [
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
@@ -51,11 +51,11 @@ class KpiRepository extends ServiceEntityRepository
             'is_active' => (int)($data['is_active'] ?? true),
             'period' => $data['period'] ?? 'day',
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function updateKpiDefinition(int $id, array $data): bool
+    public function updateKpiDefinition(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE kpi_definitions SET 
@@ -67,7 +67,7 @@ class KpiRepository extends ServiceEntityRepository
                     is_active = :is_active,
                     period = :period
                 WHERE id = :id";
-                
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'name' => $data['name'],
@@ -80,7 +80,7 @@ class KpiRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function deleteKpiDefinition(int $id): bool
+    public function deleteKpiDefinition(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM kpi_definitions WHERE id = :id";
@@ -88,7 +88,7 @@ class KpiRepository extends ServiceEntityRepository
     }
 
     // --- KPI Results ---
-    public function saveKpiResult(array $data): ?int
+    public function saveKpiResult(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO kpi_results (kpi_id, user_id, period_start, period_end, calculated_value, notes) 
@@ -123,18 +123,18 @@ class KpiRepository extends ServiceEntityRepository
               AND period_end = :period_end
             LIMIT 1
         ";
-        
+
         $row = $conn->fetchAssociative($sql, [
             'kpi_id' => $data['kpi_id'],
             'user_id' => $data['user_id'],
             'period_start' => $data['period_start'],
             'period_end' => $data['period_end'],
         ]);
-        
+
         return $row ? (int)$row['id'] : null;
     }
 
-    public function findKpiResultsForUser(int $userId, ?string $periodStart = null, ?string $periodEnd = null): array
+    public function findKpiResultsForUser(int $userId, ?string $periodStart = null, ?string $periodEnd = null) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -161,7 +161,7 @@ class KpiRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql, $params);
     }
 
-    public function findAllKpiResults(): array
+    public function findAllKpiResults() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -178,7 +178,7 @@ class KpiRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findLatestKpiResult(int $kpiId, string $periodType): ?array
+    public function findLatestKpiResult(int $kpiId, string $periodType) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -190,10 +190,10 @@ class KpiRepository extends ServiceEntityRepository
 
         switch ($periodType) {
             case 'day':
-                $sql .= " AND kr.period_start = kr.period_end"; 
+                $sql .= " AND kr.period_start = kr.period_end";
                 break;
             case 'week':
-                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6"; 
+                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6";
                 break;
             case 'month':
                 $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 29";
@@ -208,7 +208,7 @@ class KpiRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findKpiResultForPreviousPeriod(int $kpiId, string $currentPeriodEnd, string $periodType = 'day'): ?array
+    public function findKpiResultForPreviousPeriod(int $kpiId, string $currentPeriodEnd, string $periodType = 'day') : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -218,12 +218,12 @@ class KpiRepository extends ServiceEntityRepository
             ORDER BY kr.period_end DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
             LIMIT 1
         ";
-        
+
         $result = $conn->fetchAssociative($sql, [
             'kpi_id' => $kpiId,
             'current_period_end' => $currentPeriodEnd
         ]);
-        
+
         return $result ?: null;
     }
 }

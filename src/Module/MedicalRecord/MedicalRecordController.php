@@ -2,21 +2,19 @@
 
 namespace App\Module\MedicalRecord;
 
-use App\Database\Database;
-
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
+use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
-use App\Core\Validation\Validator;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MedicalRecordController extends \App\Core\Controller\AbstractController
 {
@@ -50,7 +48,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/new', name: 'medical_records_new_get', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('medical_record.create');
@@ -72,7 +70,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records', name: 'medical_records_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $this->checkAuth();
         $user = $this->gate->getUser();
@@ -94,7 +92,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/new', name: 'medical_records_new_post', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('medical_record.create');
@@ -135,7 +133,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
 
         if ($medicalRecordId && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
-                if ($_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
+                if (UPLOAD_ERR_OK === $_FILES['attachments']['error'][$key]) {
                     $fileData = [
                         'name' => $name,
                         'type' => $_FILES['attachments']['type'][$key],
@@ -159,7 +157,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -191,7 +189,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/icd-codes', name: 'medical_records_icd_codes', methods: ['GET'])]
-    public function getIcdCodes(): JsonResponse
+    public function getIcdCodes() : JsonResponse
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -203,7 +201,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/intervention-codes', name: 'medical_records_intervention_codes', methods: ['GET'])]
-    public function getInterventionCodes(): JsonResponse
+    public function getInterventionCodes() : JsonResponse
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -215,7 +213,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/edit', name: 'medical_records_edit_get', methods: ['GET'])]
-    public function edit(): Response
+    public function edit() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -237,7 +235,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/edit', name: 'medical_records_edit_post', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
@@ -288,7 +286,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
-    public function uploadAttachment(): Response
+    public function uploadAttachment() : Response
     {
         $this->checkAuth();
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
@@ -302,7 +300,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
-                if ($_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
+                if (UPLOAD_ERR_OK === $_FILES['attachments']['error'][$key]) {
                     $fileData = [
                         'name' => $name,
                         'type' => $_FILES['attachments']['type'][$key],
@@ -324,13 +322,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/medical-records/attachments/download', name: 'medical_records_attachments_download', methods: ['GET'])]
-    public function downloadAttachment(): Response
+    public function downloadAttachment() : Response
     {
         $this->checkAuth();
         $attachmentId = (int)($_GET['attachment_id'] ?? 0);
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
-        if (!$attachment || $attachment['entity_type'] !== 'medical_record') {
+        if (!$attachment || 'medical_record' !== $attachment['entity_type']) {
             return new Response("Вкладення не знайдено", 404);
         }
 

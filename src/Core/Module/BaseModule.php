@@ -20,43 +20,31 @@ abstract class BaseModule implements ModuleInterface
         $this->manifestPath = $this->basePath . '/module.yaml';
     }
 
-    public function getName(): string
+    public function getName() : string
     {
         return $this->getManifest()['name'] ?? $this->getDefaultName();
     }
 
-    public function getVersion(): string
+    public function getVersion() : string
     {
         return $this->getManifest()['version'] ?? '1.0.0';
     }
 
-    public function registerServices(ContainerBuilder $container): void
-    {
-    }
+    public function registerServices(ContainerBuilder $container) : void {}
 
-    public function bootstrap(): void
-    {
-    }
+    public function bootstrap() : void {}
 
-    public function registerRoutes(Router $router): void
-    {
-    }
+    public function registerRoutes(Router $router) : void {}
 
-    public function registerPermissions(PermissionRegistry $registry): void
-    {
-    }
+    public function registerPermissions(PermissionRegistry $registry) : void {}
 
-    public function registerPolicies(PolicyRegistry $registry): void
-    {
-    }
+    public function registerPolicies(PolicyRegistry $registry) : void {}
 
-    public function registerEventListeners(EventDispatcherInterface $dispatcher): void
-    {
-    }
+    public function registerEventListeners(EventDispatcherInterface $dispatcher) : void {}
 
-    protected function getManifest(): array
+    protected function getManifest() : array
     {
-        if ($this->manifest === null) {
+        if (null === $this->manifest) {
             if (file_exists($this->manifestPath)) {
                 $yaml = file_get_contents($this->manifestPath);
                 $this->manifest = \Symfony\Component\Yaml\Yaml::parse($yaml);
@@ -68,13 +56,13 @@ abstract class BaseModule implements ModuleInterface
         return $this->manifest;
     }
 
-    protected function getDefaultName(): string
+    protected function getDefaultName() : string
     {
         $className = (new \ReflectionClass($this))->getShortName();
         return str_replace('Module', '', $className);
     }
 
-    protected function getBasePath(): string
+    protected function getBasePath() : string
     {
         $reflector = new \ReflectionClass($this);
         return dirname($reflector->getFileName());

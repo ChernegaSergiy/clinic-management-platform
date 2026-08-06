@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Insurance\InsuranceController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class InsuranceModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/insurance/companies', [InsuranceController::class, 'index']);
         $router->add('GET', '/insurance/companies/show', [InsuranceController::class, 'show']);
@@ -26,7 +25,7 @@ class InsuranceModule extends BaseModule
         $router->add('POST', '/insurance/claims/update-status', [InsuranceController::class, 'updateClaimStatus']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Insurance\Repository\InsuranceCompanyRepository::class)->setPublic(true);
         $container->register(\App\Module\Insurance\Repository\PatientInsurancePolicyRepository::class)->setPublic(true);
@@ -44,14 +43,14 @@ class InsuranceModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('insurance.manage', 'Керування страховкою');
 
         $registry->addRoleMapping('admin', ['insurance.manage']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('insurance', InsurancePolicy::class);
     }

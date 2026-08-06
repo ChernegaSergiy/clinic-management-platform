@@ -13,40 +13,40 @@ class IcdCodeRepository extends ServiceEntityRepository
         parent::__construct($registry, IcdCode::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, code, description FROM icd_codes ORDER BY code ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function countAll(): int
+    public function countAll() : int
     {
         $conn = $this->getEntityManager()->getConnection();
         return (int)$conn->fetchOne("SELECT COUNT(*) FROM icd_codes");
     }
 
-    public function replaceAll(array $rows): int
+    public function replaceAll(array $rows) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
         try {
             $conn->executeStatement("DELETE FROM icd_codes");
-            
+
             $sql = "INSERT INTO icd_codes (code, description) VALUES (:code, :description)";
-            
+
             $count = 0;
             $seen = [];
             foreach ($rows as $row) {
                 $code = trim($row['code'] ?? '');
-                if ($code === '' || $code === '-') {
+                if ('' === $code || '-' === $code) {
                     continue; // пропускаємо пусті/технічні коди
                 }
                 if (isset($seen[$code])) {
                     continue; // уникаємо дублювання
                 }
                 $description = $row['description'] ?? '';
-                
+
                 $conn->executeStatement($sql, [
                     'code' => $code,
                     'description' => $description,
@@ -62,13 +62,13 @@ class IcdCodeRepository extends ServiceEntityRepository
         }
     }
 
-    public function searchByCodeOrDescription(string $searchTerm): array
+    public function searchByCodeOrDescription(string $searchTerm) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, code, description FROM icd_codes 
                 WHERE code LIKE :term OR description LIKE :term 
                 ORDER BY code ASC LIMIT 20";
-                
+
         return $conn->fetchAllAssociative($sql, ['term' => '%' . $searchTerm . '%']);
     }
 }

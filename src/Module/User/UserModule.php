@@ -6,15 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\User\AuthController;
-use App\Module\User\OAuthController;
-use App\Module\User\UserController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class UserModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/login', [AuthController::class, 'showLoginForm']);
         $router->add('POST', '/login', [AuthController::class, 'login']);
@@ -45,7 +42,7 @@ class UserModule extends BaseModule
         $router->add('POST', '/user/mfa/regenerate-backup-codes', [MfaController::class, 'regenerateBackupCodes']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\User\Repository\UserRepository::class)->setPublic(true);
         $container->register(\App\Module\User\Repository\RoleRepository::class)->setPublic(true);
@@ -81,7 +78,7 @@ class UserModule extends BaseModule
                 new Reference(\App\Module\User\Repository\UserRepository::class),
                 new Reference(\App\Module\User\Repository\UserOAuthIdentityRepository::class),
             ])->setPublic(true);
-            
+
         $container->register(\App\Module\User\UserController::class)
             ->setArguments([
                 new Reference(\App\Module\User\Repository\UserRepository::class),
@@ -92,11 +89,7 @@ class UserModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
-    {
-    }
+    public function registerPermissions(PermissionRegistry $registry) : void {}
 
-    public function registerPolicies(PolicyRegistry $registry): void
-    {
-    }
+    public function registerPolicies(PolicyRegistry $registry) : void {}
 }

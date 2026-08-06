@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Admin\AdminController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AdminModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/admin/users', [AdminController::class, 'users']);
         $router->add('GET', '/admin/users/new', [AdminController::class, 'createUser']);
@@ -69,7 +68,7 @@ class AdminModule extends BaseModule
         $router->add('POST', '/admin/settings', [AdminController::class, 'updateSettings']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Admin\Repository\AuthConfigRepository::class)->setPublic(true);
         $container->register(\App\Module\Admin\Repository\BackupPolicyRepository::class)->setPublic(true);
@@ -89,14 +88,12 @@ class AdminModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('admin.manage', 'Керування адмінпанеллю');
 
         $registry->addRoleMapping('admin', ['admin.manage']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
-    {
-    }
+    public function registerPolicies(PolicyRegistry $registry) : void {}
 }

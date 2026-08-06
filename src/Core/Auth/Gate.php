@@ -16,7 +16,7 @@ class Gate
         $this->policyRegistry = $policyRegistry;
     }
 
-    public function getUser(): ?User
+    public function getUser() : ?User
     {
         if (!isset($_SESSION['user'])) {
             return null;
@@ -25,7 +25,7 @@ class Gate
         return new User($_SESSION['user'], $permissions);
     }
 
-    public function authorize(string $ability, $context = []): void
+    public function authorize(string $ability, $context = []) : void
     {
         $user = $this->getUser();
 
@@ -40,7 +40,7 @@ class Gate
         throw new ExitException("Доступ заборонено", 403);
     }
 
-    public function allows(string $ability, $context = []): bool
+    public function allows(string $ability, $context = []) : bool
     {
         $user = $this->getUser();
 
@@ -54,7 +54,7 @@ class Gate
 
         $parts = explode('.', $ability, 2);
 
-        if (count($parts) === 2) {
+        if (2 === count($parts)) {
             $resourceKey = $parts[0];
             $verb = $parts[1];
 

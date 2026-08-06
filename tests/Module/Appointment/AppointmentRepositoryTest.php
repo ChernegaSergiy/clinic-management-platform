@@ -2,8 +2,8 @@
 
 namespace App\Module\Appointment\Repository;
 
-use PHPUnit\Framework\TestCase;
 use PDO;
+use PHPUnit\Framework\TestCase;
 
 class AppointmentRepositoryTest extends TestCase
 {
@@ -11,7 +11,7 @@ class AppointmentRepositoryTest extends TestCase
     private PDO $mockPdo;
     private \PDOStatement $mockStmt;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->mockPdo = $this->createMock(PDO::class);
         $this->mockStmt = $this->createMock(\PDOStatement::class);
@@ -26,14 +26,14 @@ class AppointmentRepositoryTest extends TestCase
         $this->repository = $repository;
     }
 
-    public function testFindAllReturnsEmptyArrayWhenNoAppointments(): void
+    public function testFindAllReturnsEmptyArrayWhenNoAppointments() : void
     {
         $this->mockStmt->method('fetchAll')->willReturn([]);
         $result = $this->repository->findAll();
         $this->assertEmpty($result);
     }
 
-    public function testFindAllReturnsAppointments(): void
+    public function testFindAllReturnsAppointments() : void
     {
         $expected = [
             ['id' => 1, 'patient_name' => 'John Doe', 'doctor_name' => 'Dr. Smith'],
@@ -44,14 +44,14 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindByIdReturnsNullWhenNotFound(): void
+    public function testFindByIdReturnsNullWhenNotFound() : void
     {
         $this->mockStmt->method('fetch')->willReturn(false);
         $result = $this->repository->findById(999);
         $this->assertNull($result);
     }
 
-    public function testFindByIdReturnsAppointment(): void
+    public function testFindByIdReturnsAppointment() : void
     {
         $expected = ['id' => 1, 'patient_name' => 'John Doe'];
         $this->mockStmt->method('fetch')->willReturn($expected);
@@ -59,7 +59,7 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testFindByPatientIdReturnsAppointments(): void
+    public function testFindByPatientIdReturnsAppointments() : void
     {
         $expected = [
             ['id' => 1, 'start_time' => '2024-06-15 10:00:00'],
@@ -70,7 +70,7 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindByDoctorIdReturnsAppointments(): void
+    public function testFindByDoctorIdReturnsAppointments() : void
     {
         $expected = [
             ['id' => 1, 'patient_name' => 'John Doe'],
@@ -81,7 +81,7 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testFindUpcomingReturnsAppointments(): void
+    public function testFindUpcomingReturnsAppointments() : void
     {
         $expected = [
             ['id' => 1, 'patient_name' => 'John Doe'],
@@ -92,28 +92,28 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testIsPatientAssignedToDoctorReturnsTrue(): void
+    public function testIsPatientAssignedToDoctorReturnsTrue() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(1);
         $result = $this->repository->isPatientAssignedToDoctor(1, 1);
         $this->assertTrue($result);
     }
 
-    public function testIsPatientAssignedToDoctorReturnsFalse(): void
+    public function testIsPatientAssignedToDoctorReturnsFalse() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(0);
         $result = $this->repository->isPatientAssignedToDoctor(1, 1);
         $this->assertFalse($result);
     }
 
-    public function testIsAppointmentOwnedByDoctorReturnsTrue(): void
+    public function testIsAppointmentOwnedByDoctorReturnsTrue() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(1);
         $result = $this->repository->isAppointmentOwnedByDoctor(1, 1);
         $this->assertTrue($result);
     }
 
-    public function testGenerateWaitlistTicketFormat(): void
+    public function testGenerateWaitlistTicketFormat() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(5);
         $result = $this->repository->generateWaitlistTicket();
@@ -121,21 +121,21 @@ class AppointmentRepositoryTest extends TestCase
         $this->assertStringContainsString('-00006', $result);
     }
 
-    public function testCountScheduledByDate(): void
+    public function testCountScheduledByDate() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(10);
         $result = $this->repository->countScheduledByDate('2024-06-15');
         $this->assertEquals(10, $result);
     }
 
-    public function testCountAppointmentsByDate(): void
+    public function testCountAppointmentsByDate() : void
     {
         $this->mockStmt->method('fetchColumn')->willReturn(15);
         $result = $this->repository->countAppointmentsByDate('2024-06-15');
         $this->assertEquals(15, $result);
     }
 
-    public function testFindByDateRange(): void
+    public function testFindByDateRange() : void
     {
         $expected = [
             ['id' => 1, 'start_time' => '2024-06-15 10:00:00'],

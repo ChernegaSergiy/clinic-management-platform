@@ -11,14 +11,14 @@ class MigrateCommand extends Command
 {
     protected static $defaultName = 'db:migrate';
 
-    protected function configure(): void
+    protected function configure() : void
     {
         $this
             ->setName('db:migrate')
             ->setDescription('Run database migrations using Phinx');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $output->writeln('Running database migrations...');
 

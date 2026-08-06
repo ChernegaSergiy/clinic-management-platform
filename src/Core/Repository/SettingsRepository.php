@@ -14,28 +14,28 @@ class SettingsRepository
         $this->em = $em;
     }
 
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string $key, mixed $default = null) : mixed
     {
         $setting = $this->em->find(Settings::class, $key);
 
-        if ($setting === null) {
+        if (null === $setting) {
             return $default;
         }
 
         $value = $setting->getValue();
 
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return $default;
         }
 
         return $value;
     }
 
-    public function set(string $key, mixed $value): bool
+    public function set(string $key, mixed $value) : bool
     {
         $setting = $this->em->find(Settings::class, $key);
 
-        if ($setting === null) {
+        if (null === $setting) {
             $setting = new Settings();
             $setting->setKey($key);
             $setting->setCreatedAt(new \DateTimeImmutable());
@@ -50,11 +50,11 @@ class SettingsRepository
         return true;
     }
 
-    public function delete(string $key): bool
+    public function delete(string $key) : bool
     {
         $setting = $this->em->find(Settings::class, $key);
 
-        if ($setting === null) {
+        if (null === $setting) {
             return false;
         }
 
@@ -63,17 +63,17 @@ class SettingsRepository
         return true;
     }
 
-    public function getMfaPolicy(): string
+    public function getMfaPolicy() : string
     {
         return $this->get('mfa_policy', 'optional');
     }
 
-    public function setMfaPolicy(string $policy): bool
+    public function setMfaPolicy(string $policy) : bool
     {
         return $this->set('mfa_policy', $policy);
     }
 
-    public function getMfaForceRoles(): array
+    public function getMfaForceRoles() : array
     {
         $value = $this->get('mfa_force_roles', null);
         if (empty($value)) {
@@ -83,7 +83,7 @@ class SettingsRepository
         return is_array($decoded) ? $decoded : [];
     }
 
-    public function setMfaForceRoles(array $roleIds): bool
+    public function setMfaForceRoles(array $roleIds) : bool
     {
         return $this->set('mfa_force_roles', $roleIds);
     }

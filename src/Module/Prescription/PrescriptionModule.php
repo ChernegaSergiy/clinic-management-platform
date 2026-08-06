@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Prescription\PrescriptionController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class PrescriptionModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/prescriptions', [PrescriptionController::class, 'index']);
         $router->add('GET', '/prescriptions/new', [PrescriptionController::class, 'create']);
@@ -20,7 +19,7 @@ class PrescriptionModule extends BaseModule
         $router->add('GET', '/prescriptions/show', [PrescriptionController::class, 'show']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Prescription\Repository\PrescriptionRepository::class)->setPublic(true);
         $container->register(\App\Module\Prescription\PrescriptionController::class)
@@ -33,7 +32,7 @@ class PrescriptionModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('prescription.view.any', 'Перегляд будь-якого рецепту');
         $registry->add('prescription.view.own', 'Перегляд власних рецептів');
@@ -48,7 +47,7 @@ class PrescriptionModule extends BaseModule
         $registry->addRoleMapping('nurse', ['prescription.view.own']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('prescription', PrescriptionPolicy::class);
     }

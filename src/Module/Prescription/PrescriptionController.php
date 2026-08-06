@@ -2,17 +2,15 @@
 
 namespace App\Module\Prescription;
 
-use App\Database\Database;
-
 use App\Core\Validation\Validator;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PrescriptionController extends \App\Core\Controller\AbstractController
 {
@@ -40,7 +38,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/prescriptions', name: 'prescription_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $this->checkAuth();
         $searchTerm = $_GET['search'] ?? '';
@@ -62,7 +60,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/prescriptions/new', name: 'prescription_new', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('prescription.create', ['doctor_id' => $this->gate->getUser()->getId()]); // Check if current user can create prescriptions
@@ -91,7 +89,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/prescriptions/new', name: 'prescription_store', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
@@ -151,7 +149,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/prescriptions/show', name: 'prescription_show', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);

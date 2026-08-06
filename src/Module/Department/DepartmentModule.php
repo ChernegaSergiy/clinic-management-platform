@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DepartmentModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/admin/departments', [DepartmentController::class, 'index']);
         $router->add('GET', '/admin/departments/new', [DepartmentController::class, 'create']);
@@ -23,7 +23,7 @@ class DepartmentModule extends BaseModule
         $router->add('POST', '/admin/departments/toggle-status', [DepartmentController::class, 'toggleStatus']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Department\Repository\DepartmentRepository::class)->setPublic(true);
         $container->register(\App\Module\Department\DepartmentController::class)
@@ -33,7 +33,7 @@ class DepartmentModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('department.read', 'Перегляд відділень');
         $registry->add('department.write', 'Редагування відділень');
@@ -44,7 +44,7 @@ class DepartmentModule extends BaseModule
         $registry->addRoleMapping('medical_manager', ['department.read', 'department.write']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('department', DepartmentPolicy::class);
     }

@@ -15,7 +15,7 @@ class LabOrderPolicy implements Policy
         $this->labOrderRepository = $labOrderRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('lab_order.view.any')) {
             return true;
@@ -33,12 +33,12 @@ class LabOrderPolicy implements Policy
         return false;
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         return $user->hasPermission('lab_order.create');
     }
 
-    public function edit(User $user, array $context): bool
+    public function edit(User $user, array $context) : bool
     {
         if ($user->hasPermission('lab_order.edit.any')) {
             return true;
@@ -56,7 +56,7 @@ class LabOrderPolicy implements Policy
         return false;
     }
 
-    private function isOwner(User $user, int $labOrderId): bool
+    private function isOwner(User $user, int $labOrderId) : bool
     {
         $userId = $user->getId();
         if (!$userId) {

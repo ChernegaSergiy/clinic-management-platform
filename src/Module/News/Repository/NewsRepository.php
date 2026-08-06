@@ -13,14 +13,14 @@ class NewsRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsArticle::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM news_articles ORDER BY published_at DESC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM news_articles WHERE id = :id";
@@ -28,7 +28,7 @@ class NewsRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function create(array $data): int
+    public function create(array $data) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO news_articles (title, meta, content, published_at, author_id, is_published) 
@@ -44,7 +44,7 @@ class NewsRepository extends ServiceEntityRepository
         return (int)$conn->lastInsertId();
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE news_articles SET 
@@ -67,7 +67,7 @@ class NewsRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM news_articles WHERE id = :id";

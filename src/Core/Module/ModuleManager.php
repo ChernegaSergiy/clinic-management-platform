@@ -12,7 +12,7 @@ class ModuleManager
     private array $modules = [];
     private array $loadedModules = [];
 
-    public function register(string $moduleClass): void
+    public function register(string $moduleClass) : void
     {
         if (isset($this->modules[$moduleClass])) {
             return;
@@ -24,7 +24,7 @@ class ModuleManager
         ];
     }
 
-    public function unregister(string $moduleClass): void
+    public function unregister(string $moduleClass) : void
     {
         unset($this->modules[$moduleClass]);
         if (isset($this->loadedModules[$moduleClass])) {
@@ -32,7 +32,7 @@ class ModuleManager
         }
     }
 
-    public function getModule(string $moduleClass): ?ModuleInterface
+    public function getModule(string $moduleClass) : ?ModuleInterface
     {
         if (!isset($this->loadedModules[$moduleClass])) {
             $this->loadModule($moduleClass);
@@ -41,37 +41,37 @@ class ModuleManager
         return $this->loadedModules[$moduleClass] ?? null;
     }
 
-    public function getLoadedModules(): array
+    public function getLoadedModules() : array
     {
         return array_values($this->loadedModules);
     }
 
-    public function getRegisteredModules(): array
+    public function getRegisteredModules() : array
     {
         return array_keys($this->modules);
     }
 
-    public function isLoaded(string $moduleClass): bool
+    public function isLoaded(string $moduleClass) : bool
     {
         return isset($this->loadedModules[$moduleClass]);
     }
 
-    public function isEnabled(string $moduleClass): bool
+    public function isEnabled(string $moduleClass) : bool
     {
         return $this->modules[$moduleClass]['enabled'] ?? false;
     }
 
-    public function enable(string $moduleClass): void
+    public function enable(string $moduleClass) : void
     {
         $this->modules[$moduleClass]['enabled'] = true;
     }
 
-    public function disable(string $moduleClass): void
+    public function disable(string $moduleClass) : void
     {
         $this->modules[$moduleClass]['enabled'] = false;
     }
 
-    public function bootstrapAll(): void
+    public function bootstrapAll() : void
     {
         foreach ($this->modules as $moduleClass => $config) {
             if (!$config['enabled']) {
@@ -85,7 +85,7 @@ class ModuleManager
         }
     }
 
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         foreach ($this->modules as $moduleClass => $config) {
             if (!$config['enabled']) {
@@ -99,7 +99,7 @@ class ModuleManager
         }
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         foreach ($this->modules as $moduleClass => $config) {
             if (!$config['enabled']) {
@@ -113,7 +113,7 @@ class ModuleManager
         }
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         foreach ($this->modules as $moduleClass => $config) {
             if (!$config['enabled']) {
@@ -127,7 +127,7 @@ class ModuleManager
         }
     }
 
-    public function registerEventListeners(EventDispatcherInterface $dispatcher): void
+    public function registerEventListeners(EventDispatcherInterface $dispatcher) : void
     {
         foreach ($this->modules as $moduleClass => $config) {
             if (!$config['enabled']) {
@@ -141,7 +141,7 @@ class ModuleManager
         }
     }
 
-    private function loadModule(string $moduleClass): void
+    private function loadModule(string $moduleClass) : void
     {
         if (!class_exists($moduleClass)) {
             return;

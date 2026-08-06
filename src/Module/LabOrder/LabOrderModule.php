@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\LabOrder\LabOrderController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class LabOrderModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/lab-orders/new', [LabOrderController::class, 'create']);
         $router->add('POST', '/lab-orders/new', [LabOrderController::class, 'store']);
@@ -21,7 +20,7 @@ class LabOrderModule extends BaseModule
         $router->add('POST', '/lab-orders/edit', [LabOrderController::class, 'update']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\LabOrder\Repository\LabOrderRepository::class)->setPublic(true);
         $container->register(\App\Module\LabOrder\Repository\LabResourceRepository::class)->setPublic(true);
@@ -37,7 +36,7 @@ class LabOrderModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('lab_order.view.any', 'Перегляд будь-якого лабораторного дослідження');
         $registry->add('lab_order.view.own', 'Перегляд власних лабораторних досліджень');
@@ -52,7 +51,7 @@ class LabOrderModule extends BaseModule
         $registry->addRoleMapping('nurse', ['lab_order.view.own']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('lab_order', LabOrderPolicy::class);
     }

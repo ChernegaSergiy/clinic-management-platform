@@ -5,8 +5,8 @@ namespace App\Module\User\Repository;
 use App\Entity\User;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
@@ -19,7 +19,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findByEmail(string $email): ?array
+    public function findByEmail(string $email) : ?array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.password_hash', 'IDENTITY(u.role) as role_id', 'u.mfa_enabled', 'u.mfa_type', 'u.mfa_verified_at', 'u.mfa_pending', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
@@ -29,7 +29,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', 'u.mfa_enabled', "CONCAT(u.first_name, ' ', u.last_name) AS full_name");
@@ -48,7 +48,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAllByRole(string $roleName): array
+    public function findAllByRole(string $roleName) : array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
@@ -61,7 +61,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAllActive(): array
+    public function findAllActive() : array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
@@ -72,7 +72,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAllDoctors(): array
+    public function findAllDoctors() : array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
@@ -85,7 +85,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $qb = $this->createQueryBuilder('u')
             ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'IDENTITY(u.role) as role_id', 'u.password_hash', 'u.created_at', 'u.updated_at', 'u.profile_photo_path', 'u.mfa_enabled', 'u.mfa_type', 'u.mfa_verified_at', 'u.mfa_pending', "CONCAT(u.first_name, ' ', u.last_name) AS full_name")
@@ -93,7 +93,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             ->setParameter('id', $id);
 
         $result = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
-        
+
         if ($result) {
             // Cast timestamps to DateTime objects for safer usage in views if they are returned as strings.
             // Doctrine usually returns DateTime objects for datetime types if hydrated as array? Actually, it does!
@@ -109,7 +109,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $result;
     }
 
-    public function findByEmailExcludingId(string $email, int $id): ?array
+    public function findByEmailExcludingId(string $email, int $id) : ?array
     {
         $qb = $this->createQueryBuilder('u')
             ->where('u.email = :email')
@@ -120,7 +120,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function save(array $data): int|false
+    public function save(array $data) : int|false
     {
         $username = $data['username'] ?? $data['email'];
 
@@ -129,7 +129,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->setLastName($data['last_name']);
         $user->setEmail($data['email']);
         $user->setUsername($username);
-        
+
         if (!empty($data['password'])) {
             $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
         }
@@ -151,7 +151,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $oldData = $this->findById($id);
         if (!$oldData) {
@@ -190,7 +190,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $oldData = $this->findById($id);
         if (!$oldData) {
@@ -213,12 +213,12 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
     }
 
-    public function countUsers(): int
+    public function countUsers() : int
     {
         return $this->count([]);
     }
 
-    public function updateProfilePhotoPath(int $userId, ?string $path): bool
+    public function updateProfilePhotoPath(int $userId, ?string $path) : bool
     {
         /** @var User|null $user */
         $user = $this->find($userId);
@@ -227,7 +227,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
 
         $user->setProfilePhotoPath($path);
-        
+
         try {
             $this->getEntityManager()->flush();
             return true;
@@ -236,7 +236,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
     }
 
-    public function findRoleIdByName(string $roleName): ?int
+    public function findRoleIdByName(string $roleName) : ?int
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('r.id')

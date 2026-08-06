@@ -2,14 +2,12 @@
 
 namespace App\Module\Room;
 
-use Symfony\Component\Routing\Attribute\Route;
-use App\Database\Database;
-
 use App\Core\Validation\Validator;
 use App\Module\Room\Repository\RoomRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
 class RoomController extends \App\Core\Controller\AbstractController
 {
@@ -23,7 +21,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms', name: 'admin_rooms_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $this->authorizeAdmin();
         $searchTerm = $_GET['search'] ?? '';
@@ -36,7 +34,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->authorizeAdmin();
 
@@ -52,7 +50,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->authorizeAdmin();
 
@@ -77,7 +75,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->authorizeAdmin();
 
@@ -92,7 +90,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
-    public function edit(): Response
+    public function edit() : Response
     {
         $this->authorizeAdmin();
 
@@ -116,7 +114,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $this->authorizeAdmin();
 
@@ -147,7 +145,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
-    public function delete(): Response
+    public function delete() : Response
     {
         $this->authorizeAdmin();
 
@@ -165,7 +163,7 @@ class RoomController extends \App\Core\Controller\AbstractController
 
     // API endpoints for calendar integration
     #[Route('/api/calendar/rooms', name: 'api_calendar_rooms_get', methods: ['GET'])]
-    public function apiRooms(): JsonResponse
+    public function apiRooms() : JsonResponse
     {
         $rooms = $this->roomRepository->findAvailable();
         $resources = [];
@@ -184,7 +182,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return new JsonResponse($resources);
     }
 
-    private function authorizeAdmin(): void
+    private function authorizeAdmin() : void
     {
         $this->checkAuth();
         $this->gate->authorize('rooms.manage');

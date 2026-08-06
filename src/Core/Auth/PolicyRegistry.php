@@ -6,7 +6,7 @@ class PolicyRegistry
 {
     private array $policies = [];
 
-    public function register(string $resourceKey, string $policyClass): void
+    public function register(string $resourceKey, string $policyClass) : void
     {
         if (!class_exists($policyClass)) {
             return;
@@ -15,7 +15,7 @@ class PolicyRegistry
         $this->policies[$resourceKey] = $policyClass;
     }
 
-    public function get(string $resourceKey): ?object
+    public function get(string $resourceKey) : ?object
     {
         if (!isset($this->policies[$resourceKey])) {
             return null;

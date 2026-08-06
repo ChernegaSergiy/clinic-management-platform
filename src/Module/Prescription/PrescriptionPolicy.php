@@ -20,7 +20,7 @@ class PrescriptionPolicy implements Policy
         $this->appointmentRepository = $appointmentRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('prescription.view.any')) {
             return true;
@@ -38,7 +38,7 @@ class PrescriptionPolicy implements Policy
         return false;
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         if ($user->hasPermission('prescription.create.any')) {
             return true;
@@ -57,7 +57,7 @@ class PrescriptionPolicy implements Policy
         return false;
     }
 
-    public function edit(User $user, array $context): bool
+    public function edit(User $user, array $context) : bool
     {
         if ($user->hasPermission('prescription.edit.any')) {
             return true;
@@ -75,7 +75,7 @@ class PrescriptionPolicy implements Policy
         return false;
     }
 
-    private function isOwner(User $user, int $prescriptionId): bool
+    private function isOwner(User $user, int $prescriptionId) : bool
     {
         $userId = $user->getId();
         if (!$userId) {

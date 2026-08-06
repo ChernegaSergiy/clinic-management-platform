@@ -2,7 +2,6 @@
 
 namespace App\Module\Dashboard;
 
-
 use App\Module\Dashboard\Service\DashboardService;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -16,7 +15,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth(); // Ensure user is authenticated
         $this->gate->authorize('dashboard.view');
@@ -36,7 +35,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export/csv', name: 'dashboard_export_csv', methods: ['GET'])]
-    public function exportCsv(): \Symfony\Component\HttpFoundation\Response
+    public function exportCsv() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('dashboard.export');
@@ -60,7 +59,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export/pdf', name: 'dashboard_export_pdf', methods: ['GET'])]
-    public function exportPdf(): \Symfony\Component\HttpFoundation\Response
+    public function exportPdf() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('dashboard.export');
@@ -79,7 +78,7 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export/excel', name: 'dashboard_export_excel', methods: ['GET'])]
-    public function exportExcel(): \Symfony\Component\HttpFoundation\Response
+    public function exportExcel() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('dashboard.export');

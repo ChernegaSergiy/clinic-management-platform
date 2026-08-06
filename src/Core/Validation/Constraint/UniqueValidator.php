@@ -16,7 +16,7 @@ class UniqueValidator extends ConstraintValidator
         $this->registry = $registry;
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate($value, Constraint $constraint) : void
     {
         if (!$constraint instanceof Unique) {
             throw new UnexpectedTypeException($constraint, Unique::class);
@@ -32,7 +32,7 @@ class UniqueValidator extends ConstraintValidator
             $sql = "SELECT COUNT(*) FROM `{$constraint->table}` WHERE `{$constraint->column}` = :value";
             $queryParams = ['value' => $value];
 
-            if ($constraint->ignoreId !== null) {
+            if (null !== $constraint->ignoreId) {
                 $sql .= " AND `id` != :ignore_id";
                 $queryParams['ignore_id'] = $constraint->ignoreId;
             }
@@ -47,7 +47,7 @@ class UniqueValidator extends ConstraintValidator
         } catch (\Exception $e) {
             // In test environments, skip the unique validation rather than failing
             // In production, rethrow the exception to surface database issues
-            if (getenv('APP_ENV') === 'testing') {
+            if ('testing' === getenv('APP_ENV')) {
                 return;
             }
             throw $e;

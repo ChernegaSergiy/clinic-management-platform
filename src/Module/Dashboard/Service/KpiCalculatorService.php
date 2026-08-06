@@ -33,7 +33,7 @@ class KpiCalculatorService
         $this->medicalRecordRepository = $medicalRecordRepository;
     }
 
-    public function calculateAndStoreAll(?string $forDate = null): void
+    public function calculateAndStoreAll(?string $forDate = null) : void
     {
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
         $today = $forDate ? new DateTimeImmutable($forDate) : new DateTimeImmutable('today');
@@ -42,7 +42,7 @@ class KpiCalculatorService
         foreach ($definitions as $definition) {
             [$periodStart, $periodEnd] = $this->resolvePeriodRange($today, $definition['period'] ?? 'day');
             $value = $this->calculateKpiValue($definition['kpi_type'], $periodStart, $periodEnd);
-            if ($value === null) {
+            if (null === $value) {
                 continue;
             }
             $this->kpiRepository->saveKpiResult([
@@ -56,7 +56,7 @@ class KpiCalculatorService
         }
     }
 
-    private function resolvePeriodRange(DateTimeImmutable $today, string $period): array
+    private function resolvePeriodRange(DateTimeImmutable $today, string $period) : array
     {
         return match ($period) {
             'week' => [
@@ -74,7 +74,7 @@ class KpiCalculatorService
         };
     }
 
-    private function calculateKpiValue(string $type, string $from, string $to): ?float
+    private function calculateKpiValue(string $type, string $from, string $to) : ?float
     {
         return match ($type) {
             'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($from, $to),
@@ -85,12 +85,12 @@ class KpiCalculatorService
         };
     }
 
-    private function calculateDoctorUtilization(string $from, string $to): ?float
+    private function calculateDoctorUtilization(string $from, string $to) : ?float
     {
         $bookedHours = $this->appointmentRepository->sumBookedHoursByRange($from, $to);
         $doctorCount = $this->appointmentRepository->countDistinctDoctorsByRange($from, $to);
 
-        if ($doctorCount === 0) {
+        if (0 === $doctorCount) {
             return null;
         }
 
@@ -104,10 +104,10 @@ class KpiCalculatorService
         return round(($bookedHours / $totalCapacity) * 100, 1);
     }
 
-    private function calculateReadmissionRate(string $from, string $to): ?float
+    private function calculateReadmissionRate(string $from, string $to) : ?float
     {
         $totalPatients = $this->appointmentRepository->countDistinctPatientsByRange($from, $to);
-        if ($totalPatients === 0) {
+        if (0 === $totalPatients) {
             return null;
         }
 

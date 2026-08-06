@@ -35,12 +35,12 @@ class SchedulingService
     /**
      * Generates time slots for a given doctor on a specific date.
      *
-     * @param int $doctorId
-     * @param DateTime $date
-     * @param int $serviceId Optional, to get specific duration. Default to 30 mins if not provided.
-     * @return array An array of time slots with availability info ['time' => DateTime, 'available' => bool, 'booked' => bool].
+     * @param  int      $doctorId
+     * @param  DateTime $date
+     * @param  int      $serviceId Optional, to get specific duration. Default to 30 mins if not provided.
+     * @return array    An array of time slots with availability info ['time' => DateTime, 'available' => bool, 'booked' => bool].
      */
-    public function getAvailableTimeSlots(int $doctorId, DateTime $date, ?int $serviceId = null): array
+    public function getAvailableTimeSlots(int $doctorId, DateTime $date, ?int $serviceId = null) : array
     {
         $availableSlots = [];
         $dayOfWeek = (int)$date->format('w'); // 0 for Sunday, 6 for Saturday
@@ -57,7 +57,7 @@ class SchedulingService
 
         // Determine slot duration
         $slotDurationMinutes = 30; // Default
-        if ($serviceId !== null) {
+        if (null !== $serviceId) {
             $service = $this->serviceRepository->findById($serviceId);
             if ($service && isset($service['duration_minutes'])) {
                 $slotDurationMinutes = (int)$service['duration_minutes'];
@@ -164,7 +164,7 @@ class SchedulingService
     /**
      * Check if a room is available for given time slot
      */
-    public function isRoomAvailable(?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): bool
+    public function isRoomAvailable(?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null) : bool
     {
         if (!$roomId) {
             return true; // No room specified, always available
@@ -202,7 +202,7 @@ class SchedulingService
     /**
      * Check if a time slot is available for both doctor and room
      */
-    public function isTimeSlotAvailable(int $doctorId, ?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): array
+    public function isTimeSlotAvailable(int $doctorId, ?int $roomId, DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null) : array
     {
         $result = [
             'available' => true,
@@ -251,7 +251,7 @@ class SchedulingService
     /**
      * Get available rooms for a given time slot
      */
-    public function getAvailableRooms(DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null): array
+    public function getAvailableRooms(DateTime $startTime, DateTime $endTime, ?int $excludeAppointmentId = null) : array
     {
         $allRooms = $this->roomRepository->findAvailable();
         $availableRooms = [];
@@ -268,7 +268,7 @@ class SchedulingService
     /**
      * Validate appointment booking with room conflict detection
      */
-    public function validateAppointmentBooking(array $data): array
+    public function validateAppointmentBooking(array $data) : array
     {
         $result = [
             'valid' => true,

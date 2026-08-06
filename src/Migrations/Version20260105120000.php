@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20260105120000 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'add_mfa_settings_to_users_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $this->addSql("ALTER TABLE users ADD COLUMN mfa_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER password_hash");
         $this->addSql("ALTER TABLE users ADD COLUMN mfa_type ENUM('totp', 'sms', 'email') NOT NULL DEFAULT 'totp' AFTER mfa_enabled");
@@ -24,7 +24,7 @@ final class Version20260105120000 extends AbstractMigration
         $this->addSql("ALTER TABLE users ADD COLUMN mfa_pending TINYINT(1) NOT NULL DEFAULT 0 AFTER mfa_verified_at");
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $table = $schema->getTable('users');
         $table->dropColumn('mfa_pending');

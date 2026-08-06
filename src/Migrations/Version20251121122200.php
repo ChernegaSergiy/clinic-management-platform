@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251121122200 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_lab_order_resources_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->createTable('lab_order_resources');
         $table->addColumn('lab_order_id', 'integer', ['unsigned' => true]);
@@ -26,7 +26,7 @@ final class Version20251121122200 extends AbstractMigration
         $table->addForeignKeyConstraint('lab_resources', ['lab_resource_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => 'NO_ACTION']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $schema->dropTable('lab_order_resources');
     }

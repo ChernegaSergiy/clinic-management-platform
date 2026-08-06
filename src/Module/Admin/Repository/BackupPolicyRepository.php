@@ -13,14 +13,14 @@ class BackupPolicyRepository extends ServiceEntityRepository
         parent::__construct($registry, BackupPolicy::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM backup_policies ORDER BY name ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM backup_policies WHERE id = :id";
@@ -28,12 +28,12 @@ class BackupPolicyRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO backup_policies (name, description, frequency, retention_days, status) 
                 VALUES (:name, :description, :frequency, :retention_days, :status)";
-                
+
         $success = $conn->executeStatement($sql, [
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
@@ -41,11 +41,11 @@ class BackupPolicyRepository extends ServiceEntityRepository
             'retention_days' => $data['retention_days'] ?? 30,
             'status' => $data['status'] ?? 'inactive',
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE backup_policies SET 
@@ -56,7 +56,7 @@ class BackupPolicyRepository extends ServiceEntityRepository
                     last_run_at = :last_run_at, 
                     status = :status 
                 WHERE id = :id";
-                
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'name' => $data['name'],
@@ -68,7 +68,7 @@ class BackupPolicyRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM backup_policies WHERE id = :id";

@@ -2,19 +2,19 @@
 
 namespace App\Tests;
 
-use PHPUnit\Framework\TestCase;
 use PDO;
+use PHPUnit\Framework\TestCase;
 
 abstract class RepositoryTestCase extends TestCase
 {
     protected PDO $pdo;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->pdo = $this->createMockPdo();
     }
 
-    private function createMockPdo(): PDO
+    private function createMockPdo() : PDO
     {
         $pdo = $this->createMock(PDO::class);
 

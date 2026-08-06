@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\Patient\Repository\PatientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Patient\Repository\PatientRepository;
 
 #[ORM\Entity(repositoryClass: PatientRepository::class)]
 #[ORM\Table(name: 'patients')]
@@ -57,160 +57,160 @@ class Patient
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName() : ?string
     {
         return $this->first_name;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(string $firstName) : static
     {
         $this->first_name = $firstName;
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName() : ?string
     {
         return $this->last_name;
     }
 
-    public function setLastName(string $lastName): static
+    public function setLastName(string $lastName) : static
     {
         $this->last_name = $lastName;
         return $this;
     }
 
-    public function getMiddleName(): ?string
+    public function getMiddleName() : ?string
     {
         return $this->middle_name;
     }
 
-    public function setMiddleName(?string $middleName): static
+    public function setMiddleName(?string $middleName) : static
     {
         $this->middle_name = $middleName;
         return $this;
     }
 
-    public function getBirthDate(): ?\DateTimeInterface
+    public function getBirthDate() : ?\DateTimeInterface
     {
         return $this->birth_date;
     }
 
-    public function setBirthDate(\DateTimeInterface $birthDate): static
+    public function setBirthDate(\DateTimeInterface $birthDate) : static
     {
         $this->birth_date = $birthDate;
         return $this;
     }
 
-    public function getGender(): ?string
+    public function getGender() : ?string
     {
         return $this->gender;
     }
 
-    public function setGender(string $gender): static
+    public function setGender(string $gender) : static
     {
         $this->gender = $gender;
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getPhone() : ?string
     {
         return $this->phone;
     }
 
-    public function setPhone(string $phone): static
+    public function setPhone(string $phone) : static
     {
         $this->phone = $phone;
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail() : ?string
     {
         return $this->email;
     }
 
-    public function setEmail(?string $email): static
+    public function setEmail(?string $email) : static
     {
         $this->email = $email;
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getAddress() : ?string
     {
         return $this->address;
     }
 
-    public function setAddress(?string $address): static
+    public function setAddress(?string $address) : static
     {
         $this->address = $address;
         return $this;
     }
 
-    public function getTaxId(): ?string
+    public function getTaxId() : ?string
     {
         return $this->tax_id;
     }
 
-    public function setTaxId(?string $taxId): static
+    public function setTaxId(?string $taxId) : static
     {
         $this->tax_id = $taxId;
         return $this;
     }
 
-    public function getDocumentId(): ?string
+    public function getDocumentId() : ?string
     {
         return $this->document_id;
     }
 
-    public function setDocumentId(?string $documentId): static
+    public function setDocumentId(?string $documentId) : static
     {
         $this->document_id = $documentId;
         return $this;
     }
 
-    public function getMaritalStatus(): ?string
+    public function getMaritalStatus() : ?string
     {
         return $this->marital_status;
     }
 
-    public function setMaritalStatus(?string $maritalStatus): static
+    public function setMaritalStatus(?string $maritalStatus) : static
     {
         $this->marital_status = $maritalStatus;
         return $this;
     }
 
-    public function getStatus(): string
+    public function getStatus() : string
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(string $status) : static
     {
         $this->status = $status;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt) : static
     {
         $this->updated_at = $updatedAt;
         return $this;

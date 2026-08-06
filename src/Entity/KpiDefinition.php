@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Kpi\Repository\KpiRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Kpi\Repository\KpiRepository;
 
 #[ORM\Entity(repositoryClass: KpiRepository::class)]
 #[ORM\Table(name: 'kpi_definitions')]

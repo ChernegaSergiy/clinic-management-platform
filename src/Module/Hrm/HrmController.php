@@ -2,13 +2,11 @@
 
 namespace App\Module\Hrm;
 
-use App\Database\Database;
-
-use App\Module\Hrm\Repository\HrmRepositoryInterface;
+use App\Core\Validation\Validator;
 use App\Module\Department\Repository\DepartmentRepository;
+use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Core\Validation\Validator;
 
 class HrmController extends \App\Core\Controller\AbstractController
 {
@@ -30,7 +28,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('hrm.read');
@@ -43,7 +41,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
-    public function create(): \Symfony\Component\HttpFoundation\Response
+    public function create() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('hrm.write');
@@ -58,7 +56,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
-    public function store(): \Symfony\Component\HttpFoundation\Response
+    public function store() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('hrm.write');
@@ -91,7 +89,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/show', name: 'hrm_show', methods: ['GET'])]
-    public function show(): \Symfony\Component\HttpFoundation\Response
+    public function show() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -109,7 +107,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
-    public function edit(): \Symfony\Component\HttpFoundation\Response
+    public function edit() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -132,7 +130,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
-    public function update(): \Symfony\Component\HttpFoundation\Response
+    public function update() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -172,7 +170,7 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/toggle-status', name: 'hrm_toggle_status', methods: ['POST'])]
-    public function toggleStatus(): \Symfony\Component\HttpFoundation\Response
+    public function toggleStatus() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('hrm.manage');
@@ -181,7 +179,7 @@ class HrmController extends \App\Core\Controller\AbstractController
         $employee = $this->hrmRepository->findById($id);
 
         if ($employee) {
-            $newStatus = $employee['status'] === 'active' ? 'terminated' : 'active';
+            $newStatus = 'active' === $employee['status'] ? 'terminated' : 'active';
             $this->hrmRepository->updateStatus($id, $newStatus);
             $_SESSION['success_message'] = 'Статус співробітника оновлено.';
         }

@@ -13,18 +13,18 @@ class ServiceBundleRepository extends ServiceEntityRepository
         parent::__construct($registry, ServiceBundle::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM service_bundles ORDER BY name ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM service_bundles WHERE id = :id";
-        
+
         $bundle = $conn->fetchAssociative($sql, ['id' => $id]);
 
         if ($bundle) {
@@ -33,22 +33,22 @@ class ServiceBundleRepository extends ServiceEntityRepository
         return $bundle ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
-        
+
         try {
             $sql = "INSERT INTO service_bundles (name, description, price, is_active) 
                     VALUES (:name, :description, :price, :is_active)";
-                    
+
             $conn->executeStatement($sql, [
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
                 'price' => $data['price'],
                 'is_active' => $data['is_active'] ?? true,
             ]);
-            
+
             $bundleId = (int)$conn->lastInsertId();
 
             if (!empty($data['services']) && is_array($data['services'])) {
@@ -63,11 +63,11 @@ class ServiceBundleRepository extends ServiceEntityRepository
         }
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
-        
+
         try {
             $sql = "UPDATE service_bundles SET 
                         name = :name, 
@@ -75,7 +75,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
                         price = :price, 
                         is_active = :is_active 
                     WHERE id = :id";
-                    
+
             $success = $conn->executeStatement($sql, [
                 'id' => $id,
                 'name' => $data['name'],
@@ -96,7 +96,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
         }
     }
 
-    public function getServicesInBundle(int $bundleId): array
+    public function getServicesInBundle(int $bundleId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -109,7 +109,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql, ['bundle_id' => $bundleId]);
     }
 
-    private function syncServices(int $bundleId, array $serviceIds): void
+    private function syncServices(int $bundleId, array $serviceIds) : void
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->executeStatement("DELETE FROM bundle_services WHERE bundle_id = :bundle_id", ['bundle_id' => $bundleId]);

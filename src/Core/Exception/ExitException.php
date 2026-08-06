@@ -14,12 +14,12 @@ class ExitException extends RuntimeException
         $this->statusCode = $statusCode;
     }
 
-    public function getExitMessage(): string
+    public function getExitMessage() : string
     {
         return $this->getMessage();
     }
 
-    public function getStatusCode(): int
+    public function getStatusCode() : int
     {
         return $this->statusCode;
     }

@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251121122000 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_prescription_items_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->createTable('prescription_items');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
@@ -29,7 +29,7 @@ final class Version20251121122000 extends AbstractMigration
         $table->addForeignKeyConstraint('prescriptions', ['prescription_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => 'NO_ACTION']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $schema->dropTable('prescription_items');
     }

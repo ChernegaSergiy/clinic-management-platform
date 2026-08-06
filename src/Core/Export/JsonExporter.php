@@ -4,7 +4,7 @@ namespace App\Core\Export;
 
 class JsonExporter
 {
-    public function export(array $data, string $filename = 'export.json'): void
+    public function export(array $data, string $filename = 'export.json') : void
     {
         header('Content-Type: application/json');
         header('Content-Disposition: attachment;filename="' . $filename . '"');

@@ -17,10 +17,10 @@ class CsvExporter
         $this->enclosure = $enclosure;
     }
 
-    public function generate(): string
+    public function generate() : string
     {
         $output = fopen('php://temp', 'r+');
-        if ($output === false) {
+        if (false === $output) {
             return '';
         }
 
@@ -37,7 +37,7 @@ class CsvExporter
         return $csv;
     }
 
-    public function download(string $filename = 'export.csv'): void
+    public function download(string $filename = 'export.csv') : void
     {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '"');

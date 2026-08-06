@@ -2,9 +2,9 @@
 
 namespace App\Module\Prescription\Repository;
 
+use App\Entity\Prescription;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Entity\Prescription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -19,7 +19,7 @@ class PrescriptionRepository extends ServiceEntityRepository
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -46,7 +46,7 @@ class PrescriptionRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql, $params);
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
@@ -77,7 +77,7 @@ class PrescriptionRepository extends ServiceEntityRepository
             }
 
             $conn->commit();
-            
+
             $this->eventDispatcher->dispatch(new EntityChangedEvent('prescription', $prescriptionId, 'create', null, $data));
             $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -92,7 +92,7 @@ class PrescriptionRepository extends ServiceEntityRepository
         }
     }
 
-    private function saveItems(int $prescriptionId, array $items): void
+    private function saveItems(int $prescriptionId, array $items) : void
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO prescription_items (prescription_id, medication_name, dosage, frequency, duration, notes) 
@@ -110,7 +110,7 @@ class PrescriptionRepository extends ServiceEntityRepository
         }
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT p.*, 
@@ -120,7 +120,7 @@ class PrescriptionRepository extends ServiceEntityRepository
                 JOIN patients pat ON p.patient_id = pat.id 
                 JOIN users doc ON p.doctor_id = doc.id 
                 WHERE p.id = :id";
-                
+
         $prescription = $conn->fetchAssociative($sql, ['id' => $id]);
 
         if ($prescription) {
@@ -129,14 +129,14 @@ class PrescriptionRepository extends ServiceEntityRepository
         return $prescription ?: null;
     }
 
-    public function findItemsByPrescriptionId(int $prescriptionId): array
+    public function findItemsByPrescriptionId(int $prescriptionId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM prescription_items WHERE prescription_id = :prescription_id";
         return $conn->fetchAllAssociative($sql, ['prescription_id' => $prescriptionId]);
     }
 
-    public function findByPatientId(int $patientId): array
+    public function findByPatientId(int $patientId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT p.id, p.issue_date, p.expiry_date, 
@@ -145,11 +145,11 @@ class PrescriptionRepository extends ServiceEntityRepository
                 JOIN users doc ON p.doctor_id = doc.id 
                 WHERE p.patient_id = :patient_id 
                 ORDER BY p.issue_date DESC";
-                
+
         return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
     }
 
-    public function findByDoctorId(int $doctorId, string $searchTerm = ''): array
+    public function findByDoctorId(int $doctorId, string $searchTerm = '') : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT p.id, p.issue_date, p.expiry_date, 

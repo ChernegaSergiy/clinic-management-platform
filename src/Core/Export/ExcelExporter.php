@@ -7,7 +7,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelExporter
 {
-    public function export(array $headers, array $data, string $filename = 'export.xlsx'): void
+    public function export(array $headers, array $data, string $filename = 'export.xlsx') : void
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();

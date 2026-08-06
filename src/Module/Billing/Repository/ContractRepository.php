@@ -13,14 +13,14 @@ class ContractRepository extends ServiceEntityRepository
         parent::__construct($registry, Contract::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM contracts ORDER BY created_at DESC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM contracts WHERE id = :id";
@@ -28,7 +28,7 @@ class ContractRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO contracts (title, description, start_date, end_date, party_a, party_b, file_path, status) 
@@ -44,11 +44,11 @@ class ContractRepository extends ServiceEntityRepository
             'file_path' => $data['file_path'] ?? null,
             'status' => $data['status'] ?? 'active',
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE contracts SET 
@@ -75,7 +75,7 @@ class ContractRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM contracts WHERE id = :id";

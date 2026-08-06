@@ -6,6 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ *
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
@@ -30,12 +31,12 @@ class Unique extends Constraint
         $this->column = $column;
         $this->ignoreId = $ignoreId;
 
-        if ($message !== null) {
+        if (null !== $message) {
             $this->message = $message;
         }
     }
 
-    public function getTargets(): string|array
+    public function getTargets() : string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

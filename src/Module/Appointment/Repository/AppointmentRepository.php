@@ -7,7 +7,6 @@ use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
@@ -20,7 +19,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -43,13 +42,13 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function save(array $data): int|false
+    public function save(array $data) : int|false
     {
         $appointment = new Appointment();
-        
+
         $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
         $appointment->setPatient($patient);
-        
+
         $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
         $appointment->setDoctor($doctor);
 
@@ -61,15 +60,15 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         }
 
         $appointment->setStatus($data['status'] ?? 'scheduled');
-        
+
         if (array_key_exists('notes', $data)) {
             $appointment->setNotes($data['notes']);
         }
-        
+
         if (!empty($data['waitlist_id'])) {
             $appointment->setWaitlistId($data['waitlist_id']);
         }
-        
+
         if (!empty($data['room_id'])) {
             $appointment->setRoomId($data['room_id']);
         }
@@ -79,7 +78,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             $this->getEntityManager()->flush();
 
             $appointmentId = $appointment->getId();
-            
+
             $this->eventDispatcher->dispatch(new EntityChangedEvent('appointment', $appointmentId, 'create', null, $data));
             $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -87,14 +86,14 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
                 'Ваш прийом заплановано на ' . $data['start_time'],
                 ['appointment_id' => $appointmentId]
             ));
-            
+
             return $appointmentId;
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -113,7 +112,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $result ?: null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $oldAppointment = $this->findById($id);
         if (!$oldAppointment) {
@@ -138,12 +137,14 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         if (isset($data['start_time'])) {
             try {
                 $appointment->setStartTime(new \DateTime($data['start_time']));
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
         if (isset($data['end_time'])) {
             try {
                 $appointment->setEndTime(new \DateTime($data['end_time']));
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         if (isset($data['status'])) {
@@ -165,7 +166,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         }
     }
 
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status) : bool
     {
         $oldAppointment = $this->findById($id);
         if (!$oldAppointment) {
@@ -191,7 +192,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         }
     }
 
-    public function findWaitlistById(int $id): ?array
+    public function findWaitlistById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -208,13 +209,13 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $result ?: null;
     }
 
-    public function updateWaitlistStatus(int $id, string $status): bool
+    public function updateWaitlistStatus(int $id, string $status) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         return $conn->executeStatement("UPDATE waitlists SET status = :status WHERE id = :id", ['status' => $status, 'id' => $id]) > 0;
     }
 
-    public function findByPatientId(int $patientId): array
+    public function findByPatientId(int $patientId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -231,7 +232,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
     }
 
-    public function findByDateRange(string $start, string $end): array
+    public function findByDateRange(string $start, string $end) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -256,11 +257,11 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['start_time' => $start, 'end_time' => $end]);
     }
 
-    public function addToWaitlist(array $data): bool
+    public function addToWaitlist(array $data) : bool
     {
         $ticket = $data['ticket_number'] ?? $this->generateWaitlistTicket();
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $sql = "INSERT INTO waitlists (ticket_number, patient_id, desired_doctor_id, 
                                     desired_start_time, desired_end_time, notes, 
                                     contact_phone, contact_email) 
@@ -280,7 +281,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         ]) > 0;
     }
 
-    public function getWaitlistEntries(?string $status = 'pending'): array
+    public function getWaitlistEntries(?string $status = 'pending') : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT 
@@ -307,7 +308,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['status' => $status]);
     }
 
-    public function generateWaitlistTicket(): string
+    public function generateWaitlistTicket() : string
     {
         $conn = $this->getEntityManager()->getConnection();
         $year = date('Y');
@@ -315,21 +316,21 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return sprintf('WL-%s-%05d', $year, $count);
     }
 
-    public function isPatientAssignedToDoctor(int $patientId, int $doctorId): bool
+    public function isPatientAssignedToDoctor(int $patientId, int $doctorId) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT 1 FROM appointments WHERE patient_id = :patient_id AND doctor_id = :doctor_id LIMIT 1";
         return (bool)$conn->fetchOne($sql, ['patient_id' => $patientId, 'doctor_id' => $doctorId]);
     }
 
-    public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId): bool
+    public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT 1 FROM appointments WHERE id = :appointment_id AND doctor_id = :doctor_id LIMIT 1";
         return (bool)$conn->fetchOne($sql, ['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
     }
 
-    public function findAppointmentsForReminder(int $minutesBefore): array
+    public function findAppointmentsForReminder(int $minutesBefore) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -350,7 +351,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['minutes_before' => $minutesBefore]);
     }
 
-    public function findByDoctorId(int $doctorId): array
+    public function findByDoctorId(int $doctorId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -367,7 +368,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId]);
     }
 
-    public function findByDoctorIdAndDateRange(int $doctorId, string $start, string $end): array
+    public function findByDoctorIdAndDateRange(int $doctorId, string $start, string $end) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -390,7 +391,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId, 'start_time' => $start, 'end_time' => $end]);
     }
 
-    public function findPatientIdsByDoctor(int $doctorId): array
+    public function findPatientIdsByDoctor(int $doctorId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = :doctor_id";
@@ -398,42 +399,42 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return array_map('intval', $results);
     }
 
-    public function countScheduledByDate(string $date): int
+    public function countScheduledByDate(string $date) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) = :date";
         return (int)$conn->fetchOne($sql, ['date' => $date]);
     }
 
-    public function countScheduledByRange(string $from, string $to): int
+    public function countScheduledByRange(string $from, string $to) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
         return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
-    public function sumBookedHoursByRange(string $from, string $to): float
+    public function sumBookedHoursByRange(string $from, string $to) : float
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COALESCE(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600, 0) as hours FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
         return (float)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
-    public function countDistinctDoctorsByRange(string $from, string $to): int
+    public function countDistinctDoctorsByRange(string $from, string $to) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(DISTINCT doctor_id) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
         return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
-    public function countDistinctPatientsByRange(string $from, string $to): int
+    public function countDistinctPatientsByRange(string $from, string $to) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(DISTINCT patient_id) FROM appointments WHERE status = 'scheduled' AND DATE(start_time) BETWEEN :from AND :to";
         return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
-    public function countReadmittedPatients(string $from, string $to): int
+    public function countReadmittedPatients(string $from, string $to) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -448,7 +449,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return (int)$conn->fetchOne($sql, ['from' => $from, 'to' => $to]);
     }
 
-    public function getDoctorDailyLoad(string $date): array
+    public function getDoctorDailyLoad(string $date) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -468,7 +469,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['date' => $date]);
     }
 
-    public function findUpcoming(): array
+    public function findUpcoming() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -490,14 +491,14 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function countAppointmentsByDate(string $date): int
+    public function countAppointmentsByDate(string $date) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM appointments WHERE DATE(start_time) = :date";
         return (int)$conn->fetchOne($sql, ['date' => $date]);
     }
 
-    public function getSumOfCompletedAppointmentDurationsForDate(string $date): array
+    public function getSumOfCompletedAppointmentDurationsForDate(string $date) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -512,7 +513,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return array_map('intval', $results);
     }
 
-    public function getCompletedAppointmentsWithIcdCodes(string $date): array
+    public function getCompletedAppointmentsWithIcdCodes(string $date) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -530,7 +531,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         return $conn->fetchAllAssociative($sql, ['date' => $date]);
     }
 
-    public function findPatientSubsequentAppointments(int $patientId, string $afterDate, int $timeframeDays): array
+    public function findPatientSubsequentAppointments(int $patientId, string $afterDate, int $timeframeDays) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -553,7 +554,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         ]);
     }
 
-    public function findByRoomIdAndDateRange(int $roomId, string $start, string $end): array
+    public function findByRoomIdAndDateRange(int $roomId, string $start, string $end) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "

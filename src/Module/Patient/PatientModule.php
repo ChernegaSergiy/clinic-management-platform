@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Patient\PatientController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class PatientModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/patients', [PatientController::class, 'index']);
         $router->add('GET', '/patients/new', [PatientController::class, 'create']);
@@ -35,7 +34,7 @@ class PatientModule extends BaseModule
         }
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Patient\Repository\PatientRepository::class)
             ->setArguments([new Reference('pdo'), new Reference(\App\Core\Service\AuditLogger::class)])
@@ -51,7 +50,7 @@ class PatientModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('patient.view.any', 'Перегляд будь-якого пацієнта');
         $registry->add('patient.view.own', 'Перегляд призначених пацієнтів');
@@ -66,7 +65,7 @@ class PatientModule extends BaseModule
         $registry->addRoleMapping('nurse', ['patient.view.own']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('patient', PatientPolicy::class);
     }

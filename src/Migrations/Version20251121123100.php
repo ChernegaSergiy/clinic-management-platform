@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251121123100 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_contracts_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->createTable('contracts');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
@@ -31,7 +31,7 @@ final class Version20251121123100 extends AbstractMigration
         $table->setPrimaryKey(['id']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $schema->dropTable('contracts');
     }

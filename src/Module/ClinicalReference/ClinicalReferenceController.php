@@ -2,14 +2,13 @@
 
 namespace App\Module\ClinicalReference;
 
-
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
 use MedCore\Nk0262021Parser\Parser as Nk026Parser;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ClinicalReferenceController extends \App\Core\Controller\AbstractController
 {
@@ -25,7 +24,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     }
 
     #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_form', methods: ['GET'])]
-    public function icdImportForm(): Response
+    public function icdImportForm() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -41,7 +40,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     }
 
     #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_run', methods: ['POST'])]
-    public function icdImportRun(): Response
+    public function icdImportRun() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -76,7 +75,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     }
 
     #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_form', methods: ['GET'])]
-    public function interventionImportForm(): Response
+    public function interventionImportForm() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -92,7 +91,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     }
 
     #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_run', methods: ['POST'])]
-    public function interventionImportRun(): Response
+    public function interventionImportRun() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');
@@ -128,7 +127,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     }
 
     #[Route('/admin/clinical', name: 'clinical_index', methods: ['GET'])]
-    public function clinicalIndex(): Response
+    public function clinicalIndex() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('clinical.manage');

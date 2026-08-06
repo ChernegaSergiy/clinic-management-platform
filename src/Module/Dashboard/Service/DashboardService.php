@@ -40,7 +40,7 @@ class DashboardService
      *
      * @return array An associative array containing kpi_results and chart_data.
      */
-    public function getDashboardData(): array
+    public function getDashboardData() : array
     {
         $dashboardKpis = [];
         $kpiDefinitions = $this->kpiRepository->findActiveKpiDefinitions();
@@ -105,9 +105,9 @@ class DashboardService
         ];
     }
 
-    private function calculateTrend(float $currentValue, ?float $previousValue): ?string
+    private function calculateTrend(float $currentValue, ?float $previousValue) : ?string
     {
-        if ($previousValue === null || $previousValue === 0.0) {
+        if (null === $previousValue || 0.0 === $previousValue) {
             return null; // No previous data or no change if previous was zero
         }
 

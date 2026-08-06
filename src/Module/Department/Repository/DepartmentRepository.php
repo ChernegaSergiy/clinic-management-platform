@@ -4,8 +4,8 @@ namespace App\Module\Department\Repository;
 
 use App\Entity\Department;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 
 class DepartmentRepository extends ServiceEntityRepository implements DepartmentRepositoryInterface
 {
@@ -14,7 +14,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         parent::__construct($registry, Department::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $qb = $this->createQueryBuilder('d')
             ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
@@ -25,7 +25,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAllActive(): array
+    public function findAllActive() : array
     {
         $qb = $this->createQueryBuilder('d')
             ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
@@ -37,7 +37,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $qb = $this->createQueryBuilder('d')
             ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
@@ -49,15 +49,15 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         return $result ?: null;
     }
 
-    public function save(array $data): bool
+    public function save(array $data) : bool
     {
         $department = new Department();
         $department->setName($data['name']);
-        
+
         if (array_key_exists('description', $data)) {
             $department->setDescription($data['description']);
         }
-        
+
         if (!empty($data['parent_id'])) {
             $parent = $this->getEntityManager()->getReference(Department::class, $data['parent_id']);
             $department->setParent($parent);
@@ -66,7 +66,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         if (array_key_exists('is_active', $data)) {
             $department->setIsActive((bool)$data['is_active']);
         }
-        
+
         if (array_key_exists('sort_order', $data)) {
             $department->setSortOrder((int)$data['sort_order']);
         }
@@ -80,7 +80,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         }
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         /** @var Department|null $department */
         $department = $this->find($id);
@@ -91,7 +91,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         if (isset($data['name'])) {
             $department->setName($data['name']);
         }
-        
+
         if (array_key_exists('description', $data)) {
             $department->setDescription($data['description']);
         }
@@ -108,7 +108,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         if (array_key_exists('is_active', $data)) {
             $department->setIsActive((bool)$data['is_active']);
         }
-        
+
         if (array_key_exists('sort_order', $data)) {
             $department->setSortOrder((int)$data['sort_order']);
         }
@@ -121,7 +121,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         }
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $count = $this->createQueryBuilder('d')
             ->select('COUNT(d.id)')
@@ -148,7 +148,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         }
     }
 
-    public function findByName(string $name): ?array
+    public function findByName(string $name) : ?array
     {
         $qb = $this->createQueryBuilder('d')
             ->select('d.id', 'd.name', 'd.description', 'd.is_active', 'd.sort_order', 'IDENTITY(d.parent) as parent_id', 'dp.name as parent_name')
@@ -159,7 +159,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function getHierarchy(): array
+    public function getHierarchy() : array
     {
         $departments = $this->findAllActive();
 
@@ -168,7 +168,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
 
         foreach ($departments as $department) {
             $parentId = $department['parent_id'];
-            if ($parentId === null) {
+            if (null === $parentId) {
                 $hierarchy[] = $department;
             } else {
                 $parentMap[$parentId][] = $department;
@@ -182,7 +182,7 @@ class DepartmentRepository extends ServiceEntityRepository implements Department
         return $hierarchy;
     }
 
-    private function addChildren(array &$parent, array $parentMap): void
+    private function addChildren(array &$parent, array $parentMap) : void
     {
         $parentId = $parent['id'];
         if (isset($parentMap[$parentId])) {

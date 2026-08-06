@@ -7,12 +7,12 @@ use App\Core\Model\User;
 
 class DashboardPolicy implements Policy
 {
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         return $user->hasPermission('dashboard.view');
     }
 
-    public function export(User $user, array $context): bool
+    public function export(User $user, array $context) : bool
     {
         return $user->hasPermission('dashboard.export');
     }

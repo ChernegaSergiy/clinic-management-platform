@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class AuthGuardTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $_SESSION = [];
 
@@ -17,13 +17,13 @@ class AuthGuardTest extends TestCase
         AuthGuard::setRoleRepository($mockRoleRepo);
     }
 
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
         $_SESSION = [];
         AuthGuard::resetRoleRepository();
     }
 
-    public function testCheckRedirectsWhenNoSession(): void
+    public function testCheckRedirectsWhenNoSession() : void
     {
         $_SESSION = [];
 
@@ -35,7 +35,7 @@ class AuthGuardTest extends TestCase
         $this->assertArrayHasKey('intended_url', $_SESSION);
     }
 
-    public function testCheckDoesNotRedirectWhenSessionExists(): void
+    public function testCheckDoesNotRedirectWhenSessionExists() : void
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 2];
 
@@ -44,7 +44,7 @@ class AuthGuardTest extends TestCase
         $this->assertArrayHasKey('user', $_SESSION);
     }
 
-    public function testHydrateRoleNameSetsRoleName(): void
+    public function testHydrateRoleNameSetsRoleName() : void
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 2, 'role_name' => null];
 
@@ -53,7 +53,7 @@ class AuthGuardTest extends TestCase
         $this->assertArrayHasKey('role_name', $_SESSION['user']);
     }
 
-    public function testIsAdminExitsWhenNotAdmin(): void
+    public function testIsAdminExitsWhenNotAdmin() : void
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 2];
 
@@ -63,7 +63,7 @@ class AuthGuardTest extends TestCase
         AuthGuard::isAdmin();
     }
 
-    public function testIsAdminPassesWhenAdmin(): void
+    public function testIsAdminPassesWhenAdmin() : void
     {
         $_SESSION['user'] = ['id' => 1, 'role_id' => 1];
 

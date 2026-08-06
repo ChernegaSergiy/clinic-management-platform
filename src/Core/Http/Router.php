@@ -5,7 +5,6 @@ namespace App\Core\Http;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Core\Http\View;
 
 class Router
 {
@@ -17,7 +16,7 @@ class Router
         $this->container = $container;
     }
 
-    public function add(string $method, string $path, callable|array $handler): void
+    public function add(string $method, string $path, callable|array $handler) : void
     {
         $this->routes[] = [
             'method' => $method,
@@ -26,7 +25,7 @@ class Router
         ];
     }
 
-    public function dispatch(Request $request): Response
+    public function dispatch(Request $request) : Response
     {
         $method = $request->getMethod();
         $path = $request->getPathInfo();

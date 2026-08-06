@@ -7,14 +7,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AuditLogger implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents() : array
     {
         return [
             EntityChangedEvent::class => 'onEntityChanged',
         ];
     }
 
-    public function onEntityChanged(EntityChangedEvent $event): void
+    public function onEntityChanged(EntityChangedEvent $event) : void
     {
         // Log the change
         $entityType = $event->entityType;

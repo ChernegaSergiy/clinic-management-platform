@@ -2,6 +2,4 @@
 
 namespace App\Core\Auth;
 
-interface Policy
-{
-}
+interface Policy {}

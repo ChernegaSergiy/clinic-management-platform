@@ -26,23 +26,23 @@ class InstallCommand extends Command
         $this->entityManager = $entityManager;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Clinic Management Platform - Installation Wizard');
 
         $io->section('1. Database Schema Setup');
-        
+
         try {
             $io->text('Creating database schema using Doctrine...');
             $schemaTool = new SchemaTool($this->entityManager);
             $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
-            
+
             // Drop schema if exists and recreate (or just update)
             // Using updateSchema is safer if tables already exist, but createSchema is more robust for fresh install
             // Let's use updateSchema to be safe and create missing tables without dropping
             $schemaTool->updateSchema($metadata, true);
-            
+
             $io->success('Database schema is successfully synchronized.');
         } catch (\Exception $e) {
             $io->error('Failed to setup schema: ' . $e->getMessage());
@@ -62,7 +62,7 @@ class InstallCommand extends Command
 
         $firstName = $io->ask('First Name', 'Sergiy');
         $lastName = $io->ask('Last Name', 'Cherneha');
-        
+
         $password = $io->askHidden('Administrator Password', function ($answer) {
             if (empty($answer) || strlen($answer) < 6) {
                 throw new \RuntimeException('Password must be at least 6 characters long.');
@@ -75,7 +75,7 @@ class InstallCommand extends Command
         // Create or fetch Admin Role
         $roleRepo = $this->entityManager->getRepository(Role::class);
         $role = $roleRepo->findOneBy(['name' => 'admin']);
-        
+
         if (!$role) {
             $role = new Role();
             $role->setName('admin');
@@ -101,7 +101,7 @@ class InstallCommand extends Command
         $user->setLastName($lastName);
         $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
         $user->setRole($role);
-        
+
         // Disable MFA by default for the first admin, or keep default
         if (method_exists($user, 'setMfaEnabled')) {
             $user->setMfaEnabled(false);
@@ -113,7 +113,7 @@ class InstallCommand extends Command
         $io->success("Administrator account [{$email}] has been successfully created/updated.");
 
         $io->section('3. Finalization');
-        
+
         // Mark as installed in .env if possible (or .env.local)
         $this->markAsInstalled($io);
 
@@ -122,7 +122,7 @@ class InstallCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function markAsInstalled(SymfonyStyle $io): void
+    private function markAsInstalled(SymfonyStyle $io) : void
     {
         $envPath = dirname(__DIR__, 2) . '/.env';
         $envLocalPath = dirname(__DIR__, 2) . '/.env.local';

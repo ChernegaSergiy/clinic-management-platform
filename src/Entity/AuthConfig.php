@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Admin\Repository\AuthConfigRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Admin\Repository\AuthConfigRepository;
 
 #[ORM\Entity(repositoryClass: AuthConfigRepository::class)]
 #[ORM\Table(name: 'auth_configs')]

@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
 
 #[ORM\Entity(repositoryClass: MedicalRecordRepository::class)]
 #[ORM\Table(name: 'medical_records')]
@@ -48,116 +48,116 @@ class MedicalRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getPatient(): ?Patient
+    public function getPatient() : ?Patient
     {
         return $this->patient;
     }
 
-    public function setPatient(?Patient $patient): static
+    public function setPatient(?Patient $patient) : static
     {
         $this->patient = $patient;
         return $this;
     }
 
-    public function getAppointment(): ?Appointment
+    public function getAppointment() : ?Appointment
     {
         return $this->appointment;
     }
 
-    public function setAppointment(?Appointment $appointment): static
+    public function setAppointment(?Appointment $appointment) : static
     {
         $this->appointment = $appointment;
         return $this;
     }
 
-    public function getDoctor(): ?User
+    public function getDoctor() : ?User
     {
         return $this->doctor;
     }
 
-    public function setDoctor(?User $doctor): static
+    public function setDoctor(?User $doctor) : static
     {
         $this->doctor = $doctor;
         return $this;
     }
 
-    public function getVisitDate(): ?\DateTimeInterface
+    public function getVisitDate() : ?\DateTimeInterface
     {
         return $this->visit_date;
     }
 
-    public function setVisitDate(\DateTimeInterface $visitDate): static
+    public function setVisitDate(\DateTimeInterface $visitDate) : static
     {
         $this->visit_date = $visitDate;
         return $this;
     }
 
-    public function getDiagnosisCode(): ?string
+    public function getDiagnosisCode() : ?string
     {
         return $this->diagnosis_code;
     }
 
-    public function setDiagnosisCode(?string $diagnosisCode): static
+    public function setDiagnosisCode(?string $diagnosisCode) : static
     {
         $this->diagnosis_code = $diagnosisCode;
         return $this;
     }
 
-    public function getDiagnosisText(): ?string
+    public function getDiagnosisText() : ?string
     {
         return $this->diagnosis_text;
     }
 
-    public function setDiagnosisText(?string $diagnosisText): static
+    public function setDiagnosisText(?string $diagnosisText) : static
     {
         $this->diagnosis_text = $diagnosisText;
         return $this;
     }
 
-    public function getTreatment(): ?string
+    public function getTreatment() : ?string
     {
         return $this->treatment;
     }
 
-    public function setTreatment(?string $treatment): static
+    public function setTreatment(?string $treatment) : static
     {
         $this->treatment = $treatment;
         return $this;
     }
 
-    public function getNotes(): ?string
+    public function getNotes() : ?string
     {
         return $this->notes;
     }
 
-    public function setNotes(?string $notes): static
+    public function setNotes(?string $notes) : static
     {
         $this->notes = $notes;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt) : static
     {
         $this->updated_at = $updatedAt;
         return $this;

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class FrontControllerTest extends TestCase
 {
-    public function testMimeMapContainsCommonTypes(): void
+    public function testMimeMapContainsCommonTypes() : void
     {
         $mimeMap = [
             'css' => 'text/css',
@@ -28,13 +28,13 @@ class FrontControllerTest extends TestCase
         $this->assertEquals('font/woff2', $mimeMap['woff2']);
     }
 
-    public function testRouterInitialization(): void
+    public function testRouterInitialization() : void
     {
         $router = new Router();
         $this->assertInstanceOf(Router::class, $router);
     }
 
-    public function testRouterCanAddRoutes(): void
+    public function testRouterCanAddRoutes() : void
     {
         $router = new Router();
         $callback = function () {};
@@ -43,19 +43,19 @@ class FrontControllerTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testRouterParsesUrlCorrectly(): void
+    public function testRouterParsesUrlCorrectly() : void
     {
         $path = parse_url('http://example.com/test/path?query=1', PHP_URL_PATH);
         $this->assertEquals('/test/path', $path);
     }
 
-    public function testRouterParsesUrlWithOnlyPath(): void
+    public function testRouterParsesUrlWithOnlyPath() : void
     {
         $path = parse_url('/api/users/123', PHP_URL_PATH);
         $this->assertEquals('/api/users/123', $path);
     }
 
-    public function testStaticFileDetectionLogic(): void
+    public function testStaticFileDetectionLogic() : void
     {
         $staticExtensions = ['css', 'js', 'png', 'jpg', 'jpeg', 'svg', 'gif', 'ico', 'woff', 'woff2', 'ttf'];
 
@@ -64,7 +64,7 @@ class FrontControllerTest extends TestCase
         $this->assertContains('png', $staticExtensions);
     }
 
-    public function testSessionConfigParameters(): void
+    public function testSessionConfigParameters() : void
     {
         $cookieParams = [
             'lifetime' => 0,
@@ -81,7 +81,7 @@ class FrontControllerTest extends TestCase
         $this->assertEquals('Lax', $cookieParams['samesite']);
     }
 
-    public function testDefaultRouteMapping(): void
+    public function testDefaultRouteMapping() : void
     {
         $router = new Router();
         $router->add('GET', '/', function () {});
@@ -91,14 +91,14 @@ class FrontControllerTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testInstallRouteExists(): void
+    public function testInstallRouteExists() : void
     {
         $router = new Router();
         $router->add('GET', '/install', function () {});
         $this->assertTrue(true);
     }
 
-    public function testErrorHandlingReturns500(): void
+    public function testErrorHandlingReturns500() : void
     {
         $this->assertEquals(500, http_response_code(500) ?: 500);
     }

@@ -19,7 +19,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -50,7 +50,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         return $conn->fetchAllAssociative($sql, $params);
     }
 
-    public function save(array $data): int
+    public function save(array $data) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
@@ -65,9 +65,9 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             'notes' => $data['notes'] ?? null,
             'type' => $data['type'] ?? 'invoice',
         ]);
-        
+
         $invoiceId = (int)$conn->lastInsertId();
-        
+
         $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
         $this->eventDispatcher->dispatch(new PatientNotificationEvent(
             $data['patient_id'],
@@ -75,15 +75,15 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             sprintf('Створено рахунок на суму %.2f грн', $data['amount']),
             ['invoice_id' => $invoiceId]
         ));
-        
+
         return $invoiceId;
     }
 
-    public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue): bool
+    public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE invoices SET insurance_due = :insurance_due, patient_due = :patient_due WHERE id = :id";
-        
+
         return $conn->executeStatement($sql, [
             'id' => $invoiceId,
             'insurance_due' => $insuranceDue,
@@ -91,7 +91,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         ]) > 0;
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -102,7 +102,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             JOIN patients p ON i.patient_id = p.id
             WHERE i.id = :id
         ";
-        
+
         $result = $conn->fetchAssociative($sql, ['id' => $id]);
 
         if ($result) {
@@ -110,11 +110,11 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             $result['total_paid'] = array_sum(array_column($result['payments'], 'amount'));
             $result['remaining_amount'] = $result['amount'] - $result['total_paid'];
         }
-        
+
         return $result ?: null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $oldInvoice = $this->findById($id);
         if (!$oldInvoice) {
@@ -141,7 +141,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             'amount' => $data['amount'],
             'status' => $data['status'],
             'notes' => $data['notes'] ?? null,
-            'paid_date' => ($data['status'] === 'paid' && !empty($data['paid_date'])) ? $data['paid_date'] : null,
+            'paid_date' => ('paid' === $data['status'] && !empty($data['paid_date'])) ? $data['paid_date'] : null,
             'type' => $data['type'] ?? 'invoice',
         ]);
 
@@ -159,14 +159,14 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         string $paymentMethod,
         ?string $transactionId = null,
         ?string $notes = null
-    ): bool {
+    ) : bool {
         $conn = $this->getEntityManager()->getConnection();
         $conn->beginTransaction();
-        
+
         try {
             $sql = "INSERT INTO payments (invoice_id, amount, payment_method, transaction_id, notes) 
                     VALUES (:invoice_id, :amount, :payment_method, :transaction_id, :notes)";
-                    
+
             $success = $conn->executeStatement($sql, [
                 'invoice_id' => $invoiceId,
                 'amount' => $amount,
@@ -180,7 +180,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
                 if (
                     $invoice &&
                     $invoice['remaining_amount'] <= 0.01 &&
-                    $invoice['status'] !== 'paid'
+                    'paid' !== $invoice['status']
                 ) {
                     $updateData = array_merge($invoice, [
                         'status' => 'paid',
@@ -189,7 +189,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
                     $this->update($invoiceId, $updateData);
                 }
             }
-            
+
             $conn->commit();
             return $success > 0;
         } catch (\Exception $e) {
@@ -198,7 +198,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         }
     }
 
-    public function getPaymentsForInvoice(int $invoiceId): array
+    public function getPaymentsForInvoice(int $invoiceId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC";
@@ -211,14 +211,14 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         string $transactionType,
         string $description,
         ?int $entityId = null
-    ): bool {
+    ) : bool {
         return true;
     }
 
-    public function sumTotalAmountByDate(string $date): float
+    public function sumTotalAmountByDate(string $date) : float
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $paymentsSql = "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE DATE(payment_date) = :date";
         $paymentsSum = (float)$conn->fetchOne($paymentsSql, ['date' => $date]);
 
@@ -236,7 +236,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         return $paymentsSum + $invoicesSum;
     }
 
-    public function getDailyRevenueForPeriod(string $startDate, string $endDate): array
+    public function getDailyRevenueForPeriod(string $startDate, string $endDate) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -248,14 +248,14 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             GROUP BY DATE(issued_date)
             ORDER BY DATE(issued_date) ASC
         ";
-        
+
         return $conn->fetchAllAssociative($sql, [
             'start_date' => $startDate,
             'end_date' => $endDate,
         ]);
     }
 
-    public function sumRevenueForPeriod(string $startDate, string $endDate): float
+    public function sumRevenueForPeriod(string $startDate, string $endDate) : float
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -263,7 +263,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             FROM invoices 
             WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
         ";
-        
+
         return (float)$conn->fetchOne($sql, [
             'start_date' => $startDate,
             'end_date' => $endDate,

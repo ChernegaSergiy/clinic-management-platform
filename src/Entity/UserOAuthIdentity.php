@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\User\Repository\UserOAuthIdentityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\User\Repository\UserOAuthIdentityRepository;
 
 #[ORM\Entity(repositoryClass: UserOAuthIdentityRepository::class)]
 #[ORM\Table(name: 'user_oauth_identities')]
@@ -29,50 +29,50 @@ class UserOAuthIdentity
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $created_at = null;
 
-    public function getId(): ?int
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUser() : ?User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(?User $user) : static
     {
         $this->user = $user;
         return $this;
     }
 
-    public function getProvider(): ?string
+    public function getProvider() : ?string
     {
         return $this->provider;
     }
 
-    public function setProvider(string $provider): static
+    public function setProvider(string $provider) : static
     {
         $this->provider = $provider;
         return $this;
     }
 
-    public function getProviderId(): ?string
+    public function getProviderId() : ?string
     {
         return $this->provider_id;
     }
 
-    public function setProviderId(string $providerId): static
+    public function setProviderId(string $providerId) : static
     {
         $this->provider_id = $providerId;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;

@@ -6,13 +6,11 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Hrm\HrmController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 class HrmModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/hrm', [HrmController::class, 'index']);
         $router->add('GET', '/hrm/new', [HrmController::class, 'create']);
@@ -23,12 +21,12 @@ class HrmModule extends BaseModule
         $router->add('POST', '/hrm/toggle-status', [HrmController::class, 'toggleStatus']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Hrm\Repository\HrmRepository::class)->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('hrm.read', 'Перегляд співробітників');
         $registry->add('hrm.write', 'Редагування співробітників');
@@ -39,7 +37,7 @@ class HrmModule extends BaseModule
         $registry->addRoleMapping('medical_manager', ['hrm.read']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('hrm', HrmPolicy::class);
     }

@@ -2,9 +2,9 @@
 
 namespace App\Module\LabOrder\Repository;
 
+use App\Entity\LabOrder;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
-use App\Entity\LabOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -19,7 +19,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findByMedicalRecordId(int $medicalRecordId): array
+    public function findByMedicalRecordId(int $medicalRecordId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -31,7 +31,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
     }
 
-    public function save(array $data): int|false
+    public function save(array $data) : int|false
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, 
@@ -62,7 +62,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         return false;
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -79,7 +79,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         return $result ?: null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $oldLabOrder = $this->findById($id);
         if (!$oldLabOrder) {
@@ -109,7 +109,7 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         return $result;
     }
 
-    public function updateQrCodeHash(int $id, string $qrCodeHash): bool
+    public function updateQrCodeHash(int $id, string $qrCodeHash) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE lab_orders SET qr_code_hash = :qr_code_hash WHERE id = :id";
@@ -119,16 +119,16 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         ]) > 0;
     }
 
-    public function countByStatus(array $statuses): int
+    public function countByStatus(array $statuses) : int
     {
         if (empty($statuses)) {
             return 0;
         }
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $placeholders = implode(',', array_fill(0, count($statuses), '?'));
         $sql = "SELECT COUNT(*) FROM lab_orders WHERE status IN ($placeholders)";
-        
+
         $stmt = $conn->executeQuery($sql, $statuses);
         return (int)$stmt->fetchOne();
     }

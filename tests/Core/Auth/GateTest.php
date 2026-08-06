@@ -12,7 +12,7 @@ class GateTest extends TestCase
     private PolicyRegistry $policyRegistry;
     private Gate $gate;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->permissionRegistry = new PermissionRegistry();
         $this->policyRegistry = new PolicyRegistry();
@@ -20,18 +20,18 @@ class GateTest extends TestCase
         Gate::setPolicyRegistry($this->policyRegistry);
     }
 
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
         $_SESSION = [];
     }
 
-    public function testGetUserReturnsNullWhenNoSession(): void
+    public function testGetUserReturnsNullWhenNoSession() : void
     {
         $result = Gate::getUser();
         $this->assertNull($result);
     }
 
-    public function testGetUserReturnsUserFromSession(): void
+    public function testGetUserReturnsUserFromSession() : void
     {
         $_SESSION['user'] = [
             'id' => 1,
@@ -45,13 +45,13 @@ class GateTest extends TestCase
         $this->assertEquals(1, $user->getId());
     }
 
-    public function testAllowsReturnsFalseWhenNoUser(): void
+    public function testAllowsReturnsFalseWhenNoUser() : void
     {
         $result = Gate::allows('patient.view');
         $this->assertFalse($result);
     }
 
-    public function testAllowsReturnsTrueForAdmin(): void
+    public function testAllowsReturnsTrueForAdmin() : void
     {
         $_SESSION['user'] = [
             'id' => 1,
@@ -64,7 +64,7 @@ class GateTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testAllowsChecksPermission(): void
+    public function testAllowsChecksPermission() : void
     {
         $_SESSION['user'] = [
             'id' => 1,
@@ -79,7 +79,7 @@ class GateTest extends TestCase
         $this->assertFalse(Gate::allows('admin.system'));
     }
 
-    public function testAllowsChecksGranularPermission(): void
+    public function testAllowsChecksGranularPermission() : void
     {
         $_SESSION['user'] = [
             'id' => 1,
@@ -94,7 +94,7 @@ class GateTest extends TestCase
         $this->assertFalse(Gate::allows('prescription.delete_any'));
     }
 
-    public function testAuthorizeExitsOnNoUser(): void
+    public function testAuthorizeExitsOnNoUser() : void
     {
         $_SESSION = [];
 
@@ -104,7 +104,7 @@ class GateTest extends TestCase
         Gate::authorize('patient.view');
     }
 
-    public function testAuthorizeExitsOnNoPermission(): void
+    public function testAuthorizeExitsOnNoPermission() : void
     {
         $_SESSION['user'] = [
             'id' => 1,
@@ -119,7 +119,7 @@ class GateTest extends TestCase
         Gate::authorize('patient.delete');
     }
 
-    public function testAuthorizePassesWithPermission(): void
+    public function testAuthorizePassesWithPermission() : void
     {
         $_SESSION['user'] = [
             'id' => 1,

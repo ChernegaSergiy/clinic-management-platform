@@ -9,18 +9,18 @@ class RouterTest extends TestCase
 {
     private Router $router;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->router = new Router();
     }
 
-    public function testAddStoresRoute(): void
+    public function testAddStoresRoute() : void
     {
         $this->router->add('GET', '/test', function () {});
         $this->assertTrue(true);
     }
 
-    public function testDispatchReturns404ForUnknownRoute(): void
+    public function testDispatchReturns404ForUnknownRoute() : void
     {
         $this->router->add('GET', '/known', function () {});
         $request = Request::create('/unknown', 'GET');
@@ -28,7 +28,7 @@ class RouterTest extends TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testDispatchReturns404ForUnknownMethod(): void
+    public function testDispatchReturns404ForUnknownMethod() : void
     {
         $this->router->add('GET', '/test', function () {});
         $request = Request::create('/test', 'POST');
@@ -36,7 +36,7 @@ class RouterTest extends TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testDispatchMatchesExactRoute(): void
+    public function testDispatchMatchesExactRoute() : void
     {
         $called = false;
         $this->router->add('GET', '/dashboard', function () use (&$called) {
@@ -50,7 +50,7 @@ class RouterTest extends TestCase
         $this->assertEquals('Dashboard content', $response->getContent());
     }
 
-    public function testDispatchExtractsPathParameter(): void
+    public function testDispatchExtractsPathParameter() : void
     {
         $capturedId = null;
         $this->router->add('GET', '/users/{id}', function (int $id) use (&$capturedId) {
@@ -63,7 +63,7 @@ class RouterTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testDispatchExtractsMultipleParameters(): void
+    public function testDispatchExtractsMultipleParameters() : void
     {
         $captured = [];
         $this->router->add('GET', '/posts/{postId}/comments/{commentId}', function (int $postId, int $commentId) use (&$captured) {
@@ -76,7 +76,7 @@ class RouterTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testDispatchHandlesControllerClass(): void
+    public function testDispatchHandlesControllerClass() : void
     {
         $this->router->add('GET', '/test', [TestController::class, 'index']);
         $request = Request::create('/test', 'GET');
@@ -85,7 +85,7 @@ class RouterTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testParseUrlRemovesQueryString(): void
+    public function testParseUrlRemovesQueryString() : void
     {
         $capturedPath = null;
         $this->router->add('GET', '/api', function () use (&$capturedPath) {
@@ -98,7 +98,7 @@ class RouterTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testRoutePatternWithUnderscoreParameter(): void
+    public function testRoutePatternWithUnderscoreParameter() : void
     {
         $capturedUserName = null;
         $this->router->add('GET', '/profile/{user_name}', function (string $user_name) use (&$capturedUserName) {
@@ -116,7 +116,7 @@ class TestController
 {
     public static bool $called = false;
 
-    public function index(): void
+    public function index() : void
     {
         self::$called = true;
     }

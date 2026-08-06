@@ -19,22 +19,22 @@ class PdfExporter
         $this->dompdf->setPaper('A4', 'portrait');
     }
 
-    public function loadHtml(string $html): void
+    public function loadHtml(string $html) : void
     {
         $this->dompdf->loadHtml($html);
     }
 
-    public function render(): void
+    public function render() : void
     {
         $this->dompdf->render();
     }
 
-    public function stream(string $filename = 'document.pdf'): void
+    public function stream(string $filename = 'document.pdf') : void
     {
         $this->dompdf->stream($filename);
     }
 
-    public function download(string $filename = 'document.pdf'): void
+    public function download(string $filename = 'document.pdf') : void
     {
         $this->dompdf->stream($filename, ['Attachment' => true]);
     }

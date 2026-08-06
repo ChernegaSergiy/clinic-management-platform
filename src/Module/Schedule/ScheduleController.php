@@ -2,7 +2,6 @@
 
 namespace App\Module\Schedule;
 
-
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
@@ -24,7 +23,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/doctor/schedule', name: 'doctor_schedule_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         // Personal schedule for doctors
         $this->gate->authorize('schedules.manage_own');
@@ -49,7 +48,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/schedules', name: 'admin_schedules_index', methods: ['GET'])]
-    public function adminIndex(): Response
+    public function adminIndex() : Response
     {
         // Admin schedule management for all doctors
         $this->gate->authorize('schedules.manage_all');
@@ -62,7 +61,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/schedules/show', name: 'admin_schedules_show', methods: ['GET'])]
-    public function adminShow(): Response
+    public function adminShow() : Response
     {
         $this->gate->authorize('schedules.manage_all');
 
@@ -86,7 +85,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/doctor/schedule/update', name: 'doctor_schedule_update', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
@@ -126,7 +125,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
-    public function addException(): Response
+    public function addException() : Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
@@ -157,7 +156,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
-    public function deleteException(): Response
+    public function deleteException() : Response
     {
         $sessionUserId = (int)$_SESSION['user']['id'];
         $exceptionId = (int)$_POST['exception_id'];
@@ -190,7 +189,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
 
     // Admin schedule management methods
     #[Route('/admin/schedules/update', name: 'admin_schedules_update', methods: ['POST'])]
-    public function adminUpdate(): Response
+    public function adminUpdate() : Response
     {
         $this->gate->authorize('schedules.manage_all');
 
@@ -225,7 +224,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/schedules/exceptions/add', name: 'admin_schedules_exceptions_add', methods: ['POST'])]
-    public function adminAddException(): Response
+    public function adminAddException() : Response
     {
         $this->gate->authorize('schedules.manage_all');
 
@@ -251,7 +250,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/schedules/exceptions/delete', name: 'admin_schedules_exceptions_delete', methods: ['POST'])]
-    public function adminDeleteException(): Response
+    public function adminDeleteException() : Response
     {
         $this->gate->authorize('schedules.manage_all');
 
@@ -279,7 +278,7 @@ class ScheduleController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/schedules/edit', name: 'admin_schedules_edit', methods: ['GET'])]
-    public function adminEdit(): Response
+    public function adminEdit() : Response
     {
         $this->gate->authorize('schedules.manage_all');
 

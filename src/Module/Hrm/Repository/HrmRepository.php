@@ -13,7 +13,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         parent::__construct($registry, Employee::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT e.*, d.name as department_name 
@@ -23,7 +23,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function save(array $data): bool
+    public function save(array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO employees (first_name, last_name, middle_name, position, department_id, hire_date, salary, contact_phone, status, user_id) 
@@ -43,7 +43,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         ]) > 0;
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT e.*, d.name as department_name 
@@ -54,7 +54,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         return $result ?: null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE employees SET
@@ -87,14 +87,14 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         ]) > 0;
     }
 
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE employees SET status = :status WHERE id = :id";
         return $conn->executeStatement($sql, ['status' => $status, 'id' => $id]) > 0;
     }
 
-    public function findByUserId(int $userId): ?array
+    public function findByUserId(int $userId) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM employees WHERE user_id = :user_id";
@@ -102,7 +102,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
         return $result ?: null;
     }
 
-    public function findByDepartment(int $departmentId): array
+    public function findByDepartment(int $departmentId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "

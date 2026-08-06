@@ -22,11 +22,11 @@ class SymfonyValidator
     /**
      * Validate data against rules using Symfony Validator
      *
-     * @param array $data Data to validate
-     * @param array $rules Validation rules in the format ['field' => ['rule1', 'rule2:param']]
-     * @return bool True if validation passes, false otherwise
+     * @param  array $data  Data to validate
+     * @param  array $rules Validation rules in the format ['field' => ['rule1', 'rule2:param']]
+     * @return bool  True if validation passes, false otherwise
      */
-    public function validate(array $data, array $rules): bool
+    public function validate(array $data, array $rules) : bool
     {
         $this->errors = [];
 
@@ -40,7 +40,7 @@ class SymfonyValidator
                     $uniqueRules[$field] = $rule;
                 } else {
                     $constraint = $this->parseRule($rule, $field);
-                    if ($constraint !== null) {
+                    if (null !== $constraint) {
                         $fieldConstraints[] = $constraint;
                     }
                 }
@@ -52,9 +52,7 @@ class SymfonyValidator
 
         // Create a simple data object for validation
         $dataObject = new class ($data) {
-            public function __construct(private array $data)
-            {
-            }
+            public function __construct(private array $data) {}
 
             public function __get(string $name)
             {
@@ -83,9 +81,9 @@ class SymfonyValidator
         return empty($this->errors);
     }
 
-    private function validateUniqueRule(?string $value, string $rule, string $field): void
+    private function validateUniqueRule(?string $value, string $rule, string $field) : void
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return;
         }
 
@@ -99,7 +97,7 @@ class SymfonyValidator
             $sql = "SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` = :value";
             $queryParams = ['value' => $value];
 
-            if ($ignoreId !== null) {
+            if (null !== $ignoreId) {
                 $sql .= " AND `id` != :ignore_id";
                 $queryParams['ignore_id'] = $ignoreId;
             }
@@ -115,13 +113,13 @@ class SymfonyValidator
         }
     }
 
-    private function parseRule(string $rule, string $field): ?object
+    private function parseRule(string $rule, string $field) : ?object
     {
-        if ($rule === 'required') {
+        if ('required' === $rule) {
             return new Assert\NotBlank(['message' => "Поле '{$field}' обов'язкове для заповнення."]);
         }
 
-        if ($rule === 'email') {
+        if ('email' === $rule) {
             return new Assert\Email(['message' => "Поле '{$field}' повинно містити дійсну електронну адресу."]);
         }
 
@@ -141,11 +139,11 @@ class SymfonyValidator
             ]);
         }
 
-        if ($rule === 'date') {
+        if ('date' === $rule) {
             return new Assert\Date(['message' => "Поле '{$field}' повинно містити дійсну дату."]);
         }
 
-        if ($rule === 'datetime') {
+        if ('datetime' === $rule) {
             return new Assert\Callback(function ($value, $context) use ($field) {
                 if (empty($value)) {
                     return;
@@ -167,7 +165,7 @@ class SymfonyValidator
             ]);
         }
 
-        if ($rule === 'numeric') {
+        if ('numeric' === $rule) {
             return new Assert\Regex([
                 'pattern' => '/^[0-9]+(\.[0-9]+)?$/',
                 'message' => "Поле '{$field}' повинно бути числом."
@@ -190,7 +188,7 @@ class SymfonyValidator
             ]);
         }
 
-        if ($rule === 'array') {
+        if ('array' === $rule) {
             return new Assert\Type(
                 type: 'array',
                 message: "Поле '{$field}' повинно бути масивом."
@@ -205,17 +203,17 @@ class SymfonyValidator
         return null;
     }
 
-    public function addError(string $field, string $message): void
+    public function addError(string $field, string $message) : void
     {
         $this->errors[$field][] = $message;
     }
 
-    public function hasErrors(): bool
+    public function hasErrors() : bool
     {
         return !empty($this->errors);
     }
 
-    public function getErrors(): array
+    public function getErrors() : array
     {
         return $this->errors;
     }

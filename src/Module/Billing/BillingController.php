@@ -2,12 +2,8 @@
 
 namespace App\Module\Billing;
 
-use App\Database\Database;
-
 use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
-use App\Core\Validation\Validator;
-use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
@@ -18,6 +14,7 @@ use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class BillingController extends \App\Core\Controller\AbstractController
 {
@@ -60,7 +57,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing', name: 'billing_index', methods: ['GET'])]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.read');
@@ -73,7 +70,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Management ---
-    public function listServices(): \Symfony\Component\HttpFoundation\Response
+    public function listServices() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -81,7 +78,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $this->render('@modules/Billing/templates/services/index.html.twig', ['services' => $services]);
     }
 
-    public function createService(): \Symfony\Component\HttpFoundation\Response
+    public function createService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -95,7 +92,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    public function storeService(): \Symfony\Component\HttpFoundation\Response
+    public function storeService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -118,7 +115,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Bundle Management ---
-    public function listServiceBundles(): \Symfony\Component\HttpFoundation\Response
+    public function listServiceBundles() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -126,7 +123,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $this->render('@modules/Billing/templates/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
-    public function createServiceBundle(): \Symfony\Component\HttpFoundation\Response
+    public function createServiceBundle() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -140,7 +137,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    public function storeServiceBundle(): \Symfony\Component\HttpFoundation\Response
+    public function storeServiceBundle() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -164,7 +161,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/new', name: 'billing_new', methods: ['GET'])]
-    public function create(): \Symfony\Component\HttpFoundation\Response
+    public function create() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -211,7 +208,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/new', name: 'billing_store', methods: ['POST'])]
-    public function store(): \Symfony\Component\HttpFoundation\Response
+    public function store() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -262,7 +259,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/show', name: 'billing_show', methods: ['GET'])]
-    public function show(): \Symfony\Component\HttpFoundation\Response
+    public function show() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.read');
@@ -283,7 +280,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/add-payment', name: 'billing_add_payment', methods: ['POST'])]
-    public function addPayment(): \Symfony\Component\HttpFoundation\Response
+    public function addPayment() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -320,7 +317,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/edit', name: 'billing_edit', methods: ['GET'])]
-    public function edit(): \Symfony\Component\HttpFoundation\Response
+    public function edit() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -375,7 +372,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/edit', name: 'billing_update', methods: ['POST'])]
-    public function update(): \Symfony\Component\HttpFoundation\Response
+    public function update() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -408,7 +405,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-csv', name: 'billing_export_csv', methods: ['GET'])]
-    public function exportInvoicesToCsv(): \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToCsv() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.read');
@@ -445,7 +442,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-pdf', name: 'billing_export_pdf', methods: ['GET'])]
-    public function exportInvoicesToPdf(): \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToPdf() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.read');
@@ -467,7 +464,7 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-excel', name: 'billing_export_excel', methods: ['GET'])]
-    public function exportInvoicesToExcel(): \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToExcel() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.read');

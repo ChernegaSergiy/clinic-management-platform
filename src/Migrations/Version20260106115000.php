@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20260106115000 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'create_settings_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->createTable('settings');
         $table->addColumn('key', 'string', ['length' => 100]);
@@ -27,7 +27,7 @@ final class Version20260106115000 extends AbstractMigration
         $this->addSql("INSERT INTO settings (`key`, `value`, `created_at`, `updated_at`) VALUES ('mfa_force_roles', NULL, NOW(), NOW())");
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $schema->dropTable('settings');
     }

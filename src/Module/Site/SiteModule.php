@@ -2,13 +2,13 @@
 
 namespace App\Module\Site;
 
-use App\Core\Module\BaseModule;
 use App\Core\Http\Router;
+use App\Core\Module\BaseModule;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SiteModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/', [SiteController::class, 'home']);
         $router->add('GET', '/about', [SiteController::class, 'about']);
@@ -20,7 +20,7 @@ class SiteModule extends BaseModule
         $router->add('GET', '/doctors', [SiteController::class, 'doctors']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(SiteController::class)->setPublic(true);
     }

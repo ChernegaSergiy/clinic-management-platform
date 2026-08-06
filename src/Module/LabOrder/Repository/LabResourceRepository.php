@@ -13,7 +13,7 @@ class LabResourceRepository extends ServiceEntityRepository
         parent::__construct($registry, LabResource::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, name, type, capacity, 
@@ -21,7 +21,7 @@ class LabResourceRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, name, type, capacity, is_available, 
@@ -30,12 +30,12 @@ class LabResourceRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO lab_resources (name, type, capacity, is_available, notes) 
                 VALUES (:name, :type, :capacity, :is_available, :notes)";
-        
+
         $success = $conn->executeStatement($sql, [
             'name' => $data['name'],
             'type' => $data['type'] ?? null,
@@ -43,16 +43,16 @@ class LabResourceRepository extends ServiceEntityRepository
             'is_available' => (int)($data['is_available'] ?? true),
             'notes' => $data['notes'] ?? null,
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE lab_resources SET name = :name, type = :type, capacity = :capacity, 
                 is_available = :is_available, notes = :notes WHERE id = :id";
-                
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'name' => $data['name'],
@@ -69,7 +69,7 @@ class LabResourceRepository extends ServiceEntityRepository
         string $startTime,
         string $endTime,
         int $requiredCapacity = 1
-    ): bool {
+    ) : bool {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT lr.capacity - COUNT(lor.lab_order_id) as remaining_capacity
@@ -82,7 +82,7 @@ class LabResourceRepository extends ServiceEntityRepository
               AND lo.end_time NOT BETWEEN :start_time AND :end_time))
             GROUP BY lr.id, lr.capacity
         ";
-        
+
         $result = $conn->fetchAssociative($sql, [
             'resource_id' => $resourceId,
             'start_time' => $startTime,

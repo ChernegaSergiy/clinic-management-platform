@@ -7,22 +7,22 @@ use App\Core\Model\User;
 
 class KpiPolicy implements Policy
 {
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         return $user->hasPermission('kpi.read');
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         return $user->isAdmin();
     }
 
-    public function update(User $user, array $context): bool
+    public function update(User $user, array $context) : bool
     {
         return $user->isAdmin();
     }
 
-    public function delete(User $user, array $context): bool
+    public function delete(User $user, array $context) : bool
     {
         return $user->isAdmin();
     }

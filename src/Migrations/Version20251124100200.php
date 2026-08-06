@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20251124100200 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'add_ticket_and_contact_to_waitlists_table';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->getTable('waitlists');
         $table->addColumn('ticket_number', 'string', ['length' => 32, 'notnull' => false]);
@@ -23,7 +23,7 @@ final class Version20251124100200 extends AbstractMigration
         $table->addUniqueIndex(['ticket_number']);
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $table = $schema->getTable('waitlists');
         $table->dropIndex(['ticket_number']);

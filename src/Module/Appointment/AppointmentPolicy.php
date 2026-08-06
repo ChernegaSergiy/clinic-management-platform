@@ -15,7 +15,7 @@ class AppointmentPolicy implements Policy
         $this->appointmentRepository = $appointmentRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('appointment.view.any')) {
             return true;
@@ -33,7 +33,7 @@ class AppointmentPolicy implements Policy
         return false;
     }
 
-    public function edit(User $user, array $context): bool
+    public function edit(User $user, array $context) : bool
     {
         if ($user->hasPermission('appointment.edit.any')) {
             return true;
@@ -50,17 +50,17 @@ class AppointmentPolicy implements Policy
         return false;
     }
 
-    public function create(User $user, array $context): bool
+    public function create(User $user, array $context) : bool
     {
         return $user->hasPermission('appointment.create');
     }
 
-    public function cancel(User $user, array $context): bool
+    public function cancel(User $user, array $context) : bool
     {
         return $this->edit($user, $context);
     }
 
-    private function isUserOwnerOfAppointment(User $user, int $appointmentId): bool
+    private function isUserOwnerOfAppointment(User $user, int $appointmentId) : bool
     {
         $userId = $user->getId();
         if (!$userId) {

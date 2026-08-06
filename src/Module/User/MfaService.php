@@ -2,10 +2,10 @@
 
 namespace App\Module\User;
 
-use Doctrine\Persistence\ManagerRegistry;
-use OTPHP\TOTP;
-use OTPHP\HOTP;
 use App\Core\Service\QrCodeGenerator;
+use Doctrine\Persistence\ManagerRegistry;
+use OTPHP\HOTP;
+use OTPHP\TOTP;
 
 class MfaService
 {
@@ -19,19 +19,19 @@ class MfaService
         $this->issuerName = $issuerName;
     }
 
-    public function generateSecret(): string
+    public function generateSecret() : string
     {
         $totp = TOTP::create();
         return $totp->getSecret();
     }
 
-    public function generateHotpSecret(): string
+    public function generateHotpSecret() : string
     {
         $hotp = HOTP::create();
         return $hotp->getSecret();
     }
 
-    public function generateQRCode(string $secret, string $userEmail): string
+    public function generateQRCode(string $secret, string $userEmail) : string
     {
         $totp = TOTP::create($secret);
         $totp->setLabel($userEmail);
@@ -41,7 +41,7 @@ class MfaService
         return $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
     }
 
-    public function generateHotpQRCode(string $secret, string $userEmail, int $counter = 0): string
+    public function generateHotpQRCode(string $secret, string $userEmail, int $counter = 0) : string
     {
         $hotp = HOTP::create($secret);
         $hotp->setLabel($userEmail);
@@ -52,19 +52,19 @@ class MfaService
         return $this->qrCodeGenerator->generateQrCodeAsBase64($otpauthUri);
     }
 
-    public function verifyCode(string $secret, string $code): bool
+    public function verifyCode(string $secret, string $code) : bool
     {
         $totp = TOTP::create($secret);
         return $totp->verify($code);
     }
 
-    public function verifyHotpCode(string $secret, string $code, int $counter, int $window = 10): bool
+    public function verifyHotpCode(string $secret, string $code, int $counter, int $window = 10) : bool
     {
         $hotp = HOTP::create($secret);
         return $hotp->verify($code, $counter, $window);
     }
 
-    public function verifyHotpCodeWithCounter(string $secret, string $code, int $currentCounter, int $lastCounter = 0, int $window = 10): ?int
+    public function verifyHotpCodeWithCounter(string $secret, string $code, int $currentCounter, int $lastCounter = 0, int $window = 10) : ?int
     {
         $hotp = HOTP::create($secret);
 
@@ -81,7 +81,7 @@ class MfaService
         return null;
     }
 
-    public function generateBackupCodes(int $count = 10): array
+    public function generateBackupCodes(int $count = 10) : array
     {
         $codes = [];
         for ($i = 0; $i < $count; $i++) {
@@ -90,12 +90,12 @@ class MfaService
         return $codes;
     }
 
-    private function generateRandomCode(int $length): string
+    private function generateRandomCode(int $length) : string
     {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $code = '';
         for ($i = 0; $i < $length; $i++) {
-            if ($i > 0 && $i % 4 === 0) {
+            if ($i > 0 && 0 === $i % 4) {
                 $code .= '-';
             }
             $code .= $characters[random_int(0, strlen($characters) - 1)];
@@ -103,7 +103,7 @@ class MfaService
         return $code;
     }
 
-    public function enableMfaForUser(int $userId, string $secret, array $backupCodes, string $mfaType = 'totp'): bool
+    public function enableMfaForUser(int $userId, string $secret, array $backupCodes, string $mfaType = 'totp') : bool
     {
         $mfaType = in_array($mfaType, ['totp', 'hotp', 'sms', 'email'], true) ? $mfaType : 'totp';
 
@@ -128,7 +128,7 @@ class MfaService
         ]) > 0;
     }
 
-    public function enableHotpForUser(int $userId, string $secret, array $backupCodes, int $counter = 0): bool
+    public function enableHotpForUser(int $userId, string $secret, array $backupCodes, int $counter = 0) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "
@@ -154,7 +154,7 @@ class MfaService
         ]) > 0;
     }
 
-    public function disableMfaForUser(int $userId): bool
+    public function disableMfaForUser(int $userId) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "
@@ -173,7 +173,7 @@ class MfaService
         return $conn->executeStatement($sql, ['id' => $userId]) > 0;
     }
 
-    public function verifyUserMfa(int $userId, string $code): bool
+    public function verifyUserMfa(int $userId, string $code) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT mfa_secret, mfa_type, mfa_counter, mfa_last_counter, mfa_backup_codes FROM users WHERE id = :id";
@@ -188,10 +188,10 @@ class MfaService
         $counter = $user['mfa_counter'] ?? 0;
         $lastCounter = $user['mfa_last_counter'] ?? 0;
 
-        if ($mfaType === 'hotp') {
+        if ('hotp' === $mfaType) {
             $verifiedCounter = $this->verifyHotpCodeWithCounter($secret, $code, $counter, $lastCounter);
 
-            if ($verifiedCounter !== null) {
+            if (null !== $verifiedCounter) {
                 $this->updateHotpCounter($userId, $verifiedCounter);
                 return true;
             }
@@ -210,14 +210,14 @@ class MfaService
         return false;
     }
 
-    private function updateHotpCounter(int $userId, int $counter): void
+    private function updateHotpCounter(int $userId, int $counter) : void
     {
         $conn = $this->registry->getConnection();
         $sql = "UPDATE users SET mfa_counter = :next_counter, mfa_last_counter = :last_counter WHERE id = :id";
         $conn->executeStatement($sql, ['id' => $userId, 'next_counter' => $counter + 1, 'last_counter' => $counter]);
     }
 
-    private function removeUsedBackupCode(int $userId, string $code): void
+    private function removeUsedBackupCode(int $userId, string $code) : void
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT mfa_backup_codes FROM users WHERE id = :id";
@@ -228,38 +228,38 @@ class MfaService
         }
 
         $backupCodes = json_decode($user['mfa_backup_codes'] ?? '[]', true);
-        $backupCodes = array_filter($backupCodes, fn($c) => strtoupper($c) !== strtoupper($code));
+        $backupCodes = array_filter($backupCodes, fn ($c) => strtoupper($c) !== strtoupper($code));
 
         $sql = "UPDATE users SET mfa_backup_codes = :codes WHERE id = :id";
         $conn->executeStatement($sql, ['id' => $userId, 'codes' => json_encode(array_values($backupCodes))]);
     }
 
-    public function isMfaEnabled(int $userId): bool
+    public function isMfaEnabled(int $userId) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT mfa_enabled FROM users WHERE id = :id";
         $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
-        return $user && $user['mfa_enabled'] == 1;
+        return $user && 1 == $user['mfa_enabled'];
     }
 
-    public function isMfaPending(int $userId): bool
+    public function isMfaPending(int $userId) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT mfa_pending FROM users WHERE id = :id";
         $user = $conn->fetchAssociative($sql, ['id' => $userId]);
 
-        return $user && $user['mfa_pending'] == 1;
+        return $user && 1 == $user['mfa_pending'];
     }
 
-    public function setMfaPending(int $userId, bool $pending): bool
+    public function setMfaPending(int $userId, bool $pending) : bool
     {
         $conn = $this->registry->getConnection();
         $sql = "UPDATE users SET mfa_pending = :pending WHERE id = :id";
         return $conn->executeStatement($sql, ['id' => $userId, 'pending' => $pending ? 1 : 0]) > 0;
     }
 
-    public function getUserMfaStatus(int $userId): array
+    public function getUserMfaStatus(int $userId) : array
     {
         $conn = $this->registry->getConnection();
         $sql = "

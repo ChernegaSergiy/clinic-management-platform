@@ -2,10 +2,7 @@
 
 namespace App\Module\Appointment;
 
-use App\Database\Database;
-
 use App\Core\Service\NotificationService;
-use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Patient\Repository\PatientRepositoryInterface;
@@ -54,7 +51,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $user = $this->gate->getUser();
@@ -92,7 +89,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/book-appointment', name: 'appointment_public_form', methods: ['GET'])]
-    public function publicForm(): \Symfony\Component\HttpFoundation\Response
+    public function publicForm() : \Symfony\Component\HttpFoundation\Response
     {
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -125,7 +122,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/book-appointment', name: 'appointment_submit_public_form', methods: ['POST'])]
-    public function submitPublicForm(): \Symfony\Component\HttpFoundation\Response
+    public function submitPublicForm() : \Symfony\Component\HttpFoundation\Response
     {
         $rawInput = $_POST;
 
@@ -206,7 +203,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
-    public function rejectWaitlist(): \Symfony\Component\HttpFoundation\Response
+    public function rejectWaitlist() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.edit.any');
@@ -220,7 +217,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
-    public function create(): \Symfony\Component\HttpFoundation\Response
+    public function create() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.create');
@@ -312,7 +309,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
-    public function store(): \Symfony\Component\HttpFoundation\Response
+    public function store() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.create');
@@ -440,7 +437,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments');
     }
 
-    private function normalizeDateTime(string $value): \DateTime
+    private function normalizeDateTime(string $value) : \DateTime
     {
         $formats = [
             'Y-m-d\TH:i',
@@ -460,7 +457,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/json', name: 'appointment_json', methods: ['GET'])]
-    public function json(): \Symfony\Component\HttpFoundation\Response
+    public function json() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $user = $this->gate->getUser();
@@ -519,7 +516,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
-    public function show(): \Symfony\Component\HttpFoundation\Response
+    public function show() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -535,7 +532,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
-    public function edit(): \Symfony\Component\HttpFoundation\Response
+    public function edit() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
@@ -585,7 +582,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
-    public function update(): \Symfony\Component\HttpFoundation\Response
+    public function update() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
@@ -703,7 +700,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
-    public function cancel(): \Symfony\Component\HttpFoundation\Response
+    public function cancel() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $id = (int)($_POST['id'] ?? 0);
@@ -740,7 +737,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
-    public function showWaitlist(): \Symfony\Component\HttpFoundation\Response
+    public function showWaitlist() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.view.any');
@@ -767,7 +764,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/add', name: 'appointment_add_waitlist', methods: ['POST'])]
-    public function addPatientToWaitlist(): \Symfony\Component\HttpFoundation\Response
+    public function addPatientToWaitlist() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.create');
@@ -806,7 +803,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/load-analytics', name: 'appointment_load_analytics', methods: ['GET'])]
-    public function showLoadAnalytics(): \Symfony\Component\HttpFoundation\Response
+    public function showLoadAnalytics() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.view.any');
@@ -821,7 +818,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/available-slots', name: 'appointment_available_slots_api', methods: ['GET'])]
-    public function getAvailableSlotsApi(): \Symfony\Component\HttpFoundation\Response
+    public function getAvailableSlotsApi() : \Symfony\Component\HttpFoundation\Response
     {
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
         $selectedDateStr = $_GET['date'] ?? null;
@@ -853,7 +850,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/fulfill', name: 'appointment_fulfill_waitlist', methods: ['GET'])]
-    public function fulfillWaitlist(): \Symfony\Component\HttpFoundation\Response
+    public function fulfillWaitlist() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.create');
@@ -907,7 +904,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/cancel', name: 'appointment_cancel_waitlist', methods: ['POST'])]
-    public function cancelWaitlist(): \Symfony\Component\HttpFoundation\Response
+    public function cancelWaitlist() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('appointment.edit.any');

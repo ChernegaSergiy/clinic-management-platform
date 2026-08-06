@@ -18,7 +18,7 @@ final class ModuleDiscovery
      *
      * @return array List of module names (directory names)
      */
-    public function discover(): array
+    public function discover() : array
     {
         $finder = new Finder();
         $modules = [];

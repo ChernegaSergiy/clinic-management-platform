@@ -17,20 +17,20 @@ abstract class AbstractController
      * This avoids forcing child classes to call parent::__construct with all dependencies.
      */
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setBaseDependencies(AuthGuard $authGuard, View $view, Gate $gate): void
+    public function setBaseDependencies(AuthGuard $authGuard, View $view, Gate $gate) : void
     {
         $this->authGuard = $authGuard;
         $this->view = $view;
         $this->gate = $gate;
     }
 
-    protected function render(string $template, array $data = []): \Symfony\Component\HttpFoundation\Response
+    protected function render(string $template, array $data = []) : \Symfony\Component\HttpFoundation\Response
     {
         $content = $this->view->renderToString($template, $data);
         return new \Symfony\Component\HttpFoundation\Response($content);
     }
 
-    protected function checkAuth(): void
+    protected function checkAuth() : void
     {
         $this->authGuard->check();
     }

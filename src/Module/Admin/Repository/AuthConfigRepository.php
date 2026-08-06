@@ -13,21 +13,21 @@ class AuthConfigRepository extends ServiceEntityRepository
         parent::__construct($registry, AuthConfig::class);
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM auth_configs ORDER BY provider ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findActive(): array
+    public function findActive() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM auth_configs WHERE is_active = 1 ORDER BY provider ASC";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM auth_configs WHERE id = :id";
@@ -35,7 +35,7 @@ class AuthConfigRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findByProvider(string $provider): ?array
+    public function findByProvider(string $provider) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM auth_configs WHERE provider = :provider";
@@ -43,12 +43,12 @@ class AuthConfigRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function save(array $data): ?int
+    public function save(array $data) : ?int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "INSERT INTO auth_configs (provider, client_id, client_secret, is_active, config) 
                 VALUES (:provider, :client_id, :client_secret, :is_active, :config)";
-        
+
         $success = $conn->executeStatement($sql, [
             'provider' => $data['provider'],
             'client_id' => $data['client_id'] ?? null,
@@ -56,11 +56,11 @@ class AuthConfigRepository extends ServiceEntityRepository
             'is_active' => $data['is_active'] ?? false,
             'config' => $data['config'] ?? null,
         ]) > 0;
-        
+
         return $success ? (int)$conn->lastInsertId() : null;
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE auth_configs SET 
@@ -70,7 +70,7 @@ class AuthConfigRepository extends ServiceEntityRepository
                     is_active = :is_active, 
                     config = :config 
                 WHERE id = :id";
-                
+
         return $conn->executeStatement($sql, [
             'id' => $id,
             'provider' => $data['provider'],
@@ -81,7 +81,7 @@ class AuthConfigRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM auth_configs WHERE id = :id";

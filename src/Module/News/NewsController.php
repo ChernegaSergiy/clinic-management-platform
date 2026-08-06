@@ -2,9 +2,7 @@
 
 namespace App\Module\News;
 
-
 use App\Core\Validation\Validator;
-use App\Database\Database;
 use App\Module\News\Repository\NewsRepository;
 use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,7 +23,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/news', name: 'news_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $newsArticles = $this->newsRepository->findAll();
         return $this->render('news/index.html.twig', [
@@ -34,7 +32,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/news/{id}', name: 'news_show', methods: ['GET'])]
-    public function show(array $args): Response
+    public function show(array $args) : Response
     {
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
@@ -52,7 +50,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news', name: 'admin_news_index', methods: ['GET'])]
-    public function adminIndex(): Response
+    public function adminIndex() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');
@@ -64,7 +62,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news/new', name: 'admin_news_new', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');
@@ -85,7 +83,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news/new', name: 'admin_news_store', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');
@@ -111,7 +109,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
-    public function edit(array $args): Response
+    public function edit(array $args) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');
@@ -143,7 +141,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
-    public function update(array $args): Response
+    public function update(array $args) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');
@@ -179,7 +177,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/admin/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
-    public function delete(array $args): Response
+    public function delete(array $args) : Response
     {
         $this->checkAuth();
         $this->gate->authorize('news.manage');

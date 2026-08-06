@@ -2,12 +2,12 @@
 
 namespace App\Module\Patient\Repository;
 
-use App\Entity\Patient;
 use App\Core\Service\AuditLogger as CoreAuditLogger;
+use App\Entity\Patient;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PatientRepository extends ServiceEntityRepository implements PatientRepositoryInterface
@@ -23,7 +23,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $qb = $this->createQueryBuilder('p');
 
@@ -43,7 +43,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findByIds(array $ids, string $searchTerm = ''): array
+    public function findByIds(array $ids, string $searchTerm = '') : array
     {
         if (empty($ids)) {
             return [];
@@ -70,16 +70,16 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function countAll(): int
+    public function countAll() : int
     {
         return $this->count([]);
     }
 
-    public function save(array $data): int|false
+    public function save(array $data) : int|false
     {
         $this->lastError = null;
 
-        if (isset($data['birth_date']) && $data['birth_date'] !== '1900-01-01') {
+        if (isset($data['birth_date']) && '1900-01-01' !== $data['birth_date']) {
             if ($this->findByCredentials($data['last_name'], $data['first_name'], $data['birth_date'])) {
                 $this->lastError = 'patient_exists';
                 return false;
@@ -110,14 +110,14 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         }
     }
 
-    public function findByCredentials(string $lastName, string $firstName, string $birthDate): ?array
+    public function findByCredentials(string $lastName, string $firstName, string $birthDate) : ?array
     {
         try {
             $dt = new \DateTime($birthDate);
         } catch (\Exception $e) {
             return null;
         }
-        
+
         $qb = $this->createQueryBuilder('p')
             ->where('p.last_name = :last_name')
             ->andWhere('p.first_name = :first_name')
@@ -130,7 +130,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $result;
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $qb = $this->createQueryBuilder('p')
             ->where('p.id = :id')
@@ -139,13 +139,13 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findByTaxId(string $taxId, ?int $excludeId = null): ?array
+    public function findByTaxId(string $taxId, ?int $excludeId = null) : ?array
     {
         $qb = $this->createQueryBuilder('p')
             ->where('p.tax_id = :tax_id')
             ->setParameter('tax_id', $taxId);
 
-        if ($excludeId !== null) {
+        if (null !== $excludeId) {
             $qb->andWhere('p.id != :exclude_id')
                ->setParameter('exclude_id', $excludeId);
         }
@@ -153,7 +153,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findByEmail(string $email): ?array
+    public function findByEmail(string $email) : ?array
     {
         $qb = $this->createQueryBuilder('p')
             ->where('p.email = :email')
@@ -162,7 +162,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $this->lastError = null;
 
@@ -202,12 +202,12 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return true;
     }
 
-    public function getLastError(): ?string
+    public function getLastError() : ?string
     {
         return $this->lastError;
     }
 
-    public function findAllActive(): array
+    public function findAllActive() : array
     {
         $qb = $this->createQueryBuilder('p')
             ->select("p.id", "CONCAT(p.last_name, ' ', p.first_name) as full_name")
@@ -219,7 +219,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status) : bool
     {
         $oldPatientArray = $this->findById($id);
         $oldStatus = $oldPatientArray['status'] ?? null;
@@ -240,7 +240,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         return true;
     }
 
-    private function hydrateEntity(Patient $patient, array $data): void
+    private function hydrateEntity(Patient $patient, array $data) : void
     {
         if (isset($data['first_name'])) {
             $patient->setFirstName($data['first_name']);
@@ -254,7 +254,8 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         if (isset($data['birth_date'])) {
             try {
                 $patient->setBirthDate(new \DateTime($data['birth_date']));
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
         if (isset($data['gender'])) {
             $patient->setGender($data['gender']);

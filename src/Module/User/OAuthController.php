@@ -27,7 +27,7 @@ class OAuthController extends \App\Core\Controller\AbstractController
         $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
     }
 
-    public function redirect(string $provider): \Symfony\Component\HttpFoundation\Response
+    public function redirect(string $provider) : \Symfony\Component\HttpFoundation\Response
     {
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
@@ -45,7 +45,7 @@ class OAuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/oauth/callback/{provider}', name: 'oauth_callback', methods: ['GET'])]
-    public function callback(string $provider): \Symfony\Component\HttpFoundation\Response
+    public function callback(string $provider) : \Symfony\Component\HttpFoundation\Response
     {
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
@@ -169,7 +169,7 @@ class OAuthController extends \App\Core\Controller\AbstractController
         }
     }
 
-    public static function getSupportedProviders(): array
+    public static function getSupportedProviders() : array
     {
         return [
             'google',

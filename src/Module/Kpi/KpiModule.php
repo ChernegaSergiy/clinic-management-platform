@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Kpi\KpiController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class KpiModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/kpi/definitions', [KpiController::class, 'listDefinitions']);
         $router->add('GET', '/kpi/definitions/new', [KpiController::class, 'createDefinition']);
@@ -24,7 +23,7 @@ class KpiModule extends BaseModule
         $router->add('POST', '/kpi/calculate', [KpiController::class, 'calculateResults']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Kpi\Repository\KpiRepository::class)->setPublic(true);
         $container->register(\App\Module\Kpi\KpiController::class)
@@ -35,7 +34,7 @@ class KpiModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('kpi.read', 'Перегляд KPI');
         $registry->add('kpi.manage', 'Керування KPI');
@@ -44,7 +43,7 @@ class KpiModule extends BaseModule
         $registry->addRoleMapping('medical_manager', ['kpi.read']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('kpi', KpiPolicy::class);
     }

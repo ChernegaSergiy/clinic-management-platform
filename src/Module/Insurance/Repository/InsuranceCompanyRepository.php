@@ -15,7 +15,7 @@ class InsuranceCompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, InsuranceCompany::class);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM insurance_companies WHERE id = :id";
@@ -23,14 +23,14 @@ class InsuranceCompanyRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findAll(): array
+    public function findAll() : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM insurance_companies";
         return $conn->fetchAllAssociative($sql);
     }
 
-    public function create(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): int
+    public function create(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -47,7 +47,7 @@ class InsuranceCompanyRepository extends ServiceEntityRepository
         return (int) $conn->lastInsertId();
     }
 
-    public function update(int $id, string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null): bool
+    public function update(int $id, string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -65,7 +65,7 @@ class InsuranceCompanyRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM insurance_companies WHERE id = :id";

@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20260105230000 extends AbstractMigration
 {
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return 'update_employees_add_department_id';
     }
 
-    public function up(Schema $schema): void
+    public function up(Schema $schema) : void
     {
         $table = $schema->getTable('employees');
         $table->addColumn('department_id', 'integer', ['unsigned' => true, 'notnull' => false]);
@@ -33,7 +33,7 @@ final class Version20260105230000 extends AbstractMigration
         ");
     }
 
-    public function down(Schema $schema): void
+    public function down(Schema $schema) : void
     {
         $table = $schema->getTable('employees');
         $table->removeForeignKeyConstraint('department_id');

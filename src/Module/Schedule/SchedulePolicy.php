@@ -16,7 +16,7 @@ class SchedulePolicy implements Policy
         $this->doctorScheduleRepository = $doctorScheduleRepository;
     }
 
-    public function view(User $user, array $context): bool
+    public function view(User $user, array $context) : bool
     {
         if ($user->hasPermission('schedules.manage_all')) {
             return true;
@@ -32,7 +32,7 @@ class SchedulePolicy implements Policy
         return false;
     }
 
-    public function update(User $user, array $context): bool
+    public function update(User $user, array $context) : bool
     {
         if ($user->hasPermission('schedules.manage_all')) {
             return true;

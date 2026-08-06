@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Appointment\AppointmentController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AppointmentModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/appointments', [AppointmentController::class, 'index']);
         $router->add('GET', '/appointments/new', [AppointmentController::class, 'create']);
@@ -37,7 +36,7 @@ class AppointmentModule extends BaseModule
         }
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Appointment\Repository\AppointmentRepository::class)->setPublic(true);
         $container->register(\App\Module\Appointment\AppointmentController::class)
@@ -54,7 +53,7 @@ class AppointmentModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('appointment.view.any', 'Перегляд будь-якого запису');
         $registry->add('appointment.view.own', 'Перегляд власних записів');
@@ -70,7 +69,7 @@ class AppointmentModule extends BaseModule
         $registry->addRoleMapping('billing', ['appointment.view.any']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('appointment', AppointmentPolicy::class);
     }

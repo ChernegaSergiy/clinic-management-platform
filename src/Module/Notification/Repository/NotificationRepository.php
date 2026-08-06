@@ -16,11 +16,11 @@ class NotificationRepository extends ServiceEntityRepository
     /**
      * Finds the most recent unread notifications for a specific user.
      *
-     * @param int $userId The ID of the user.
-     * @param int $limit The maximum number of notifications to return.
+     * @param  int   $userId The ID of the user.
+     * @param  int   $limit  The maximum number of notifications to return.
      * @return array An array of unread notifications.
      */
-    public function findUnreadByUserId(int $userId, int $limit = 10): array
+    public function findUnreadByUserId(int $userId, int $limit = 10) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -40,7 +40,7 @@ class NotificationRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function findByUserId(int $userId, int $limit = 10, int $offset = 0): array
+    public function findByUserId(int $userId, int $limit = 10, int $offset = 0) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -58,14 +58,14 @@ class NotificationRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function countUnreadByUserId(int $userId): int
+    public function countUnreadByUserId(int $userId) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = false";
         return (int)$conn->fetchOne($sql, ['user_id' => $userId]);
     }
 
-    public function deleteByIdAndUser(int $id, int $userId): bool
+    public function deleteByIdAndUser(int $id, int $userId) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM notifications WHERE id = :id AND user_id = :user_id";
@@ -78,10 +78,10 @@ class NotificationRepository extends ServiceEntityRepository
     /**
      * Marks all unread notifications for a specific user as read.
      *
-     * @param int $userId The ID of the user.
+     * @param  int  $userId The ID of the user.
      * @return bool True on success, false on failure.
      */
-    public function markAllAsReadByUserId(int $userId): bool
+    public function markAllAsReadByUserId(int $userId) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "UPDATE notifications SET is_read = true WHERE user_id = :user_id AND is_read = false";

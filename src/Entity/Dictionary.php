@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Entity;
+
+use App\Module\Admin\Repository\DictionaryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Admin\Repository\DictionaryRepository;
 
 #[ORM\Entity(repositoryClass: DictionaryRepository::class)]
 #[ORM\Table(name: 'dictionaries')]

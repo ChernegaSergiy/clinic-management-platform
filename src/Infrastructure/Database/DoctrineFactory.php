@@ -9,7 +9,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class DoctrineFactory
 {
-    public static function createEntityManager(): EntityManager
+    public static function createEntityManager() : EntityManager
     {
         $projectDir = dirname(__DIR__, 3);
         $paths = [$projectDir . '/src/Entity'];

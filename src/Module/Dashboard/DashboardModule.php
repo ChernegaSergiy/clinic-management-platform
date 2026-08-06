@@ -6,13 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Dashboard\DashboardController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DashboardModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/dashboard', [DashboardController::class, 'index']);
 
@@ -23,7 +22,7 @@ class DashboardModule extends BaseModule
         }
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Dashboard\Service\DashboardService::class)->setPublic(true);
         $container->register(\App\Module\Dashboard\DashboardController::class)
@@ -32,7 +31,7 @@ class DashboardModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('dashboard.view', 'Перегляд панелі');
         $registry->add('dashboard.export', 'Експорт даних');
@@ -48,7 +47,7 @@ class DashboardModule extends BaseModule
         $registry->addRoleMapping('hr_manager', ['dashboard.view']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('dashboard', DashboardPolicy::class);
     }

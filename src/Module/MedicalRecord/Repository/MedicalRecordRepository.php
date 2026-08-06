@@ -6,9 +6,8 @@ use App\Entity\MedicalRecord;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
-use PDO;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MedicalRecordRepository extends ServiceEntityRepository implements MedicalRecordRepositoryInterface
@@ -21,13 +20,19 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function findByPatientId(int $patientId): array
+    public function findByPatientId(int $patientId) : array
     {
         $qb = $this->createQueryBuilder('mr')
             ->select(
-                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
-                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
-                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                'mr.id',
+                'IDENTITY(mr.patient) as patient_id',
+                'IDENTITY(mr.appointment) as appointment_id',
+                'IDENTITY(mr.doctor) as doctor_id',
+                'mr.visit_date',
+                'mr.diagnosis_code',
+                'mr.diagnosis_text',
+                'mr.treatment',
+                'mr.notes',
                 "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
                 "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
             )
@@ -40,13 +45,19 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findAll(string $searchTerm = ''): array
+    public function findAll(string $searchTerm = '') : array
     {
         $qb = $this->createQueryBuilder('mr')
             ->select(
-                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
-                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
-                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                'mr.id',
+                'IDENTITY(mr.patient) as patient_id',
+                'IDENTITY(mr.appointment) as appointment_id',
+                'IDENTITY(mr.doctor) as doctor_id',
+                'mr.visit_date',
+                'mr.diagnosis_code',
+                'mr.diagnosis_text',
+                'mr.treatment',
+                'mr.notes',
                 "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
                 "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
             )
@@ -65,13 +76,19 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function findByDoctorId(int $doctorId, string $searchTerm = ''): array
+    public function findByDoctorId(int $doctorId, string $searchTerm = '') : array
     {
         $qb = $this->createQueryBuilder('mr')
             ->select(
-                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
-                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
-                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                'mr.id',
+                'IDENTITY(mr.patient) as patient_id',
+                'IDENTITY(mr.appointment) as appointment_id',
+                'IDENTITY(mr.doctor) as doctor_id',
+                'mr.visit_date',
+                'mr.diagnosis_code',
+                'mr.diagnosis_text',
+                'mr.treatment',
+                'mr.notes',
                 "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
                 "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
             )
@@ -94,13 +111,13 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function save(array $data): int|false
+    public function save(array $data) : int|false
     {
         $mr = new MedicalRecord();
-        
+
         $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
         $mr->setPatient($patient);
-        
+
         $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
         $mr->setDoctor($doctor);
 
@@ -112,9 +129,10 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         if (!empty($data['visit_date'])) {
             try {
                 $mr->setVisitDate(new \DateTime($data['visit_date']));
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
-        
+
         if (array_key_exists('diagnosis_code', $data)) {
             $mr->setDiagnosisCode($data['diagnosis_code']);
         }
@@ -140,7 +158,7 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
             if (isset($data['intervention_codes']) && is_array($data['intervention_codes'])) {
                 $this->attachInterventionCodes($medicalRecordId, $data['intervention_codes']);
             }
-            
+
             $this->eventDispatcher->dispatch(new EntityChangedEvent('medical_record', $medicalRecordId, 'create', null, $data));
             $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -148,14 +166,14 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
                 'Створено новий медичний запис після візиту',
                 ['medical_record_id' => $medicalRecordId]
             ));
-            
+
             return $medicalRecordId;
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data) : bool
     {
         $oldMedicalRecord = $this->findById($id);
         if (!$oldMedicalRecord) {
@@ -172,7 +190,7 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
             $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
             $mr->setPatient($patient);
         }
-        
+
         if (isset($data['doctor_id'])) {
             $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
             $mr->setDoctor($doctor);
@@ -190,9 +208,10 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         if (!empty($data['visit_date'])) {
             try {
                 $mr->setVisitDate(new \DateTime($data['visit_date']));
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
-        
+
         if (array_key_exists('diagnosis_code', $data)) {
             $mr->setDiagnosisCode($data['diagnosis_code']);
         }
@@ -222,13 +241,19 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         }
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $qb = $this->createQueryBuilder('mr')
             ->select(
-                'mr.id', 'IDENTITY(mr.patient) as patient_id', 'IDENTITY(mr.appointment) as appointment_id', 
-                'IDENTITY(mr.doctor) as doctor_id', 'mr.visit_date', 
-                'mr.diagnosis_code', 'mr.diagnosis_text', 'mr.treatment', 'mr.notes',
+                'mr.id',
+                'IDENTITY(mr.patient) as patient_id',
+                'IDENTITY(mr.appointment) as appointment_id',
+                'IDENTITY(mr.doctor) as doctor_id',
+                'mr.visit_date',
+                'mr.diagnosis_code',
+                'mr.diagnosis_text',
+                'mr.treatment',
+                'mr.notes',
                 "CONCAT(u.last_name, ' ', u.first_name) as doctor_name",
                 "CONCAT(p.last_name, ' ', p.first_name) as patient_name"
             )
@@ -246,10 +271,10 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $result;
     }
 
-    public function attachIcdCodes(int $medicalRecordId, array $icdCodeIds): bool
+    public function attachIcdCodes(int $medicalRecordId, array $icdCodeIds) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $conn->executeStatement(
             "DELETE FROM medical_record_icd WHERE medical_record_id = :medical_record_id",
             ['medical_record_id' => $medicalRecordId]
@@ -274,7 +299,7 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $conn->executeStatement($insertSql, $params) > 0;
     }
 
-    public function getIcdCodesForMedicalRecord(int $medicalRecordId): array
+    public function getIcdCodesForMedicalRecord(int $medicalRecordId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -289,10 +314,10 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
     }
 
-    public function attachInterventionCodes(int $medicalRecordId, array $interventionCodeIds): bool
+    public function attachInterventionCodes(int $medicalRecordId, array $interventionCodeIds) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $conn->executeStatement(
             "DELETE FROM medical_record_intervention WHERE medical_record_id = :medical_record_id",
             ['medical_record_id' => $medicalRecordId]
@@ -317,7 +342,7 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
         return $conn->executeStatement($insertSql, $params) > 0;
     }
 
-    public function getInterventionCodesForMedicalRecord(int $medicalRecordId): array
+    public function getInterventionCodesForMedicalRecord(int $medicalRecordId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "

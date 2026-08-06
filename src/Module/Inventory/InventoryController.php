@@ -2,13 +2,11 @@
 
 namespace App\Module\Inventory;
 
-use App\Database\Database;
-
-use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use App\Core\Validation\Validator;
+use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class InventoryController extends \App\Core\Controller\AbstractController
 {
@@ -22,7 +20,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
-    public function index(): Response
+    public function index() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');
@@ -40,7 +38,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
-    public function create(): Response
+    public function create() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');
@@ -58,7 +56,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
-    public function store(): Response
+    public function store() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');
@@ -82,7 +80,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
-    public function show(): Response
+    public function show() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');
@@ -103,7 +101,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
-    public function edit(): Response
+    public function edit() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');
@@ -130,7 +128,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
-    public function update(): Response
+    public function update() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('inventory.manage');

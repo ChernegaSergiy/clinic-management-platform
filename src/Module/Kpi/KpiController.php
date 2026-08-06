@@ -2,16 +2,13 @@
 
 namespace App\Module\Kpi;
 
-use App\Database\Database;
-
 use App\Core\Validation\Validator;
 use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
 
 class KpiController extends \App\Core\Controller\AbstractController
 {
@@ -34,7 +31,7 @@ class KpiController extends \App\Core\Controller\AbstractController
 
     // --- KPI Definitions ---
     #[Route('/kpi/definitions', name: 'kpi_definitions_index', methods: ['GET'])]
-    public function listDefinitions(): Response
+    public function listDefinitions() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -43,7 +40,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/kpi/definitions/new', name: 'kpi_definitions_new', methods: ['GET'])]
-    public function createDefinition(): Response
+    public function createDefinition() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -56,7 +53,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/kpi/definitions/new', name: 'kpi_definitions_store', methods: ['POST'])]
-    public function storeDefinition(): Response
+    public function storeDefinition() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -81,7 +78,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/kpi/definitions/edit', name: 'kpi_definitions_edit', methods: ['GET'])]
-    public function editDefinition(): Response
+    public function editDefinition() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -103,7 +100,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/kpi/definitions/edit', name: 'kpi_definitions_update', methods: ['POST'])]
-    public function updateDefinition(): Response
+    public function updateDefinition() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -135,7 +132,7 @@ class KpiController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/kpi/definitions/delete', name: 'kpi_definitions_delete', methods: ['POST'])]
-    public function deleteDefinition(): Response
+    public function deleteDefinition() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.manage');
@@ -148,12 +145,12 @@ class KpiController extends \App\Core\Controller\AbstractController
 
     // --- KPI Results ---
     #[Route('/kpi/results', name: 'kpi_results_index', methods: ['GET'])]
-    public function listResults(): Response
+    public function listResults() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.read');
         $results = [];
-        if (isset($_SESSION['user']) && $_SESSION['user']['role_id'] === 1) {
+        if (isset($_SESSION['user']) && 1 === $_SESSION['user']['role_id']) {
             // Перевірка, чи користувач є адміністратором
             $results = $this->kpiRepository->findAllKpiResults();
         } else {
@@ -165,7 +162,7 @@ class KpiController extends \App\Core\Controller\AbstractController
 
     // This would be called by a cron job or background process
     #[Route('/kpi/calculate', name: 'kpi_calculate', methods: ['POST'])]
-    public function calculateResults(): Response
+    public function calculateResults() : Response
     {
         $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
@@ -177,7 +174,7 @@ class KpiController extends \App\Core\Controller\AbstractController
             [$periodStart, $periodEnd] = $this->resolvePeriodRange($today, $period);
 
             $value = $this->calculateKpiValue($definition['kpi_type'], $periodStart, $periodEnd);
-            if ($value === null) {
+            if (null === $value) {
                 continue;
             }
             $this->kpiRepository->saveKpiResult([
@@ -194,7 +191,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         return new RedirectResponse('/dashboard');
     }
 
-    private function calculateKpiValue(string $type, string $from, string $to): ?float
+    private function calculateKpiValue(string $type, string $from, string $to) : ?float
     {
         return match ($type) {
             'revenue_generated' => $this->invoiceRepository->sumRevenueForPeriod($from, $to),
@@ -205,7 +202,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         };
     }
 
-    private function resolvePeriodRange(\DateTimeImmutable $today, string $period): array
+    private function resolvePeriodRange(\DateTimeImmutable $today, string $period) : array
     {
         return match ($period) {
             'week' => [
@@ -223,12 +220,12 @@ class KpiController extends \App\Core\Controller\AbstractController
         };
     }
 
-    private function calculateDoctorUtilization(string $from, string $to): ?float
+    private function calculateDoctorUtilization(string $from, string $to) : ?float
     {
         $bookedHours = $this->appointmentRepository->sumBookedHoursByRange($from, $to);
         $doctorCount = $this->appointmentRepository->countDistinctDoctorsByRange($from, $to);
 
-        if ($doctorCount === 0) {
+        if (0 === $doctorCount) {
             return null;
         }
 
@@ -242,10 +239,10 @@ class KpiController extends \App\Core\Controller\AbstractController
         return round(($bookedHours / $totalCapacity) * 100, 1);
     }
 
-    private function calculateReadmissionRate(string $from, string $to): ?float
+    private function calculateReadmissionRate(string $from, string $to) : ?float
     {
         $totalPatients = $this->appointmentRepository->countDistinctPatientsByRange($from, $to);
-        if ($totalPatients === 0) {
+        if (0 === $totalPatients) {
             return null;
         }
 
@@ -254,7 +251,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         return round(($readmitted / $totalPatients) * 100, 1);
     }
 
-    private function authorizeKpiAccess(): void
+    private function authorizeKpiAccess() : void
     {
         if (PHP_SAPI === 'cli') {
             return;

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class PatientAppointmentTreatmentFlowTest extends TestCase
 {
-    public function testFlowScenario(): void
+    public function testFlowScenario() : void
     {
         $patientData = [
             'first_name' => 'John',
@@ -83,7 +83,7 @@ class PatientAppointmentTreatmentFlowTest extends TestCase
         $this->assertTrue(true, 'Integration flow scenario validated');
     }
 
-    public function testPatientToAppointmentRelationship(): void
+    public function testPatientToAppointmentRelationship() : void
     {
         $patient = [
             'id' => 100,
@@ -105,7 +105,7 @@ class PatientAppointmentTreatmentFlowTest extends TestCase
         $this->assertCount(3, $patientAppointments);
 
         $scheduledAppointments = array_filter($patientAppointments, function ($apt) {
-            return $apt['status'] === 'scheduled';
+            return 'scheduled' === $apt['status'];
         });
 
         $this->assertCount(1, $scheduledAppointments);
@@ -117,7 +117,7 @@ class PatientAppointmentTreatmentFlowTest extends TestCase
         );
     }
 
-    public function testAppointmentToTreatmentRelationship(): void
+    public function testAppointmentToTreatmentRelationship() : void
     {
         $appointment = [
             'id' => 50,
@@ -149,7 +149,7 @@ class PatientAppointmentTreatmentFlowTest extends TestCase
         );
     }
 
-    public function testFullClinicalFlow(): void
+    public function testFullClinicalFlow() : void
     {
         $patient = [
             'id' => 500,

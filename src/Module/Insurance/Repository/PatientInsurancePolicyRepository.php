@@ -15,7 +15,7 @@ class PatientInsurancePolicyRepository extends ServiceEntityRepository
         parent::__construct($registry, PatientInsurancePolicy::class);
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id) : ?array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM patient_insurance_policies WHERE id = :id";
@@ -23,14 +23,14 @@ class PatientInsurancePolicyRepository extends ServiceEntityRepository
         return $result ?: null;
     }
 
-    public function findByPatientId(int $patientId): array
+    public function findByPatientId(int $patientId) : array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM patient_insurance_policies WHERE patient_id = :patient_id ORDER BY is_active DESC, valid_to DESC";
         return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
     }
 
-    public function create(int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive): int
+    public function create(int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive) : int
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -49,7 +49,7 @@ class PatientInsurancePolicyRepository extends ServiceEntityRepository
         return (int) $conn->lastInsertId();
     }
 
-    public function update(int $id, int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive): bool
+    public function update(int $id, int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
@@ -69,7 +69,7 @@ class PatientInsurancePolicyRepository extends ServiceEntityRepository
         ]) > 0;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id) : bool
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "DELETE FROM patient_insurance_policies WHERE id = :id";

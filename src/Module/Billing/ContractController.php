@@ -2,11 +2,8 @@
 
 namespace App\Module\Billing;
 
-use App\Database\Database;
-
-use App\Core\Validation\Validator;
-use Symfony\Component\Routing\Attribute\Route;
 use App\Module\Billing\Repository\ContractRepository;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ContractController extends \App\Core\Controller\AbstractController
 {
@@ -22,7 +19,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -31,7 +28,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
-    public function create(): \Symfony\Component\HttpFoundation\Response
+    public function create() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -44,7 +41,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_store', methods: ['POST'])]
-    public function store(): \Symfony\Component\HttpFoundation\Response
+    public function store() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -56,12 +53,12 @@ class ContractController extends \App\Core\Controller\AbstractController
             'status' => ['required', 'in:active,expired,terminated'],
         ]);
 
-        if (isset($_POST['end_date']) && $_POST['end_date'] === '') {
+        if (isset($_POST['end_date']) && '' === $_POST['end_date']) {
             unset($_POST['end_date']);
         }
 
         // Normalize optional end_date: store null instead of empty string
-        if (isset($_POST['end_date']) && $_POST['end_date'] === '') {
+        if (isset($_POST['end_date']) && '' === $_POST['end_date']) {
             unset($_POST['end_date']);
         }
 
@@ -73,7 +70,7 @@ class ContractController extends \App\Core\Controller\AbstractController
 
         // Handle file upload for contract document
         $filePath = null;
-        if (isset($_FILES['contract_file']) && $_FILES['contract_file']['error'] === UPLOAD_ERR_OK) {
+        if (isset($_FILES['contract_file']) && UPLOAD_ERR_OK === $_FILES['contract_file']['error']) {
             $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0775, true);
@@ -94,7 +91,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/show', name: 'billing_contracts_show', methods: ['GET'])]
-    public function show(): \Symfony\Component\HttpFoundation\Response
+    public function show() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -110,7 +107,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
-    public function edit(): \Symfony\Component\HttpFoundation\Response
+    public function edit() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -132,7 +129,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_update', methods: ['POST'])]
-    public function update(): \Symfony\Component\HttpFoundation\Response
+    public function update() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -159,7 +156,7 @@ class ContractController extends \App\Core\Controller\AbstractController
 
         // Handle file upload for contract document (if new file is uploaded)
         $filePath = $contract['file_path']; // Keep existing path by default
-        if (isset($_FILES['contract_file']) && $_FILES['contract_file']['error'] === UPLOAD_ERR_OK) {
+        if (isset($_FILES['contract_file']) && UPLOAD_ERR_OK === $_FILES['contract_file']['error']) {
             $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0775, true);
@@ -181,7 +178,7 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/delete', name: 'billing_contracts_delete', methods: ['POST'])]
-    public function delete(): \Symfony\Component\HttpFoundation\Response
+    public function delete() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
@@ -204,13 +201,13 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
-    public function downloadFile(int $id = 0): \Symfony\Component\HttpFoundation\Response
+    public function downloadFile(int $id = 0) : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         $this->gate->authorize('billing.manage');
 
         // Accept ID from route parameter or query string fallback
-        if ($id === 0) {
+        if (0 === $id) {
             $id = (int)($_GET['id'] ?? 0);
         }
 

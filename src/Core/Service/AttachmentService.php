@@ -11,7 +11,7 @@ class AttachmentService
     public function __construct(ManagerRegistry $registry, ?string $uploadDir = null)
     {
         $this->registry = $registry;
-        if ($uploadDir !== null) {
+        if (null !== $uploadDir) {
             $this->uploadDir = $uploadDir;
         }
         if (!is_dir($this->uploadDir)) {
@@ -21,7 +21,7 @@ class AttachmentService
 
     public function uploadAttachment(array $fileData, string $entityType, int $entityId, ?int $userId = null)
     {
-        if ($fileData['error'] !== UPLOAD_ERR_OK) {
+        if (UPLOAD_ERR_OK !== $fileData['error']) {
             return false;
         }
 
@@ -135,7 +135,7 @@ class AttachmentService
         }
     }
 
-    public function getAttachmentById(int $attachmentId): ?array
+    public function getAttachmentById(int $attachmentId) : ?array
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT * FROM attachments WHERE id = :id";
@@ -143,7 +143,7 @@ class AttachmentService
         return $result ?: null;
     }
 
-    public function getAttachmentsForEntity(string $entityType, int $entityId): array
+    public function getAttachmentsForEntity(string $entityType, int $entityId) : array
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT * FROM attachments WHERE entity_type = :entity_type AND entity_id = :entity_id ORDER BY created_at DESC";
@@ -153,14 +153,14 @@ class AttachmentService
         ]);
     }
 
-    public function getAttachmentVersions(int $attachmentId): array
+    public function getAttachmentVersions(int $attachmentId) : array
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id ORDER BY version_number DESC";
         return $conn->fetchAllAssociative($sql, ['attachment_id' => $attachmentId]);
     }
 
-    public function getAttachmentVersion(int $attachmentId, int $versionNumber): ?array
+    public function getAttachmentVersion(int $attachmentId, int $versionNumber) : ?array
     {
         $conn = $this->registry->getConnection();
         $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id AND version_number = :version_number";
@@ -171,10 +171,10 @@ class AttachmentService
         return $result ?: null;
     }
 
-    public function checkViewAccess(int $attachmentId, int $userId, int $userRoleId): bool
+    public function checkViewAccess(int $attachmentId, int $userId, int $userRoleId) : bool
     {
         $conn = $this->registry->getConnection();
-        
+
         $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND user_id = :user_id AND can_view = TRUE";
         if ($conn->fetchOne($sql, ['attachment_id' => $attachmentId, 'user_id' => $userId]) > 0) {
             return true;
@@ -195,9 +195,9 @@ class AttachmentService
         return false;
     }
 
-    public function updateAccess(int $attachmentId, ?int $userId = null, ?int $roleId = null, bool $canView = false, bool $canEdit = false): bool
+    public function updateAccess(int $attachmentId, ?int $userId = null, ?int $roleId = null, bool $canView = false, bool $canEdit = false) : bool
     {
-        if ($userId === null && $roleId === null) {
+        if (null === $userId && null === $roleId) {
             return false;
         }
 

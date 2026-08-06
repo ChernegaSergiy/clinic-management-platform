@@ -6,14 +6,12 @@ use App\Core\Auth\PermissionRegistry;
 use App\Core\Auth\PolicyRegistry;
 use App\Core\Http\Router;
 use App\Core\Module\BaseModule;
-use App\Module\Billing\BillingController;
-use App\Module\Billing\ContractController;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class BillingModule extends BaseModule
 {
-    public function registerRoutes(Router $router): void
+    public function registerRoutes(Router $router) : void
     {
         $router->add('GET', '/billing', [BillingController::class, 'index']);
         $router->add('GET', '/billing/new', [BillingController::class, 'create']);
@@ -36,7 +34,7 @@ class BillingModule extends BaseModule
         $router->add('GET', '/billing/contracts/{id}/download', [ContractController::class, 'downloadFile']);
     }
 
-    public function registerServices(ContainerBuilder $container): void
+    public function registerServices(ContainerBuilder $container) : void
     {
         $container->register(\App\Module\Billing\Repository\InvoiceRepository::class)->setPublic(true);
         $container->register(\App\Module\Billing\Repository\ServiceRepository::class)->setPublic(true);
@@ -60,7 +58,7 @@ class BillingModule extends BaseModule
             ])->setPublic(true);
     }
 
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function registerPermissions(PermissionRegistry $registry) : void
     {
         $registry->add('billing.read', 'Перегляд рахунків');
         $registry->add('billing.manage', 'Керування рахунками');
@@ -69,7 +67,7 @@ class BillingModule extends BaseModule
         $registry->addRoleMapping('billing', ['billing.read', 'billing.manage']);
     }
 
-    public function registerPolicies(PolicyRegistry $registry): void
+    public function registerPolicies(PolicyRegistry $registry) : void
     {
         $registry->register('billing', BillingPolicy::class);
     }

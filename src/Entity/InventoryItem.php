@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\Inventory\Repository\InventoryItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Inventory\Repository\InventoryItemRepository;
 
 #[ORM\Entity(repositoryClass: InventoryItemRepository::class)]
 #[ORM\Table(name: 'inventory_items')]

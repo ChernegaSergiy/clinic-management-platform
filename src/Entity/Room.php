@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Module\Room\Repository\RoomRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Module\Room\Repository\RoomRepository;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 #[ORM\Table(name: 'rooms')]
@@ -39,94 +39,94 @@ class Room
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName() : ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name) : static
     {
         $this->name = $name;
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType() : ?string
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(string $type) : static
     {
         $this->type = $type;
         return $this;
     }
 
-    public function getCapacity(): int
+    public function getCapacity() : int
     {
         return $this->capacity;
     }
 
-    public function setCapacity(int $capacity): static
+    public function setCapacity(int $capacity) : static
     {
         $this->capacity = $capacity;
         return $this;
     }
 
-    public function getLocation(): ?string
+    public function getLocation() : ?string
     {
         return $this->location;
     }
 
-    public function setLocation(?string $location): static
+    public function setLocation(?string $location) : static
     {
         $this->location = $location;
         return $this;
     }
 
-    public function getEquipment(): ?string
+    public function getEquipment() : ?string
     {
         return $this->equipment;
     }
 
-    public function setEquipment(?string $equipment): static
+    public function setEquipment(?string $equipment) : static
     {
         $this->equipment = $equipment;
         return $this;
     }
 
-    public function isAvailable(): bool
+    public function isAvailable() : bool
     {
         return $this->is_available;
     }
 
-    public function setIsAvailable(bool $isAvailable): static
+    public function setIsAvailable(bool $isAvailable) : static
     {
         $this->is_available = $isAvailable;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : static
     {
         $this->created_at = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt) : static
     {
         $this->updated_at = $updatedAt;
         return $this;

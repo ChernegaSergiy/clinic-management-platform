@@ -2,14 +2,12 @@
 
 namespace App\Module\User;
 
-use App\Database\Database;
+use App\Core\Validation\Validator;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\User\Repository\RoleRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
-use App\Module\User\OAuthController;
-use App\Core\Validation\Validator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -45,7 +43,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
-    public function showLoginForm(): \Symfony\Component\HttpFoundation\Response
+    public function showLoginForm() : \Symfony\Component\HttpFoundation\Response
     {
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -60,7 +58,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/login', name: 'login_post', methods: ['POST'])]
-    public function login(): \Symfony\Component\HttpFoundation\Response
+    public function login() : \Symfony\Component\HttpFoundation\Response
     {
         // Admin creation should be done via CLI commands or fixtures in Symfony
 
@@ -87,7 +85,7 @@ class AuthController extends \App\Core\Controller\AbstractController
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
             $mfaForceRoles = $this->settingsRepository->getMfaForceRoles();
 
-            if ($mfaPolicy === 'disabled') {
+            if ('disabled' === $mfaPolicy) {
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'first_name' => $user['first_name'],
@@ -143,17 +141,17 @@ class AuthController extends \App\Core\Controller\AbstractController
     /**
      * Redirects to the specified OAuth provider for authentication.
      *
-     * @param string $provider
+     * @param  string $provider
      * @return void
      */
     #[Route('/oauth/{provider}', name: 'oauth_login', methods: ['GET'])]
-    public function redirectToProvider(string $provider): \Symfony\Component\HttpFoundation\Response
+    public function redirectToProvider(string $provider) : \Symfony\Component\HttpFoundation\Response
     {
         return $this->oauthController->redirect($provider);
     }
 
     #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
-    public function logout(): \Symfony\Component\HttpFoundation\Response
+    public function logout() : \Symfony\Component\HttpFoundation\Response
     {
         $userId = $_SESSION['user']['id'] ?? null;
         $userEmail = $_SESSION['user']['email'] ?? null;
@@ -165,7 +163,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard_redirect', name: 'dashboard_redirect', methods: ['GET'])]
-    public function dashboard(): \Symfony\Component\HttpFoundation\Response
+    public function dashboard() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/dashboard');

@@ -4,10 +4,10 @@ namespace App\Core\Http;
 
 use App\Core\Auth\MfaGuard;
 use App\Core\Service\TranslationService;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Doctrine\Persistence\ManagerRegistry;
 
 class View
 {
@@ -24,7 +24,7 @@ class View
         $this->mfaGuard = $mfaGuard;
     }
 
-    private function loadTwigGlobals(): void
+    private function loadTwigGlobals() : void
     {
         if (!empty($this->twigGlobals)) {
             return;
@@ -46,7 +46,7 @@ class View
         }
     }
 
-    private function setupLocale(): void
+    private function setupLocale() : void
     {
         $this->loadTwigGlobals();
 
@@ -59,7 +59,7 @@ class View
         $this->translationService->setLocale($finalLocale);
     }
 
-    private function detectBrowserLanguage(): ?string
+    private function detectBrowserLanguage() : ?string
     {
         $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
         if (empty($acceptLang)) {
@@ -83,9 +83,9 @@ class View
         return null;
     }
 
-    private function getTwig(): Environment
+    private function getTwig() : Environment
     {
-        if ($this->twig === null) {
+        if (null === $this->twig) {
             $this->setupLocale();
 
             $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
@@ -103,7 +103,7 @@ class View
         return $this->twig;
     }
 
-    public function render(string $template, array $data = []): void
+    public function render(string $template, array $data = []) : void
     {
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
@@ -115,18 +115,18 @@ class View
         echo $this->getTwig()->render($template, $data);
     }
 
-    public function renderToString(string $template, array $data = []): string
+    public function renderToString(string $template, array $data = []) : string
     {
         return $this->getTwig()->render($template, $data);
     }
 
-    public function clearCache(): void
+    public function clearCache() : void
     {
         $this->twig = null;
         $this->twigGlobals = [];
     }
 
-    public function getTranslationService(): TranslationService
+    public function getTranslationService() : TranslationService
     {
         return $this->translationService;
     }
