@@ -10,3 +10,4 @@ build/
 public/uploads/*
 composer.phar
 composer-setup.php
+.php-cs-fixer.cache
