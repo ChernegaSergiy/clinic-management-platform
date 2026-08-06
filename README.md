@@ -105,4 +105,4 @@ GitHub Actions automatically runs all checks on every push to branches `main`, `
 
 ## License
 
-This project is licensed under the [CSSM Unlimited License v2.0](LICENSE).
+This project is licensed under the CSSM Unlimited License v2.0 (CSSM-ULv2). See the [LICENSE](LICENSE) file for details.
