@@ -3,7 +3,7 @@
 [![PHPStan](https://github.com/medcore-ua/medcore/actions/workflows/phpstan.yml/badge.svg)](https://github.com/medcore-ua/medcore/actions/workflows/phpstan.yml)
 [![PHPCS](https://github.com/medcore-ua/medcore/actions/workflows/phpcs.yml/badge.svg)](https://github.com/medcore-ua/medcore/actions/workflows/phpcs.yml)
 [![PHPUnit](https://github.com/medcore-ua/medcore/actions/workflows/phpunit.yml/badge.svg)](https://github.com/medcore-ua/medcore/actions/workflows/phpunit.yml)
-[![Test Coverage](https://img.shields.io/codecov/c/github/ChernegaSergiy/clinic-management-platform?label=Test%20Coverage&logo=codecov)](https://app.codecov.io/gh/ChernegaSergiy/clinic-management-platform)
+[![Test Coverage](https://img.shields.io/codecov/c/github/medcore-ua/medcore?label=Test%20Coverage&logo=codecov)](https://app.codecov.io/gh/medcore-ua/medcore)
 
 A robust, three-tier healthcare information system designed to automate key workflows in modern medical centers. This platform is built with a modular architecture, prioritizing scalability, security, and compliance with national regulatory requirements.
 
