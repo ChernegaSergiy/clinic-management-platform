@@ -102,3 +102,7 @@ vendor/bin/phpunit
 ### CI Checks
 
 GitHub Actions automatically runs all checks on every push to branches `main`, `epic/**`, `feature/**`, `fix/**` and on Pull Requests to `main`. The status of checks is displayed in the badges at the beginning of this file.
+
+## License
+
+This project is licensed under the [CSSM Unlimited License v2.0](LICENSE).
