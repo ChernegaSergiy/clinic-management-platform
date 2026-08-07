@@ -22,7 +22,7 @@
                 {{ forms.input('party_b', 'billing.contracts.new.party_b_label'|trans, old.party_b ?? contract.party_b, 'text', 'billing.contracts.new.party_b_placeholder'|trans, errors.party_b ?? null) }}
             </div>
 
-            <div class="field {% if errors.contract_file %}error{% endif %}">
+            <div class="field {% if errors.contract_file ?? null %}error{% endif %}">
                 <label>{{ 'billing.contracts.new.contract_file_label'|trans }}</label>
                 {% if contract.file_path %}
                     <p>{{ 'billing.contracts.edit.current_file'|trans }} <a href="/billing/contracts/{{ contract.id }}/download">{{ contract.file_path | split('/') | last }}</a></p>
@@ -33,17 +33,17 @@
                     <label for="contract-file-input" class="ui button">{{ 'billing.contracts.new.choose_file'|trans }}</label>
                 </div>
                 <input type="file" id="contract-file-input" name="contract_file" style="display: none;">
-                {% if errors.contract_file %}<div class="ui red basic pointing label">{{ errors.contract_file | first }}</div>{% endif %}
+                {% if errors.contract_file ?? null %}<div class="ui red basic pointing label">{{ (errors.contract_file ?? null) | first }}</div>{% endif %}
             </div>
 
-            <div class="field {% if errors.status %}error{% endif %}">
+            <div class="field {% if errors.status ?? null %}error{% endif %}">
                 <label>{{ 'billing.contracts.new.status_label'|trans }}</label>
                 <select class="ui dropdown" name="status">
                     <option value="active" {% if (old.status is defined and old.status == 'active') or (old.status is not defined and contract.status == 'active') %}selected{% endif %}>{{ 'billing.contracts.new.status_active'|trans }}</option>
-                    <option value="expired" {% if old.status == 'expired' or contract.status == 'expired' %}selected{% endif %}>{{ 'billing.contracts.new.status_expired'|trans }}</option>
-                    <option value="terminated" {% if old.status == 'terminated' or contract.status == 'terminated' %}selected{% endif %}>{{ 'billing.contracts.new.status_terminated'|trans }}</option>
+                    <option value="expired" {% if (old.status ?? null) == 'expired' or contract.status == 'expired' %}selected{% endif %}>{{ 'billing.contracts.new.status_expired'|trans }}</option>
+                    <option value="terminated" {% if (old.status ?? null) == 'terminated' or contract.status == 'terminated' %}selected{% endif %}>{{ 'billing.contracts.new.status_terminated'|trans }}</option>
                 </select>
-                {% if errors.status %}<div class="ui red basic pointing label">{{ errors.status | first }}</div>{% endif %}
+                {% if errors.status ?? null %}<div class="ui red basic pointing label">{{ (errors.status ?? null) | first }}</div>{% endif %}
             </div>
 
             <div class="ui divider"></div>

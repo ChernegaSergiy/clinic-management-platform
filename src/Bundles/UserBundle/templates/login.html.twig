@@ -12,16 +12,16 @@
                     <p class="section__description" style="font-size: 0.75rem; opacity: 0.8;">{{ 'user.login.description'|trans }}</p>
                 </header>
 
-                {% if errors.login %}
+                {% if errors.login ?? null %}
                     <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem; text-align: center;">
-                        <strong>{{ 'user.login.login_error'|trans }}</strong> {{ errors.login }}
+                        <strong>{{ 'user.login.login_error'|trans }}</strong> {{ errors.login ?? '' }}
                     </div>
                 {% endif %}
-                {% if errors.email or errors.password %}
+                {% if (errors.email ?? null) or (errors.password ?? null) %}
                     <div style="border: var(--border-medium); background: #ffe6e6; padding: 0.8rem; margin-bottom: 1.5rem; color: var(--color-alert); font-weight: 700; font-size: 0.85rem;">
                         <ul style="list-style: none; margin: 0; padding: 0;">
-                            {% if errors.email %}<li style="margin-bottom: 0.2rem;">{{ errors.email }}</li>{% endif %}
-                            {% if errors.password %}<li>{{ errors.password }}</li>{% endif %}
+                            {% if errors.email ?? null %}<li style="margin-bottom: 0.2rem;">{{ errors.email ?? '' }}</li>{% endif %}
+                            {% if errors.password ?? null %}<li>{{ errors.password ?? '' }}</li>{% endif %}
                         </ul>
                     </div>
                 {% endif %}

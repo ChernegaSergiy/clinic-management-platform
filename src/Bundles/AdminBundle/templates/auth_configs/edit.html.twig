@@ -10,7 +10,7 @@
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/auth_configs/edit?id={{ config.id }}">
-            <div class="field {% if errors.provider %}error{% endif %}">
+            <div class="field {% if errors.provider ?? null %}error{% endif %}">
                 <label>{{ 'admin.auth_configs.edit.provider'|trans }}</label>
                 <select name="provider" class="ui fluid dropdown" required>
                     <option value="">{{ 'admin.auth_configs.edit.select_provider'|trans }}</option>
@@ -20,7 +20,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                {% if errors.provider %}<div class="ui basic red pointing prompt label">{{ errors.provider[0] }}</div>{% endif %}
+                {% if errors.provider ?? null %}<div class="ui basic red pointing prompt label">{{ (errors.provider ?? null)[0] ?? '' }}</div>{% endif %}
             </div>
             {{ forms.input('client_id', 'admin.auth_configs.edit.client_id'|trans, old.client_id ?? config.client_id, 'text', 'admin.auth_configs.edit.client_id_placeholder'|trans, errors.client_id ?? null) }}
             {{ forms.input('client_secret', 'admin.auth_configs.edit.client_secret'|trans, old.client_secret ?? config.client_secret, 'text', 'admin.auth_configs.edit.client_secret_placeholder'|trans, errors.client_secret ?? null) }}

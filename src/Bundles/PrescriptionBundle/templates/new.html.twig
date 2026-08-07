@@ -12,7 +12,7 @@
         <form class="ui form" method="POST" action="/prescriptions/new">
             <input type="hidden" name="patient_id" value="{{ patient.id }}">
             <div class="two fields">
-                <div class="field {% if errors.doctor_id %}error{% endif %}">
+                <div class="field {% if errors.doctor_id ?? null %}error{% endif %}">
                     <label>{{ 'prescription.new.doctor'|trans }}</label>
                     <select class="ui search dropdown" name="doctor_id">
                         <option value="">{{ 'prescription.new.select_doctor'|trans }}</option>
@@ -20,9 +20,9 @@
                             <option value="{{ id }}" {% if (old.doctor_id is defined and old.doctor_id == id) or (old.doctor_id is not defined and currentDoctorId == id) %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
-                    {% if errors.doctor_id %}<div class="ui red basic pointing label">{{ errors.doctor_id | first }}</div>{% endif %}
+                    {% if errors.doctor_id ?? null %}<div class="ui red basic pointing label">{{ (errors.doctor_id ?? null) | first }}</div>{% endif %}
                 </div>
-                <div class="field {% if errors.medical_record_id %}error{% endif %}">
+                <div class="field {% if errors.medical_record_id ?? null %}error{% endif %}">
                     <label>{{ 'prescription.new.medical_record'|trans }}</label>
                     <select class="ui search dropdown" name="medical_record_id">
                         <option value="">{{ 'prescription.new.no_link'|trans }}</option>
@@ -30,7 +30,7 @@
                             <option value="{{ record.id }}" {% if old.medical_record_id == record.id %}selected{% endif %}>{{ 'prescription.new.record_option'|trans({'%id%': record.id, '%date%': record.visit_date|date('Y-m-d')}) }}</option>
                         {% endfor %}
                     </select>
-                    {% if errors.medical_record_id %}<div class="ui red basic pointing label">{{ errors.medical_record_id | first }}</div>{% endif %}
+                    {% if errors.medical_record_id ?? null %}<div class="ui red basic pointing label">{{ (errors.medical_record_id ?? null) | first }}</div>{% endif %}
                 </div>
             </div>
             <div class="two fields">

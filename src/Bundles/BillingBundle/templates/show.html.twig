@@ -122,32 +122,32 @@
         <form class="ui form" action="/billing/add-payment" method="POST">
             <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
             <div class="two fields">
-                <div class="field {% if errors.amount %}error{% endif %}">
+                <div class="field {% if errors.amount ?? null %}error{% endif %}">
                     <label>{{ 'billing.show.payment_amount'|trans }}</label>
                     <input type="number" name="amount" placeholder="0.00" step="0.01" min="0.01" value="{{ old.amount ?? '' }}">
-                    {% if errors.amount %}<div class="ui red basic pointing label">{{ errors.amount | first }}</div>{% endif %}
+                    {% if errors.amount ?? null %}<div class="ui red basic pointing label">{{ (errors.amount ?? null) | first }}</div>{% endif %}
                 </div>
-                <div class="field {% if errors.payment_method %}error{% endif %}">
+                <div class="field {% if errors.payment_method ?? null %}error{% endif %}">
                     <label>{{ 'billing.show.payment_method'|trans }}</label>
                     <select class="ui dropdown" name="payment_method">
                         <option value="">{{ 'billing.show.select_method'|trans }}</option>
-                        <option value="cash" {% if old.payment_method == 'cash' %}selected{% endif %}>{{ 'billing.show.payment_methods.cash'|trans }}</option>
-                        <option value="card" {% if old.payment_method == 'card' %}selected{% endif %}>{{ 'billing.show.payment_methods.card'|trans }}</option>
-                        <option value="bank_transfer" {% if old.payment_method == 'bank_transfer' %}selected{% endif %}>{{ 'billing.show.payment_methods.bank_transfer'|trans }}</option>
+                        <option value="cash" {% if (old.payment_method ?? null) == 'cash' %}selected{% endif %}>{{ 'billing.show.payment_methods.cash'|trans }}</option>
+                        <option value="card" {% if (old.payment_method ?? null) == 'card' %}selected{% endif %}>{{ 'billing.show.payment_methods.card'|trans }}</option>
+                        <option value="bank_transfer" {% if (old.payment_method ?? null) == 'bank_transfer' %}selected{% endif %}>{{ 'billing.show.payment_methods.bank_transfer'|trans }}</option>
                     </select>
-                    {% if errors.payment_method %}<div class="ui red basic pointing label">{{ errors.payment_method | first }}</div>{% endif %}
+                    {% if errors.payment_method ?? null %}<div class="ui red basic pointing label">{{ (errors.payment_method ?? null) | first }}</div>{% endif %}
                 </div>
             </div>
             <div class="two fields">
-                <div class="field {% if errors.transaction_id %}error{% endif %}">
+                <div class="field {% if errors.transaction_id ?? null %}error{% endif %}">
                     <label>{{ 'billing.show.transaction_id'|trans }}</label>
                     <input type="text" name="transaction_id" value="{{ old.transaction_id ?? '' }}">
-                    {% if errors.transaction_id %}<div class="ui red basic pointing label">{{ errors.transaction_id | first }}</div>{% endif %}
+                    {% if errors.transaction_id ?? null %}<div class="ui red basic pointing label">{{ (errors.transaction_id ?? null) | first }}</div>{% endif %}
                 </div>
-                <div class="field {% if errors.notes %}error{% endif %}">
+                <div class="field {% if errors.notes ?? null %}error{% endif %}">
                     <label>{{ 'billing.show.payment_notes'|trans }}</label>
                     <textarea name="notes" rows="2">{{ old.notes ?? '' }}</textarea>
-                    {% if errors.notes %}<div class="ui red basic pointing label">{{ errors.notes | first }}</div>{% endif %}
+                    {% if errors.notes ?? null %}<div class="ui red basic pointing label">{{ (errors.notes ?? null) | first }}</div>{% endif %}
                 </div>
             </div>
             <button class="ui green button" type="submit">{{ 'billing.show.add_payment_button'|trans }}</button>

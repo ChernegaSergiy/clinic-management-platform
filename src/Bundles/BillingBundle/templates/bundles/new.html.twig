@@ -14,7 +14,7 @@
             {{ forms.textarea('description', 'billing.bundles.new.description_label'|trans, old.description ?? '', 'billing.bundles.new.description_placeholder'|trans, errors.description ?? null) }}
             {{ forms.input('price', 'billing.bundles.new.price_label'|trans, old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
             
-            <div class="field {% if errors.services %}error{% endif %}">
+            <div class="field {% if errors.services ?? null %}error{% endif %}">
                 <label>{{ 'billing.bundles.new.services_label'|trans }}</label>
                 <div class="ui fluid search multiple selection dropdown">
                     <input type="hidden" name="services[]" value="{{ old.services|json_encode|raw }}">
@@ -26,7 +26,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                {% if errors.services %}<div class="ui red basic pointing label">{{ errors.services | first }}</div>{% endif %}
+                {% if errors.services ?? null %}<div class="ui red basic pointing label">{{ (errors.services ?? null) | first }}</div>{% endif %}
             </div>
 
             <div class="field">

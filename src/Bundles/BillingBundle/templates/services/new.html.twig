@@ -14,15 +14,15 @@
             {{ forms.textarea('description', 'billing.services.new.description_label'|trans, old.description ?? '', 'billing.services.new.description_placeholder'|trans, errors.description ?? null) }}
             {{ forms.input('price', 'billing.services.new.price_label'|trans, old.price ?? '', 'number', '0.00', errors.price ?? null, {'step': '0.01', 'required': 'required'}) }}
             
-            <div class="field {% if errors.category_id %}error{% endif %}">
+            <div class="field {% if errors.category_id ?? null %}error{% endif %}">
                 <label>{{ 'billing.services.new.category_label'|trans }}</label>
                 <select class="ui dropdown" name="category_id">
                     <option value="">{{ 'billing.services.new.category_placeholder'|trans }}</option>
                     {% for category in categories %}
-                        <option value="{{ category.id }}" {% if old.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                        <option value="{{ category.id }}" {% if (old.category_id ?? null) == category.id %}selected{% endif %}>{{ category.name }}</option>
                     {% endfor %}
                 </select>
-                {% if errors.category_id %}<div class="ui red basic pointing label">{{ errors.category_id | first }}</div>{% endif %}
+                {% if errors.category_id ?? null %}<div class="ui red basic pointing label">{{ (errors.category_id ?? null) | first }}</div>{% endif %}
             </div>
 
             <div class="field">
