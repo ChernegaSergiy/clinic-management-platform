@@ -19,4 +19,5 @@ return [
     App\Bundles\BillingBundle\BillingBundle::class => ['all' => true],
     App\Bundles\HrmBundle\HrmBundle::class => ['all' => true],
     App\Bundles\KpiBundle\KpiBundle::class => ['all' => true],
+    App\Bundles\ClinicalReferenceBundle\ClinicalReferenceBundle::class => ['all' => true],
 ];
