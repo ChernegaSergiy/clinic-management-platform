@@ -11,4 +11,5 @@ return [
     App\Bundles\ScheduleBundle\ScheduleBundle::class => ['all' => true],
     App\Bundles\MedicalRecordBundle\MedicalRecordBundle::class => ['all' => true],
     App\Bundles\RoomBundle\RoomBundle::class => ['all' => true],
+    App\Bundles\PrescriptionBundle\PrescriptionBundle::class => ['all' => true],
 ];
