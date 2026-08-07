@@ -14,27 +14,26 @@ src/Controller/ @ChernegaSergiy
 src/Controller/PageController.php @ChernegaSergiy
 src/Event/ @Sameer6305
 src/Infrastructure/Module/ @Sameer6305
-src/Module/Admin/ @ChernegaSergiy
-src/Module/Appointment/ @Andriihev
-src/Module/Billing/ @ChernegaSergiy
-src/Module/ClinicalReference/ @ChernegaSergiy
-src/Module/Dashboard/ @ChernegaSergiy
-src/Module/Department/ @ChernegaSergiy
-src/Module/Hrm/ @ChernegaSergiy
-src/Module/Insurance/ @ChernegaSergiy
-src/Module/Inventory/ @ChernegaSergiy
-src/Module/Kpi/ @ChernegaSergiy
-src/Module/LabOrder/ @ChernegaSergiy
-src/Module/MedicalRecord/ @ChernegaSergiy
-src/Module/Mfa/ @ChernegaSergiy
-src/Module/News/ @ChernegaSergiy
-src/Module/Notification/ @ChernegaSergiy
-src/Module/Patient/ @ChernegaSergiy
-src/Module/Prescription/ @ChernegaSergiy
-src/Module/Profile/ @ChernegaSergiy
-src/Module/Room/ @Andriihev
-src/Module/Schedule/ @Andriihev
-src/Module/User/ @ChernegaSergiy
+src/Bundles/AdminBundle/ @ChernegaSergiy
+src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
+src/Bundles/BillingBundle/ @ChernegaSergiy
+src/Bundles/ClinicalReferenceBundle/ @ChernegaSergiy
+src/Bundles/DashboardBundle/ @ChernegaSergiy
+src/Bundles/DepartmentBundle/ @ChernegaSergiy
+src/Bundles/HrmBundle/ @ChernegaSergiy
+src/Bundles/InsuranceBundle/ @ChernegaSergiy
+src/Bundles/InventoryBundle/ @ChernegaSergiy
+src/Bundles/KpiBundle/ @ChernegaSergiy
+src/Bundles/LabOrderBundle/ @ChernegaSergiy
+src/Bundles/MedicalRecordBundle/ @ChernegaSergiy
+src/Bundles/NewsBundle/ @ChernegaSergiy
+src/Bundles/NotificationBundle/ @ChernegaSergiy
+src/Bundles/PatientBundle/ @ChernegaSergiy
+src/Bundles/PrescriptionBundle/ @ChernegaSergiy
+src/Bundles/RoomBundle/ @Andriihev @ChernegaSergiy
+src/Bundles/ScheduleBundle/ @Andriihev @ChernegaSergiy
+src/Bundles/SiteBundle/ @ChernegaSergiy
+src/Bundles/UserBundle/ @ChernegaSergiy
 templates/ @Andriihev
 
 # Frontend assets
