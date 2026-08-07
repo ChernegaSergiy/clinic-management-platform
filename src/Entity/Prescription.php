@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Prescription\Repository\PrescriptionRepository;
+use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
