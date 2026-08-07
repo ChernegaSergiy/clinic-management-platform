@@ -1,6 +1,0 @@
-name: News
-version: 1.0.0
-description: Модуль для управління новинами
-author: Serhii
-config:
-    enabled: true
