@@ -154,10 +154,10 @@ class HrmController extends \App\Core\Controller\AbstractController
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
             return $this->render('@Hrm/edit.html.twig', [
-                    'errors' => $validator->getErrors(),
-                    'employee' => array_merge($employee, $_POST),
-                    'users' => $users,
-                ]);
+                'errors' => $validator->getErrors(),
+                'employee' => array_merge($employee, $_POST),
+                'users' => $users,
+            ]);
         }
 
         if ($this->hrmRepository->update($id, $_POST)) {
