@@ -1,0 +1,241 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'appointment.new.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'appointment.new.title_full'|trans }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/appointments/new">
+            <style>
+                @media only screen and (max-width: 480px) {
+                    .ui.mobile.two.column.grid > .column {
+                        width: 50% !important;
+                    }
+                }
+            </style>
+            {% if old.waitlist_id %}
+                <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id }}">
+            {% endif %}
+
+            {# Filters for finding slots #}
+            <h4 class="ui dividing header">{{ 'appointment.new.step1'|trans }}</h4>
+            <div class="three fields">
+                {% set doctor_select_attrs = {'id': 'doctor_selector', 'required': 'required'} %}
+                {% if session.user.role_name == 'doctor' %}
+                    {% set doctor_select_attrs = doctor_select_attrs|merge({'disabled': 'disabled'}) %}
+                {% endif %}
+                {{ forms.select('doctor_id', 'appointment.new.doctor'|trans, doctors, old.doctor_id ?? null, errors.doctor_id ?? null, doctor_select_attrs) }}
+                {{ forms.select('service_id', 'appointment.new.service'|trans, services, old.service_id ?? null, errors.service_id ?? null, {'id': 'service_selector', 'required': 'required'}) }}
+                {{ forms.input('date', 'appointment.new.date'|trans, old.date ?? selectedDate, 'date', '', errors.date ?? null, {'id': 'date_selector', 'required': 'required'}) }}
+            </div>
+
+            <div id="slot-loader" class="ui active inverted dimmer" style="display: none;">
+                <div class="ui text loader">{{ 'appointment.new.loading'|trans }}</div>
+            </div>
+
+            <div id="slots-container" class="field" style="margin-top: 2rem;">
+                {# Slots will be loaded here via AJAX #}
+            </div>
+
+            <div class="ui hidden divider"></div>
+
+            {# Patient and notes #}
+            <h4 class="ui dividing header">{{ 'appointment.new.step2'|trans }}</h4>
+
+            {# Hidden fields for selected slot times #}
+            <input type="hidden" name="start_time" id="start_time_hidden" value="{{ old.start_time ?? '' }}">
+            <input type="hidden" name="end_time" id="end_time_hidden" value="{{ old.end_time ?? '' }}">
+
+            <div class="three fields">
+                {{ forms.select('patient_id', 'appointment.new.patient'|trans, patients, old.patient_id ?? null, errors.patient_id ?? null, {'required': 'required'}) }}
+                {{ forms.select('room_id', 'appointment.new.room'|trans, rooms, old.room_id ?? null, errors.room_id ?? null, {}) }}
+                <div class="field">
+                    <label>{{ 'appointment.new.selected_time'|trans }}</label>
+                    <input type="text" id="selected_slot_display" readonly placeholder="{{ 'appointment.new.select_time_placeholder'|trans }}">
+                 </div>
+            </div>
+
+            {{ forms.textarea('notes', 'appointment.new.notes'|trans, old.notes ?? null, 'appointment.new.notes_placeholder'|trans) }}
+
+            <div class="ui divider"></div>
+
+            <div style="margin-top: 2rem;">
+                {{ ui.button('appointment.new.save'|trans, 'primary', '', 'save', { 'type': 'submit', 'id': 'save-button', 'class': 'disabled' }) }}
+                <a href="/appointments" class="ui button"><i class="arrow left icon"></i> {{ 'appointment.new.cancel'|trans }}</a>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            const doctorField = $('#doctor_id');
+            const serviceField = $('#service_id');
+            const dateField = $('#date');
+            const slotsContainer = $('#slots-container');
+            const slotLoader = $('#slot-loader');
+            const saveButton = $('#save-button');
+            const selectedSlotDisplay = $('#selected_slot_display');
+            const startTimeHidden = $('#start_time_hidden');
+            const endTimeHidden = $('#end_time_hidden');
+
+// Store services data to get duration on the fly
+            const servicesData = {
+                {% for service in servicesForJs %}
+                    "{{ service.id }}": { duration: {{ service.duration_minutes }} }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            };
+
+            function fetchAvailableSlots() {
+                const doctorId = $('#doctor_id').dropdown('get value');
+                const serviceId = $('#service_id').dropdown('get value');
+                const date = $('#date').val();
+
+                
+
+                if (!doctorId || !serviceId || !date) {
+                    slotsContainer.html('<div class="ui message"><p>{{ "appointment.new.select_all_parameters"|trans }}</p></div>');
+                    return;
+                }
+
+                slotLoader.show();
+                slotsContainer.empty();
+                resetSelection();
+
+                $.ajax({
+                    url: '/api/appointments/available-slots',
+                    data: {
+                        doctor_id: doctorId,
+                        service_id: serviceId,
+                        date: date
+                    },
+                    success: function(slots) {
+                        slotLoader.hide();
+                        if (slots.length > 0) {
+                            let content = '<div class="ui segment">';
+                            content += '<h3 class="ui header dividing"><i class="calendar alternate outline icon"></i>{{ "appointment.new.available_slots_on"|trans }}' + new Date(date + 'T00:00:00').toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</h3>';
+                            
+                            // Group slots by time periods
+                            const morningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) < 12);
+                            const afternoonSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 12 && parseInt(s.label.split(':')[0]) < 17);
+                            const eveningSlots = slots.filter(s => parseInt(s.label.split(':')[0]) >= 17);
+                            
+                            function renderSlotGroup(title, slots, icon, color) {
+                                if (slots.length === 0) return '';
+                                
+                                let html = '<div class="ui segment">';
+                                html += '<div class="ui header">';
+                                html += '<i class="' + icon + ' ' + color + ' icon"></i>';
+                                html += '<div class="content">';
+                                html += title;
+                                html += '<div class="sub header">{{ "appointment.new.available_slots_count"|trans }} ' + slots.filter(s => s.available).length + ' {{ "appointment.new.from_total"|trans }} ' + slots.length + '</div>';
+                                html += '</div>';
+                                html += '</div>';
+                                
+                                html += '<div class="ui stackable four column grid mobile two column">';
+                                
+                                slots.forEach(function(slot) {
+                                    let buttonClass = 'ui basic button';
+                                    if (!slot.available) {
+                                        buttonClass = 'ui basic disabled button';
+                                        if (slot.is_in_past) {
+                                            buttonClass = 'ui basic grey disabled button';
+                                        } else if (slot.is_booked) {
+                                            buttonClass = 'ui basic red disabled button';
+                                        }
+                                    }
+                                    html += '<div class="column"><button class="' + buttonClass + ' slot-button" data-slot-time="' + slot.value + '" data-available="' + slot.available + '">' + slot.label + '</button></div>';
+                                });
+                                
+                                html += '</div></div>';
+                                return html;
+                            }
+                            
+                            content += renderSlotGroup('{{ "appointment.new.morning"|trans }}', morningSlots, 'sun', 'yellow');
+                            content += renderSlotGroup('{{ "appointment.new.afternoon"|trans }}', afternoonSlots, 'sun', 'orange');
+                            content += renderSlotGroup('{{ "appointment.new.evening"|trans }}', eveningSlots, 'moon', 'blue');
+                            
+                            content += '</div>';
+                            slotsContainer.html(content);
+                        } else {
+                            slotsContainer.html('<div class="ui warning message"><i class="calendar times outline icon"></i><div class="content">{{ "appointment.new.no_slots_available"|trans }}</div></div>');
+                        }
+                    },
+                    error: function() {
+                        slotLoader.hide();
+                        slotsContainer.html('<div class="ui negative message"><p>{{ "appointment.new.error_loading_slots"|trans }}</p></div>');
+                    }
+                });
+            }
+            
+            function resetSelection() {
+                selectedSlotDisplay.val('');
+                startTimeHidden.val('');
+                endTimeHidden.val('');
+                saveButton.addClass('disabled');
+                // Remove primary class from all slot buttons
+                $('.slot-button').removeClass('primary');
+            }
+
+            // Initialize dropdowns and bind events
+            $('#doctor_id').dropdown({
+                onChange: fetchAvailableSlots
+            });
+            $('#service_id').dropdown({
+                onChange: fetchAvailableSlots
+            });
+            dateField.on('change', fetchAvailableSlots);
+
+            // Event delegation for dynamically added slot buttons
+            $(document).on('click', '.slot-button', function(e) {
+                e.preventDefault();
+                
+                const isAvailable = $(this).data('available');
+                if (isAvailable === false || isAvailable === 'false') {
+                    return; // Don't allow selection of unavailable slots
+                }
+                
+                const startTimeStr = $(this).data('slot-time');
+                const serviceId = serviceField.val();
+
+                if (!serviceId || !servicesData[serviceId]) {
+                    alert('{{ "appointment.new.select_service_first"|trans }}');
+                    return;
+                }
+                const duration = servicesData[serviceId].duration;
+                const startTime = new Date(startTimeStr.replace(/-/g, "/"));
+                let endTime = new Date(startTime.getTime() + duration * 60000);
+
+                const formatForHidden = (date) => {
+                    const pad = (num) => num.toString().padStart(2, '0');
+                    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+                };
+
+                startTimeHidden.val(formatForHidden(startTime));
+                endTimeHidden.val(formatForHidden(endTime));
+
+                selectedSlotDisplay.val(startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+                $('.slot-button').removeClass('primary');
+                $(this).addClass('primary');
+
+                saveButton.removeClass('disabled');
+            });
+            
+            // Initial fetch if data is pre-filled
+            if ($('#doctor_id').dropdown('get value') && $('#service_id').dropdown('get value') && dateField.val()) {
+                fetchAvailableSlots();
+            } else {
+                slotsContainer.html('<div class="ui message"><p>{{ "appointment.new.select_doctor_first"|trans }}</p></div>');
+            }
+        });
+    </script>
+{% endblock %}
