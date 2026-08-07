@@ -1,0 +1,57 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'news.admin.list.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'news.admin.list.header'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/news/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'news.admin.list.add_news'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+            <tr>
+                <th>{{ 'news.admin.list.table.id'|trans }}</th>
+                <th>{{ 'news.admin.list.table.title'|trans }}</th>
+                <th>{{ 'news.admin.list.table.published_at'|trans }}</th>
+                <th>{{ 'news.admin.list.table.status'|trans }}</th>
+                <th>{{ 'news.admin.list.table.actions'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for article in newsArticles %}
+                <tr>
+                    <td>{{ article.id }}</td>
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.published_at|date('Y-m-d H:i') }}</td>
+                    <td>{{ article.is_published ? 'news.admin.list.status_published'|trans : 'news.admin.list.status_draft'|trans }}</td>
+                    <td>
+                        <a href="/admin/news/edit/{{ article.id }}" class="ui icon button">
+                            <i class="edit icon"></i>
+                        </a>
+                        <form action="/admin/news/delete/{{ article.id }}" method="post" style="display: inline;">
+                            <button type="submit" class="ui icon button" onclick="return confirm('{{ 'news.admin.list.confirm_delete'|trans }}');">
+                                <i class="trash icon"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="center aligned">{{ 'news.admin.list.no_news'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
