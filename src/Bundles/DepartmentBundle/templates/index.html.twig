@@ -1,0 +1,111 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'department.list.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="twelve wide column">
+                <h2 class="ui header">{{ 'department.list.header'|trans }}</h2>
+            </div>
+            <div class="four wide column right aligned">
+                <a href="/admin/departments/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'department.list.add_department'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if flash.success_message is defined %}
+            <div class="ui success message">
+                <i class="close icon"></i>
+                {{ flash.success_message }}
+            </div>
+        {% endif %}
+
+        {% if flash.error_message is defined %}
+            <div class="ui error message">
+                <i class="close icon"></i>
+                {{ flash.error_message }}
+            </div>
+        {% endif %}
+
+        {% if departments is not empty %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>{{ 'department.list.table.name'|trans }}</th>
+                        <th>{{ 'department.list.table.description'|trans }}</th>
+                        <th>{{ 'department.list.table.parent_department'|trans }}</th>
+                        <th>{{ 'department.list.table.status'|trans }}</th>
+                        <th>{{ 'department.list.table.sort_order'|trans }}</th>
+                        <th>{{ 'department.list.table.actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                        <tr>
+                            <td>
+                                <strong>{{ department.name }}</strong>
+                                {% if department.children is defined and department.children is not empty %}
+                                    <span class="ui tiny label">{{ 'department.list.parent_label'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ department.description|default('—') }}</td>
+                            <td>{{ department.parent_name|default('—') }}</td>
+                            <td>
+                                {% if department.is_active %}
+                                    <span class="ui green label">{{ 'department.list.active'|trans }}</span>
+                                {% else %}
+                                    <span class="ui red label">{{ 'department.list.inactive'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ department.sort_order }}</td>
+                            <td>
+                                <a href="/admin/departments/show?id={{ department.id }}" class="ui icon button">
+                                    <i class="eye icon"></i>
+                                </a>
+                                <a href="/admin/departments/edit?id={{ department.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <form method="POST" action="/admin/departments/toggle-status" style="display: inline-block;">
+                                    <input type="hidden" name="id" value="{{ department.id }}">
+                                    <button type="submit" class="ui icon button {% if department.is_active %}orange{% else %}green{% endif %}">
+                                        <i class="power off icon"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="/admin/departments/delete" style="display: inline-block;" 
+                                      onsubmit="return confirm('{{ 'department.list.confirm_delete'|trans }}');">
+                                    <input type="hidden" name="id" value="{{ department.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>{{ 'department.list.table.name'|trans }}</th>
+                        <th>{{ 'department.list.table.description'|trans }}</th>
+                        <th>{{ 'department.list.table.parent_department'|trans }}</th>
+                        <th>{{ 'department.list.table.status'|trans }}</th>
+                        <th>{{ 'department.list.table.sort_order'|trans }}</th>
+                        <th>{{ 'department.list.table.actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="center aligned">{{ 'department.list.no_departments'|trans }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
