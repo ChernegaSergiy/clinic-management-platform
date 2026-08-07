@@ -374,8 +374,8 @@ def migrate(mod):
         print(f"SKIP {mod}: {old_dir} not found")
         return
 
-    # Замість git mv та глобальної автозміни неймспейсів, скрипт ТІЛЬКИ генерує каркас бандлу.
-    # Копіювання файлів та зміну просторів імен ми зробимо вручну/аналітично для кожного модуля.
+    # Instead of git mv and global namespace replacement, the script ONLY generates the bundle scaffold.
+    # Copying files and changing namespaces will be done manually/analytically for each module.
     
     os.makedirs(os.path.join(ROOT, new_dir), exist_ok=True)
 
@@ -398,8 +398,8 @@ def migrate(mod):
     with open(os.path.join(ROOT, new_dir, f"{mod}Bundle.php"), "w") as f:
         f.write(build_bundle_php(mod))
 
-    # Виконуємо php-cs-fixer для новостворених файлів
-    print("🧹 Запуск php-cs-fixer...")
+    # Run php-cs-fixer for newly created files
+    print("🧹 Running php-cs-fixer...")
     subprocess.run(f"vendor/bin/php-cs-fixer fix {new_dir}", shell=True, cwd=ROOT, capture_output=True)
 
     # 4. register bundle in config/bundles.php
@@ -415,19 +415,19 @@ def migrate(mod):
         with open(bundles_path, "w") as f:
             f.write(content)
 
-    print(f"✅ Успішно згенеровано каркас бандлу для {mod} у {new_dir}")
-    print(f"⚠️ Папку {old_dir} НЕ видалено і неймспейси НЕ змінено (робимо це вручну).")
+    print(f"✅ Successfully generated bundle scaffold for {mod} in {new_dir}")
+    print(f"⚠️ The {old_dir} directory is NOT deleted and namespaces are NOT changed (this is done manually).")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Використання: python3 migrate.py <ModuleName>")
-        print(f"Доступні модулі: {', '.join(ORDER)}")
+        print("Usage: python3 migrate.py <ModuleName>")
+        print(f"Available modules: {', '.join(ORDER)}")
         sys.exit(1)
 
     target_mod = sys.argv[1]
     if target_mod not in DATA:
-        print(f"Помилка: Модуль '{target_mod}' не знайдено в конфігурації.")
+        print(f"Error: Module '{target_mod}' not found in configuration.")
         sys.exit(1)
 
     migrate(target_mod)
