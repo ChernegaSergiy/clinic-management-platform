@@ -4,15 +4,13 @@ namespace App\Bundles\SiteBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Yaml\Yaml;
 
 class SiteController extends \App\Core\Controller\AbstractController
 {
     #[Route('/', name: 'site_home')]
     public function home() : Response
     {
-        $content = Yaml::parseFile(__DIR__ . '/../../../content/home.uk.yml');
-        return $this->render('@Site/index.html.twig', ['page' => $content]);
+        return $this->render('@Site/index.html.twig');
     }
 
     #[Route('/about', name: 'site_about')]
