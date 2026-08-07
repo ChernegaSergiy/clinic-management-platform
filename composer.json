@@ -72,8 +72,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "cs": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
-        "cs-check": "phpcs --standard=PSR12 --ignore=vendor/,public/,src/ .",
+        "cs": "phpcs .",
+        "cs-fix": "phpcbf .",
         "stan": "phpstan analyse"
     },
     "config": {
