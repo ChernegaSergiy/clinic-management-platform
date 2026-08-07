@@ -14,11 +14,6 @@ return function (ContainerBuilder $container) {
         ->setFactory([\App\Database\Database::class, 'getInstance'])
         ->setPublic(true);
 
-    // Core services
-    $container->register(\App\Core\Http\Router::class)
-        ->setArguments([new Reference('service_container')])
-        ->setPublic(true);
-
     $container->register(\App\Core\Auth\PermissionRegistry::class)->setPublic(true);
     $container->register(\App\Core\Auth\PolicyRegistry::class)->setPublic(true);
     $container->register(\App\Core\Auth\Gate::class)
