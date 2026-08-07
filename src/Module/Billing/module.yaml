@@ -1,6 +1,0 @@
-name: Billing
-version: 1.0.0
-description: Модуль білінгу та рахунків
-author: Serhii
-config:
-    enabled: true
