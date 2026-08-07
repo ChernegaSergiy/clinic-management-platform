@@ -4,13 +4,13 @@ namespace App\Bundles\AppointmentBundle\Controller;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
+use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
+use App\Bundles\ScheduleBundle\Service\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Room\Repository\RoomRepository;
-use App\Module\Schedule\Repository\DoctorScheduleRepository;
-use App\Module\Schedule\Repository\ScheduleExceptionRepository;
-use App\Module\Schedule\Service\SchedulingService;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AppointmentController extends \App\Core\Controller\AbstractController

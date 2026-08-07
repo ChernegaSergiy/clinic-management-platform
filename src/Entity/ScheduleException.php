@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Schedule\Repository\ScheduleExceptionRepository;
+use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

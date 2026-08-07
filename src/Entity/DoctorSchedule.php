@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Schedule\Repository\DoctorScheduleRepository;
+use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
