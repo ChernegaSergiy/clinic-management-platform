@@ -69,9 +69,9 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
 
             $response = $this->render('@Department/create.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-            'parentOptions' => $parentOptions,
+                'old' => $_SESSION['old'] ?? [],
+                'errors' => $_SESSION['errors'] ?? [],
+                'parentOptions' => $parentOptions,
             ]);
             unset($_SESSION['old'], $_SESSION['errors']);
             return $response;
