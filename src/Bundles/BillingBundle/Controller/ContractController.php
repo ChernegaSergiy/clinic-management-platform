@@ -1,0 +1,229 @@
+<?php
+
+namespace App\Bundles\BillingBundle\Controller;
+
+use App\Bundles\BillingBundle\Repository\ContractRepository;
+use Symfony\Component\Routing\Attribute\Route;
+
+class ContractController extends \App\Core\Controller\AbstractController
+{
+    private ContractRepository $contractRepository;
+    private \App\Core\Validation\Validator $validator;
+
+    public function __construct(
+        ContractRepository $contractRepository,
+        \App\Core\Validation\Validator $validator
+    ) {
+        $this->contractRepository = $contractRepository;
+        $this->validator = $validator;
+    }
+
+    #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
+    public function index() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+        $contracts = $this->contractRepository->findAll();
+        return $this->render('@Billing/contracts/index.html.twig', ['contracts' => $contracts]);
+    }
+
+    #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
+    public function create() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+        $response = $this->render('@Billing/contracts/new.html.twig', [
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
+    }
+
+    #[Route('/billing/contracts/new', name: 'billing_contracts_store', methods: ['POST'])]
+    public function store() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        $validator = $this->validator;
+        $validator->validate($_POST, [
+            'title' => ['required'],
+            'start_date' => ['required', 'date'],
+            'status' => ['required', 'in:active,expired,terminated'],
+        ]);
+
+        if (isset($_POST['end_date']) && '' === $_POST['end_date']) {
+            unset($_POST['end_date']);
+        }
+
+        // Normalize optional end_date: store null instead of empty string
+        if (isset($_POST['end_date']) && '' === $_POST['end_date']) {
+            unset($_POST['end_date']);
+        }
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/new');
+        }
+
+        // Handle file upload for contract document
+        $filePath = null;
+        if (isset($_FILES['contract_file']) && UPLOAD_ERR_OK === $_FILES['contract_file']['error']) {
+            $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
+            $filename = uniqid('contract_', true) . '_' . basename($_FILES['contract_file']['name']);
+            $targetPath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['contract_file']['tmp_name'], $targetPath)) {
+                $filePath = 'uploads/contracts/' . $filename; // Store relative path
+            }
+        }
+
+        $data = $_POST;
+        $data['file_path'] = $filePath;
+
+        $this->contractRepository->save($data);
+        $_SESSION['success_message'] = "Контракт успішно створено.";
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts');
+    }
+
+    #[Route('/billing/contracts/show', name: 'billing_contracts_show', methods: ['GET'])]
+    public function show() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $contract = $this->contractRepository->findById($id);
+
+        if (!$contract) {
+            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+        }
+
+        return $this->render('@Billing/contracts/show.html.twig', ['contract' => $contract]);
+    }
+
+    #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
+    public function edit() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $contract = $this->contractRepository->findById($id);
+
+        if (!$contract) {
+            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+        }
+
+        $response = $this->render('@Billing/contracts/edit.html.twig', [
+            'contract' => $contract,
+            'old' => $_SESSION['old'] ?? [],
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['old'], $_SESSION['errors']);
+        return $response;
+    }
+
+    #[Route('/billing/contracts/edit', name: 'billing_contracts_update', methods: ['POST'])]
+    public function update() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $contract = $this->contractRepository->findById($id);
+
+        if (!$contract) {
+            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+        }
+
+        $validator = $this->validator;
+        $validator->validate($_POST, [
+            'title' => ['required'],
+            'start_date' => ['required', 'date'],
+            'status' => ['required', 'in:active,expired,terminated'],
+        ]);
+
+        if ($validator->hasErrors()) {
+            $_SESSION['errors'] = $validator->getErrors();
+            $_SESSION['old'] = $_POST;
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/edit?id=' . $id);
+        }
+
+        // Handle file upload for contract document (if new file is uploaded)
+        $filePath = $contract['file_path']; // Keep existing path by default
+        if (isset($_FILES['contract_file']) && UPLOAD_ERR_OK === $_FILES['contract_file']['error']) {
+            $uploadDir = dirname(__DIR__, 3) . '/uploads/contracts/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0775, true);
+            }
+            $filename = uniqid('contract_', true) . '_' . basename($_FILES['contract_file']['name']);
+            $targetPath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['contract_file']['tmp_name'], $targetPath)) {
+                $filePath = 'uploads/contracts/' . $filename; // Store relative path
+                // Optionally, delete old file
+            }
+        }
+
+        $data = $_POST;
+        $data['file_path'] = $filePath;
+
+        $this->contractRepository->update($id, $data);
+        $_SESSION['success_message'] = "Контракт успішно оновлено.";
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/show?id=' . $id);
+    }
+
+    #[Route('/billing/contracts/delete', name: 'billing_contracts_delete', methods: ['POST'])]
+    public function delete() : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        $id = (int)($_GET['id'] ?? 0);
+        $contract = $this->contractRepository->findById($id);
+
+        if (!$contract) {
+            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+        }
+
+        // Optionally, delete the physical file
+        if ($contract['file_path'] && file_exists(dirname(__DIR__, 3) . '/' . $contract['file_path'])) {
+            unlink(dirname(__DIR__, 3) . '/' . $contract['file_path']);
+        }
+
+        $this->contractRepository->delete($id);
+        $_SESSION['success_message'] = "Контракт успішно видалено.";
+        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts');
+    }
+
+    #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
+    public function downloadFile(int $id = 0) : \Symfony\Component\HttpFoundation\Response
+    {
+        $this->checkAuth();
+        $this->gate->authorize('billing.manage');
+
+        // Accept ID from route parameter or query string fallback
+        if (0 === $id) {
+            $id = (int)($_GET['id'] ?? 0);
+        }
+
+        $contract = $this->contractRepository->findById($id);
+
+        if (!$contract || !$contract['file_path'] || !file_exists(dirname(__DIR__, 3) . '/' . $contract['file_path'])) {
+            return new \Symfony\Component\HttpFoundation\Response("Файл контракту не знайдено", 404);
+        }
+
+        $filePath = dirname(__DIR__, 3) . '/' . $contract['file_path'];
+        $filename = basename($contract['file_path']);
+        $mimeType = mime_content_type($filePath);
+
+        $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($filePath);
+        $response->headers->set('Content-Type', $mimeType);
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        return $response;
+    }
+}
