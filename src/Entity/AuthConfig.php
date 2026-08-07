@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Admin\Repository\AuthConfigRepository;
+use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

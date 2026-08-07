@@ -2,9 +2,9 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
+use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\UserBundle\Repository\UserOAuthIdentityRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
-use App\Module\Admin\Repository\AuthConfigRepository;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\Facebook;
 use League\OAuth2\Client\Provider\Github;

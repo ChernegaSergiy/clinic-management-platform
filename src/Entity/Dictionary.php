@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Admin\Repository\DictionaryRepository;
+use App\Bundles\AdminBundle\Repository\DictionaryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

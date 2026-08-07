@@ -2,13 +2,13 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
+use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Validation\Validator;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
-use App\Module\Admin\Repository\AuthConfigRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 

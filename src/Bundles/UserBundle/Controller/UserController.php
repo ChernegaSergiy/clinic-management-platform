@@ -2,11 +2,11 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
+use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserOAuthIdentityRepository;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
-use App\Module\Admin\Repository\AuthConfigRepository;
 use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends \App\Core\Controller\AbstractController
