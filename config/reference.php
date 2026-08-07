@@ -961,6 +961,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         api?: bool|Param, // Default: true
  *     },
  * }
+ * @psalm-type UserConfig = array{
+ *     features?: array{
+ *         oauth?: bool|Param, // Default: true
+ *         profile_photo?: bool|Param, // Default: true
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -971,6 +977,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     dashboard?: DashboardConfig,
  *     patient?: PatientConfig,
  *     appointment?: AppointmentConfig,
+ *     user?: UserConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -981,6 +988,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         dashboard?: DashboardConfig,
  *         patient?: PatientConfig,
  *         appointment?: AppointmentConfig,
+ *         user?: UserConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
