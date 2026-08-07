@@ -1,66 +1,66 @@
-# Специфікація архітектури MedCore
+# MedCore Architecture Specification
 
-Цей документ фіксує основні архітектурні принципи, шари та обов'язки платформи MedCore. 
+This document defines the core architectural principles, layers, and responsibilities of the MedCore platform.
 
 ---
 
-## 1. Три шари системи
+## 1. Three System Layers
 
-### 1.1 Kernel (Ядро)
+### 1.1 Kernel
 
-Ядро — це механізм, який **не знає** жодної предметної області (Appointment, Patient, MedicalRecord тощо). Воно вміє:
-- підняти DI-контейнер через Symfony Kernel;
-- знайти й завантажити бандли, зареєстровані в `config/bundles.php`;
-- дати бандлу можливість зареєструвати маршрути через атрибути, DI-сервіси, права, політики, слухачів подій через `CompilerPass` та `Extension`;
-- прийняти HTTP-запит, знайти маршрут, викликати контролер;
-- обробити виняток і повернути відповідь.
+The Kernel is an engine that **does not know** about any specific business domain (Appointment, Patient, MedicalRecord, etc.). It knows how to:
+- boot the DI container via Symfony Kernel;
+- discover and load bundles registered in `config/bundles.php`;
+- allow a bundle to register routes via attributes, DI services, permissions, policies, and event listeners via `CompilerPass` and `Extension`;
+- accept an HTTP request, find the route, and call the controller;
+- handle exceptions and return a response.
 
-Ядро не містить маршрутів конкретних сторінок, реєстрацій конкретних репозиторіїв та доменних логік.
+The Kernel does not contain routes for specific pages, specific repository registrations, or domain logic.
 
-Namespace: `App\Core\*` (контракти й абстракції) та `App\Infrastructure\*` (файлова система, з'єднання).
+Namespace: `App\Core\*` (contracts and abstractions) and `App\Infrastructure\*` (file system, connections).
 
-### 1.2 Bundle (Модуль)
+### 1.2 Bundle
 
-Бандл — самодостатня одиниця домену: `Appointment`, `Patient`, `MedicalRecord`, `Billing` і т.д. Кожен бандл:
-- сам реєструє свої маршрути (через `#[Route]` атрибути);
-- сам реєструє свої DI-сервіси (через `Extension`);
-- сам реєструє свої права та політики (через `CompilerPass`);
-- сам реєструє своїх слухачів подій;
-- сам володіє своїми шаблонами та перекладами.
+A Bundle is a self-contained domain unit: `Appointment`, `Patient`, `MedicalRecord`, `Billing`, etc. Each bundle:
+- registers its own routes (via `#[Route]` attributes);
+- registers its own DI services (via `Extension`);
+- registers its own permissions and policies (via `CompilerPass`);
+- registers its own event listeners;
+- owns its own templates and translations.
 
-Бандл спілкується з іншими бандлами виключно через **публічний інтерфейс репозиторію** (внесений у DI за інтерфейсом) або через **доменні події**.
+A bundle communicates with other bundles exclusively through a **public repository interface** (injected into DI by interface) or via **domain events**.
 
 ### 1.3 Host Application
 
-Host Application не є окремим привілейованим шаром. "Сайт" (публічні сторінки `/`, `/about`) — це такий самий бандл (`SiteBundle`), просто без складних прав чи політик. Директорія `src/Controller/*` з хардкодженими маршрутами не існує.
+The Host Application is not a separate privileged layer. The "Site" (public pages `/`, `/about`) is a bundle just like the rest (`SiteBundle`), simply without complex permissions or policies. The `src/Controller/*` directory with hardcoded routes does not exist.
 
 ---
 
-## 2. Контракт бандла (Bundle Contract)
+## 2. Bundle Contract
 
-Кожен бандл є стандартним Symfony Bundle та наслідує `Symfony\Component\HttpKernel\Bundle\Bundle`:
+Each bundle is a standard Symfony Bundle and extends `Symfony\Component\HttpKernel\Bundle\Bundle`:
 
-### Структура директорії бандла
+### Bundle Directory Structure
 ```
 src/Bundles/<Name>Bundle/
-├── <Name>Bundle.php             # Головний клас бандла
+├── <Name>Bundle.php             # Main bundle class
 ├── Controller/
-│   └── <Name>Controller.php     # Контролери з атрибутами #[Route]
+│   └── <Name>Controller.php     # Controllers with #[Route] attributes
 ├── DependencyInjection/
-│   ├── <Name>Extension.php      # Реєстрація DI сервісів
+│   ├── <Name>Extension.php      # DI service registration
 │   └── Compiler/
-│       └── <Name>PermissionsPass.php # Реєстрація прав та політик
+│       └── <Name>PermissionsPass.php # Permissions and policies registration
 ├── Repository/
 │   └── <Name>Repository.php
-├── <Name>Policy.php             # Доменні правила доступу
-├── templates/                   # Шаблони Twig
-└── translations/                # Переклади
+├── <Name>Policy.php             # Domain access rules
+├── templates/                   # Twig templates
+└── translations/                # Translations
 ```
 
-### Реєстрація DI-сервісів та Прав
+### DI Services and Permissions Registration
 
-Сервіси модуля реєструються через `DependencyInjection/<Name>Extension.php`. 
-Права доступу та політики додаються до реєстру через `CompilerPass`.
+Bundle services are registered via `DependencyInjection/<Name>Extension.php`. 
+Access rights and policies are added to the registry via `CompilerPass`.
 
 ```php
 class PatientPermissionsPass implements CompilerPassInterface
@@ -69,7 +69,7 @@ class PatientPermissionsPass implements CompilerPassInterface
     {
         if ($container->hasDefinition(PermissionRegistry::class)) {
             $registry = $container->getDefinition(PermissionRegistry::class);
-            $registry->addMethodCall('add', ['patient.read', 'Перегляд пацієнтів']);
+            $registry->addMethodCall('add', ['patient.read', 'View patients']);
         }
     }
 }
@@ -77,28 +77,28 @@ class PatientPermissionsPass implements CompilerPassInterface
 
 ---
 
-## 3. Життєвий цикл запиту
+## 3. Request Lifecycle
 
-1. `public/index.php` стартує сесію та ініціалізує `App\Kernel` (через Symfony Runtime).
+1. `public/index.php` starts the session and initializes `App\Kernel` (via Symfony Runtime).
 2. `App\Kernel`:
-   - завантажує глобальні конфігурації з `config/services.php` та `config/routes.yaml`;
-   - знаходить усі бандли, прописані в `config/bundles.php`;
-   - для кожного бандла завантажує `Extension` та виконує зареєстровані `CompilerPass` (наприклад, реєстрацію прав у `PermissionRegistry`);
-   - компілює DI контейнер.
-3. Symfony `HttpKernel` приймає `Request`.
-4. Встановлюються реєстри у глобальний `Gate` (через подію або ін’єкцію).
-5. `Router` знаходить потрібний контролер за маршрутом.
-6. Контролер обробляє запит і повертає `Response`.
-7. `HttpKernel` відправляє відповідь користувачу.
+   - loads global configurations from `config/services.php` and `config/routes.yaml`;
+   - discovers all bundles defined in `config/bundles.php`;
+   - loads the `Extension` for each bundle and executes registered `CompilerPass` instances (e.g., registering rights in `PermissionRegistry`);
+   - compiles the DI container.
+3. Symfony `HttpKernel` accepts the `Request`.
+4. Registries are set into the global `Gate` (via event or injection).
+5. The `Router` finds the appropriate controller for the route.
+6. The controller processes the request and returns a `Response`.
+7. `HttpKernel` sends the response to the user.
 
 ---
 
-## 4. Заборонені патерни (NEVER)
+## 4. Forbidden Patterns (NEVER)
 
-- **NEVER** реєструвати маршрут напряму в `public/index.php`.
-- **NEVER** дописувати реєстрацію сервісу конкретного домену в глобальний `config/services.php`. Тільки через `<Name>Extension::load()`.
-- **NEVER** створювати клас контролера поза `src/Bundles/<Name>Bundle/`.
-- **NEVER** тайпхінтити конкретний клас репозиторію іншого бандла (завжди використовувати Interface).
-- **NEVER** одному бандлу читати чи писати файли в директорії іншого бандла.
-- **NEVER** одному бандлу викликати метод контролера чи репозиторію іншого бандла напряму для сповіщення про зміну стану — тільки через `App\Event\*`.
-- **NEVER** ігнорувати реєстрацію `Permissions` і `Policies` для модулів, які керують медичними/чутливими даними.
+- **NEVER** register a route directly in `public/index.php`.
+- **NEVER** add a domain-specific service registration to the global `config/services.php`. Only via `<Name>Extension::load()`.
+- **NEVER** create a controller class outside of `src/Bundles/<Name>Bundle/`.
+- **NEVER** type-hint a specific repository class from another bundle (always use the Interface).
+- **NEVER** allow one bundle to read or write files in another bundle's directory.
+- **NEVER** allow one bundle to directly call a controller or repository method of another bundle to notify it about a state change — only via `App\Event\*`.
+- **NEVER** ignore the registration of `Permissions` and `Policies` for modules that manage medical/sensitive data.
