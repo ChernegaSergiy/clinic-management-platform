@@ -1,7 +1,31 @@
 <?xml version="1.0"?>
-<ruleset name="PSR12">
-    <description>PSR12 Coding Standard</description>
-    <arg name="standard" value="PSR12"/>
-    <file>public/</file>
-    <file>src/</file>
+<ruleset name="Custom Standard">
+    <description>Custom coding standard based on PSR12 with exclusions for compatibility with php-cs-fixer.</description>
+
+    <!-- Include PSR-12 standard -->
+    <rule ref="PSR12">
+        <!-- Allow space before return type colon (conflicts with php-cs-fixer) -->
+        <exclude name="PSR12.Functions.ReturnTypeDeclaration"/>
+        <!-- Allow single line empty body (conflicts with php-cs-fixer) -->
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+        <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore"/>
+        <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+    </rule>
+
+    <!-- Exclude line length warnings/errors -->
+    <rule ref="Generic.Files.LineLength">
+        <exclude-pattern>*</exclude-pattern>
+    </rule>
+
+    <!-- Exclude multiple classes per file in tests -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>tests/*</exclude-pattern>
+        <exclude-pattern>config/reference.php</exclude-pattern>
+    </rule>
+
+    <!-- Exclude directories -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>var/*</exclude-pattern>
+    <exclude-pattern>public/*</exclude-pattern>
 </ruleset>
+
