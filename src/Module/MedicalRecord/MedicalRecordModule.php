@@ -31,7 +31,7 @@ class MedicalRecordModule extends BaseModule
         $container->register(\App\Module\MedicalRecord\MedicalRecordController::class)
             ->setArguments([
                 new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
-                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Bundles\AppointmentBundle\Repository\AppointmentRepository::class),
                 new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
                 new Reference(\App\Module\ClinicalReference\Repository\IcdCodeRepository::class),
                 new Reference(\App\Module\ClinicalReference\Repository\InterventionCodeRepository::class),

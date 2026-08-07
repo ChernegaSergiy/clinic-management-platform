@@ -2,7 +2,7 @@
 
 namespace App\Module\Schedule\Service;
 
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Room\Repository\RoomRepository;
 use App\Module\Schedule\Repository\DoctorScheduleRepository; // Assuming this exists or will be created

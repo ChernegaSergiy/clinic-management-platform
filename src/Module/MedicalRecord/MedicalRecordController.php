@@ -2,10 +2,10 @@
 
 namespace App\Module\MedicalRecord;
 
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\ClinicalReference\Repository\IcdCodeRepository;
 use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;

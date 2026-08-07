@@ -2,10 +2,10 @@
 
 namespace App\Bundles\PatientBundle;
 
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 
 class PatientPolicy implements Policy
 {

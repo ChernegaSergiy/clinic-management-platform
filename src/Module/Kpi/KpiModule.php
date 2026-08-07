@@ -30,7 +30,7 @@ class KpiModule extends BaseModule
             ->setArguments([
                 new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
                 new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
-                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Bundles\AppointmentBundle\Repository\AppointmentRepository::class),
             ])->setPublic(true);
     }
 

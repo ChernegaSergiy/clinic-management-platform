@@ -2,7 +2,7 @@
 
 namespace App\Bundles\DashboardBundle\Service;
 
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;

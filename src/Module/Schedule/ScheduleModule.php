@@ -34,7 +34,7 @@ class ScheduleModule extends BaseModule
             ->setArguments([
                 new Reference(\App\Module\Schedule\Repository\DoctorScheduleRepository::class),
                 new Reference(\App\Module\Schedule\Repository\ScheduleExceptionRepository::class),
-                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Bundles\AppointmentBundle\Repository\AppointmentRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
                 new Reference(\App\Module\Room\Repository\RoomRepository::class),
             ])->setPublic(true);

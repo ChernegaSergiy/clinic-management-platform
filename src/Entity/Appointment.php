@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Appointment\Repository\AppointmentRepository;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

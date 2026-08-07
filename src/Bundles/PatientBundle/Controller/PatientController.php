@@ -2,11 +2,11 @@
 
 namespace App\Bundles\PatientBundle\Controller;
 
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Billing\Repository\InvoiceRepositoryInterface;
 use App\Module\Insurance\Repository\ClaimRepository;
 use App\Module\Insurance\Repository\InsuranceCompanyRepository;

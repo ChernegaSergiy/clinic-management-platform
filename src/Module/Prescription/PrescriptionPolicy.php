@@ -2,9 +2,9 @@
 
 namespace App\Module\Prescription;
 
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Module\Appointment\Repository\AppointmentRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepositoryInterface;
 
 class PrescriptionPolicy implements Policy

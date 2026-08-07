@@ -44,8 +44,8 @@ class BillingModule extends BaseModule
         $container->register(\App\Module\Billing\BillingController::class)
             ->setArguments([
                 new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
-                new Reference(\App\Module\Patient\Repository\PatientRepository::class),
-                new Reference(\App\Module\Appointment\Repository\AppointmentRepository::class),
+                new Reference(\App\Bundles\PatientBundle\Repository\PatientRepository::class),
+                new Reference(\App\Bundles\AppointmentBundle\Repository\AppointmentRepository::class),
                 new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceBundleRepository::class),
