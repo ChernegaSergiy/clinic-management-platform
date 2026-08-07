@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\ClinicalReference\Repository\IcdCodeRepository;
+use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IcdCodeRepository::class)]

@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
+use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InterventionCodeRepository::class)]

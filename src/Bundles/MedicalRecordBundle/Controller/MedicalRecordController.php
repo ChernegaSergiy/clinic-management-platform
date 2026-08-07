@@ -3,13 +3,13 @@
 namespace App\Bundles\MedicalRecordBundle\Controller;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
+use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Core\Validation\Validator;
-use App\Module\ClinicalReference\Repository\IcdCodeRepository;
-use App\Module\ClinicalReference\Repository\InterventionCodeRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
