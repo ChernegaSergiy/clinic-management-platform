@@ -1,6 +1,0 @@
-name: Hrm
-version: 1.0.0
-description: Модуль для управління HR (Human Resource Management)
-author: Serhii
-config:
-    enabled: true
