@@ -39,6 +39,10 @@ src/Module/Room/ @Andriihev
 src/Module/Schedule/ @Andriihev
 templates/ @Andriihev
 
+# Sameer
+src/Infrastructure/Module/ @Sameer6305
+src/Event/ @Sameer6305
+
 # Frontend assets
 public/scss/ @Andriihev
 public/css/ @Andriihev
