@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Bundles\InsuranceBundle\Service;
 
+use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
 use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
 use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
-use App\Module\Billing\Repository\InvoiceRepository;
 
 class InsuranceService
 {

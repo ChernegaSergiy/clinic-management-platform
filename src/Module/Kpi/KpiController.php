@@ -3,8 +3,8 @@
 namespace App\Module\Kpi;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Core\Validation\Validator;
-use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;

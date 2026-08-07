@@ -3,10 +3,10 @@
 namespace App\Bundles\ScheduleBundle\Service;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\RoomBundle\Repository\RoomRepository;
-use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
-use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository; // Assuming this exists or will be created
-use App\Module\Billing\Repository\ServiceRepository;
+use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository; // Assuming this exists or will be created
+use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
 use DateInterval;
 use DateTime;
 
@@ -15,7 +15,7 @@ class SchedulingService
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
     private AppointmentRepository $appointmentRepository;
-    private ServiceRepository $serviceRepository; // Assuming ServiceRepository is in App\Module\Billing\Repository
+    private ServiceRepository $serviceRepository;
     private RoomRepository $roomRepository;
 
     public function __construct(

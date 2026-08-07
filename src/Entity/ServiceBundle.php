@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Billing\Repository\ServiceBundleRepository;
+use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

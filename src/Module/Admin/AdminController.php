@@ -2,13 +2,13 @@
 
 namespace App\Module\Admin;
 
+use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
-use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
 use Symfony\Component\Routing\Attribute\Route;
 

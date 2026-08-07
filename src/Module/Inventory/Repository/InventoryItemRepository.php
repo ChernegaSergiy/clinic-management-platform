@@ -2,8 +2,8 @@
 
 namespace App\Module\Inventory\Repository;
 
+use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Entity\InventoryItem;
-use App\Module\Billing\Repository\InvoiceRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
