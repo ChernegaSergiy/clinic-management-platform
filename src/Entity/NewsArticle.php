@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\News\Repository\NewsRepository;
+use App\Bundles\NewsBundle\Repository\NewsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
