@@ -53,7 +53,11 @@ class AuthController extends \App\Core\Controller\AbstractController
 
         return $this->render('@User/login.html.twig', [
             'old' => $old,
-            'errors' => $errors,
+            'errors' => [
+                'login' => $errors['login'] ?? null,
+                'email' => $errors['email'] ?? null,
+                'password' => $errors['password'] ?? null,
+            ],
             'authConfigs' => $this->authConfigRepository->findActive(),
         ]);
     }
