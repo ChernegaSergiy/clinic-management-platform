@@ -1,6 +1,0 @@
-name: ClinicalReference
-version: 1.0.0
-description: Модуль для клінічних довідників
-author: Serhii
-config:
-    enabled: true
