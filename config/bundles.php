@@ -8,4 +8,5 @@ return [
     App\Bundles\PatientBundle\PatientBundle::class => ['all' => true],
     App\Bundles\AppointmentBundle\AppointmentBundle::class => ['all' => true],
     App\Bundles\UserBundle\UserBundle::class => ['all' => true],
+    App\Bundles\ScheduleBundle\ScheduleBundle::class => ['all' => true],
 ];
