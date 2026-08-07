@@ -18,6 +18,7 @@ return (new Config())
             'keep_multiple_spaces_after_comma' => false,
         ],
         'single_line_empty_body' => true,
+        'array_indentation' => true,
         'no_whitespace_in_blank_line' => true,
         'no_trailing_whitespace' => true,
         'single_blank_line_at_eof' => true,
