@@ -2,7 +2,7 @@
 
 ## Overview
 
-The new modular access rights system allows modules to independently register their rights and access verification policies.
+The new modular access rights system allows bundles to independently register their rights and access verification policies.
 
 ## Architecture
 
@@ -44,36 +44,33 @@ class HrmPolicy extends Policy
 }
 ```
 
-## Usage in Modules
+## Usage in Bundles
 
-### Permission Registration
+### Permission and Policy Registration
 
-Each module can register its permissions through the `registerPermissions` method:
+Each bundle registers its permissions and policies through a Symfony `CompilerPass` (e.g. in `DependencyInjection/Compiler/HrmPermissionsPass.php`):
 
 ```php
-class HrmModule extends BaseModule
+class HrmPermissionsPass implements CompilerPassInterface
 {
-    public function registerPermissions(PermissionRegistry $registry): void
+    public function process(ContainerBuilder $container): void
     {
-        $registry->add('hrm.read', 'View employees');
-        $registry->add('hrm.write', 'Edit employees');
-        $registry->add('hrm.manage', 'Manage employees');
+        if ($container->hasDefinition(PermissionRegistry::class)) {
+            $registry = $container->getDefinition(PermissionRegistry::class);
+            $registry->addMethodCall('add', ['hrm.read', 'View employees']);
+            $registry->addMethodCall('add', ['hrm.write', 'Edit employees']);
+            $registry->addMethodCall('add', ['hrm.manage', 'Manage employees']);
 
-        $registry->addRoleMapping('admin', ['hrm.read', 'hrm.write', 'hrm.manage']);
-        $registry->addRoleMapping('hr_manager', ['hrm.read', 'hrm.write', 'hrm.manage']);
-        $registry->addRoleMapping('medical_manager', ['hrm.read']);
+            $registry->addMethodCall('addRoleMapping', ['admin', ['hrm.read', 'hrm.write', 'hrm.manage']]);
+            $registry->addMethodCall('addRoleMapping', ['hr_manager', ['hrm.read', 'hrm.write', 'hrm.manage']]);
+            $registry->addMethodCall('addRoleMapping', ['medical_manager', ['hrm.read']]);
+        }
+
+        if ($container->hasDefinition(PolicyRegistry::class)) {
+            $registry = $container->getDefinition(PolicyRegistry::class);
+            $registry->addMethodCall('register', ['hrm', HrmPolicy::class]);
+        }
     }
-}
-```
-
-### Policy Registration
-
-You can also register policies for access verification:
-
-```php
-public function registerPolicies(PolicyRegistry $registry): void
-{
-    $registry->register('hrm', HrmPolicy::class);
 }
 ```
 
@@ -105,28 +102,19 @@ Gate::authorize('patients.read', ['patient_id' => $id]);
 
 ## Initialization in Request Lifecycle
 
-In the new architecture, initialization is handled through the DI container and `public/index.php`:
+In the new architecture, initialization is handled through the Symfony DI container and `App\Kernel`:
 
 ```php
-// 1. Container creation (App\Infrastructure\DI\ContainerFactory)
-// The factory registers core services, loads modules, and calls registerServices() on each module.
-$container = ContainerFactory::createContainer();
+// 1. Container compilation
+// Symfony Kernel compiles the container and runs all registered CompilerPass classes.
+// The `HrmPermissionsPass` is executed, injecting permissions into the `PermissionRegistry` definition.
 
 // 2. Resolve core services from DI
 $permissionRegistry = $container->get(PermissionRegistry::class);
 $policyRegistry = $container->get(PolicyRegistry::class);
-$moduleManager = $container->get(ModuleManager::class);
-$router = $container->get(Router::class);
 
-// 3. Bootstrap modules
-$moduleManager->bootstrapAll();
-
-// 4. Register module components in strict order
-$moduleManager->registerPermissions($permissionRegistry);
-$moduleManager->registerPolicies($policyRegistry);
-$moduleManager->registerRoutes($router);
-
-// 5. Configure Gate
+// 3. Configure Gate
+// This happens globally via a listener or direct injection.
 Gate::setPermissionRegistry($permissionRegistry);
 Gate::setPolicyRegistry($policyRegistry);
 ```
