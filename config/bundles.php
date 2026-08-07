@@ -12,4 +12,5 @@ return [
     App\Bundles\MedicalRecordBundle\MedicalRecordBundle::class => ['all' => true],
     App\Bundles\RoomBundle\RoomBundle::class => ['all' => true],
     App\Bundles\PrescriptionBundle\PrescriptionBundle::class => ['all' => true],
+    App\Bundles\LabOrderBundle\LabOrderBundle::class => ['all' => true],
 ];
