@@ -17,8 +17,8 @@
                     }
                 }
             </style>
-            {% if old.waitlist_id %}
-                <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id }}">
+            {% if old.waitlist_id ?? null %}
+                <input type="hidden" name="waitlist_id" value="{{ old.waitlist_id ?? '' }}">
             {% endif %}
 
             {# Filters for finding slots #}
