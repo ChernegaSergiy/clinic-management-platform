@@ -68,7 +68,7 @@ class PatientController extends \App\Core\Controller\AbstractController
             }
         }
 
-        return $this->render('@modules/Patient/templates/index.html.twig', [
+        return $this->render('@Patient/index.html.twig', [
             'patients' => $patients,
             'searchTerm' => $searchTerm,
         ]);
@@ -79,7 +79,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     {
         $this->checkAuth();
         $this->gate->authorize('patient.create');
-        return $this->render('@modules/Patient/templates/new.html.twig');
+        return $this->render('@Patient/new.html.twig');
     }
 
     #[Route('/patients/new', name: 'patient_store', methods: ['POST'])]
@@ -98,7 +98,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-            return $this->render('@modules/Patient/templates/new.html.twig', [
+            return $this->render('@Patient/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
             ]);
@@ -114,7 +114,7 @@ class PatientController extends \App\Core\Controller\AbstractController
             } else {
                 $errors['save'] = 'Не вдалося зберегти пацієнта. Спробуйте ще раз.';
             }
-            return $this->render('@modules/Patient/templates/new.html.twig', [
+            return $this->render('@Patient/new.html.twig', [
                 'errors' => $errors,
                 'old' => $_POST,
             ]);
@@ -139,7 +139,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         $medicalRecords = $this->medicalRecordRepository->findByPatientId($id);
         $patientPolicies = $this->patientInsurancePolicyRepository->findByPatientId($id);
 
-        return $this->render('@modules/Patient/templates/show.html.twig', [
+        return $this->render('@Patient/show.html.twig', [
             'patient' => $patient,
             'medical_records' => $medicalRecords,
             'patient_policies' => $patientPolicies,
@@ -159,7 +159,7 @@ class PatientController extends \App\Core\Controller\AbstractController
             return new Response("Пацієнта не знайдено", 404);
         }
 
-        return $this->render('@modules/Patient/templates/edit.html.twig', ['patient' => $patient]);
+        return $this->render('@Patient/edit.html.twig', ['patient' => $patient]);
     }
 
     #[Route('/patients/edit', name: 'patient_update', methods: ['POST'])]
@@ -185,7 +185,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-            return $this->render('@modules/Patient/templates/edit.html.twig', [
+            return $this->render('@Patient/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'patient' => array_merge($patient, $_POST),
             ]);
@@ -200,7 +200,7 @@ class PatientController extends \App\Core\Controller\AbstractController
                 $errors['update'] = 'Не вдалося оновити дані пацієнта. Спробуйте ще раз.';
             }
 
-            return $this->render('@modules/Patient/templates/edit.html.twig', [
+            return $this->render('@Patient/edit.html.twig', [
                 'errors' => $errors,
                 'patient' => array_merge($patient, $_POST),
             ]);
@@ -252,7 +252,7 @@ class PatientController extends \App\Core\Controller\AbstractController
         $this->checkAuth();
         $this->gate->authorize('patient.create');
         if ('GET' === $_SERVER['REQUEST_METHOD']) {
-            $response = $this->render('@modules/Patient/templates/import_json.html.twig', [
+            $response = $this->render('@Patient/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
                 'success_message' => $_SESSION['success_message'] ?? null,
             ]);
@@ -370,7 +370,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
 
-        return $this->render('@modules/Patient/templates/add_policy.html.twig', [
+        return $this->render('@Patient/add_policy.html.twig', [
             'patient' => $patient,
             'insurance_companies' => $insuranceCompanies,
         ]);
@@ -396,7 +396,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         if (!$validator->validate($_POST, $rules)) {
             $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
-            return $this->render('@modules/Patient/templates/add_policy.html.twig', [
+            return $this->render('@Patient/add_policy.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -435,7 +435,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
 
-        return $this->render('@modules/Patient/templates/edit_policy.html.twig', [
+        return $this->render('@Patient/edit_policy.html.twig', [
             'patient' => $patient,
             'policy' => $policy,
             'insurance_companies' => $insuranceCompanies,
@@ -465,7 +465,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         if (!$validator->validate($_POST, $rules)) {
             $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
-            return $this->render('@modules/Patient/templates/edit_policy.html.twig', [
+            return $this->render('@Patient/edit_policy.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
