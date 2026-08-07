@@ -74,10 +74,10 @@ All commands are executed from the `www/` directory:
 composer stan
 
 # Code style check with PHPCS
-composer cs-check
+composer cs
 
 # Automatic style fixes with PHPCS
-composer cs
+composer cs-fix
 
 # Running PHPUnit tests
 composer test
@@ -90,10 +90,10 @@ composer test
 vendor/bin/phpstan analyse
 
 # PHPCS
-vendor/bin/phpcs --standard=PSR12 --ignore=vendor/ public/ src/
+vendor/bin/phpcs .
 
 # PHPCBF (automatic fixes)
-vendor/bin/phpcbf --standard=PSR12 --ignore=vendor/ public/ src/
+vendor/bin/phpcbf .
 
 # PHPUnit
 vendor/bin/phpunit
