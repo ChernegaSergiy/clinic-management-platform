@@ -2,23 +2,29 @@
 
 namespace App\Core\Validation;
 
-use PDO;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase
 {
     private Validator $validator;
-    private \PDOStatement $mockStmt;
-    private \PDO $mockPdo;
+    private $mockRegistry;
+    private $mockConnection;
+    private $mockResult;
 
     protected function setUp() : void
     {
-        $this->mockPdo = $this->createMock(PDO::class);
-        $this->mockStmt = $this->createMock(\PDOStatement::class);
-        $this->mockPdo->expects($this->any())
-            ->method('prepare')
-            ->willReturn($this->mockStmt);
-        $this->validator = new Validator($this->mockPdo);
+        $this->mockRegistry = $this->createMock(ManagerRegistry::class);
+        $this->mockConnection = $this->createMock(Connection::class);
+        $this->mockResult = $this->createMock(Result::class);
+
+        // We only map this for when the validator actually tries to query DB (for 'unique' rules)
+        $this->mockRegistry->method('getConnection')->willReturn($this->mockConnection);
+        $this->mockConnection->method('executeQuery')->willReturn($this->mockResult);
+
+        $this->validator = new Validator($this->mockRegistry);
     }
 
     public function testValidateWithNoRulesReturnsTrue() : void
@@ -180,8 +186,8 @@ class ValidatorTest extends TestCase
 
     public function testUniqueRulePassesWhenNoDuplicate() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
+        $this->mockResult->expects($this->once())
+            ->method('fetchOne')
             ->willReturn(0);
         $result = $this->validator->validate(['email' => 'new@example.com'], ['email' => ['unique:users,email']]);
         $this->assertTrue($result);
@@ -189,8 +195,8 @@ class ValidatorTest extends TestCase
 
     public function testUniqueRuleFailsWhenDuplicateExists() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
+        $this->mockResult->expects($this->once())
+            ->method('fetchOne')
             ->willReturn(1);
         $result = $this->validator->validate(['email' => 'existing@example.com'], ['email' => ['unique:users,email']]);
         $this->assertFalse($result);
@@ -199,8 +205,8 @@ class ValidatorTest extends TestCase
 
     public function testUniqueRulePassesWhenDuplicateIsIgnoredId() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
+        $this->mockResult->expects($this->once())
+            ->method('fetchOne')
             ->willReturn(0); // No duplicates found (current record ignored)
         $result = $this->validator->validate(['email' => 'existing@example.com'], ['email' => ['unique:users,email,1']]);
         $this->assertTrue($result);
@@ -208,11 +214,13 @@ class ValidatorTest extends TestCase
 
     public function testUniqueRuleValidatesZeroValue() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('execute')
-            ->with([':value' => '0']);
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
+        $this->mockConnection->expects($this->once())
+            ->method('executeQuery')
+            ->with($this->anything(), ['value' => '0'])
+            ->willReturn($this->mockResult);
+
+        $this->mockResult->expects($this->once())
+            ->method('fetchOne')
             ->willReturn(0); // No duplicates found
         $result = $this->validator->validate(['status' => '0'], ['status' => ['unique:users,status']]);
         $this->assertTrue($result);

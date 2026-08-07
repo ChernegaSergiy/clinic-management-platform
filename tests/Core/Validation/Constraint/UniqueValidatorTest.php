@@ -2,8 +2,9 @@
 
 namespace App\Core\Validation\Constraint;
 
-use PDO;
-use PDOStatement;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -11,17 +12,20 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 class UniqueValidatorTest extends TestCase
 {
     private UniqueValidator $validator;
-    private PDO $mockPdo;
-    private PDOStatement $mockStmt;
+    private $mockRegistry;
+    private $mockConnection;
+    private $mockResult;
 
     protected function setUp() : void
     {
-        $this->mockPdo = $this->createMock(PDO::class);
-        $this->mockStmt = $this->createMock(PDOStatement::class);
-        $this->mockPdo->expects($this->any())
-            ->method('prepare')
-            ->willReturn($this->mockStmt);
-        $this->validator = new UniqueValidator($this->mockPdo);
+        $this->mockRegistry = $this->createMock(ManagerRegistry::class);
+        $this->mockConnection = $this->createMock(Connection::class);
+        $this->mockResult = $this->createMock(Result::class);
+
+        $this->mockRegistry->method('getConnection')->willReturn($this->mockConnection);
+        $this->mockConnection->method('executeQuery')->willReturn($this->mockResult);
+
+        $this->validator = new UniqueValidator($this->mockRegistry);
     }
 
     public function testValidatePassesWhenValueIsEmpty() : void
@@ -36,12 +40,7 @@ class UniqueValidatorTest extends TestCase
 
     public function testValidatePassesWhenNoDuplicateFound() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('execute')
-            ->with([':value' => 'test@example.com']);
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn(0);
+        $this->mockResult->expects($this->once())->method('fetchOne')->willReturn(0);
 
         $constraint = new Unique('users', 'email');
         $this->validator->validate('test@example.com', $constraint);
@@ -52,12 +51,7 @@ class UniqueValidatorTest extends TestCase
 
     public function testValidateFailsWhenDuplicateFound() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('execute')
-            ->with([':value' => 'test@example.com']);
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn(1);
+        $this->mockResult->expects($this->once())->method('fetchOne')->willReturn(1);
 
         $constraint = new Unique('users', 'email');
 
@@ -87,12 +81,12 @@ class UniqueValidatorTest extends TestCase
 
     public function testValidatePassesWhenDuplicateIsIgnored() : void
     {
-        $this->mockStmt->expects($this->once())
-            ->method('execute')
-            ->with([':value' => 'test@example.com', ':ignore_id' => 1]);
-        $this->mockStmt->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn(0);
+        $this->mockConnection->expects($this->once())
+            ->method('executeQuery')
+            ->with($this->anything(), ['value' => 'test@example.com', 'ignore_id' => 1])
+            ->willReturn($this->mockResult);
+
+        $this->mockResult->expects($this->once())->method('fetchOne')->willReturn(0);
 
         $constraint = new Unique('users', 'email', 1);
         $this->validator->validate('test@example.com', $constraint);
@@ -107,11 +101,5 @@ class UniqueValidatorTest extends TestCase
 
         $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate('test@example.com', $constraint);
-    }
-
-    public function testConstructorAcceptsNullPdo() : void
-    {
-        $validator = new UniqueValidator(null);
-        $this->assertInstanceOf(UniqueValidator::class, $validator);
     }
 }
