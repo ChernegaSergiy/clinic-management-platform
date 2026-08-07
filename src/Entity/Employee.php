@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Hrm\Repository\HrmRepository;
+use App\Bundles\HrmBundle\Repository\HrmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

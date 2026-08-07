@@ -3,7 +3,7 @@
 namespace App\Bundles\DepartmentBundle\Controller;
 
 use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
-use App\Module\Hrm\Repository\HrmRepositoryInterface;
+use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DepartmentController extends \App\Core\Controller\AbstractController
