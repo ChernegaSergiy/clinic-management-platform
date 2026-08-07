@@ -1,6 +1,0 @@
-name: Kpi
-version: 1.0.0
-description: Модуль для KPI показників
-author: Serhii
-config:
-    enabled: true
