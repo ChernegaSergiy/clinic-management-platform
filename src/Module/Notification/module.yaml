@@ -1,6 +1,0 @@
-name: Notification
-version: 1.0.0
-description: Модуль для сповіщень
-author: Serhii
-config:
-    enabled: true
