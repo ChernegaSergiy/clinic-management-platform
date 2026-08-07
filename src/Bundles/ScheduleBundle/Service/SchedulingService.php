@@ -3,10 +3,10 @@
 namespace App\Bundles\ScheduleBundle\Service;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Bundles\RoomBundle\Repository\RoomRepository;
 use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
-use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
-use App\Module\Billing\Repository\ServiceRepository; // Assuming this exists or will be created
-use App\Module\Room\Repository\RoomRepository;
+use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository; // Assuming this exists or will be created
+use App\Module\Billing\Repository\ServiceRepository;
 use DateInterval;
 use DateTime;
 
