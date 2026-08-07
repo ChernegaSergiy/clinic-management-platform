@@ -72,7 +72,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'parentOptions' => $parentOptions,
-        ]);
+            ]);
             unset($_SESSION['old'], $_SESSION['errors']);
             return $response;
         }
