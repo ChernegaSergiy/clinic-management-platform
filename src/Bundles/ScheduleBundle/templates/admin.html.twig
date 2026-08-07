@@ -1,0 +1,38 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'schedule.admin.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'schedule.admin.title_full'|trans }}</h2>
+
+        <div class="ui divider"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <label>{{ 'schedule.admin.select_doctor'|trans }}</label>
+                <select class="ui fluid search dropdown" id="doctor_select">
+                    <option value="">{{ 'schedule.admin.select_doctor_placeholder'|trans }}</option>
+                    {% for doctor in allDoctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('#doctor_select').on('change', function() {
+                var doctorId = $(this).val();
+                if (doctorId) {
+                    window.location.href = '/admin/schedules/show?id=' + doctorId;
+                }
+            });
+        });
+    </script>
+{% endblock %}
