@@ -10,38 +10,32 @@
 src/Core/ @ChernegaSergiy
 src/Controller/ @ChernegaSergiy
 
-# Modules by owner
-
-# Serhii Cherneha
-src/Module/Dashboard/ @ChernegaSergiy
-src/Module/Patient/ @ChernegaSergiy
-src/Module/MedicalRecord/ @ChernegaSergiy
-src/Module/Prescription/ @ChernegaSergiy
-src/Module/LabOrder/ @ChernegaSergiy
-src/Module/Inventory/ @ChernegaSergiy
+# Modules
+src/Controller/PageController.php @ChernegaSergiy
+src/Event/ @Sameer6305
+src/Infrastructure/Module/ @Sameer6305
 src/Module/Admin/ @ChernegaSergiy
+src/Module/Appointment/ @Andriihev
 src/Module/Billing/ @ChernegaSergiy
-src/Module/Kpi/ @ChernegaSergiy
-src/Module/Insurance/ @ChernegaSergiy
-src/Module/News/ @ChernegaSergiy
-src/Module/Notification/ @ChernegaSergiy
+src/Module/ClinicalReference/ @ChernegaSergiy
+src/Module/Dashboard/ @ChernegaSergiy
 src/Module/Department/ @ChernegaSergiy
 src/Module/Hrm/ @ChernegaSergiy
-src/Module/ClinicalReference/ @ChernegaSergiy
-src/Module/User/ @ChernegaSergiy
-src/Module/Profile/ @ChernegaSergiy
+src/Module/Insurance/ @ChernegaSergiy
+src/Module/Inventory/ @ChernegaSergiy
+src/Module/Kpi/ @ChernegaSergiy
+src/Module/LabOrder/ @ChernegaSergiy
+src/Module/MedicalRecord/ @ChernegaSergiy
 src/Module/Mfa/ @ChernegaSergiy
-src/Controller/PageController.php @ChernegaSergiy
-
-# Andrii Hevko
-src/Module/Appointment/ @Andriihev
+src/Module/News/ @ChernegaSergiy
+src/Module/Notification/ @ChernegaSergiy
+src/Module/Patient/ @ChernegaSergiy
+src/Module/Prescription/ @ChernegaSergiy
+src/Module/Profile/ @ChernegaSergiy
 src/Module/Room/ @Andriihev
 src/Module/Schedule/ @Andriihev
+src/Module/User/ @ChernegaSergiy
 templates/ @Andriihev
-
-# Sameer
-src/Infrastructure/Module/ @Sameer6305
-src/Event/ @Sameer6305
 
 # Frontend assets
 public/scss/ @Andriihev
@@ -49,17 +43,11 @@ public/css/ @Andriihev
 public/images/ @Andriihev
 
 # Testing
-
-# Maksym Reminskyi
 tests/Core/Http/FrontControllerTest.php @makztezerest
 tests/Database/DatabaseTest.php @makztezerest
-
-# Serhii Cherneha - remaining tests
 tests/ @ChernegaSergiy
 
 # CI/CD
-
-# Maksym Reminskyi - workflow improvements
 .github/workflows/ @makztezerest @ChernegaSergiy
 
 # Configuration files
