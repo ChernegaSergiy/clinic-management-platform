@@ -29,7 +29,7 @@ class LabOrderModule extends BaseModule
             ->setArguments([
                 new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
-                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
                 new Reference(\App\Core\Service\NotificationService::class),
                 new Reference(\App\Core\Service\QrCodeGenerator::class),
                 new Reference(\App\Module\LabOrder\Service\LabImportService::class),

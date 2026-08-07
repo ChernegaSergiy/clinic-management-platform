@@ -2,9 +2,9 @@
 
 namespace App\Module\Schedule;
 
+use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Module\Schedule\Repository\DoctorScheduleRepository;
 use App\Module\Schedule\Repository\ScheduleExceptionRepository;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

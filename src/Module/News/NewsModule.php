@@ -29,7 +29,7 @@ class NewsModule extends BaseModule
         $container->register(\App\Module\News\NewsController::class)
             ->setArguments([
                 new Reference(\App\Module\News\Repository\NewsRepository::class),
-                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
             ])->setPublic(true);
     }
 

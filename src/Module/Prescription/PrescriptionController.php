@@ -3,11 +3,11 @@
 namespace App\Module\Prescription;
 
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
 use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use App\Module\Prescription\Repository\PrescriptionRepository;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

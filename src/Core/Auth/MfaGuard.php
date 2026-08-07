@@ -2,8 +2,8 @@
 
 namespace App\Core\Auth;
 
+use App\Bundles\UserBundle\MfaService;
 use App\Core\Exception\RedirectException;
-use App\Module\User\MfaService;
 
 class MfaGuard
 {

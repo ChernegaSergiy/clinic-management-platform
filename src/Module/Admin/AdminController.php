@@ -2,14 +2,14 @@
 
 namespace App\Module\Admin;
 
+use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
 use App\Module\Billing\Repository\ServiceRepository;
 use App\Module\Kpi\Repository\KpiRepository;
-use App\Module\User\Repository\RoleRepositoryInterface;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminController extends \App\Core\Controller\AbstractController
@@ -22,7 +22,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     private KpiRepository $kpiRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
-    private \App\Module\User\MfaService $mfaService;
+    private \App\Bundles\UserBundle\MfaService $mfaService;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
@@ -34,7 +34,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         KpiRepository $kpiRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
-        \App\Module\User\MfaService $mfaService,
+        \App\Bundles\UserBundle\MfaService $mfaService,
         \App\Core\Validation\Validator $validator
     ) {
         $this->userRepository = $userRepository;
@@ -675,7 +675,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function createAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
+        $supportedProviders = \App\Bundles\UserBundle\OAuthController::getSupportedProviders();
 
         $response = $this->render('@modules/Admin/templates/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -721,7 +721,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if (!$config) {
             return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
         }
-        $supportedProviders = \App\Module\User\OAuthController::getSupportedProviders();
+        $supportedProviders = \App\Bundles\UserBundle\OAuthController::getSupportedProviders();
 
         $response = $this->render('@modules/Admin/templates/auth_configs/edit.html.twig', [
             'config' => $config,

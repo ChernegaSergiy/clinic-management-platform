@@ -2,9 +2,9 @@
 
 namespace App\Core\Auth;
 
+use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Exception\ExitException;
 use App\Core\Exception\RedirectException;
-use App\Module\User\Repository\RoleRepositoryInterface;
 
 class AuthGuard
 {

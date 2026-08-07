@@ -2,9 +2,9 @@
 
 namespace App\Module\News;
 
+use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
 use App\Module\News\Repository\NewsRepository;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

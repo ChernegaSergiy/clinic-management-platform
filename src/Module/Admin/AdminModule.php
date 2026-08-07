@@ -76,15 +76,15 @@ class AdminModule extends BaseModule
 
         $container->register(\App\Module\Admin\AdminController::class)
             ->setArguments([
-                new Reference(\App\Module\User\Repository\UserRepository::class),
-                new Reference(\App\Module\User\Repository\RoleRepository::class),
+                new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
+                new Reference(\App\Bundles\UserBundle\Repository\RoleRepository::class),
                 new Reference(\App\Module\Admin\Repository\DictionaryRepository::class),
                 new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
                 new Reference(\App\Module\Admin\Repository\BackupPolicyRepository::class),
                 new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
                 new Reference(\App\Core\Repository\SettingsRepository::class),
-                new Reference(\App\Module\User\MfaService::class),
+                new Reference(\App\Bundles\UserBundle\MfaService::class),
             ])->setPublic(true);
     }
 

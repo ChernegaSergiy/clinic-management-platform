@@ -2,10 +2,10 @@
 
 namespace App\Module\Hrm;
 
+use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
 use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
-use App\Module\User\Repository\UserRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HrmController extends \App\Core\Controller\AbstractController

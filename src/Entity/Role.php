@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\User\Repository\RoleRepository;
+use App\Bundles\UserBundle\Repository\RoleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

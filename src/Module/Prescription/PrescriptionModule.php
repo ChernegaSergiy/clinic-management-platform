@@ -27,7 +27,7 @@ class PrescriptionModule extends BaseModule
                 new Reference(\App\Module\Prescription\Repository\PrescriptionRepository::class),
                 new Reference(\App\Bundles\PatientBundle\Repository\PatientRepository::class),
                 new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
-                new Reference(\App\Module\User\Repository\UserRepository::class),
+                new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
                 new Reference(\App\Module\Inventory\Repository\InventoryItemRepository::class),
             ])->setPublic(true);
     }

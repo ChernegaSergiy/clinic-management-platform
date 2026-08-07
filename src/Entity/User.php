@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\User\Repository\UserRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
