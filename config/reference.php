@@ -948,6 +948,13 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         export?: bool|Param, // Default: true
  *     },
  * }
+ * @psalm-type PatientConfig = array{
+ *     features?: array{
+ *         insurance?: bool|Param, // Default: true
+ *         policies?: bool|Param, // Default: true
+ *         export?: bool|Param, // Default: true
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -956,6 +963,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     doctrine?: DoctrineConfig,
  *     doctrine_migrations?: DoctrineMigrationsConfig,
  *     dashboard?: DashboardConfig,
+ *     patient?: PatientConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -964,6 +972,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         dashboard?: DashboardConfig,
+ *         patient?: PatientConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
