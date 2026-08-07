@@ -60,6 +60,7 @@ abstract class RepositoryTestCase extends TestCase
         $queryBuilder->method('addOrderBy')->willReturnSelf();
         $queryBuilder->method('leftJoin')->willReturnSelf();
         $queryBuilder->method('innerJoin')->willReturnSelf();
+        $queryBuilder->method('join')->willReturnSelf();
 
         return $queryBuilder;
     }
