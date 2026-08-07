@@ -1,0 +1,56 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'room.show.title'|trans({'%id%': room.id}) }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h2 class="ui header">{{ 'room.show.title_full'|trans({'%id%': room.id}) }}</h2>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui unstackable definition table">
+            <tbody>
+                <tr>
+                    <td><strong>{{ 'room.show.table.type'|trans }}</strong></td>
+                    <td>{{ room.type }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ 'room.show.table.capacity'|trans }}</strong></td>
+                    <td>{{ room.capacity }} {{ 'room.show.table.capacity_suffix'|trans }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ 'room.show.table.location'|trans }}</strong></td>
+                    <td>{{ room.location|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ 'room.show.table.equipment'|trans }}</strong></td>
+                    <td>{{ room.equipment|nl2br|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ 'room.show.table.status'|trans }}</strong></td>
+                    <td>
+                        {% if room.is_available %}
+                            <span class="ui green label">{{ 'room.show.table.available'|trans }}</span>
+                        {% else %}
+                            <span class="ui red label">{{ 'room.show.table.unavailable'|trans }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/admin/rooms/edit?id={{ room.id }}" class="ui primary button">
+            <i class="edit icon"></i> {{ 'room.show.edit'|trans }}
+        </a>
+        <a href="/admin/rooms" class="ui button">
+            <i class="arrow left icon"></i> {{ 'room.show.back'|trans }}
+        </a>
+    </div>
+{% endblock %}
