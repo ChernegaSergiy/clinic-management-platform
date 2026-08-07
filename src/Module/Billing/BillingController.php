@@ -3,6 +3,10 @@
 namespace App\Module\Billing;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
+use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
+use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
+use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\ExcelExporter;
@@ -10,10 +14,6 @@ use App\Core\Export\PdfExporter;
 use App\Module\Billing\Repository\InvoiceRepository;
 use App\Module\Billing\Repository\ServiceBundleRepository;
 use App\Module\Billing\Repository\ServiceRepository;
-use App\Module\Insurance\Repository\ClaimRepository;
-use App\Module\Insurance\Repository\InsuranceCompanyRepository;
-use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
-use App\Module\Insurance\Service\InsuranceService;
 use Symfony\Component\Routing\Attribute\Route;
 
 class BillingController extends \App\Core\Controller\AbstractController

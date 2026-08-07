@@ -3,16 +3,16 @@
 namespace App\Bundles\PatientBundle\Controller;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
+use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
+use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
+use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
 use App\Module\Billing\Repository\InvoiceRepositoryInterface;
-use App\Module\Insurance\Repository\ClaimRepository;
-use App\Module\Insurance\Repository\InsuranceCompanyRepository;
-use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
-use App\Module\Insurance\Service\InsuranceService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

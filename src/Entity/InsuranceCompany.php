@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Insurance\Repository\InsuranceCompanyRepository;
+use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

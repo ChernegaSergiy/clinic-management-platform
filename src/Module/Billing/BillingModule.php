@@ -49,7 +49,7 @@ class BillingModule extends BaseModule
                 new Reference(\App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceBundleRepository::class),
-                new Reference(\App\Module\Insurance\Service\InsuranceService::class),
+                new Reference(\App\Bundles\InsuranceBundle\Service\InsuranceService::class),
             ])->setPublic(true);
 
         $container->register(\App\Module\Billing\ContractController::class)
