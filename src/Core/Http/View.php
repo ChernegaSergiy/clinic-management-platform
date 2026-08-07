@@ -5,32 +5,31 @@ namespace App\Core\Http;
 use App\Core\Auth\MfaGuard;
 use App\Core\Service\TranslationService;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class View
 {
-    private ?Environment $twig = null;
-    private array $twigGlobals = [];
+    private Environment $twig;
     private TranslationService $translationService;
     private ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
 
-    public function __construct(TranslationService $translationService, ManagerRegistry $registry, MfaGuard $mfaGuard)
+    public function __construct(Environment $twig, TranslationService $translationService, ManagerRegistry $registry, MfaGuard $mfaGuard)
     {
+        $this->twig = $twig;
         $this->translationService = $translationService;
         $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
+
+        $this->addGlobals();
+        $this->setupLocale();
     }
 
-    private function loadTwigGlobals() : void
+    private function addGlobals() : void
     {
-        if (!empty($this->twigGlobals)) {
-            return;
-        }
+        $this->twig->addGlobal('session', $_SESSION);
 
-        $this->twigGlobals = [
+        $globals = [
             'clinic_name' => 'Міська клінічна лікарня №1',
         ];
 
@@ -39,18 +38,21 @@ class View
             $sql = "SELECT `key`, value FROM settings";
             $result = $conn->executeQuery($sql);
             while ($row = $result->fetchAssociative()) {
-                $this->twigGlobals[$row['key']] = $row['value'];
+                $globals[$row['key']] = $row['value'];
             }
         } catch (\Exception $e) {
             // DB not available
+        }
+
+        foreach ($globals as $key => $value) {
+            $this->twig->addGlobal($key, $value);
         }
     }
 
     private function setupLocale() : void
     {
-        $this->loadTwigGlobals();
-
-        $preferredLocale = ($this->twigGlobals['system_locale'] ?? null) ?? $this->detectBrowserLanguage() ?? 'uk';
+        $globals = $this->twig->getGlobals();
+        $preferredLocale = ($globals['system_locale'] ?? null) ?? $this->detectBrowserLanguage() ?? 'uk';
         $rawAvailableLocales = array_keys($this->translationService->getAvailableLocales());
         $finalLocale = 'uk';
         if (in_array($preferredLocale, $rawAvailableLocales)) {
@@ -68,39 +70,17 @@ class View
 
         $supportedLocales = array_keys($this->translationService->getAvailableLocales());
 
-        // Parse Accept-Language header
         $languages = explode(',', $acceptLang);
         foreach ($languages as $lang) {
             $lang = trim(explode(';', $lang)[0]);
-            $lang = explode('-', $lang)[0]; // Get primary language code
+            $lang = explode('-', $lang)[0];
 
-            // Check if we support this language
             if (in_array($lang, $supportedLocales)) {
                 return $lang;
             }
         }
 
         return null;
-    }
-
-    private function getTwig() : Environment
-    {
-        if (null === $this->twig) {
-            $this->setupLocale();
-
-            $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
-            $loader->addPath(__DIR__ . '/../../../src/Module', 'modules');
-            $this->twig = new Environment($loader, []);
-            $this->twig->addGlobal('session', $_SESSION);
-
-            // Add translation extension
-            $this->twig->addExtension(new TranslationExtension($this->translationService->getTranslator()));
-
-            foreach ($this->twigGlobals as $key => $value) {
-                $this->twig->addGlobal($key, $value);
-            }
-        }
-        return $this->twig;
     }
 
     public function render(string $template, array $data = []) : void
@@ -112,18 +92,12 @@ class View
             exit();
         }
 
-        echo $this->getTwig()->render($template, $data);
+        echo $this->twig->render($template, $data);
     }
 
     public function renderToString(string $template, array $data = []) : string
     {
-        return $this->getTwig()->render($template, $data);
-    }
-
-    public function clearCache() : void
-    {
-        $this->twig = null;
-        $this->twigGlobals = [];
+        return $this->twig->render($template, $data);
     }
 
     public function getTranslationService() : TranslationService
