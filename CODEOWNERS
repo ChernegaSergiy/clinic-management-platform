@@ -68,7 +68,8 @@ package.json @ChernegaSergiy
 composer.lock @ChernegaSergiy
 
 # Database migrations
-database/migrations_phinx/ @ChernegaSergiy @Andriihev
+src/Migrations/ @ChernegaSergiy @Andriihev
+migrations.php @ChernegaSergiy @Andriihev
 
 # Documentation
 README.md @ChernegaSergiy @Andriihev @makztezerest
