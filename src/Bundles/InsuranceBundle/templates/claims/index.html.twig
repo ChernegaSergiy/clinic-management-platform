@@ -1,0 +1,65 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}{{ 'insurance.claims.list.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h2 class="ui header">{{ 'insurance.claims.list.header'|trans }}</h2>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'insurance.claims.list.table.id'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.invoice_id'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.patient'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.company'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.amount'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.status'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.submitted_at'|trans }}</th>
+                    <th>{{ 'insurance.claims.list.table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                    <tr>
+                        <td>{{ claim.id }}</td>
+                        <td><a href="/billing/show?id={{ claim.invoice_id }}">{{ claim.invoice_id }}</a></td>
+                        <td>{{ claim.patient_name }}</td>
+                        <td>{{ claim.insurance_company_name }}</td>
+                        <td>{{ claim.total_claimed|number_format(2, ',', ' ') }}</td>
+                        <td>
+                            {% set status_color = 'grey' %}
+                            {% if claim.status in ['paid', 'approved'] %}
+                                {% set status_color = 'green' %}
+                            {% elseif claim.status in ['denied', 'rejected'] %}
+                                {% set status_color = 'red' %}
+                            {% elseif claim.status in ['submitted', 'pending'] %}
+                                {% set status_color = 'orange' %}
+                            {% elseif claim.status == 'draft' %}
+                                {% set status_color = 'blue' %}
+                            {% endif %}
+                            <div class="ui {{ status_color }} label">
+                                {{ claim.status|capitalize }}
+                            </div>
+                        </td>
+                        <td>{{ claim.submitted_at ? claim.submitted_at|date('Y-m-d') : '' }}</td>
+                        <td>
+                            <a href="/insurance/claims/show?id={{ claim.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="center aligned">{{ 'insurance.claims.list.no_claims'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

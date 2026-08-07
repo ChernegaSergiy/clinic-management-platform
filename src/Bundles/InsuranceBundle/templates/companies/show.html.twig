@@ -1,0 +1,48 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}{{ 'insurance.companies.show.title'|trans({'%id%': company.id}) }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h2 class="ui header">{{ 'insurance.companies.show.title_full'|trans({'%id%': company.id}) }}</h2>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+
+        <table class="ui unstackable definition table">
+            <tbody>
+                <tr>
+                    <td class="three wide">{{ 'insurance.companies.show.table.name'|trans }}</td>
+                    <td>{{ company.name }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'insurance.companies.show.table.contact_person'|trans }}</td>
+                    <td>{{ company.contact_person|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'insurance.companies.show.table.phone'|trans }}</td>
+                    <td>{{ company.phone|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'insurance.companies.show.table.email'|trans }}</td>
+                    <td>{{ company.email|default('—') }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'insurance.companies.show.table.notes'|trans }}</td>
+                    <td>{{ company.notes|nl2br|default('—') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="ui divider"></div>
+
+        <a href="/insurance/companies/edit?id={{ company.id }}" class="ui primary button">
+            <i class="edit icon"></i> {{ 'insurance.companies.show.edit'|trans }}
+        </a>
+        <a href="/insurance/companies" class="ui button">
+            <i class="arrow left icon"></i> {{ 'insurance.companies.show.back'|trans }}
+        </a>
+    </div>
+{% endblock %}
