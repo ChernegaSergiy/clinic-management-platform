@@ -1,0 +1,166 @@
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}{{ 'patient.show.page_title'|trans({'%first_name%': patient.first_name, '%last_name%': patient.last_name}) }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'patient.show.title_full'|trans({'%first_name%': patient.first_name, '%last_name%': patient.last_name}) }} {{ patient.middle_name }}</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">{{ 'patient.show.basic_info'|trans }}</h3>
+                <table class="ui unstackable definition table">
+                    <tbody>
+                        <tr>
+                            <td>ID</td>
+                            <td>{{ patient.id }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.birth_date'|trans }}</td>
+                            <td>{{ patient.birth_date }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.gender'|trans }}</td>
+                            <td>{{ patient.gender|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.phone'|trans }}</td>
+                            <td>{{ patient.phone|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.email'|trans }}</td>
+                            <td>{{ patient.email|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.address'|trans }}</td>
+                            <td>{{ patient.address|default('—') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="eight wide column">
+                <h3 class="ui header">{{ 'patient.show.additional_info'|trans }}</h3>
+                <table class="ui unstackable definition table">
+                    <tbody>
+                        <tr>
+                            <td>{{ 'patient.new.tax_id'|trans }}</td>
+                            <td>{{ patient.tax_id|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.document_id'|trans }}</td>
+                            <td>{{ patient.document_id|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.new.marital_status'|trans }}</td>
+                            <td>{{ patient.marital_status|default('—') }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'patient.show.status'|trans }}</td>
+                            <td>{{ patient.status == 'active' ? 'patient.show.active'|trans : 'patient.show.archived'|trans }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <a href="/patients/edit?id={{ patient.id }}" class="ui primary button">
+            <i class="edit icon"></i> {{ 'patient.show.edit'|trans }}
+        </a>
+        <a href="/prescriptions/new?patient_id={{ patient.id }}" class="ui teal button">{{ 'patient.show.create_prescription'|trans }}</a>
+        {% if patient.status == 'active' %}
+            <form action="/patients/toggle-status" method="POST" style="display: inline;">
+                <input type="hidden" name="id" value="{{ patient.id }}">
+                <button type="submit" class="ui negative button">{{ 'patient.show.archive'|trans }}</button>
+            </form>
+        {% else %}
+            <form action="/patients/toggle-status" method="POST" style="display: inline;">
+                <input type="hidden" name="id" value="{{ patient.id }}">
+                <button type="submit" class="ui positive button">{{ 'patient.show.activate'|trans }}</button>
+            </form>
+        {% endif %}
+        <a href="/patients" class="ui button">
+            <i class="arrow left icon"></i> {{ 'patient.show.back'|trans }}
+        </a>
+    </div>
+
+    <div class="ui segment">
+        <h3 class="ui header">{{ 'patient.show.medical_records'|trans }}</h3>
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'patient.show.medical_records_table.visit_date'|trans }}</th>
+                    <th>{{ 'patient.show.medical_records_table.doctor'|trans }}</th>
+                    <th>{{ 'patient.show.medical_records_table.diagnosis'|trans }}</th>
+                    <th>{{ 'patient.show.medical_records_table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in medical_records %}
+                    <tr>
+                        <td>{{ record.visit_date|date('Y-m-d H:i') }}</td>
+                        <td>{{ record.doctor_name }}</td>
+                        <td>{{ record.diagnosis_code }}</td>
+                        <td>
+                            <a href="/medical-records/show?id={{ record.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="center aligned">{{ 'patient.show.no_medical_records'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h3 class="ui header">{{ 'patient.show.insurance_policies'|trans }}</h3>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/patients/{{ patient.id }}/policies/add" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'patient.show.add_policy'|trans }}
+                </a>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'patient.show.policies_table.policy_number'|trans }}</th>
+                    <th>{{ 'patient.show.policies_table.company'|trans }}</th>
+                    <th>{{ 'patient.show.policies_table.valid_from'|trans }}</th>
+                    <th>{{ 'patient.show.policies_table.valid_to'|trans }}</th>
+                    <th>{{ 'patient.show.policies_table.status'|trans }}</th>
+                    <th>{{ 'patient.show.policies_table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in patient_policies %}
+                    <tr>
+                        <td>{{ policy.policy_number }}</td>
+                        <td>{{ policy.insurance_company_id }}</td>
+                        <td>{{ policy.valid_from|date('Y-m-d') }}</td>
+                        <td>{{ policy.valid_to|date('Y-m-d') }}</td>
+                        <td>{{ policy.is_active ? 'patient.show.policies_table.active'|trans : 'patient.show.policies_table.inactive'|trans }}</td>
+                        <td>
+                            <a href="/patients/{{ patient.id }}/policies/edit?id={{ policy.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">{{ 'patient.show.no_policies'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
