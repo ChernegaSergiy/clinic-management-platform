@@ -13,4 +13,5 @@ return [
     App\Bundles\RoomBundle\RoomBundle::class => ['all' => true],
     App\Bundles\PrescriptionBundle\PrescriptionBundle::class => ['all' => true],
     App\Bundles\LabOrderBundle\LabOrderBundle::class => ['all' => true],
+    App\Bundles\DepartmentBundle\DepartmentBundle::class => ['all' => true],
 ];
