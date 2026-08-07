@@ -22,4 +22,5 @@ return [
     App\Bundles\ClinicalReferenceBundle\ClinicalReferenceBundle::class => ['all' => true],
     App\Bundles\NotificationBundle\NotificationBundle::class => ['all' => true],
     App\Bundles\InventoryBundle\InventoryBundle::class => ['all' => true],
+    App\Bundles\AdminBundle\AdminBundle::class => ['all' => true],
 ];
