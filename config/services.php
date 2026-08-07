@@ -39,6 +39,6 @@ return function (ContainerBuilder $container) {
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
     $container->register(\App\Core\Service\QrCodeGenerator::class)->setPublic(true);
-    
+
     $container->register(\App\Core\Repository\SettingsRepository::class)->setPublic(true);
 };

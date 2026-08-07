@@ -973,7 +973,7 @@ final class App
      *
      * @psalm-return ConfigType
      */
-    public static function config(array $config): array
+    public static function config(array $config) : array
     {
         /** @var ConfigType $config */
         $config = AppReference::config($config);
@@ -1051,7 +1051,7 @@ final class Routes
      *
      * @psalm-return RoutesConfig
      */
-    public static function config(array $config): array
+    public static function config(array $config) : array
     {
         return $config;
     }
