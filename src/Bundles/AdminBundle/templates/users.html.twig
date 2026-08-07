@@ -1,0 +1,88 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'admin.users.page_title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'admin.users.title'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/users/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'admin.users.add'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="get" action="/admin/users">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'admin.users.search_placeholder'|trans }}">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'admin.users.table.id'|trans }}</th>
+                    <th>{{ 'admin.users.table.first_name'|trans }}</th>
+                    <th>{{ 'admin.users.table.last_name'|trans }}</th>
+                    <th>{{ 'admin.users.table.email'|trans }}</th>
+                    <th>{{ 'admin.users.table.role'|trans }}</th>
+                    <th>{{ 'admin.users.table.mfa'|trans }}</th>
+                    <th>{{ 'admin.users.table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role_name }}</td>
+                        <td>
+                            {% if user.mfa_enabled %}
+                                <span class="ui green label">{{ 'admin.users.mfa.enabled'|trans }}</span>
+                            {% else %}
+                                <span class="ui grey label">{{ 'admin.users.mfa.disabled'|trans }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/admin/users/show?id={{ user.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="/admin/users/edit?id={{ user.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                            {% if user.mfa_enabled %}
+                                <form action="/admin/users/disable-mfa" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.mfa.disable_confirm'|trans }}');">
+                                    <input type="hidden" name="id" value="{{ user.id }}">
+                                    <button type="submit" class="ui icon button orange" title="{{ 'admin.users.mfa.disable_title'|trans }}">
+                                        <i class="shield icon"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <form action="/admin/users/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.delete_confirm'|trans }}');">
+                                <input type="hidden" name="id" value="{{ user.id }}">
+                                <button type="submit" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">{{ 'admin.users.no_users'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

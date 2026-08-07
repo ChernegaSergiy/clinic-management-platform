@@ -1,0 +1,31 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'admin.service_categories.new.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'admin.service_categories.new.header'|trans }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/service-categories/new">
+            {{ forms.input('name', 'admin.service_categories.new.name'|trans, old.name ?? null, 'text', 'admin.service_categories.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'admin.service_categories.new.description'|trans, old.description ?? null, 'admin.service_categories.new.description_placeholder'|trans, errors.description ?? null) }}
+
+            <div class="ui divider"></div>
+
+            {{ ui.button('admin.service_categories.new.save'|trans, 'primary', '', 'save') }}
+            <a href="/admin/service-categories" class="ui button"><i class="arrow left icon"></i> {{ 'admin.service_categories.new.cancel'|trans }}</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+        });
+    </script>
+{% endblock %}

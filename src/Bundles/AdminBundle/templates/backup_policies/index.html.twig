@@ -1,0 +1,70 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'admin.backup_policies.index.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'admin.backup_policies.index.header'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/admin/backup_policies/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'admin.backup_policies.index.add_policy'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if policies is empty %}
+            <p>{{ 'admin.backup_policies.index.no_policies'|trans }}</p>
+        {% else %}
+            <table class="ui celled unstackable table">
+                <thead>
+                    <tr>
+                        <th>{{ 'admin.backup_policies.index.table.id'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.name'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.description'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.frequency'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.retention_days'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.last_run'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.status'|trans }}</th>
+                        <th>{{ 'admin.backup_policies.index.table.actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for policy in policies %}
+                        <tr>
+                            <td>{{ policy.id }}</td>
+                            <td>{{ policy.name }}</td>
+                            <td>{{ policy.description ?: 'admin.backup_policies.index.not_specified'|trans }}</td>
+                            <td>{{ policy.frequency }}</td>
+                            <td>{{ policy.retention_days }}</td>
+                            <td>{{ policy.last_run_at ?: 'admin.backup_policies.index.never'|trans }}</td>
+                            <td>
+                                {% if policy.status == 'active' %}
+                                    <i class="check circle icon green"></i> {{ 'admin.backup_policies.index.active'|trans }}
+                                {% else %}
+                                    <i class="times circle icon red"></i> {{ 'admin.backup_policies.index.inactive'|trans }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/backup_policies/edit?id={{ policy.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                <form action="/admin/backup_policies/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.backup_policies.index.delete_confirm'|trans }}');">
+                                    <input type="hidden" name="id" value="{{ policy.id }}">
+                                    <button type="submit" class="ui icon button red">
+                                        <i class="trash icon"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

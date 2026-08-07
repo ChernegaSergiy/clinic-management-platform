@@ -1,0 +1,22 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'admin.roles.edit.page_title'|trans({'%id%': role.id}) }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'admin.roles.edit.title'|trans({'%id%': role.id}) }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/admin/roles/edit?id={{ role.id }}">
+            {{ forms.input('name', 'admin.roles.new.name'|trans, old.name ?? role.name, 'text', 'admin.roles.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'admin.roles.new.description'|trans, old.description ?? role.description, 'admin.roles.new.description_placeholder'|trans, errors.description ?? null) }}
+
+            {{ ui.button('admin.roles.edit.save'|trans, 'primary', 'large', 'save') }}
+            <a href="/admin/roles" class="ui button">
+                <i class="arrow left icon"></i> {{ 'admin.roles.new.cancel'|trans }}
+            </a>
+        </form>
+    </div>
+{% endblock %}
