@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\LabOrder\Repository\LabOrderRepository;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
