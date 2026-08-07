@@ -1,0 +1,208 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}{{ clinic_name }}{% endblock %}
+
+{% block body %}
+        <section id="hero" class="hero">
+            <div class="container">
+                <div class="hero-inner">
+                    <div>
+                        <div class="hero__kicker">Клінічна лікарня, мінімалістичний бруталізм</div>
+                        <h1 class="hero__title">Спокійна медицина в чітких лініях</h1>
+                        <p class="hero__subtitle">
+                            Сучасна міська клінічна лікарня без зайвого шуму — лише факти: 
+                            коли відкрите відділення, як потрапити на прийом і куди звернутися в разі невідкладного стану.
+                        </p>
+                        <div class="hero__actions">
+                            <a class="btn btn--primary" href="#booking">Записатися на прийом</a>
+                            <a class="btn btn--ghost" href="#departments">Переглянути відділення</a>
+                        </div>
+                        <div class="hero__meta">
+                            <div class="hero__meta-item"><span class="hero__meta-label">РЕЖИМ РОБОТИ ПОЛІКЛІНІКИ</span><span class="hero__meta-value">ПН–ПТ 08:00–19:00</span></div>
+                            <div class="hero__meta-item"><span class="hero__meta-label">СТАЦІОНАР</span><span class="hero__meta-value">24/7</span></div>
+                            <div class="hero__meta-item"><span class="hero__meta-label">АДРЕСА</span><span class="hero__meta-value">вул. Прикладна, 10</span></div>
+                        </div>
+                    </div>
+                    <aside class="hero__image">
+                        <div class="hero__image-label">Внутрішній простір лікарні</div>
+                        <img src="/images/hero.jpg" alt="Внутрішній простір лікарні" style="width: 100%; height: auto; border: var(--border-medium); object-fit: cover;">
+                        <div class="hero__image-caption">Сучасне обладнання та стерильне оточення для безпеки пацієнтів.</div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Про лікарню</div>
+                    <h2 class="section__title section__title--compact">Прозора структура замість складних банерів</h2>
+                    <p class="section__description">Жодних слайдерів і рекламних блоків. Тільки ключова інформація: хто ми, як працюємо, які послуги надаємо та які стандарти дотримуємося.</p>
+                </header>
+                <div class="about-grid">
+                    <article class="about-block">
+                        <div class="about-block__label">Коротко</div>
+                        <div class="about-block__content">{{ clinic_name }} — багатопрофільний заклад охорони здоров’я, що надає планову та невідкладну медичну допомогу дорослому населенню. Пріоритет: доказова медицина, контроль інфекційної безпеки, чітка маршрутизація пацієнтів.</div>
+                    </article>
+                    <article class="about-block">
+                        <div class="about-block__label">Факти</div>
+                        <ul class="about-facts">
+                            <li><span>Ліжковий фонд</span><span class="about-facts__value">250 місць</span></li>
+                            <li><span>Операційні</span><span class="about-facts__value">5 сучасних блоків</span></li>
+                            <li><span>Щорічно допомогу отримують</span><span class="about-facts__value">≈ 40 000 пацієнтів</span></li>
+                            <li><span>Мова спілкування</span><span class="about-facts__value">Українська</span></li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="departments" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Відділення</div>
+                    <h2 class="section__title section__title--compact">Структура лікарні у вигляді списку</h2>
+                    <p class="section__description">Замість складних схем — простий перелік відділень із базовими примітками про режим роботи. Кожне відділення має відповідального лікаря та чіткі функції.</p>
+                </header>
+
+                <div class="departments-grid">
+                    <div>
+                        <div class="chip-row">
+                            <span class="chip">Невідкладна допомога</span>
+                            <span class="chip">Планова госпіталізація</span>
+                            <span class="chip">Амбулаторний прийом</span>
+                        </div>
+                    </div>
+
+                    <div class="departments-list">
+                        <article class="department-item">
+                            <div class="department-item__name">Приймальне відділення</div>
+                            <div class="department-item__meta">24/7 · первинний огляд, сортування, оформлення госпіталізації</div>
+                        </article>
+                        <article class="department-item">
+                            <div class="department-item__name">Терапевтичне відділення</div>
+                            <div class="department-item__meta">ПН–НД · лікування внутрішніх хвороб, тривалий нагляд</div>
+                        </article>
+                        <article class="department-item">
+                            <div class="department-item__name">Хірургічне відділення</div>
+                            <div class="department-item__meta">Планові та ургентні операції, післяопераційний супровід та стандарти анестезіологічного забезпечення</div>
+                        </article>
+                        <article class="department-item">
+                            <div class="department-item__name">Відділення анестезіології та інтенсивної терапії</div>
+                            <div class="department-item__meta">Підтримка критичних станів, спостереження після операцій</div>
+                        </article>
+                         <article class="department-item">
+                            <div class="department-item__name">Стаціонар денного перебування</div>
+                            <div class="department-item__meta">Інфузійна терапія, контроль стану без нічного перебування</div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking" class="section">
+             <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Запис</div>
+                    <h2 class="section__title section__title--compact">Запис на плановий прийом</h2>
+                    <p class="section__description">Справжня система запису може бути інтегрована з eHealth. На цьому макеті — мінімалістична форма-заготовка. Без відволікаючих кольорів, лише чіткі поля та інструкції.</p>
+                </header>
+                <div class="booking-layout">
+                    <form class="booking-form" id="bookingForm">
+                        <div style="margin-bottom: 0.8rem;">
+                            <label class="booking-label">ПІБ пацієнта</label>
+                            <input class="booking-input" name="patientName" required placeholder="Наприклад: Шевченко Марія Іванівна">
+                        </div>
+                         <div style="margin-bottom: 0.8rem;">
+                            <label class="booking-label">Номер телефону</label>
+                            <input class="booking-input" name="phone" required placeholder="+380...">
+                        </div>
+                        <div style="margin-bottom: 0.8rem;">
+                            <label class="booking-label">Відділення / спеціальність</label>
+                             <select class="booking-select" name="department" required>
+                                <option value="">Оберіть відділення</option>
+                                <option>Терапевтичне відділення</option>
+                                <option>Хірургічне відділення</option>
+                                <option>Стаціонар денного перебування</option>
+                                <option>Консультація сімейного лікаря</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 0.8rem;">
+                             <label class="booking-label">Бажана дата</label>
+                             <input type="date" class="booking-input" name="preferredDate" required>
+                        </div>
+                        <div style="margin-bottom: 0.8rem;">
+                            <label class="booking-label">Короткий опис звернення</label>
+                            <textarea class="booking-textarea" placeholder="Напишіть коротко, з яким запитом ви звертаєтесь"></textarea>
+                            <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 0.3rem">Не вказуйте детальних діагнозів або конфіденційних даних в цій формі. Точний стан обговорюється з лікарем на прийомі.</p>
+                        </div>
+                        <button type="submit" class="btn btn--primary" style="margin-top: 1rem">Надіслати запит</button>
+                        <div id="bookingResult" style="margin-top:1rem; display:none; font-size: 0.8rem; border-top: var(--border-thin); padding-top: 0.4rem;">Запит надіслано.</div>
+                    </form>
+                     <aside class="booking-sidebar">
+                        <div class="booking-sidebar__title">Як це працює</div>
+                        <ul class="booking-sidebar__list">
+                            <li>1. Ви надсилаєте запит із базовими контактами.</li>
+                            <li>2. Реєстратура телефонує для підтвердження дати і часу.</li>
+                            <li>3. Уточнюються документи, які потрібно взяти з собою.</li>
+                            <li>4. У день візиту приходьте за 10–15 хвилин до прийому.</li>
+                        </ul>
+                    </aside>
+                </div>
+             </div>
+        </section>
+
+         <section id="contacts" class="section">
+            <div class="container">
+                <header class="section__header">
+                    <div class="section__eyebrow">Контакти</div>
+                    <h2 class="section__title section__title--compact">Як нас знайти</h2>
+                    <p class="section__description">Мінімум елементів, максимум користі: адреса, телефони, години роботи, орієнтир на карті. Тут може бути вбудована Google-карта, але в бруталістичному стилі достатньо структурованого блоку.</p>
+                </header>
+                <div class="contacts-grid">
+                    <article class="contact-block">
+                        <div class="contact-block__title" style="border-bottom: var(--border-thin); padding-bottom: 0.35rem; margin-bottom: 0.4rem; text-transform: uppercase; font-size: 0.75rem;">Основні контакти</div>
+                        <div class="table-wrapper">
+                            <table class="contact-table">
+                                <thead><tr><th>Служба</th><th>Телефон</th></tr></thead>
+                                <tbody>
+                                <tr><td>Приймальне відділення</td><td>+380 (000) 000 00 01</td></tr>
+                                <tr><td>Реєстратура поліклініки</td><td>+380 (000) 000 00 02</td></tr>
+                                <tr><td>Довідкова служба</td><td>+380 (000) 000 00 03</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="margin-top: 0.6rem; font-size: 0.8rem;">Адреса: вул. Прикладна, 10, м. Прикладне<br>Громадський транспорт: зупинка «Клінічна лікарня №1».</p>
+                    </article>
+                    <article class="contact-block">
+                        <div class="contact-block__title" style="border-bottom: var(--border-thin); padding-bottom: 0.35rem; margin-bottom: 0.4rem; text-transform: uppercase; font-size: 0.75rem;">Карта (демо)</div>
+                        <div class="map-placeholder">Тут може бути вбудована карта. Для мінімалістичного бруталізму допустима чорно-біла стилізація схеми району без кольорових підкладок.</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="section">
+            <div class="container">
+                <header class="section__header">
+                     <div class="section__eyebrow">Часті питання</div>
+                    <h2 class="section__title section__title--compact">Простий текст замість складних діалогових вікон</h2>
+                    <p class="section__description">Замість чат-ботів та спливаючих вікон — лаконічні відповіді на базові питання. Користувач бачить усе на одній сторінці.</p>
+                </header>
+                <div id="faqList">
+                    <article class="faq-item">
+                        <button class="faq-question"><span>Чи потрібне направлення сімейного лікаря?</span><span>+</span></button>
+                        <div class="faq-answer">Для планової госпіталізації зазвичай потрібне направлення. Для ургентних станів (невідкладних випадків) приймальне відділення працює без направлення — важливий стан пацієнта.</div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question"><span>Чи є платні послуги?</span><span>+</span></button>
+                        <div class="faq-answer">Перелік платних послуг затверджується наказом по лікарні. Він може бути представлений окремим txt / pdf-файлом або таблицею без декоративних елементів.</div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question"><span>Як дізнатися, чи відкрите потрібне відділення?</span><span>+</span></button>
+                        <div class="faq-answer">Оперативний статус відділень можна розміщувати у верхній частині сторінки як текстовий рядок (без анімацій), або в окремому розділі «Статус відділень». На цій сторінці він позначений бейджами «ВІДКРИТО / ЗАЧИНЕНО».</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+{% endblock %}

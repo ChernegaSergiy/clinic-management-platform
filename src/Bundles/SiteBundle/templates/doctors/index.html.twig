@@ -1,0 +1,109 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}Лікарі — {{ clinic_name }}{% endblock %}
+
+{% block body %}
+    <section id="doctors" class="section">
+        <div class="container">
+            <header class="section__header">
+                <div class="section__eyebrow">Наша команда</div>
+                <h1 class="section__title">Персональний склад та відповідальність</h1>
+                <p class="section__description">Список ключового медичного персоналу, завідувачів відділень та фахівців, відповідальних за амбулаторний прийом. Для запису до лікаря скористайтеся розділом «Запис» або зверніться до реєстратури.</p>
+            </header>
+            
+            <div class="doc-category">Адміністрація та Керівництво</div>
+            <div class="doctors-grid">
+                <article class="doctor-card">
+                    <div class="doctor-avatar">д.м.н.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Іваненко Олександр</div>
+                        <div class="doctor-info__role">Головний лікар</div>
+                        <div class="doctor-info__meta">Загальне керівництво закладом, стратегічне планування, контроль якості медичної допомоги.</div>
+                         <div class="doctor-tags"><span class="tag">Адміністрація</span><span class="tag">Контроль якості</span></div>
+                    </div>
+                </article>
+                <article class="doctor-card">
+                    <div class="doctor-avatar">к.м.н.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Мельник Анна</div>
+                        <div class="doctor-info__role">Заступник головного лікаря з медичної частини</div>
+                        <div class="doctor-info__meta">Координація роботи всіх клінічних відділень та оперативне управління стаціонаром.</div>
+                         <div class="doctor-tags"><span class="tag">Адміністрація</span><span class="tag">Стаціонар</span></div>
+                    </div>
+                </article>
+                 <article class="doctor-card">
+                    <div class="doctor-avatar">Черг.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Петраченко Марія</div>
+                        <div class="doctor-info__role">Черговий лікар приймального відділення</div>
+                        <div class="doctor-info__meta">Координує прийом ургентних пацієнтів, визначає подальший маршрут 24/7.</div>
+                        <div class="doctor-tags"><span class="tag">Приймальне</span><span class="tag">24/7</span></div>
+                    </div>
+                </article>
+            </div>
+            
+            <div class="doc-category">Завідувачі клінічних відділень</div>
+            <div class="doctors-grid">
+                <article class="doctor-card">
+                    <div class="doctor-avatar">Хір.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Коваленко Сергій</div>
+                        <div class="doctor-info__role">Завідувач хірургічного відділення</div>
+                        <div class="doctor-info__meta">Керівництво оперативними втручаннями та післяопераційним супроводом.</div>
+                         <div class="doctor-tags"><span class="tag">Хірургія</span><span class="tag">Завідувач</span></div>
+                    </div>
+                </article>
+                <article class="doctor-card">
+                    <div class="doctor-avatar">Тер.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Лисенко Віктор</div>
+                        <div class="doctor-info__role">Завідувач терапевтичного відділення</div>
+                        <div class="doctor-info__meta">Відповідальність за лікування внутрішніх хвороб, інфузійна терапія.</div>
+                         <div class="doctor-tags"><span class="tag">Терапія</span><span class="tag">Стаціонар</span></div>
+                    </div>
+                </article>
+                 <article class="doctor-card">
+                    <div class="doctor-avatar">Травм.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Захарчук Олена</div>
+                        <div class="doctor-info__role">Завідувач травматологічного відділення</div>
+                        <div class="doctor-info__meta">Контроль травматологічних операцій та реабілітаційних програм.</div>
+                        <div class="doctor-tags"><span class="tag">Травматологія</span><span class="tag">Завідувач</span></div>
+                    </div>
+                </article>
+                <article class="doctor-card">
+                    <div class="doctor-avatar">Анест.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Гуменюк Ігор</div>
+                        <div class="doctor-info__role">Завідувач ВАІТ</div>
+                        <div class="doctor-info__meta">Керівництво відділенням інтенсивної терапії та анестезіологічним забезпеченням.</div>
+                         <div class="doctor-tags"><span class="tag">ВАІТ</span><span class="tag">Анестезіологія</span></div>
+                    </div>
+                </article>
+            </div>
+            
+            <div class="doc-category">Амбулаторний прийом та Діагностика</div>
+             <div class="doctors-grid">
+                <article class="doctor-card">
+                    <div class="doctor-avatar">Сім.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Семенюк Катерина</div>
+                        <div class="doctor-info__role">Лікар загальної практики (Сімейний лікар)</div>
+                        <div class="doctor-info__meta">Первинний прийом, направлення, ведення електронної медичної карти.</div>
+                         <div class="doctor-tags"><span class="tag">Поліклініка</span><span class="tag">Сімейна медицина</span></div>
+                    </div>
+                </article>
+                <article class="doctor-card">
+                    <div class="doctor-avatar">Діагн.</div>
+                    <div class="doctor-info">
+                        <div class="doctor-info__name">д-р Островський Павло</div>
+                        <div class="doctor-info__role">Лікар ультразвукової діагностики</div>
+                        <div class="doctor-info__meta">Проведення та опис результатів УЗД обстежень.</div>
+                         <div class="doctor-tags"><span class="tag">Діагностика</span><span class="tag">УЗД</span></div>
+                    </div>
+                </article>
+            </div>
+            
+        </div>
+    </section>
+{% endblock %}
