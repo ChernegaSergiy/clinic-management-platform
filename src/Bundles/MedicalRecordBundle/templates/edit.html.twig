@@ -1,0 +1,128 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'medical_record.edit.title'|trans({'%id%': record.id}) }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'medical_record.edit.title_full'|trans({'%id%': record.id}) }}</h2>
+        <p><strong>{{ 'medical_record.edit.patient'|trans }}</strong> {{ record.patient_name ?? '' }}</p>
+        <p><strong>{{ 'medical_record.edit.doctor'|trans }}</strong> {{ record.doctor_name ?? '' }}</p>
+        <p><strong>{{ 'medical_record.edit.appointment_time'|trans }}</strong> {{ record.start_time|date('Y-m-d H:i') }}</p>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/medical-records/edit?id={{ record.id }}">
+            <input type="hidden" name="id" value="{{ record.id }}">
+            <div class="two fields">
+                {{ forms.input('diagnosis_code', 'medical_record.edit.diagnosis_code'|trans, old.diagnosis_code ?? record.diagnosis_code, 'text', 'medical_record.edit.diagnosis_code_placeholder'|trans, errors.diagnosis_code ?? null, {'required': 'required'}) }}
+                {{ forms.input('visit_date', 'medical_record.edit.visit_date'|trans, old.visit_date ?? record.visit_date|date('Y-m-d\\TH:i'), 'datetime-local', '', errors.visit_date ?? null, {'required': 'required'})
+ }}
+            </div>
+            <div class="field">
+                <label>{{ 'medical_record.edit.icd_codes'|trans }}</label>
+                <div class="ui fluid search multiple selection dropdown" id="icd-codes-dropdown">
+                    <input type="hidden" name="icd_codes[]" value="{{ record.icd_codes|map(c => c.id)|join(',') }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">{{ 'medical_record.edit.select_icd_codes'|trans }}</div>
+                    <div class="menu">
+                        {% for icd in record.icd_codes %}
+                            <div class="item" data-value="{{ icd.id }}">{{ icd.code }} - {{ icd.description }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>{{ 'medical_record.edit.intervention_codes'|trans }}</label>
+                <div class="ui fluid search multiple selection dropdown" id="intervention-codes-dropdown">
+                    <input type="hidden" name="intervention_codes[]" value="{{ record.intervention_codes|map(c => c.id)|join(',') }}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">{{ 'medical_record.edit.select_intervention_codes'|trans }}</div>
+                </div>
+            </div>
+            {{ forms.textarea('diagnosis_text', 'medical_record.edit.diagnosis_text'|trans, old.diagnosis_text ?? record.diagnosis_text, 'medical_record.new.diagnosis_text_placeholder'|trans) }}
+            {{ forms.textarea('treatment', 'medical_record.edit.treatment'|trans, old.treatment ?? record.treatment, 'medical_record.new.treatment_placeholder'|trans) }}
+            {{ forms.textarea('notes', 'medical_record.edit.notes'|trans, old.notes ?? record.notes, 'medical_record.new.notes_placeholder'|trans) }}
+
+            <div class="ui divider"></div>
+
+            {{ ui.button('medical_record.edit.save'|trans, 'primary', '', 'save') }}
+            <a href="/medical-records/show?id={{ record.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'medical_record.edit.cancel'|trans }}</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('#icd-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/icd-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact',
+                // Pre-select existing codes
+                {% if record.icd_codes is not empty %}
+                setValues: [
+                    {% for icd in record.icd_codes %}
+                        '{{ icd.id }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                {% endif %}
+            });
+
+            $('#intervention-codes-dropdown').dropdown({
+                apiSettings: {
+                    url: '/medical-records/intervention-codes?search={query}',
+                    onResponse: function (response) {
+                        var codes = [];
+                        $.each(response, function (index, item) {
+                            codes.push({
+                                name: item.code + ' - ' + item.description,
+                                value: item.id
+                            });
+                        });
+                        return {
+                            success: true,
+                            results: codes
+                        };
+                    }
+                },
+                fields: {
+                    remoteValues: 'results',
+                    name: 'name',
+                    value: 'value'
+                },
+                clearable: true,
+                fullTextSearch: 'exact',
+                // Pre-select existing codes
+                {% if record.intervention_codes is not empty %}
+                setValues: [
+                    {% for intervention in record.intervention_codes %}
+                        '{{ intervention.id }}'{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                {% endif %}
+            });
+        });
+    </script>
+{% endblock %}
