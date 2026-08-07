@@ -2,33 +2,36 @@
 
 namespace App\Module\Patient\Repository;
 
-use PDO;
-use PHPUnit\Framework\TestCase;
+use App\Core\Service\AuditLogger;
+use App\Entity\Patient;
+use App\Tests\RepositoryTestCase;
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+use Doctrine\ORM\UnitOfWork;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PatientRepositoryTest extends TestCase
+class PatientRepositoryTest extends RepositoryTestCase
 {
     private PatientRepository $repository;
-    private PDO $mockPdo;
-    private \PDOStatement $mockStmt;
+    private AuditLogger&MockObject $auditLogger;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     protected function setUp() : void
     {
-        $this->mockPdo = $this->createMock(PDO::class);
-        $this->mockStmt = $this->createMock(\PDOStatement::class);
-        $this->mockPdo->method('prepare')->willReturn($this->mockStmt);
-        $this->mockPdo->method('query')->willReturn($this->mockStmt);
+        parent::setUp();
 
-        $reflection = new \ReflectionClass(PatientRepository::class);
-        $repository = $reflection->newInstanceWithoutConstructor();
-        $pdoProperty = $reflection->getProperty('pdo');
-        $pdoProperty->setAccessible(true);
-        $pdoProperty->setValue($repository, $this->mockPdo);
-        $this->repository = $repository;
+        $this->auditLogger = $this->createMock(AuditLogger::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $registry = $this->createMockManagerRegistry(Patient::class);
+
+        $this->repository = new PatientRepository($registry, $this->auditLogger, $this->eventDispatcher);
     }
 
     public function testFindAllReturnsEmptyArrayWhenNoPatients() : void
     {
-        $this->mockStmt->method('fetchAll')->willReturn([]);
+        $mockQueryBuilder = $this->createMockQueryBuilder([]);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findAll();
         $this->assertEmpty($result);
     }
@@ -39,7 +42,9 @@ class PatientRepositoryTest extends TestCase
             ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'],
             ['id' => 2, 'first_name' => 'Jane', 'last_name' => 'Smith']
         ];
-        $this->mockStmt->method('fetchAll')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findAll();
         $this->assertCount(2, $result);
         $this->assertEquals('John', $result[0]['first_name']);
@@ -47,7 +52,9 @@ class PatientRepositoryTest extends TestCase
 
     public function testFindByIdReturnsNullWhenNotFound() : void
     {
-        $this->mockStmt->method('fetch')->willReturn(false);
+        $mockQueryBuilder = $this->createMockQueryBuilder(null, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findById(999);
         $this->assertNull($result);
     }
@@ -55,14 +62,18 @@ class PatientRepositoryTest extends TestCase
     public function testFindByIdReturnsPatient() : void
     {
         $expected = ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'];
-        $this->mockStmt->method('fetch')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findById(1);
         $this->assertEquals($expected, $result);
     }
 
     public function testFindByCredentialsReturnsNullWhenNotFound() : void
     {
-        $this->mockStmt->method('fetch')->willReturn(false);
+        $mockQueryBuilder = $this->createMockQueryBuilder(null, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findByCredentials('Doe', 'John', '1990-01-01');
         $this->assertNull($result);
     }
@@ -70,14 +81,18 @@ class PatientRepositoryTest extends TestCase
     public function testFindByCredentialsReturnsPatient() : void
     {
         $expected = ['id' => 1, 'first_name' => 'John', 'last_name' => 'Doe'];
-        $this->mockStmt->method('fetch')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findByCredentials('Doe', 'John', '1990-01-01');
         $this->assertEquals($expected, $result);
     }
 
     public function testFindByTaxIdReturnsNullWhenNotFound() : void
     {
-        $this->mockStmt->method('fetch')->willReturn(false);
+        $mockQueryBuilder = $this->createMockQueryBuilder(null, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findByTaxId('TAX123');
         $this->assertNull($result);
     }
@@ -85,14 +100,23 @@ class PatientRepositoryTest extends TestCase
     public function testFindByTaxIdReturnsPatient() : void
     {
         $expected = ['id' => 1, 'tax_id' => 'TAX123'];
-        $this->mockStmt->method('fetch')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected, true);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findByTaxId('TAX123');
         $this->assertEquals($expected, $result);
     }
 
     public function testCountAllReturnsCount() : void
     {
-        $this->mockStmt->method('fetchColumn')->willReturn(42);
+        $persister = $this->createMock(EntityPersister::class);
+        $persister->method('count')->willReturn(42);
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->method('getEntityPersister')->willReturn($persister);
+
+        $this->entityManager->method('getUnitOfWork')->willReturn($uow);
+
         $result = $this->repository->countAll();
         $this->assertEquals(42, $result);
     }
@@ -109,7 +133,9 @@ class PatientRepositoryTest extends TestCase
             ['id' => 1, 'first_name' => 'John'],
             ['id' => 2, 'first_name' => 'Jane']
         ];
-        $this->mockStmt->method('fetchAll')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findByIds([1, 2]);
         $this->assertCount(2, $result);
     }
@@ -120,7 +146,9 @@ class PatientRepositoryTest extends TestCase
             ['id' => 1, 'full_name' => 'Doe John'],
             ['id' => 2, 'full_name' => 'Smith Jane']
         ];
-        $this->mockStmt->method('fetchAll')->willReturn($expected);
+        $mockQueryBuilder = $this->createMockQueryBuilder($expected);
+        $this->entityManager->method('createQueryBuilder')->willReturn($mockQueryBuilder);
+
         $result = $this->repository->findAllActive();
         $this->assertCount(2, $result);
     }

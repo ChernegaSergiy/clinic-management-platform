@@ -2,7 +2,6 @@
 
 namespace App\Tests;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -40,7 +39,7 @@ abstract class RepositoryTestCase extends TestCase
     protected function createMockQueryBuilder(mixed $result = null, bool $isSingleResult = false) : QueryBuilder&MockObject
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(\Doctrine\ORM\Query::class);
 
         if ($isSingleResult) {
             $query->method('getOneOrNullResult')->willReturn($result);
