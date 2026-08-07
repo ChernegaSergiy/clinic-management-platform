@@ -22,7 +22,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     private KpiRepository $kpiRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
-    private \App\Bundles\UserBundle\MfaService $mfaService;
+    private \App\Bundles\UserBundle\Service\MfaService $mfaService;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
@@ -34,7 +34,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         KpiRepository $kpiRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
-        \App\Bundles\UserBundle\MfaService $mfaService,
+        \App\Bundles\UserBundle\Service\MfaService $mfaService,
         \App\Core\Validation\Validator $validator
     ) {
         $this->userRepository = $userRepository;
