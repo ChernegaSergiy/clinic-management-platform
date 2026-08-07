@@ -27,7 +27,7 @@ class LabOrderModule extends BaseModule
         $container->register(\App\Module\LabOrder\Service\LabImportService::class)->setPublic(true);
         $container->register(\App\Module\LabOrder\LabOrderController::class)
             ->setArguments([
-                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Module\LabOrder\Repository\LabOrderRepository::class),
                 new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
                 new Reference(\App\Core\Service\NotificationService::class),

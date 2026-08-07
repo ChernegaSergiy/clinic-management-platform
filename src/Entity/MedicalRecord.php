@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\MedicalRecord\Repository\MedicalRecordRepository;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

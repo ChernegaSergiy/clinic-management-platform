@@ -46,7 +46,7 @@ class BillingModule extends BaseModule
                 new Reference(\App\Module\Billing\Repository\InvoiceRepository::class),
                 new Reference(\App\Bundles\PatientBundle\Repository\PatientRepository::class),
                 new Reference(\App\Bundles\AppointmentBundle\Repository\AppointmentRepository::class),
-                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceRepository::class),
                 new Reference(\App\Module\Billing\Repository\ServiceBundleRepository::class),
                 new Reference(\App\Module\Insurance\Service\InsuranceService::class),

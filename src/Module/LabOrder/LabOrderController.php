@@ -2,13 +2,13 @@
 
 namespace App\Module\LabOrder;
 
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
 use App\Module\LabOrder\Repository\LabOrderRepositoryInterface;
 use App\Module\LabOrder\Service\LabImportService;
-use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

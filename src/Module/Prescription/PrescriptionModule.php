@@ -26,7 +26,7 @@ class PrescriptionModule extends BaseModule
             ->setArguments([
                 new Reference(\App\Module\Prescription\Repository\PrescriptionRepository::class),
                 new Reference(\App\Bundles\PatientBundle\Repository\PatientRepository::class),
-                new Reference(\App\Module\MedicalRecord\Repository\MedicalRecordRepository::class),
+                new Reference(\App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository::class),
                 new Reference(\App\Bundles\UserBundle\Repository\UserRepository::class),
                 new Reference(\App\Module\Inventory\Repository\InventoryItemRepository::class),
             ])->setPublic(true);
