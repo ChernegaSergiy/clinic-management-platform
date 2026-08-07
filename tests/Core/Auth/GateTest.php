@@ -16,8 +16,8 @@ class GateTest extends TestCase
     {
         $this->permissionRegistry = new PermissionRegistry();
         $this->policyRegistry = new PolicyRegistry();
-        Gate::setPermissionRegistry($this->permissionRegistry);
-        Gate::setPolicyRegistry($this->policyRegistry);
+
+        $this->gate = new Gate($this->permissionRegistry, $this->policyRegistry);
     }
 
     protected function tearDown() : void
@@ -27,7 +27,7 @@ class GateTest extends TestCase
 
     public function testGetUserReturnsNullWhenNoSession() : void
     {
-        $result = Gate::getUser();
+        $result = $this->gate->getUser();
         $this->assertNull($result);
     }
 
@@ -40,14 +40,14 @@ class GateTest extends TestCase
             'permissions' => ['patient.view']
         ];
 
-        $user = Gate::getUser();
+        $user = $this->gate->getUser();
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals(1, $user->getId());
     }
 
     public function testAllowsReturnsFalseWhenNoUser() : void
     {
-        $result = Gate::allows('patient.view');
+        $result = $this->gate->allows('patient.view');
         $this->assertFalse($result);
     }
 
@@ -60,7 +60,7 @@ class GateTest extends TestCase
             'permissions' => []
         ];
 
-        $result = Gate::allows('anything');
+        $result = $this->gate->allows('anything');
         $this->assertTrue($result);
     }
 
@@ -73,10 +73,10 @@ class GateTest extends TestCase
             'permissions' => ['patient.view', 'patient.edit']
         ];
 
-        $this->assertTrue(Gate::allows('patient.view'));
-        $this->assertTrue(Gate::allows('patient.edit'));
-        $this->assertFalse(Gate::allows('patient.delete'));
-        $this->assertFalse(Gate::allows('admin.system'));
+        $this->assertTrue($this->gate->allows('patient.view'));
+        $this->assertTrue($this->gate->allows('patient.edit'));
+        $this->assertFalse($this->gate->allows('patient.delete'));
+        $this->assertFalse($this->gate->allows('admin.system'));
     }
 
     public function testAllowsChecksGranularPermission() : void
@@ -88,10 +88,10 @@ class GateTest extends TestCase
             'permissions' => ['prescription.create_own', 'prescription.edit_own', 'prescription.view_any']
         ];
 
-        $this->assertTrue(Gate::allows('prescription.create_own'));
-        $this->assertTrue(Gate::allows('prescription.edit_own'));
-        $this->assertTrue(Gate::allows('prescription.view_any'));
-        $this->assertFalse(Gate::allows('prescription.delete_any'));
+        $this->assertTrue($this->gate->allows('prescription.create_own'));
+        $this->assertTrue($this->gate->allows('prescription.edit_own'));
+        $this->assertTrue($this->gate->allows('prescription.view_any'));
+        $this->assertFalse($this->gate->allows('prescription.delete_any'));
     }
 
     public function testAuthorizeExitsOnNoUser() : void
@@ -101,7 +101,7 @@ class GateTest extends TestCase
         $this->expectException(ExitException::class);
         $this->expectExceptionMessage('Доступ заборонено (не автентифіковано)');
 
-        Gate::authorize('patient.view');
+        $this->gate->authorize('patient.view');
     }
 
     public function testAuthorizeExitsOnNoPermission() : void
@@ -116,7 +116,7 @@ class GateTest extends TestCase
         $this->expectException(ExitException::class);
         $this->expectExceptionMessage('Доступ заборонено');
 
-        Gate::authorize('patient.delete');
+        $this->gate->authorize('patient.delete');
     }
 
     public function testAuthorizePassesWithPermission() : void
@@ -128,7 +128,7 @@ class GateTest extends TestCase
             'permissions' => ['patient.view']
         ];
 
-        Gate::authorize('patient.view');
+        $this->gate->authorize('patient.view');
         $this->assertTrue(true);
     }
 }
