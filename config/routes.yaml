@@ -1,9 +1,3 @@
-controllers:
-    resource:
-        path: ../src/Module/
-        namespace: App\Module\
-    type: attribute
-
 bundles:
     resource:
         path: ../src/Bundles/

@@ -19,7 +19,6 @@ return function (ContainerBuilder $container) {
         ->setArguments([new Reference('service_container')])
         ->setPublic(true);
 
-    $container->register(\App\Core\Module\ModuleManager::class)->setPublic(true);
     $container->register(\App\Core\Auth\PermissionRegistry::class)->setPublic(true);
     $container->register(\App\Core\Auth\PolicyRegistry::class)->setPublic(true);
     $container->register(\App\Core\Auth\Gate::class)
