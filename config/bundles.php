@@ -6,4 +6,5 @@ return [
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
     App\Bundles\DashboardBundle\DashboardBundle::class => ['all' => true],
     App\Bundles\PatientBundle\PatientBundle::class => ['all' => true],
+    App\Bundles\AppointmentBundle\AppointmentBundle::class => ['all' => true],
 ];
