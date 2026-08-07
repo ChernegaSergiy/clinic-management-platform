@@ -2,12 +2,12 @@
 
 namespace App\Bundles\PrescriptionBundle\Controller;
 
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
-use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

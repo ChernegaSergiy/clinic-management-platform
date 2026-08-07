@@ -4,10 +4,10 @@ namespace App\Bundles\DashboardBundle\Service;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
-use App\Module\Inventory\Repository\InventoryItemRepositoryInterface;
 use DateTime;
 
 class DashboardService

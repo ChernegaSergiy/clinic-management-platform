@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Module\Inventory\Repository\InventoryItemRepository;
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
