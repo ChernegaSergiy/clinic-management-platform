@@ -1,0 +1,58 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}{{ 'hrm.list.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'hrm.list.header'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/hrm/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'hrm.list.add_employee'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'hrm.list.table.id'|trans }}</th>
+                    <th>{{ 'hrm.list.table.name'|trans }}</th>
+                    <th>{{ 'hrm.list.table.position'|trans }}</th>
+                    <th>{{ 'hrm.list.table.department'|trans }}</th>
+                    <th>{{ 'hrm.list.table.hire_date'|trans }}</th>
+                    <th>{{ 'hrm.list.table.status'|trans }}</th>
+                    <th>{{ 'hrm.list.table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.last_name }} {{ employee.first_name }}</td>
+                        <td>{{ employee.position }}</td>
+                        <td>{{ employee.department_name }}</td>
+                        <td>{{ employee.hire_date }}</td>
+                        <td>{{ employee.status }}</td>
+                        <td>
+                            <a href="/hrm/show?id={{ employee.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="/hrm/edit?id={{ employee.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="center aligned">{{ 'hrm.list.no_employees'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
