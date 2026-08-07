@@ -10,19 +10,19 @@ class SiteController extends \App\Core\Controller\AbstractController
     #[Route('/', name: 'site_home')]
     public function home() : Response
     {
-        return $this->render('@Site/index.html.twig');
+        return $this->render('@Site/home/index.html.twig');
     }
 
     #[Route('/about', name: 'site_about')]
     public function about() : Response
     {
-        return $this->render('@Site/about.html.twig');
+        return $this->render('@Site/about/index.html.twig');
     }
 
     #[Route('/contact', name: 'site_contact')]
     public function contact() : Response
     {
-        return $this->render('@Site/contact.html.twig');
+        return $this->render('@Site/contact/index.html.twig');
     }
 
     #[Route('/sitemap', name: 'site_sitemap')]
