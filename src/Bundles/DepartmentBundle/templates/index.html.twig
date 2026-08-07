@@ -18,19 +18,19 @@
 
         <div class="ui divider"></div>
 
-        {% if flash.success_message is defined %}
-            <div class="ui success message">
+        {% for message in app.flashes('success') %}
+            <div class="ui success message" data-flash="success">
                 <i class="close icon"></i>
-                {{ flash.success_message }}
+                {{ message }}
             </div>
-        {% endif %}
+        {% endfor %}
 
-        {% if flash.error_message is defined %}
-            <div class="ui error message">
+        {% for message in app.flashes('error') %}
+            <div class="ui error message" data-flash="error">
                 <i class="close icon"></i>
-                {{ flash.error_message }}
+                {{ message }}
             </div>
-        {% endif %}
+        {% endfor %}
 
         {% if departments is not empty %}
             <table class="ui celled table">

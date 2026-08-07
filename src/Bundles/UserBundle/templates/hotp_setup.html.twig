@@ -20,14 +20,13 @@
                 </div>
             {% endif %}
 
-            {% if session.error_message %}
+            {% for message in app.flashes('error') %}
                 <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
                     <div class="header">{{ 'user.mfa.hotp_setup.error_header'|trans }}</div>
-                    <p>{{ session.error_message }}</p>
+                    <p>{{ message }}</p>
                 </div>
-                {% set _ = session.error_message is null %}
-            {% endif %}
+            {% endfor %}
 
             <div class="ui grid stackable" style="margin-top: 2rem;">
                 <div class="ten wide column">

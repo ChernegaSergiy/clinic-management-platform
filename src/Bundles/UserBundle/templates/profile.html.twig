@@ -8,21 +8,20 @@
             <h1 class="ui header">{{ 'user.profile.title_full'|trans }}</h1>
         </div>
         <div class="ui secondary segment">
-            {% if successMessage %}
+            {% for message in app.flashes('success') %}
                 <div class="ui success message" data-flash="success">
                     <i class="close icon"></i>
                     <div class="header">{{ 'user.profile.success'|trans }}</div>
-                    <p>{{ successMessage }}</p>
+                    <p>{{ message }}</p>
                 </div>
-            {% endif %}
-            {% if session.error_message %}
+            {% endfor %}
+            {% for message in app.flashes('error') %}
                 <div class="ui error message" data-flash="error">
                     <i class="close icon"></i>
                     <div class="header">{{ 'user.profile.error'|trans }}</div>
-                    <p>{{ session.error_message }}</p>
+                    <p>{{ message }}</p>
                 </div>
-                {% set _ = session.error_message is null %}
-            {% endif %}
+            {% endfor %}
 
             <div class="ui grid">
                 <div class="four wide column">
