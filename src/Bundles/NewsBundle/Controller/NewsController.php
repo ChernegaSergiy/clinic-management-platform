@@ -26,7 +26,7 @@ class NewsController extends \App\Core\Controller\AbstractController
     public function index() : Response
     {
         $newsArticles = $this->newsRepository->findAll();
-        return $this->render('news/index.html.twig', [
+        return $this->render('@News/public/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
@@ -44,7 +44,7 @@ class NewsController extends \App\Core\Controller\AbstractController
             ]);
         }
 
-        return $this->render('news/show.html.twig', [
+        return $this->render('@News/public/show.html.twig', [
             'newsArticle' => $newsArticle,
         ]);
     }
