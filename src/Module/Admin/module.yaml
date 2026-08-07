@@ -1,6 +1,0 @@
-name: Admin
-version: 1.0.0
-description: Модуль адміністрування
-author: Serhii
-config:
-    enabled: true
