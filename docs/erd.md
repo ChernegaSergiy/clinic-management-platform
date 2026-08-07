@@ -1,6 +1,7 @@
 # ER Diagram of Main Entities
 
-> **Note:** This diagram is a basic design. It will be expanded and detailed according to the requirements of the National Health Service of Ukraine (NSZU) and eHealth electronic healthcare system standards, including specific identifiers, directories, and mandatory fields.
+> [!NOTE]
+> This diagram is a basic design. It will be expanded and detailed according to the requirements of the National Health Service of Ukraine (NSZU) and eHealth electronic healthcare system standards, including specific identifiers, directories, and mandatory fields.
 
 ## 1. Entities and Their Attributes
 
