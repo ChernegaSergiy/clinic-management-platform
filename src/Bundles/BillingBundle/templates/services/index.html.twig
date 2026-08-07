@@ -1,0 +1,63 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'billing.services.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'billing.services.list_title'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/billing/services/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'billing.services.add_service'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        {% if services is empty %}
+            <p>{{ 'billing.services.no_services'|trans }}</p>
+        {% else %}
+            <table class="ui celled unstackable table">
+                <thead>
+                    <tr>
+                        <th>{{ 'billing.services.table.id'|trans }}</th>
+                        <th>{{ 'billing.services.table.name'|trans }}</th>
+                        <th>{{ 'billing.services.table.category'|trans }}</th>
+                        <th>{{ 'billing.services.table.price'|trans }}</th>
+                        <th>{{ 'billing.services.table.active'|trans }}</th>
+                        <th>{{ 'billing.services.table.actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                        <tr>
+                            <td>{{ service.id }}</td>
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.category_name ?: ('billing.services.no_category'|trans) }}</td>
+                            <td>{{ service.price | number_format(2) }}</td>
+                            <td>
+                                {% if service.is_active %}
+                                    <i class="check circle icon green"></i> {{ 'billing.services.yes'|trans }}
+                                {% else %}
+                                    <i class="times circle icon red"></i> {{ 'billing.services.no'|trans }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/billing/services/edit?id={{ service.id }}" class="ui icon button">
+                                    <i class="edit icon"></i>
+                                </a>
+                                {# <a href="/billing/services/delete?id={{ service.id }}" class="ui icon button red">
+                                    <i class="trash icon"></i>
+                                </a> #}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

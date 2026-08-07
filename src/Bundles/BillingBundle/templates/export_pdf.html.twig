@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'billing.export_pdf.title'|trans }}</title>
+    <style>
+        body { font-family: 'DejaVu Sans', 'dejavusans', sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>{{ 'billing.export_pdf.title'|trans }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>{{ 'billing.export_pdf.table.id'|trans }}</th>
+                <th>{{ 'billing.export_pdf.table.patient'|trans }}</th>
+                <th>{{ 'billing.export_pdf.table.amount'|trans }}</th>
+                <th>{{ 'billing.export_pdf.table.status'|trans }}</th>
+                <th>{{ 'billing.export_pdf.table.issued_date'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.id }}</td>
+                    <td>{{ invoice.patient_name }}</td>
+                    <td>{{ invoice.amount }}</td>
+                    <td>{{ invoice.status }}</td>
+                    <td>{{ invoice.issued_date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

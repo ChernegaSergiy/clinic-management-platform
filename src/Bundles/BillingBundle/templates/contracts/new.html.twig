@@ -1,0 +1,68 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/forms.html.twig" as forms %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'billing.contracts.new.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h2 class="ui header">{{ 'billing.contracts.new.header'|trans }}</h2>
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="POST" action="/billing/contracts/new" enctype="multipart/form-data">
+            {{ forms.input('title', 'billing.contracts.new.title_label'|trans, old.title ?? '', 'text', 'billing.contracts.new.title_placeholder'|trans, errors.title ?? null, {'required': 'required'}) }}
+            {{ forms.textarea('description', 'billing.contracts.new.description_label'|trans, old.description ?? '', 'billing.contracts.new.description_placeholder'|trans, errors.description ?? null) }}
+            
+            <div class="two fields">
+                {{ forms.input('start_date', 'billing.contracts.new.start_date_label'|trans, old.start_date ?? '', 'date', '', errors.start_date ?? null, {'required': 'required'}) }}
+                {{ forms.input('end_date', 'billing.contracts.new.end_date_label'|trans, old.end_date ?? '', 'date', '', errors.end_date ?? null) }}
+            </div>
+            <div class="two fields">
+                {{ forms.input('party_a', 'billing.contracts.new.party_a_label'|trans, old.party_a ?? '', 'text', 'billing.contracts.new.party_a_placeholder'|trans, errors.party_a ?? null) }}
+                {{ forms.input('party_b', 'billing.contracts.new.party_b_label'|trans, old.party_b ?? '', 'text', 'billing.contracts.new.party_b_placeholder'|trans, errors.party_b ?? null) }}
+            </div>
+
+            <div class="field {% if errors.contract_file %}error{% endif %}">
+                <label>{{ 'billing.contracts.new.contract_file_label'|trans }}</label>
+                <div class="ui action input">
+                    <input type="text" id="contract-file-display" readonly placeholder="{{ 'billing.contracts.new.file_not_selected'|trans }}">
+                    <label for="contract-file-input" class="ui button">{{ 'billing.contracts.new.choose_file'|trans }}</label>
+                </div>
+                <input type="file" id="contract-file-input" name="contract_file" style="display: none;">
+                {% if errors.contract_file %}<div class="ui red basic pointing label">{{ errors.contract_file | first }}</div>{% endif %}
+            </div>
+
+            <div class="field {% if errors.status %}error{% endif %}">
+                <label>{{ 'billing.contracts.new.status_label'|trans }}</label>
+                <select class="ui dropdown" name="status">
+                    <option value="active" {% if (old.status is defined and old.status == 'active') or (old.status is not defined) %}selected{% endif %}>{{ 'billing.contracts.new.status_active'|trans }}</option>
+                    <option value="expired" {% if old.status == 'expired' %}selected{% endif %}>{{ 'billing.contracts.new.status_expired'|trans }}</option>
+                    <option value="terminated" {% if old.status == 'terminated' %}selected{% endif %}>{{ 'billing.contracts.new.status_terminated'|trans }}</option>
+                </select>
+                {% if errors.status %}<div class="ui red basic pointing label">{{ errors.status | first }}</div>{% endif %}
+            </div>
+
+            <div class="ui divider"></div>
+
+            {{ ui.button('billing.contracts.new.save_button'|trans, 'primary', '', 'save') }}
+            <a href="/billing/contracts" class="ui button"><i class="arrow left icon"></i> {{ 'billing.contracts.new.cancel_button'|trans }}</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.ui.dropdown').dropdown();
+
+            const fileInput = document.getElementById('contract-file-input');
+            const display = document.getElementById('contract-file-display');
+            if (fileInput && display) {
+                fileInput.addEventListener('change', function() {
+                    display.value = fileInput.files.length ? fileInput.files[0].name : '{{ 'billing.contracts.new.file_not_selected'|trans }}';
+                });
+            }
+        });
+    </script>
+{% endblock %}

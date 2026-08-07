@@ -1,0 +1,75 @@
+{% extends "layouts/base.html.twig" %}
+{% import "components/ui.html.twig" as ui %}
+
+{% block title %}{{ 'billing.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h2 class="ui header">{{ 'billing.list.title'|trans }}</h2>
+            </div>
+            <div class="eight wide column right aligned">
+                <a href="/billing/export-csv" class="ui secondary button">
+                    <i class="file alternate outline icon"></i> {{ 'billing.list.export_csv'|trans }}
+                </a>
+                <a href="/billing/export-excel" class="ui secondary button">
+                    <i class="file excel icon"></i> {{ 'billing.list.export_excel'|trans }}
+                </a>
+                <a href="/billing/export-pdf" class="ui secondary button">
+                    <i class="file pdf icon"></i> {{ 'billing.list.export_pdf'|trans }}
+                </a>
+                <a href="/billing/new" class="ui primary button">
+                    <i class="plus icon"></i> {{ 'billing.list.create_invoice'|trans }}
+                </a>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <form class="ui form" method="get" action="/billing">
+            <div class="field">
+                <div class="ui icon input">
+                    <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'billing.list.search_placeholder'|trans }}">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+
+        <table class="ui celled unstackable table">
+            <thead>
+                <tr>
+                    <th>{{ 'billing.list.table.id'|trans }}</th>
+                    <th>{{ 'billing.list.table.patient'|trans }}</th>
+                    <th>{{ 'billing.list.table.amount'|trans }}</th>
+                    <th>{{ 'billing.list.table.status'|trans }}</th>
+                    <th>{{ 'billing.list.table.issued_date'|trans }}</th>
+                    <th>{{ 'billing.list.table.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.id }}</td>
+                        <td>{{ invoice.patient_name }}</td>
+                        <td>{{ invoice.amount }}</td>
+                        <td>{{ invoice.status }}</td>
+                        <td>{{ invoice.issued_date|date('Y-m-d H:i') }}</td>
+                        <td>
+                            <a href="/billing/show?id={{ invoice.id }}" class="ui icon button">
+                                <i class="eye icon"></i>
+                            </a>
+                            <a href="/billing/edit?id={{ invoice.id }}" class="ui icon button">
+                                <i class="edit icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="center aligned">{{ 'billing.list.no_invoices'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
