@@ -1,0 +1,38 @@
+{% extends "layouts/public.html.twig" %}
+
+{% block title %}Помилка {{ status_code|default('') }} — {{ clinic_name|default('Клініка') }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container" style="max-width: 600px; text-align: center; padding: 3rem 0;">
+            <div class="section__eyebrow">Помилка {{ status_code|default('') }}</div>
+            <h2 class="section__title section__title--large" style="margin-bottom: 1rem;">
+                {% if status_code == 404 %}
+                    Сторінку не знайдено
+                {% elseif status_code == 403 %}
+                    Доступ заборонено
+                {% else %}
+                    {{ status_text|default('Щось пішло не так') }}
+                {% endif %}
+            </h2>
+            <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 400px;">
+                {% if status_code == 404 %}
+                    Схоже, сторінка, яку ви шукаєте, була видалена, перейменована або тимчасово недоступна.
+                {% elseif status_code == 403 %}
+                    У вас немає прав для перегляду цієї сторінки.
+                {% else %}
+                    Ми не змогли відобразити цю сторінку. Спробуйте оновити або поверніться пізніше.
+                {% endif %}
+            </p>
+            
+            {% if exception is defined and exception.message and app.environment == 'dev' %}
+                <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 0.5rem;">{{ exception.message }}</p>
+            {% endif %}
+            
+            <div class="hero__actions" style="justify-content: center; margin-top: 2rem;">
+                <a class="btn btn--primary" href="/">Повернутися на головну</a>
+                <a class="btn btn--ghost" href="/contact">Написати адміністратору</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
