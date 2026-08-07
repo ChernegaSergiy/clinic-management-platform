@@ -1,8 +1,0 @@
-name: Dashboard
-version: 1.0.0
-description: Головна панель управління
-author: Serhii
-config:
-    enabled: true
-    features:
-        export: true
