@@ -67,7 +67,7 @@ composer install
 
 ### Running Checks
 
-All commands are executed from the `www/` directory:
+All commands are executed from the root of the project:
 
 ```bash
 # Static analysis with PHPStan
