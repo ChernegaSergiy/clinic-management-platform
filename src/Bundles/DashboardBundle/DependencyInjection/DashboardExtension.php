@@ -2,9 +2,6 @@
 
 namespace App\Bundles\DashboardBundle\DependencyInjection;
 
-use App\Bundles\DashboardBundle\DashboardPolicy;
-use App\Core\Auth\PermissionRegistry;
-use App\Core\Auth\PolicyRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
