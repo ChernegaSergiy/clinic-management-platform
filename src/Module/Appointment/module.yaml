@@ -1,9 +1,0 @@
-name: Appointment
-version: 1.0.0
-description: Модуль для управління записами на прийом
-author: Serhii
-config:
-    enabled: true
-    features:
-        waitlist: true
-        api: true
