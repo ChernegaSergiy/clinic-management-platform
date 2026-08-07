@@ -116,7 +116,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         }
         unset($user); // Break the reference with the last element
 
-        return $this->render('@Admin/users.html.twig', [
+        return $this->render('@Admin/users/index.html.twig', [
             'users' => $users,
             'searchTerm' => $searchTerm,
         ]);
@@ -134,7 +134,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Admin/new_user.html.twig', [
+        return $this->render('@Admin/users/new.html.twig', [
             'roles' => $roleOptions,
             'old' => $old,
             'errors' => $errors,
@@ -185,7 +185,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $role = $this->roleRepository->findById($user['role_id']);
         $user['role_name'] = $role['name'] ?? 'Невідома';
 
-        return $this->render('@Admin/show_user.html.twig', ['user' => $user]);
+        return $this->render('@Admin/users/show.html.twig', ['user' => $user]);
     }
 
     #[Route('/admin/users/edit', name: 'admin_users_edit', methods: ['GET'])]
@@ -207,7 +207,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Admin/edit_user.html.twig', [
+        return $this->render('@Admin/users/edit.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
             'old' => $old,
@@ -335,14 +335,14 @@ class AdminController extends \App\Core\Controller\AbstractController
     {
         $this->authorizeAdmin();
         $roles = $this->roleRepository->findAll();
-        return $this->render('@Admin/index.html.twig', ['roles' => $roles]);
+        return $this->render('@Admin/roles/index.html.twig', ['roles' => $roles]);
     }
 
     #[Route('/admin/roles/new', name: 'admin_roles_new', methods: ['GET'])]
     public function createRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $response = $this->render('@Admin/new_role.html.twig', [
+        $response = $this->render('@Admin/roles/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -384,7 +384,7 @@ class AdminController extends \App\Core\Controller\AbstractController
             return new \Symfony\Component\HttpFoundation\Response("Роль не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/edit_role.html.twig', [
+        $response = $this->render('@Admin/roles/edit.html.twig', [
             'role' => $role,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

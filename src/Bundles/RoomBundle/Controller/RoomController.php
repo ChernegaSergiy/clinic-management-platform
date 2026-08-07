@@ -38,7 +38,7 @@ class RoomController extends \App\Core\Controller\AbstractController
     {
         $this->authorizeAdmin();
 
-        $response = $this->render('@Room/create.html.twig', [
+        $response = $this->render('@Room/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);

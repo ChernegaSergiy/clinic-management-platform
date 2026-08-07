@@ -370,7 +370,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
 
-        return $this->render('@Patient/add_policy.html.twig', [
+        return $this->render('@Patient/policies/new.html.twig', [
             'patient' => $patient,
             'insurance_companies' => $insuranceCompanies,
         ]);
@@ -396,7 +396,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         if (!$validator->validate($_POST, $rules)) {
             $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
-            return $this->render('@Patient/add_policy.html.twig', [
+            return $this->render('@Patient/policies/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -435,7 +435,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
 
-        return $this->render('@Patient/edit_policy.html.twig', [
+        return $this->render('@Patient/policies/edit.html.twig', [
             'patient' => $patient,
             'policy' => $policy,
             'insurance_companies' => $insuranceCompanies,
@@ -465,7 +465,7 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         if (!$validator->validate($_POST, $rules)) {
             $insuranceCompanies = $this->insuranceService->getAllInsuranceCompanies();
-            return $this->render('@Patient/edit_policy.html.twig', [
+            return $this->render('@Patient/policies/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
