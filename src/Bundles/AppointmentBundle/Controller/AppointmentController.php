@@ -113,11 +113,11 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             'services' => $services,
             'availableSlots' => $availableSlots,
             'selectedDate' => $selectedDateStr,
-            'old' => array_merge($_SESSION['old'] ?? [], $_GET),
-            'errors' => $_SESSION['errors'] ?? [],
+            'old' => $_GET,
+            'errors' => [],
             'success_message' => $_SESSION['public_success_message'] ?? null,
         ]);
-        unset($_SESSION['old'], $_SESSION['errors'], $_SESSION['public_success_message']);
+        unset($_SESSION['public_success_message']);
         return $response;
     }
 
@@ -138,31 +138,57 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             'end_time' => ['required', 'datetime'],
         ];
 
+        $errors = [];
         if (!$validator->validate($rawInput, $rules)) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $rawInput;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'] ?? '', 'service_id' => $rawInput['service_id'] ?? '', 'date' => $rawInput['date'] ?? '']));
-        }
+            foreach ($validator->getErrors() as $key => $messages) {
+                $errors[$key] = $messages;
+            }
+        } else {
+            // Advanced validation: Check if the slot is still available
+            $selectedDoctorId = (int)$rawInput['doctor_id'];
+            $selectedServiceId = (int)$rawInput['service_id'];
+            $startTime = new \DateTime($rawInput['start_time']);
 
-        // Advanced validation: Check if the slot is still available
-        $selectedDoctorId = (int)$rawInput['doctor_id'];
-        $selectedServiceId = (int)$rawInput['service_id'];
-        $startTime = new \DateTime($rawInput['start_time']);
+            $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
 
-        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+            $isSlotAvailable = false;
+            foreach ($availableSlots as $slot) {
+                if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
+                    $isSlotAvailable = true;
+                    break;
+                }
+            }
 
-        $isSlotAvailable = false;
-        foreach ($availableSlots as $slot) {
-            if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
-                $isSlotAvailable = true;
-                break;
+            if (!$isSlotAvailable) {
+                $errors['start_time'] = ['The selected time slot is no longer available. Please choose another one.'];
             }
         }
 
-        if (!$isSlotAvailable) {
-            $_SESSION['errors'] = ['start_time' => ['The selected time slot is no longer available. Please choose another one.']];
-            $_SESSION['old'] = $rawInput;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
+        if (!empty($errors)) {
+            $doctors = $this->userRepository->findAllDoctors();
+            $services = $this->serviceRepository->findAll();
+            $selectedDoctorId = (int)($rawInput['doctor_id'] ?? 0);
+            $selectedDateStr = $rawInput['date'] ?? date('Y-m-d');
+            $selectedServiceId = (int)($rawInput['service_id'] ?? $services[0]['id'] ?? 0);
+
+            $availableSlots = [];
+            if ($selectedDoctorId && $selectedDateStr && $selectedServiceId) {
+                try {
+                    $selectedDate = new \DateTime($selectedDateStr);
+                    $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+                } catch (\Exception $e) {
+                }
+            }
+
+            return $this->render('@Appointment/public/book.html.twig', [
+                'doctors' => $doctors,
+                'services' => $services,
+                'availableSlots' => $availableSlots,
+                'selectedDate' => $selectedDateStr,
+                'old' => $rawInput,
+                'errors' => $errors,
+                'success_message' => null,
+            ]);
         }
 
         // Find or create patient
@@ -178,9 +204,29 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 'gender' => 'other',
             ]);
             if (!$patientId) {
-                $_SESSION['errors'] = ['patient' => ['Could not create a new patient record.']];
-                $_SESSION['old'] = $rawInput;
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment?' . http_build_query(['doctor_id' => $rawInput['doctor_id'], 'service_id' => $rawInput['service_id'], 'date' => $rawInput['date']]));
+                $errors['patient'] = ['Could not create a new patient record.'];
+                $doctors = $this->userRepository->findAllDoctors();
+                $services = $this->serviceRepository->findAll();
+                $selectedDoctorId = (int)($rawInput['doctor_id'] ?? 0);
+                $selectedDateStr = $rawInput['date'] ?? date('Y-m-d');
+                $selectedServiceId = (int)($rawInput['service_id'] ?? $services[0]['id'] ?? 0);
+                $availableSlots = [];
+                if ($selectedDoctorId && $selectedDateStr && $selectedServiceId) {
+                    try {
+                        $selectedDate = new \DateTime($selectedDateStr);
+                        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $selectedDate, $selectedServiceId);
+                    } catch (\Exception $e) {
+                    }
+                }
+                return $this->render('@Appointment/public/book.html.twig', [
+                    'doctors' => $doctors,
+                    'services' => $services,
+                    'availableSlots' => $availableSlots,
+                    'selectedDate' => $selectedDateStr,
+                    'old' => $rawInput,
+                    'errors' => $errors,
+                    'success_message' => null,
+                ]);
             }
         } else {
             $patientId = $patient['id'];
@@ -336,41 +382,44 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         ];
 
         if (!$validator->validate($rawInput, $rules)) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $rawInput;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/new?' . http_build_query($rawInput));
-        }
+            $errors = [];
+            foreach ($validator->getErrors() as $key => $messages) {
+                $errors[$key] = is_array($messages) ? reset($messages) : $messages;
+            }
+        } else {
+            $selectedDoctorId = (int)$rawInput['doctor_id'];
+            $selectedServiceId = (int)$rawInput['service_id'];
+            $startTime = new \DateTime($rawInput['start_time']);
 
-        $selectedDoctorId = (int)$rawInput['doctor_id'];
-        $selectedServiceId = (int)$rawInput['service_id'];
-        $startTime = new \DateTime($rawInput['start_time']);
+            $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
 
-        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+            $isSlotAvailable = false;
+            foreach ($availableSlots as $slot) {
+                if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
+                    $isSlotAvailable = true;
+                    break;
+                }
+            }
 
-        $isSlotAvailable = false;
-        foreach ($availableSlots as $slot) {
-            if ($slot['time']->format('Y-m-d H:i:s') === $startTime->format('Y-m-d H:i:s') && $slot['available']) {
-                $isSlotAvailable = true;
-                break;
+            if (!$isSlotAvailable) {
+                $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
+            }
+
+            $roomValidation = $this->schedulingService->validateAppointmentBooking([
+                'doctor_id' => $selectedDoctorId,
+                'start_time' => $rawInput['start_time'],
+                'end_time' => $rawInput['end_time'],
+                'room_id' => $rawInput['room_id'] ?? null
+            ]);
+
+            if (!$roomValidation['valid']) {
+                foreach ($roomValidation['errors'] as $error) {
+                    $errors[$error['field']] = $error['message'];
+                }
             }
         }
 
-        if (!$isSlotAvailable) {
-            $errors['start_time'] = 'The selected time slot is no longer available. Please choose another one.';
-        }
 
-        $roomValidation = $this->schedulingService->validateAppointmentBooking([
-            'doctor_id' => $selectedDoctorId,
-            'start_time' => $rawInput['start_time'],
-            'end_time' => $rawInput['end_time'],
-            'room_id' => $rawInput['room_id'] ?? null
-        ]);
-
-        if (!$roomValidation['valid']) {
-            foreach ($roomValidation['errors'] as $error) {
-                $errors[$error['field']] = $error['message'];
-            }
-        }
 
         if (!empty($errors)) {
             $patients = $this->patientRepository->findAllActive();
@@ -387,8 +436,21 @@ class AppointmentController extends \App\Core\Controller\AbstractController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            $selectedDateStr = $startTime->format('Y-m-d');
-            $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+            $selectedDoctorId = (int)($rawInput['doctor_id'] ?? 0);
+            $selectedServiceId = (int)($rawInput['service_id'] ?? 0);
+
+            $availableSlots = [];
+            $selectedDateStr = date('Y-m-d');
+            if (!empty($rawInput['start_time'])) {
+                try {
+                    $startTime = new \DateTime($rawInput['start_time']);
+                    $selectedDateStr = $startTime->format('Y-m-d');
+                    if ($selectedDoctorId && $selectedServiceId) {
+                        $availableSlots = $this->schedulingService->getAvailableTimeSlots($selectedDoctorId, $startTime, $selectedServiceId);
+                    }
+                } catch (\Exception $e) {
+                }
+            }
 
             $roomOptions = [];
             foreach ($rooms as $room) {

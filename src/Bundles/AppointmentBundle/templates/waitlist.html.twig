@@ -12,43 +12,43 @@
         <h3 class="ui header">{{ 'appointment.waitlist.add_form_title'|trans }}</h3>
         <form class="ui form" action="/appointments/waitlist/add" method="POST">
             <div class="two fields">
-                <div class="field {% if errors.patient_id %}error{% endif %}">
+                <div class="field {% if errors.patient_id ?? null %}error{% endif %}">
                     <label>{{ 'appointment.waitlist.patient_label'|trans }}</label>
                     <select class="ui search dropdown" name="patient_id">
                         <option value="">{{ 'appointment.waitlist.patient_placeholder'|trans }}</option>
                         {% for id, name in patients %}
-                            <option value="{{ id }}" {% if old.patient_id == id %}selected{% endif %}>{{ name }}</option>
+                            <option value="{{ id }}" {% if (old.patient_id ?? null) == id %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
-                    {% if errors.patient_id %}<div class="ui red basic pointing label">{{ errors.patient_id | first }}</div>{% endif %}
+                    {% if errors.patient_id ?? null %}<div class="ui red basic pointing label">{{ (errors.patient_id ?? null) | first }}</div>{% endif %}
                 </div>
-                <div class="field {% if errors.desired_doctor_id %}error{% endif %}">
+                <div class="field {% if errors.desired_doctor_id ?? null %}error{% endif %}">
                     <label>{{ 'appointment.waitlist.desired_doctor_label'|trans }}</label>
                     <select class="ui search dropdown" name="desired_doctor_id">
                         <option value="">{{ 'appointment.waitlist.desired_doctor_placeholder'|trans }}</option>
                         {% for id, name in doctors %}
-                            <option value="{{ id }}" {% if old.desired_doctor_id == id %}selected{% endif %}>{{ name }}</option>
+                            <option value="{{ id }}" {% if (old.desired_doctor_id ?? null) == id %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
-                    {% if errors.desired_doctor_id %}<div class="ui red basic pointing label">{{ errors.desired_doctor_id | first }}</div>{% endif %}
+                    {% if errors.desired_doctor_id ?? null %}<div class="ui red basic pointing label">{{ (errors.desired_doctor_id ?? null) | first }}</div>{% endif %}
                 </div>
             </div>
             <div class="two fields">
-                <div class="field {% if errors.desired_start_time %}error{% endif %}">
+                <div class="field {% if errors.desired_start_time ?? null %}error{% endif %}">
                     <label>{{ 'appointment.waitlist.desired_start_time_label'|trans }}</label>
-                    <input type="datetime-local" name="desired_start_time" value="{{ old.desired_start_time }}">
-                    {% if errors.desired_start_time %}<div class="ui red basic pointing label">{{ errors.desired_start_time | first }}</div>{% endif %}
+                    <input type="datetime-local" name="desired_start_time" value="{{ old.desired_start_time ?? '' }}">
+                    {% if errors.desired_start_time ?? null %}<div class="ui red basic pointing label">{{ (errors.desired_start_time ?? null) | first }}</div>{% endif %}
                 </div>
-                <div class="field {% if errors.desired_end_time %}error{% endif %}">
+                <div class="field {% if errors.desired_end_time ?? null %}error{% endif %}">
                     <label>{{ 'appointment.waitlist.desired_end_time_label'|trans }}</label>
-                    <input type="datetime-local" name="desired_end_time" value="{{ old.desired_end_time }}">
-                    {% if errors.desired_end_time %}<div class="ui red basic pointing label">{{ errors.desired_end_time | first }}</div>{% endif %}
+                    <input type="datetime-local" name="desired_end_time" value="{{ old.desired_end_time ?? '' }}">
+                    {% if errors.desired_end_time ?? null %}<div class="ui red basic pointing label">{{ (errors.desired_end_time ?? null) | first }}</div>{% endif %}
                 </div>
             </div>
-            <div class="field {% if errors.notes %}error{% endif %}">
+            <div class="field {% if errors.notes ?? null %}error{% endif %}">
                 <label>{{ 'appointment.waitlist.notes_label'|trans }}</label>
-                <textarea name="notes" rows="3">{{ old.notes }}</textarea>
-                {% if errors.notes %}<div class="ui red basic pointing label">{{ errors.notes | first }}</div>{% endif %}
+                <textarea name="notes" rows="3">{{ old.notes ?? '' }}</textarea>
+                {% if errors.notes ?? null %}<div class="ui red basic pointing label">{{ (errors.notes ?? null) | first }}</div>{% endif %}
             </div>
             <button class="ui primary button" type="submit">{{ 'appointment.waitlist.add_button'|trans }}</button>
         </form>
