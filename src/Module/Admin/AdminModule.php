@@ -81,7 +81,7 @@ class AdminModule extends BaseModule
                 new Reference(\App\Module\Admin\Repository\DictionaryRepository::class),
                 new Reference(\App\Module\Admin\Repository\AuthConfigRepository::class),
                 new Reference(\App\Module\Admin\Repository\BackupPolicyRepository::class),
-                new Reference(\App\Module\Kpi\Repository\KpiRepository::class),
+                new Reference(\App\Bundles\KpiBundle\Repository\KpiRepository::class),
                 new Reference(\App\Bundles\BillingBundle\Repository\ServiceRepository::class),
                 new Reference(\App\Core\Repository\SettingsRepository::class),
                 new Reference(\App\Bundles\UserBundle\MfaService::class),

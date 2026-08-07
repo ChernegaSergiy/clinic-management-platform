@@ -4,9 +4,9 @@ namespace App\Bundles\DashboardBundle\Service;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
+use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
-use App\Module\Kpi\Repository\KpiRepository;
 use DateTimeImmutable;
 
 class KpiCalculatorService

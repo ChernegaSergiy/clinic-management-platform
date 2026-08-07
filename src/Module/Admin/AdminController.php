@@ -3,13 +3,13 @@
 namespace App\Module\Admin;
 
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
+use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use App\Module\Admin\Repository\AuthConfigRepository;
 use App\Module\Admin\Repository\BackupPolicyRepository;
 use App\Module\Admin\Repository\DictionaryRepository;
-use App\Module\Kpi\Repository\KpiRepository;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminController extends \App\Core\Controller\AbstractController
@@ -909,14 +909,14 @@ class AdminController extends \App\Core\Controller\AbstractController
     {
         $this->authorizeAdmin();
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        return $this->render('@modules/Kpi/templates/definitions/index.html.twig', ['definitions' => $definitions]);
+        return $this->render('@Kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $response = $this->render('@modules/Kpi/templates/definitions/new.html.twig', [
+        $response = $this->render('@Kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -964,7 +964,7 @@ class AdminController extends \App\Core\Controller\AbstractController
             return new \Symfony\Component\HttpFoundation\Response("Визначення KPI не знайдено", 404);
         }
 
-        $response = $this->render('@modules/Kpi/templates/definitions/edit.html.twig', [
+        $response = $this->render('@Kpi/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
