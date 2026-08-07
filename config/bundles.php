@@ -24,4 +24,5 @@ return [
     App\Bundles\InventoryBundle\InventoryBundle::class => ['all' => true],
     App\Bundles\AdminBundle\AdminBundle::class => ['all' => true],
     App\Bundles\NewsBundle\NewsBundle::class => ['all' => true],
+    App\Bundles\SiteBundle\SiteBundle::class => ['all' => true],
 ];
