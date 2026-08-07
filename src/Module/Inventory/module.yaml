@@ -1,6 +1,0 @@
-name: Inventory
-version: 1.0.0
-description: Модуль управління інвентарем
-author: Serhii
-config:
-    enabled: true
