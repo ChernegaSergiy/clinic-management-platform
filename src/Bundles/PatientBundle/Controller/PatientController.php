@@ -2,6 +2,7 @@
 
 namespace App\Bundles\PatientBundle\Controller;
 
+use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
@@ -12,7 +13,6 @@ use App\Module\Insurance\Repository\InsuranceCompanyRepository;
 use App\Module\Insurance\Repository\PatientInsurancePolicyRepository;
 use App\Module\Insurance\Service\InsuranceService;
 use App\Module\MedicalRecord\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
