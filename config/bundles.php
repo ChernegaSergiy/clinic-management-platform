@@ -16,4 +16,5 @@ return [
     App\Bundles\DepartmentBundle\DepartmentBundle::class => ['all' => true],
     App\Bundles\InsuranceBundle\InsuranceBundle::class => ['all' => true],
     App\Bundles\BillingBundle\BillingBundle::class => ['all' => true],
+    App\Bundles\HrmBundle\HrmBundle::class => ['all' => true],
 ];
