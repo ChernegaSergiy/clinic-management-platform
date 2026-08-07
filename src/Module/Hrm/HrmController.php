@@ -2,9 +2,9 @@
 
 namespace App\Module\Hrm;
 
+use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
-use App\Module\Department\Repository\DepartmentRepository;
 use App\Module\Hrm\Repository\HrmRepositoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
