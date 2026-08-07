@@ -23,4 +23,5 @@ return [
     App\Bundles\NotificationBundle\NotificationBundle::class => ['all' => true],
     App\Bundles\InventoryBundle\InventoryBundle::class => ['all' => true],
     App\Bundles\AdminBundle\AdminBundle::class => ['all' => true],
+    App\Bundles\NewsBundle\NewsBundle::class => ['all' => true],
 ];
