@@ -39,7 +39,7 @@ class ModuleDiscoveryTest extends TestCase
         rmdir($dir);
     }
 
-    public function test_discovers_valid_modules() : void
+    public function testDiscoversValidModules() : void
     {
         mkdir($this->tempDir . '/User');
         mkdir($this->tempDir . '/Billing');
@@ -49,7 +49,7 @@ class ModuleDiscoveryTest extends TestCase
         $this->assertSame(['Billing', 'User'], $modules);
     }
 
-    public function test_ignores_invalid_directories() : void
+    public function testIgnoresInvalidDirectories() : void
     {
         mkdir($this->tempDir . '/ValidModule');
         touch($this->tempDir . '/not_a_dir.txt');
