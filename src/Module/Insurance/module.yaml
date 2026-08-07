@@ -1,6 +1,0 @@
-name: Insurance
-version: 1.0.0
-description: Модуль для страхування
-author: Serhii
-config:
-    enabled: true
