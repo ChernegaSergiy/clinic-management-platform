@@ -709,35 +709,19 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
     public function getCompletedAppointmentsWithIcdCodes(string $date) : array
     {
-        $qb = $this->createQueryBuilder('a')
-            ->select('a.id as appointment_id', 'IDENTITY(a.patient) as patient_id', 'mr.id as medical_record_id')
-            ->addSelect('mri.icd_code_id')
-            ->join(\App\Entity\MedicalRecord::class, 'mr', 'WITH', 'a.id = IDENTITY(mr.appointment)')
-            ->leftJoin('mr.icd_codes', 'mri') // Assumes there's an icd_codes relation, otherwise we will manually aggregate
-            ->where('SUBSTRING(a.end_time, 1, 10) = :date')
-            ->andWhere('a.status = :status')
-            ->setParameter('date', substr($date, 0, 10))
-            ->setParameter('status', 'completed');
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        // Doctrine GROUP_CONCAT isn't standard, we group in PHP.
-        // Wait, if mri is a join table or entity, we fetch all rows and group by PHP.
-        // Since we don't know the exact MedicalRecord map, I'll execute raw SQL for this highly specialized join if DQL fails.
-        // But the task is to eliminate raw SQL.
+        $qb->select('a.id as appointment_id', 'a.patient_id', 'mr.id as medical_record_id', 'GROUP_CONCAT(mri.icd_code_id) as icd_code_ids')
+           ->from('appointments', 'a')
+           ->join('a', 'medical_records', 'mr', 'a.id = mr.appointment_id')
+           ->leftJoin('mr', 'medical_record_icd', 'mri', 'mr.id = mri.medical_record_id')
+           ->where('SUBSTRING(a.end_time, 1, 10) = :date')
+           ->andWhere('a.status = :status')
+           ->setParameter('date', substr($date, 0, 10))
+           ->setParameter('status', 'completed')
+           ->groupBy('a.id, a.patient_id, mr.id');
 
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT
-                a.id as appointment_id,
-                a.patient_id,
-                mr.id as medical_record_id,
-                GROUP_CONCAT(mri.icd_code_id) as icd_code_ids
-            FROM appointments a
-            JOIN medical_records mr ON a.id = mr.appointment_id
-            LEFT JOIN medical_record_icd mri ON mr.id = mri.medical_record_id
-            WHERE SUBSTRING(a.end_time, 1, 10) = :date AND a.status = 'completed'
-            GROUP BY a.id, a.patient_id, mr.id
-        ";
-        return $conn->fetchAllAssociative($sql, ['date' => substr($date, 0, 10)]);
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function findPatientSubsequentAppointments(int $patientId, string $afterDate, int $timeframeDays) : array
