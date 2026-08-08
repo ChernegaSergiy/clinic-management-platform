@@ -32,5 +32,5 @@ class AppointmentBundle extends Bundle
     public function build(ContainerBuilder $container) : void
     {
         parent::build($container);
-        }
+    }
 }
