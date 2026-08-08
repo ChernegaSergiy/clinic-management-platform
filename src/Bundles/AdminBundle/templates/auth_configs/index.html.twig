@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if configs is empty %}
-            <p>{{ 'admin.auth_configs.list.no_configs'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -59,9 +57,12 @@
                                 </form>
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="center aligned">{{ 'admin.auth_configs.list.no_configs'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
