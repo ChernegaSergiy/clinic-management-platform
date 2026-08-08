@@ -15,7 +15,7 @@ admin_routes_kpi:
     type: attribute
     prefix: /admin
 admin_routes_room:
-    resource: { path: ../src/Bundles/RoomBundle/Controller/, namespace: App\Bundles\RoomBundle\Controller\ }
+    resource: { path: ../src/Bundles/RoomBundle/Controller/Admin/, namespace: App\Bundles\RoomBundle\Controller\Admin\ }
     type: attribute
     prefix: /admin
 admin_routes_news:
@@ -69,6 +69,10 @@ app_routes_billing:
     prefix: /app
 app_routes_appointment:
     resource: { path: ../src/Bundles/AppointmentBundle/Controller/, namespace: App\Bundles\AppointmentBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_room:
+    resource: { path: ../src/Bundles/RoomBundle/Controller/App/, namespace: App\Bundles\RoomBundle\Controller\App\ }
     type: attribute
     prefix: /app
 app_routes_schedule:
