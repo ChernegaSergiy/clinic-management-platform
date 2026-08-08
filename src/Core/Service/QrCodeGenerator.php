@@ -24,7 +24,7 @@
 
 namespace App\Core\Service;
 
-use chillerlan\QRCode\Output\QRGdImage;
+use chillerlan\QRCode\Output\QRGdImagePNG;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 
@@ -33,8 +33,8 @@ class QrCodeGenerator
     public function generateQrCodeAsBase64(string $data) : string
     {
         $options = new QROptions([
-            'outputInterface' => QRGdImage::class,
-            'eccLevel'   => QRCode::ECC_L,
+            'outputInterface' => QRGdImagePNG::class,
+            'eccLevel'   => 'L',
             'scale'      => 5,
             'outputBase64' => true,
         ]);
