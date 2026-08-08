@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\Appointment\Repository;
+namespace App\Tests\Bundles\AppointmentBundle\Repository;
 
 use App\Entity\Appointment;
 use App\Tests\RepositoryTestCase;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\Patient\Repository;
+namespace App\Tests\Bundles\PatientBundle\Repository;
 
 use App\Core\Service\AuditLogger;
 use App\Entity\Patient;

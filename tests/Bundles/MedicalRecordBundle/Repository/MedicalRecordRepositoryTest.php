@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\MedicalRecord\Repository;
+namespace App\Tests\Bundles\MedicalRecordBundle\Repository;
 
 use App\Entity\MedicalRecord;
 use App\Tests\RepositoryTestCase;
