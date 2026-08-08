@@ -24,18 +24,25 @@
 
 namespace App\Bundles\DashboardBundle;
 
-use App\Core\Auth\Policy;
 use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class DashboardPolicy implements Policy
+class DashboardVoter extends Voter
 {
-    public function view(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        return $user->hasPermission('dashboard.view');
+        return false;
     }
 
-    public function export(User $user, array $context) : bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
-        return $user->hasPermission('dashboard.export');
+        $user = $token->getUser();
+
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        return false;
     }
 }
