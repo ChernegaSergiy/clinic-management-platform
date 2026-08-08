@@ -37,63 +37,80 @@ class NewsRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM news_articles ORDER BY published_at DESC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('n')
+            ->orderBy('n.published_at', 'DESC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM news_articles WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('n')
+            ->where('n.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function create(array $data) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO news_articles (title, meta, content, published_at, author_id, is_published) 
-                VALUES (:title, :meta, :content, :published_at, :author_id, :is_published)";
-        $conn->executeStatement($sql, [
-            'title' => $data['title'],
-            'meta' => $data['meta'],
-            'content' => $data['content'],
-            'published_at' => $data['published_at'] ?? date('Y-m-d H:i:s'),
-            'author_id' => $data['author_id'] ?? null,
-            'is_published' => (int)($data['is_published'] ?? true),
-        ]);
-        return (int)$conn->lastInsertId();
+        $article = new NewsArticle();
+        $article->setTitle($data['title']);
+        $article->setMeta($data['meta'] ?? null);
+        $article->setContent($data['content']);
+
+        if (!empty($data['published_at'])) {
+            try {
+                $article->setPublishedAt(new \DateTime($data['published_at']));
+            } catch (\Exception $e) {
+            }
+        } else {
+            $article->setPublishedAt(new \DateTime());
+        }
+
+        if (isset($data['author_id'])) {
+            $article->setAuthorId((int)$data['author_id']);
+        }
+
+        $article->setIsPublished((bool)($data['is_published'] ?? true));
+
+        $this->getEntityManager()->persist($article);
+        $this->getEntityManager()->flush();
+
+        return $article->getId();
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE news_articles SET 
-                    title = :title, 
-                    meta = :meta, 
-                    content = :content, 
-                    published_at = :published_at, 
-                    author_id = :author_id, 
-                    is_published = :is_published, 
-                    updated_at = NOW() 
-                WHERE id = :id";
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'title' => $data['title'],
-            'meta' => $data['meta'],
-            'content' => $data['content'],
-            'published_at' => $data['published_at'],
-            'author_id' => $data['author_id'],
-            'is_published' => (int)$data['is_published'],
-        ]) > 0;
+        $qb = $this->createQueryBuilder('n')
+            ->update()
+            ->set('n.title', ':title')
+            ->set('n.meta', ':meta')
+            ->set('n.content', ':content')
+            ->set('n.published_at', ':published_at')
+            ->set('n.author_id', ':author_id')
+            ->set('n.is_published', ':is_published')
+            ->set('n.updated_at', ':updated_at')
+            ->where('n.id = :id')
+            ->setParameter('title', $data['title'])
+            ->setParameter('meta', $data['meta'])
+            ->setParameter('content', $data['content'])
+            ->setParameter('published_at', $data['published_at'])
+            ->setParameter('author_id', $data['author_id'])
+            ->setParameter('is_published', (bool)$data['is_published'])
+            ->setParameter('updated_at', new \DateTime())
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->execute() > 0;
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM news_articles WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        $qb = $this->createQueryBuilder('n')
+            ->delete()
+            ->where('n.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->execute() > 0;
     }
 }
