@@ -98,7 +98,16 @@ class MedicalRecordRepositoryTest extends RepositoryTestCase
 
     public function testAttachIcdCodesFiltersInvalidIds() : void
     {
-        $this->mockConnection->method('executeStatement')->willReturn(1);
+        $mockQb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $this->mockConnection->method('createQueryBuilder')->willReturn($mockQb);
+
+        $mockQb->method('delete')->willReturnSelf();
+        $mockQb->method('where')->willReturnSelf();
+        $mockQb->method('setParameter')->willReturnSelf();
+        $mockQb->method('insert')->willReturnSelf();
+        $mockQb->method('setValue')->willReturnSelf();
+        $mockQb->method('executeStatement')->willReturn(1);
+
         $result = $this->repository->attachIcdCodes(1, [1, 2, 0, -1, 'abc', 3]);
         $this->assertTrue($result);
     }
@@ -115,7 +124,19 @@ class MedicalRecordRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'code' => 'A01', 'description' => 'Typhoid fever'],
             ['id' => 2, 'code' => 'A02', 'description' => 'Other salmonella infections']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+
+        $mockQb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $this->mockConnection->method('createQueryBuilder')->willReturn($mockQb);
+
+        $mockQb->method('select')->willReturnSelf();
+        $mockQb->method('from')->willReturnSelf();
+        $mockQb->method('join')->willReturnSelf();
+        $mockQb->method('where')->willReturnSelf();
+        $mockQb->method('setParameter')->willReturnSelf();
+
+        $mockResult = $this->createMock(\Doctrine\DBAL\Result::class);
+        $mockResult->method('fetchAllAssociative')->willReturn($expected);
+        $mockQb->method('executeQuery')->willReturn($mockResult);
 
         $result = $this->repository->getIcdCodesForMedicalRecord(1);
         $this->assertCount(2, $result);
@@ -126,7 +147,19 @@ class MedicalRecordRepositoryTest extends RepositoryTestCase
         $expected = [
             ['id' => 1, 'code' => 'T81.0', 'description' => 'Drainage of wound']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+
+        $mockQb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $this->mockConnection->method('createQueryBuilder')->willReturn($mockQb);
+
+        $mockQb->method('select')->willReturnSelf();
+        $mockQb->method('from')->willReturnSelf();
+        $mockQb->method('join')->willReturnSelf();
+        $mockQb->method('where')->willReturnSelf();
+        $mockQb->method('setParameter')->willReturnSelf();
+
+        $mockResult = $this->createMock(\Doctrine\DBAL\Result::class);
+        $mockResult->method('fetchAllAssociative')->willReturn($expected);
+        $mockQb->method('executeQuery')->willReturn($mockResult);
 
         $result = $this->repository->getInterventionCodesForMedicalRecord(1);
         $this->assertCount(1, $result);
@@ -134,7 +167,16 @@ class MedicalRecordRepositoryTest extends RepositoryTestCase
 
     public function testAttachInterventionCodesFiltersInvalidIds() : void
     {
-        $this->mockConnection->method('executeStatement')->willReturn(1);
+        $mockQb = $this->createMock(\Doctrine\DBAL\Query\QueryBuilder::class);
+        $this->mockConnection->method('createQueryBuilder')->willReturn($mockQb);
+
+        $mockQb->method('delete')->willReturnSelf();
+        $mockQb->method('where')->willReturnSelf();
+        $mockQb->method('setParameter')->willReturnSelf();
+        $mockQb->method('insert')->willReturnSelf();
+        $mockQb->method('setValue')->willReturnSelf();
+        $mockQb->method('executeStatement')->willReturn(1);
+
         $result = $this->repository->attachInterventionCodes(1, [1, 'invalid', 0, 2]);
         $this->assertTrue($result);
     }
