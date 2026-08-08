@@ -44,57 +44,51 @@ class NotificationRepository extends ServiceEntityRepository
      */
     public function findUnreadByUserId(int $userId, int $limit = 10) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT id, message, created_at
-            FROM notifications
-            WHERE user_id = :user_id AND is_read = false
-            ORDER BY created_at DESC
-            LIMIT :limit
-        ";
-        // Ensure limit is cast to int since PDO handles binds differently for limits.
-        // DBAL executes with PDO internally but fetchAllAssociative handles limit well if passed correctly.
-        // Alternatively, using standard query.
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue('user_id', $userId, \Doctrine\DBAL\ParameterType::INTEGER);
-        $stmt->bindValue('limit', $limit, \Doctrine\DBAL\ParameterType::INTEGER);
-        $result = $stmt->executeQuery();
-        return $result->fetchAllAssociative();
+        $qb = $this->createQueryBuilder('n')
+            ->select('n.id', 'n.message', 'n.created_at')
+            ->where('n.user_id = :user_id')
+            ->andWhere('n.is_read = false')
+            ->setParameter('user_id', $userId)
+            ->orderBy('n.created_at', 'DESC')
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findByUserId(int $userId, int $limit = 10, int $offset = 0) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT id, message, created_at, is_read
-            FROM notifications
-            WHERE user_id = :user_id
-            ORDER BY created_at DESC
-            LIMIT :limit OFFSET :offset
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue('user_id', $userId, \Doctrine\DBAL\ParameterType::INTEGER);
-        $stmt->bindValue('limit', $limit, \Doctrine\DBAL\ParameterType::INTEGER);
-        $stmt->bindValue('offset', $offset, \Doctrine\DBAL\ParameterType::INTEGER);
-        $result = $stmt->executeQuery();
-        return $result->fetchAllAssociative();
+        $qb = $this->createQueryBuilder('n')
+            ->select('n.id', 'n.message', 'n.created_at', 'n.is_read')
+            ->where('n.user_id = :user_id')
+            ->setParameter('user_id', $userId)
+            ->orderBy('n.created_at', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function countUnreadByUserId(int $userId) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = false";
-        return (int)$conn->fetchOne($sql, ['user_id' => $userId]);
+        $qb = $this->createQueryBuilder('n')
+            ->select('COUNT(n.id)')
+            ->where('n.user_id = :user_id')
+            ->andWhere('n.is_read = false')
+            ->setParameter('user_id', $userId);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
     public function deleteByIdAndUser(int $id, int $userId) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM notifications WHERE id = :id AND user_id = :user_id";
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'user_id' => $userId,
-        ]) > 0;
+        $qb = $this->createQueryBuilder('n')
+            ->delete()
+            ->where('n.id = :id')
+            ->andWhere('n.user_id = :user_id')
+            ->setParameter('id', $id)
+            ->setParameter('user_id', $userId);
+
+        return $qb->getQuery()->execute() > 0;
     }
 
     /**
@@ -105,8 +99,13 @@ class NotificationRepository extends ServiceEntityRepository
      */
     public function markAllAsReadByUserId(int $userId) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE notifications SET is_read = true WHERE user_id = :user_id AND is_read = false";
-        return $conn->executeStatement($sql, ['user_id' => $userId]) >= 0;
+        $qb = $this->createQueryBuilder('n')
+            ->update()
+            ->set('n.is_read', 'true')
+            ->where('n.user_id = :user_id')
+            ->andWhere('n.is_read = false')
+            ->setParameter('user_id', $userId);
+
+        return $qb->getQuery()->execute() >= 0;
     }
 }
