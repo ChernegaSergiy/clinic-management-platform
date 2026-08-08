@@ -21,6 +21,7 @@ The platform provides a comprehensive suite of tools for healthcare providers, c
 
 ## Quick Start
 
+> [!NOTE]
 > Detailed deployment instructions will be added to `docs/deployment.md`.
 
 1. **Clone the repository:**
