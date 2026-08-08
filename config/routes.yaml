@@ -22,6 +22,10 @@ admin_routes_news:
     resource: { path: ../src/Bundles/NewsBundle/Controller/AdminNewsController.php, namespace: App\Bundles\NewsBundle\Controller\ }
     type: attribute
     prefix: /admin
+admin_routes_schedule:
+    resource: { path: ../src/Bundles/ScheduleBundle/Controller/AdminScheduleController.php, namespace: App\Bundles\ScheduleBundle\Controller\ }
+    type: attribute
+    prefix: /admin
 
 app_routes_dashboard:
     resource: { path: ../src/Bundles/DashboardBundle/Controller/, namespace: App\Bundles\DashboardBundle\Controller\ }
@@ -68,7 +72,7 @@ app_routes_appointment:
     type: attribute
     prefix: /app
 app_routes_schedule:
-    resource: { path: ../src/Bundles/ScheduleBundle/Controller/, namespace: App\Bundles\ScheduleBundle\Controller\ }
+    resource: { path: ../src/Bundles/ScheduleBundle/Controller/AppScheduleController.php, namespace: App\Bundles\ScheduleBundle\Controller\ }
     type: attribute
     prefix: /app
 
