@@ -43,26 +43,28 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                a.id, 
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
-                a.start_time, 
-                a.end_time, 
-                a.status,
-                a.doctor_id,
-                a.room_id,
-                r.name as room_name
-            FROM appointments a
-            JOIN patients p ON a.patient_id = p.id
-            JOIN users u ON a.doctor_id = u.id
-            LEFT JOIN rooms r ON a.room_id = r.id
-            ORDER BY a.start_time DESC
-        ";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('a')
+            ->select('a.id', 'a.start_time', 'a.end_time', 'a.status', 'IDENTITY(a.doctor) as doctor_id', 'a.room_id')
+            ->addSelect("CONCAT(p.last_name, ' ', p.first_name) as patient_name")
+            ->addSelect("CONCAT(u.last_name, ' ', u.first_name) as doctor_name")
+            ->addSelect("r.name as room_name")
+            ->join('a.patient', 'p')
+            ->join('a.doctor', 'u')
+            ->leftJoin(\App\Entity\Room::class, 'r', 'WITH', 'a.room_id = r.id')
+            ->orderBy('a.start_time', 'DESC');
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        foreach ($results as &$row) {
+            if (isset($row['start_time']) && $row['start_time'] instanceof \DateTimeInterface) {
+                $row['start_time'] = $row['start_time']->format('Y-m-d H:i:s');
+            }
+            if (isset($row['end_time']) && $row['end_time'] instanceof \DateTimeInterface) {
+                $row['end_time'] = $row['end_time']->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $results;
     }
 
     public function save(array $data) : int|false

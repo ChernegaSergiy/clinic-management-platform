@@ -30,7 +30,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
 
     public function testFindAllReturnsEmptyArrayWhenNoAppointments() : void
     {
-        $this->mockConnection->method('fetchAllAssociative')->willReturn([]);
+        $this->createMockQueryBuilder([]);
         $result = $this->repository->findAll();
         $this->assertEmpty($result);
     }
@@ -41,7 +41,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'patient_name' => 'John Doe', 'doctor_name' => 'Dr. Smith'],
             ['id' => 2, 'patient_name' => 'Jane Smith', 'doctor_name' => 'Dr. Johnson']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected);
         $result = $this->repository->findAll();
         $this->assertCount(2, $result);
     }
