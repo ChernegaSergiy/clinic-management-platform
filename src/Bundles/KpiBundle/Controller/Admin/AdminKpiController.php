@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\KpiBundle\Controller;
+namespace App\Bundles\KpiBundle\Controller\Admin;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class KpiController extends \App\Core\Controller\AbstractController
+class AdminKpiController extends \App\Core\Controller\AbstractController
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
@@ -51,8 +51,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    // --- KPI Definitions ---
-    #[Route('/kpi/definitions', name: 'kpi_definitions_index', methods: ['GET'])]
+    #[Route('/kpi/definitions', name: 'admin_kpi_definitions_index', methods: ['GET'])]
     public function listDefinitions() : Response
     {
         $this->checkAuth();
@@ -61,7 +60,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         return $this->render('@Kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
-    #[Route('/kpi/definitions/new', name: 'kpi_definitions_new', methods: ['GET'])]
+    #[Route('/kpi/definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createDefinition() : Response
     {
         $this->checkAuth();
@@ -74,7 +73,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/kpi/definitions/new', name: 'kpi_definitions_store', methods: ['POST'])]
+    #[Route('/kpi/definitions/new', name: 'admin_kpi_definitions_store', methods: ['POST'])]
     public function storeDefinition() : Response
     {
         $this->checkAuth();
@@ -91,15 +90,15 @@ class KpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/kpi/definitions/new');
+            return new RedirectResponse('/admin/kpi/definitions/new');
         }
 
         $this->kpiRepository->saveKpiDefinition($_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно додано.";
-        return new RedirectResponse('/kpi/definitions');
+        return new RedirectResponse('/admin/kpi/definitions');
     }
 
-    #[Route('/kpi/definitions/edit', name: 'kpi_definitions_edit', methods: ['GET'])]
+    #[Route('/kpi/definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
     public function editDefinition() : Response
     {
         $this->checkAuth();
@@ -121,7 +120,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/kpi/definitions/edit', name: 'kpi_definitions_update', methods: ['POST'])]
+    #[Route('/kpi/definitions/edit', name: 'admin_kpi_definitions_update', methods: ['POST'])]
     public function updateDefinition() : Response
     {
         $this->checkAuth();
@@ -145,15 +144,15 @@ class KpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/kpi/definitions/edit?id=' . $id);
+            return new RedirectResponse('/admin/kpi/definitions/edit?id=' . $id);
         }
 
         $this->kpiRepository->updateKpiDefinition($id, $_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
-        return new RedirectResponse('/kpi/definitions');
+        return new RedirectResponse('/admin/kpi/definitions');
     }
 
-    #[Route('/kpi/definitions/delete', name: 'kpi_definitions_delete', methods: ['POST'])]
+    #[Route('/kpi/definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
     public function deleteDefinition() : Response
     {
         $this->checkAuth();
@@ -162,28 +161,19 @@ class KpiController extends \App\Core\Controller\AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
-        return new RedirectResponse('/kpi/definitions');
+        return new RedirectResponse('/admin/kpi/definitions');
     }
 
-    // --- KPI Results ---
-    #[Route('/kpi/results', name: 'kpi_results_index', methods: ['GET'])]
+    #[Route('/kpi/results', name: 'admin_kpi_results_index', methods: ['GET'])]
     public function listResults() : Response
     {
         $this->checkAuth();
         $this->gate->authorize('kpi.read');
-        $results = [];
-        if (isset($_SESSION['user']) && 1 === $_SESSION['user']['role_id']) {
-            // Перевірка, чи користувач є адміністратором
-            $results = $this->kpiRepository->findAllKpiResults();
-        } else {
-            $userId = $_SESSION['user']['id'];
-            $results = $this->kpiRepository->findKpiResultsForUser($userId);
-        }
+        $results = $this->kpiRepository->findAllKpiResults();
         return $this->render('@Kpi/results/index.html.twig', ['results' => $results]);
     }
 
-    // This would be called by a cron job or background process
-    #[Route('/kpi/calculate', name: 'kpi_calculate', methods: ['POST'])]
+    #[Route('/kpi/calculate', name: 'admin_kpi_calculate', methods: ['POST'])]
     public function calculateResults() : Response
     {
         $this->authorizeKpiAccess();
@@ -220,7 +210,7 @@ class KpiController extends \App\Core\Controller\AbstractController
             'appointments_count' => (float)$this->appointmentRepository->countScheduledByRange($from, $to),
             'doctor_utilization' => $this->calculateDoctorUtilization($from, $to),
             'readmission_rate' => $this->calculateReadmissionRate($from, $to),
-            default => null, // Інші KPI не підтримані наразі
+            default => null,
         };
     }
 
@@ -252,7 +242,7 @@ class KpiController extends \App\Core\Controller\AbstractController
         }
 
         $days = (new \DateTimeImmutable($from))->diff(new \DateTimeImmutable($to))->days + 1;
-        $totalCapacity = $doctorCount * 8 * $days; // 8 робочих годин на лікаря
+        $totalCapacity = $doctorCount * 8 * $days;
 
         if ($totalCapacity <= 0) {
             return null;
