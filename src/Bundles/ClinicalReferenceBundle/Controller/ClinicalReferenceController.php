@@ -45,7 +45,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         $this->interventionCodeRepository = $interventionCodeRepository;
     }
 
-    #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_form', methods: ['GET'])]
+    #[Route('/admin/clinical/icd-import', name: 'clinical_icd_import_form', methods: ['GET'])]
     public function icdImportForm() : Response
     {
         $this->checkAuth();
@@ -61,7 +61,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         return $response;
     }
 
-    #[Route('/admin/clinical/icd/import', name: 'clinical_icd_import_run', methods: ['POST'])]
+    #[Route('/admin/clinical/icd-import', name: 'clinical_icd_import_run', methods: ['POST'])]
     public function icdImportRun() : Response
     {
         $this->checkAuth();
@@ -96,7 +96,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         return new RedirectResponse('/admin/clinical');
     }
 
-    #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_form', methods: ['GET'])]
+    #[Route('/admin/clinical/intervention-import', name: 'clinical_intervention_import_form', methods: ['GET'])]
     public function interventionImportForm() : Response
     {
         $this->checkAuth();
@@ -112,7 +112,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
         return $response;
     }
 
-    #[Route('/admin/clinical/intervention/import', name: 'clinical_intervention_import_run', methods: ['POST'])]
+    #[Route('/admin/clinical/intervention-import', name: 'clinical_intervention_import_run', methods: ['POST'])]
     public function interventionImportRun() : Response
     {
         $this->checkAuth();
