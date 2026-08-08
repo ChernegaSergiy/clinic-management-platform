@@ -26,8 +26,9 @@ namespace App\Bundles\PatientBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class PatientExtension extends Extension
+class PatientExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void
     {
@@ -36,5 +37,35 @@ class PatientExtension extends Extension
         $container->setParameter('patient.features.insurance', $config['features']['insurance']);
         $container->setParameter('patient.features.policies', $config['features']['policies']);
         $container->setParameter('patient.features.export', $config['features']['export']);
+    }
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_PATIENT_VIEW_ANY',
+                'ROLE_PATIENT_EDIT_ANY',
+                'ROLE_PATIENT_CREATE',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_PATIENT_VIEW_ANY',
+            ],
+            'ROLE_REGISTRAR' => [
+                'ROLE_PATIENT_VIEW_ANY',
+                'ROLE_PATIENT_EDIT_ANY',
+                'ROLE_PATIENT_CREATE',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_PATIENT_VIEW_OWN',
+                'ROLE_PATIENT_EDIT_OWN',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_PATIENT_VIEW_OWN',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
     }
 }
