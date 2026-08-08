@@ -39,59 +39,66 @@ class InsuranceCompanyRepository extends ServiceEntityRepository
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM insurance_companies WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        return $this->createQueryBuilder('ic')
+            ->where('ic.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM insurance_companies";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        return $this->createQueryBuilder('ic')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function create(string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            INSERT INTO insurance_companies (name, contact_person, phone, email, notes, created_at, updated_at)
-            VALUES (:name, :contact_person, :phone, :email, :notes, NOW(), NOW())
-        ";
-        $conn->executeStatement($sql, [
-            'name' => $name,
-            'contact_person' => $contactPerson,
-            'phone' => $phone,
-            'email' => $email,
-            'notes' => $notes,
-        ]);
-        return (int) $conn->lastInsertId();
+        $company = new InsuranceCompany();
+        $company->setName($name);
+        $company->setContactPerson($contactPerson);
+        $company->setPhone($phone);
+        $company->setEmail($email);
+        $company->setNotes($notes);
+        $company->setCreatedAt(new \DateTime());
+        $company->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->persist($company);
+        $this->getEntityManager()->flush();
+
+        return $company->getId();
     }
 
     public function update(int $id, string $name, ?string $contactPerson = null, ?string $phone = null, ?string $email = null, ?string $notes = null) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            UPDATE insurance_companies
-            SET name = :name, contact_person = :contact_person, phone = :phone, email = :email, notes = :notes, updated_at = NOW()
-            WHERE id = :id
-        ";
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $name,
-            'contact_person' => $contactPerson,
-            'phone' => $phone,
-            'email' => $email,
-            'notes' => $notes,
-        ]) > 0;
+        $company = $this->find($id);
+        if (!$company) {
+            return false;
+        }
+
+        $company->setName($name);
+        $company->setContactPerson($contactPerson);
+        $company->setPhone($phone);
+        $company->setEmail($email);
+        $company->setNotes($notes);
+        $company->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM insurance_companies WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        $company = $this->find($id);
+        if (!$company) {
+            return false;
+        }
+
+        $this->getEntityManager()->remove($company);
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 }

@@ -39,99 +39,107 @@ class ClaimRepository extends ServiceEntityRepository
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM claims WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        return $this->createQueryBuilder('c')
+            ->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findByIdWithDetails(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                c.*,
-                pip.patient_id,
-                p.first_name,
-                p.last_name,
-                CONCAT(p.first_name, ' ', p.last_name) as patient_name,
-                ic.name as insurance_company_name
-            FROM claims c
-            JOIN patient_insurance_policies pip ON c.patient_policy_id = pip.id
-            JOIN patients p ON pip.patient_id = p.id
-            JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
-            WHERE c.id = :id
-        ";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('c')
+            ->select('c, pip.patient_id, p.first_name, p.last_name, CONCAT(p.first_name, \' \', p.last_name) as patient_name, ic.name as insurance_company_name')
+            ->join('App\Entity\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
+            ->join('App\Entity\Patient', 'p', 'WITH', 'pip.patient_id = p.id')
+            ->join('App\Entity\InsuranceCompany', 'ic', 'WITH', 'pip.insurance_company_id = ic.id')
+            ->where('c.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        if (!$result) {
+            return null;
+        }
+
+        $flat = $result[0];
+        $flat['patient_id'] = $result['patient_id'];
+        $flat['first_name'] = $result['first_name'];
+        $flat['last_name'] = $result['last_name'];
+        $flat['patient_name'] = $result['patient_name'];
+        $flat['insurance_company_name'] = $result['insurance_company_name'];
+        return $flat;
     }
 
     public function findByInvoiceId(int $invoiceId) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM claims WHERE invoice_id = :invoice_id";
-        $result = $conn->fetchAssociative($sql, ['invoice_id' => $invoiceId]);
-        return $result ?: null;
+        return $this->createQueryBuilder('c')
+            ->where('c.invoice_id = :invoice_id')
+            ->setParameter('invoice_id', $invoiceId)
+            ->getQuery()
+            ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findByPatientPolicyId(int $patientPolicyId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM claims WHERE patient_policy_id = :patient_policy_id";
-        return $conn->fetchAllAssociative($sql, ['patient_policy_id' => $patientPolicyId]);
+        return $this->createQueryBuilder('c')
+            ->where('c.patient_policy_id = :patient_policy_id')
+            ->setParameter('patient_policy_id', $patientPolicyId)
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                c.*,
-                pip.patient_id,
-                p.first_name,
-                p.last_name,
-                CONCAT(p.first_name, ' ', p.last_name) as patient_name,
-                ic.name as insurance_company_name
-            FROM claims c
-            JOIN patient_insurance_policies pip ON c.patient_policy_id = pip.id
-            JOIN patients p ON pip.patient_id = p.id
-            JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
-            ORDER BY c.created_at DESC
-        ";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('c')
+            ->select('c, pip.patient_id, p.first_name, p.last_name, CONCAT(p.first_name, \' \', p.last_name) as patient_name, ic.name as insurance_company_name')
+            ->join('App\Entity\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
+            ->join('App\Entity\Patient', 'p', 'WITH', 'pip.patient_id = p.id')
+            ->join('App\Entity\InsuranceCompany', 'ic', 'WITH', 'pip.insurance_company_id = ic.id')
+            ->orderBy('c.created_at', 'DESC');
+
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $flat = $row[0];
+            $flat['patient_id'] = $row['patient_id'];
+            $flat['first_name'] = $row['first_name'];
+            $flat['last_name'] = $row['last_name'];
+            $flat['patient_name'] = $row['patient_name'];
+            $flat['insurance_company_name'] = $row['insurance_company_name'];
+            return $flat;
+        }, $results);
     }
 
     public function create(int $invoiceId, int $patientPolicyId, string $status, float $totalClaimed, ?string $submittedAt = null) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            INSERT INTO claims (invoice_id, patient_policy_id, status, submitted_at, total_claimed, created_at, updated_at)
-            VALUES (:invoice_id, :patient_policy_id, :status, :submitted_at, :total_claimed, NOW(), NOW())
-        ";
-        $conn->executeStatement($sql, [
-            'invoice_id' => $invoiceId,
-            'patient_policy_id' => $patientPolicyId,
-            'status' => $status,
-            'submitted_at' => $submittedAt,
-            'total_claimed' => $totalClaimed,
-        ]);
-        return (int) $conn->lastInsertId();
+        $claim = new Claim();
+        $claim->setInvoiceId($invoiceId);
+        $claim->setPatientPolicyId($patientPolicyId);
+        $claim->setStatus($status);
+        $claim->setTotalClaimed($totalClaimed);
+        $claim->setSubmittedAt($submittedAt ? new \DateTime($submittedAt) : null);
+        $claim->setCreatedAt(new \DateTime());
+        $claim->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->persist($claim);
+        $this->getEntityManager()->flush();
+
+        return $claim->getId();
     }
 
     public function update(int $id, string $status, ?string $submittedAt = null, ?float $totalPaid = null) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            UPDATE claims
-            SET status = :status, submitted_at = :submitted_at, total_paid = :total_paid, updated_at = NOW()
-            WHERE id = :id
-        ";
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'status' => $status,
-            'submitted_at' => $submittedAt,
-            'total_paid' => $totalPaid,
-        ]) > 0;
+        $claim = $this->find($id);
+        if (!$claim) {
+            return false;
+        }
+
+        $claim->setStatus($status);
+        $claim->setSubmittedAt($submittedAt ? new \DateTime($submittedAt) : null);
+        $claim->setTotalPaid($totalPaid);
+        $claim->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 }

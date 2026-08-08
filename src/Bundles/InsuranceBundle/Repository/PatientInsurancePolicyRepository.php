@@ -39,62 +39,74 @@ class PatientInsurancePolicyRepository extends ServiceEntityRepository
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM patient_insurance_policies WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findByPatientId(int $patientId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM patient_insurance_policies WHERE patient_id = :patient_id ORDER BY is_active DESC, valid_to DESC";
-        return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
+        return $this->createQueryBuilder('p')
+            ->where('p.patient_id = :patient_id')
+            ->setParameter('patient_id', $patientId)
+            ->orderBy('p.is_active', 'DESC')
+            ->addOrderBy('p.valid_to', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function create(int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            INSERT INTO patient_insurance_policies (patient_id, insurance_company_id, policy_number, group_number, valid_from, valid_to, is_active, created_at, updated_at)
-            VALUES (:patient_id, :insurance_company_id, :policy_number, :group_number, :valid_from, :valid_to, :is_active, NOW(), NOW())
-        ";
-        $conn->executeStatement($sql, [
-            'patient_id' => $patientId,
-            'insurance_company_id' => $insuranceCompanyId,
-            'policy_number' => $policyNumber,
-            'group_number' => $groupNumber,
-            'valid_from' => $validFrom,
-            'valid_to' => $validTo,
-            'is_active' => (int) $isActive,
-        ]);
-        return (int) $conn->lastInsertId();
+        $policy = new PatientInsurancePolicy();
+        $policy->setPatientId($patientId);
+        $policy->setInsuranceCompanyId($insuranceCompanyId);
+        $policy->setPolicyNumber($policyNumber);
+        $policy->setGroupNumber($groupNumber);
+        $policy->setValidFrom(new \DateTime($validFrom));
+        $policy->setValidTo($validTo ? new \DateTime($validTo) : null);
+        $policy->setIsActive($isActive);
+        $policy->setCreatedAt(new \DateTime());
+        $policy->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->persist($policy);
+        $this->getEntityManager()->flush();
+
+        return $policy->getId();
     }
 
     public function update(int $id, int $patientId, int $insuranceCompanyId, string $policyNumber, ?string $groupNumber, string $validFrom, ?string $validTo, bool $isActive) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            UPDATE patient_insurance_policies
-            SET patient_id = :patient_id, insurance_company_id = :insurance_company_id, policy_number = :policy_number, group_number = :group_number, valid_from = :valid_from, valid_to = :valid_to, is_active = :is_active, updated_at = NOW()
-            WHERE id = :id
-        ";
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'patient_id' => $patientId,
-            'insurance_company_id' => $insuranceCompanyId,
-            'policy_number' => $policyNumber,
-            'group_number' => $groupNumber,
-            'valid_from' => $validFrom,
-            'valid_to' => $validTo,
-            'is_active' => (int) $isActive,
-        ]) > 0;
+        $policy = $this->find($id);
+        if (!$policy) {
+            return false;
+        }
+
+        $policy->setPatientId($patientId);
+        $policy->setInsuranceCompanyId($insuranceCompanyId);
+        $policy->setPolicyNumber($policyNumber);
+        $policy->setGroupNumber($groupNumber);
+        $policy->setValidFrom(new \DateTime($validFrom));
+        $policy->setValidTo($validTo ? new \DateTime($validTo) : null);
+        $policy->setIsActive($isActive);
+        $policy->setUpdatedAt(new \DateTime());
+
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM patient_insurance_policies WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        $policy = $this->find($id);
+        if (!$policy) {
+            return false;
+        }
+
+        $this->getEntityManager()->remove($policy);
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 }
