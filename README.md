@@ -61,10 +61,10 @@ A robust, three-tier healthcare information system designed to automate key work
    - Copy `.env.example` to `.env`.
    - Specify the connection parameters for your database.
 
-4. **Run migrations and data seeding:**
+4. **Run migrations and create the admin account:**
    ```bash
-   composer db:migrate
-   composer db:seed
+   php bin/console doctrine:migrations:migrate
+   php bin/console app:install
    ```
 
 5. **Configure the web server** to point to the `public/` directory as the root.
