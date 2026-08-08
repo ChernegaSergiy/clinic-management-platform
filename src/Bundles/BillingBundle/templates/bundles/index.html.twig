@@ -18,9 +18,6 @@
 
         <div class="ui divider"></div>
 
-        {% if bundles is empty %}
-            <p>{{ 'billing.bundles.no_bundles'|trans }}</p>
-        {% else %}
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -65,9 +62,12 @@
                                 </a> #}
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="center aligned">{{ 'billing.bundles.no_bundles'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
