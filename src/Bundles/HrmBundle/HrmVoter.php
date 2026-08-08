@@ -24,28 +24,28 @@
 
 namespace App\Bundles\HrmBundle;
 
-use App\Core\Auth\Policy;
 use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class HrmPolicy implements Policy
+class HrmVoter extends Voter
 {
-    public function view(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        return $user->hasPermission('hrm.read');
+        return false;
     }
 
-    public function create(User $user, array $context) : bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
-        return $user->hasPermission('hrm.write');
-    }
+        $user = $token->getUser();
 
-    public function update(User $user, array $context) : bool
-    {
-        return $user->hasPermission('hrm.write');
-    }
+        if (!$user instanceof User) {
+            return false;
+        }
 
-    public function delete(User $user, array $context) : bool
-    {
-        return $user->hasPermission('hrm.manage');
+        switch ($attribute) {
+        }
+
+        return false;
     }
 }
