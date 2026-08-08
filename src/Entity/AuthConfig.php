@@ -108,4 +108,14 @@ class AuthConfig
         $this->updated_at = $updated_at;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function isIsActive() : bool
+    {
+        return $this->is_active;
+    }
 }

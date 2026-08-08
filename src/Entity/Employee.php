@@ -44,4 +44,113 @@ class Employee
     #[ORM\Column(length: 50, nullable: true)] private ?string $status = null;
     #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $user_id = null;
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)] private ?\DateTimeInterface $fire_date = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function getFirstName() : ?string
+    {
+        return $this->first_name;
+    }
+    public function setFirstName(?string $first_name) : self
+    {
+        $this->first_name = $first_name;
+        return $this;
+    }
+    public function getLastName() : ?string
+    {
+        return $this->last_name;
+    }
+    public function setLastName(?string $last_name) : self
+    {
+        $this->last_name = $last_name;
+        return $this;
+    }
+    public function getMiddleName() : ?string
+    {
+        return $this->middle_name;
+    }
+    public function setMiddleName(?string $middle_name) : self
+    {
+        $this->middle_name = $middle_name;
+        return $this;
+    }
+    public function getPosition() : ?string
+    {
+        return $this->position;
+    }
+    public function setPosition(?string $position) : self
+    {
+        $this->position = $position;
+        return $this;
+    }
+    public function getDepartmentId() : ?int
+    {
+        return $this->department_id;
+    }
+    public function setDepartmentId(?int $department_id) : self
+    {
+        $this->department_id = $department_id;
+        return $this;
+    }
+    public function getHireDate() : ?\DateTimeInterface
+    {
+        return $this->hire_date;
+    }
+    public function setHireDate(?\DateTimeInterface $hire_date) : self
+    {
+        $this->hire_date = $hire_date;
+        return $this;
+    }
+    public function getSalary() : ?float
+    {
+        return $this->salary;
+    }
+    public function setSalary(?float $salary) : self
+    {
+        $this->salary = $salary;
+        return $this;
+    }
+    public function getContactPhone() : ?string
+    {
+        return $this->contact_phone;
+    }
+    public function setContactPhone(?string $contact_phone) : self
+    {
+        $this->contact_phone = $contact_phone;
+        return $this;
+    }
+    public function getStatus() : ?string
+    {
+        return $this->status;
+    }
+    public function setStatus(?string $status) : self
+    {
+        $this->status = $status;
+        return $this;
+    }
+    public function getUserId() : ?int
+    {
+        return $this->user_id;
+    }
+    public function setUserId(?int $user_id) : self
+    {
+        $this->user_id = $user_id;
+        return $this;
+    }
+    public function getFireDate() : ?\DateTimeInterface
+    {
+        return $this->fire_date;
+    }
+    public function setFireDate(?\DateTimeInterface $fire_date) : self
+    {
+        $this->fire_date = $fire_date;
+        return $this;
+    }
 }

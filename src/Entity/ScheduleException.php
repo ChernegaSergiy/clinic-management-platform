@@ -39,4 +39,68 @@ class ScheduleException
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $end_time = null;
     #[ORM\Column(type: Types::BOOLEAN)] private bool $is_available = true;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $notes = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function getDoctorId() : ?int
+    {
+        return $this->doctor_id;
+    }
+    public function setDoctorId(?int $doctor_id) : self
+    {
+        $this->doctor_id = $doctor_id;
+        return $this;
+    }
+    public function getExceptionDate() : ?\DateTimeInterface
+    {
+        return $this->exception_date;
+    }
+    public function setExceptionDate(?\DateTimeInterface $exception_date) : self
+    {
+        $this->exception_date = $exception_date;
+        return $this;
+    }
+    public function getStartTime() : ?\DateTimeInterface
+    {
+        return $this->start_time;
+    }
+    public function setStartTime(?\DateTimeInterface $start_time) : self
+    {
+        $this->start_time = $start_time;
+        return $this;
+    }
+    public function getEndTime() : ?\DateTimeInterface
+    {
+        return $this->end_time;
+    }
+    public function setEndTime(?\DateTimeInterface $end_time) : self
+    {
+        $this->end_time = $end_time;
+        return $this;
+    }
+    public function isIsAvailable() : bool
+    {
+        return $this->is_available;
+    }
+    public function setIsAvailable(bool $is_available) : self
+    {
+        $this->is_available = $is_available;
+        return $this;
+    }
+    public function getNotes() : ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes) : self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
 }

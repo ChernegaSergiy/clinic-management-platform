@@ -98,4 +98,14 @@ class Service
         $this->is_active = $is_active;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function isIsActive() : bool
+    {
+        return $this->is_active;
+    }
 }

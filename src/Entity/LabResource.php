@@ -38,4 +38,59 @@ class LabResource
     #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $capacity = null;
     #[ORM\Column(type: Types::BOOLEAN)] private bool $is_available = true;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $notes = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function getName() : ?string
+    {
+        return $this->name;
+    }
+    public function setName(?string $name) : self
+    {
+        $this->name = $name;
+        return $this;
+    }
+    public function getType() : ?string
+    {
+        return $this->type;
+    }
+    public function setType(?string $type) : self
+    {
+        $this->type = $type;
+        return $this;
+    }
+    public function getCapacity() : ?int
+    {
+        return $this->capacity;
+    }
+    public function setCapacity(?int $capacity) : self
+    {
+        $this->capacity = $capacity;
+        return $this;
+    }
+    public function isIsAvailable() : bool
+    {
+        return $this->is_available;
+    }
+    public function setIsAvailable(bool $is_available) : self
+    {
+        $this->is_available = $is_available;
+        return $this;
+    }
+    public function getNotes() : ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes) : self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
 }

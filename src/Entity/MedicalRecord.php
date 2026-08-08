@@ -184,4 +184,10 @@ class MedicalRecord
         $this->updated_at = $updatedAt;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

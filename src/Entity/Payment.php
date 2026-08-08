@@ -97,4 +97,10 @@ class Payment
         $this->payment_date = $payment_date;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

@@ -69,4 +69,113 @@ class InventoryItem
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function getName() : ?string
+    {
+        return $this->name;
+    }
+    public function setName(?string $name) : self
+    {
+        $this->name = $name;
+        return $this;
+    }
+    public function getDescription() : ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description) : self
+    {
+        $this->description = $description;
+        return $this;
+    }
+    public function getInn() : ?string
+    {
+        return $this->inn;
+    }
+    public function setInn(?string $inn) : self
+    {
+        $this->inn = $inn;
+        return $this;
+    }
+    public function getBatchNumber() : ?string
+    {
+        return $this->batch_number;
+    }
+    public function setBatchNumber(?string $batch_number) : self
+    {
+        $this->batch_number = $batch_number;
+        return $this;
+    }
+    public function getExpiryDate() : ?\DateTimeInterface
+    {
+        return $this->expiry_date;
+    }
+    public function setExpiryDate(?\DateTimeInterface $expiry_date) : self
+    {
+        $this->expiry_date = $expiry_date;
+        return $this;
+    }
+    public function getSupplier() : ?string
+    {
+        return $this->supplier;
+    }
+    public function setSupplier(?string $supplier) : self
+    {
+        $this->supplier = $supplier;
+        return $this;
+    }
+    public function getCost() : ?string
+    {
+        return $this->cost;
+    }
+    public function setCost(?string $cost) : self
+    {
+        $this->cost = $cost;
+        return $this;
+    }
+    public function getQuantity() : ?int
+    {
+        return $this->quantity;
+    }
+    public function setQuantity(?int $quantity) : self
+    {
+        $this->quantity = $quantity;
+        return $this;
+    }
+    public function getMinStockLevel() : ?int
+    {
+        return $this->min_stock_level;
+    }
+    public function setMinStockLevel(?int $min_stock_level) : self
+    {
+        $this->min_stock_level = $min_stock_level;
+        return $this;
+    }
+    public function getMaxStockLevel() : ?int
+    {
+        return $this->max_stock_level;
+    }
+    public function setMaxStockLevel(?int $max_stock_level) : self
+    {
+        $this->max_stock_level = $max_stock_level;
+        return $this;
+    }
+    public function getLocation() : ?string
+    {
+        return $this->location;
+    }
+    public function setLocation(?string $location) : self
+    {
+        $this->location = $location;
+        return $this;
+    }
 }

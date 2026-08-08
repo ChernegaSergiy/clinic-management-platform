@@ -153,4 +153,14 @@ class Room
         $this->updated_at = $updatedAt;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function isIsAvailable() : bool
+    {
+        return $this->is_available;
+    }
 }

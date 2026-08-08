@@ -168,4 +168,10 @@ class Invoice
         $this->updated_at = $updated_at;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

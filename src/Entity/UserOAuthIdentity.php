@@ -99,4 +99,10 @@ class UserOAuthIdentity
         $this->created_at = $createdAt;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

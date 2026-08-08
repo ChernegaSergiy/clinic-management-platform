@@ -57,4 +57,10 @@ class IcdCode
         $this->description = $description;
         return $this;
     }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

@@ -66,4 +66,104 @@ class LabOrder
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    public function getPatientId() : ?int
+    {
+        return $this->patient_id;
+    }
+    public function setPatientId(?int $patient_id) : self
+    {
+        $this->patient_id = $patient_id;
+        return $this;
+    }
+    public function getDoctorId() : ?int
+    {
+        return $this->doctor_id;
+    }
+    public function setDoctorId(?int $doctor_id) : self
+    {
+        $this->doctor_id = $doctor_id;
+        return $this;
+    }
+    public function getMedicalRecordId() : ?int
+    {
+        return $this->medical_record_id;
+    }
+    public function setMedicalRecordId(?int $medical_record_id) : self
+    {
+        $this->medical_record_id = $medical_record_id;
+        return $this;
+    }
+    public function getOrderCode() : ?string
+    {
+        return $this->order_code;
+    }
+    public function setOrderCode(?string $order_code) : self
+    {
+        $this->order_code = $order_code;
+        return $this;
+    }
+    public function getResults() : ?string
+    {
+        return $this->results;
+    }
+    public function setResults(?string $results) : self
+    {
+        $this->results = $results;
+        return $this;
+    }
+    public function getNotes() : ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes) : self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+    public function getStatus() : ?string
+    {
+        return $this->status;
+    }
+    public function setStatus(?string $status) : self
+    {
+        $this->status = $status;
+        return $this;
+    }
+    public function getQrCodeHash() : ?string
+    {
+        return $this->qr_code_hash;
+    }
+    public function setQrCodeHash(?string $qr_code_hash) : self
+    {
+        $this->qr_code_hash = $qr_code_hash;
+        return $this;
+    }
+    public function getCreatedAt() : ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+    public function setCreatedAt(?\DateTimeInterface $created_at) : self
+    {
+        $this->created_at = $created_at;
+        return $this;
+    }
+    public function getUpdatedAt() : ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+    public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
+    {
+        $this->updated_at = $updated_at;
+        return $this;
+    }
 }
