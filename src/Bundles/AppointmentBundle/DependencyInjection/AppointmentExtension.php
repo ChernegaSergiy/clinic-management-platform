@@ -26,8 +26,9 @@ namespace App\Bundles\AppointmentBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class AppointmentExtension extends Extension
+class AppointmentExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void
     {
@@ -35,5 +36,41 @@ class AppointmentExtension extends Extension
 
         $container->setParameter('appointment.features.waitlist', $config['features']['waitlist']);
         $container->setParameter('appointment.features.api', $config['features']['api']);
+    }
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_APPOINTMENT_VIEW_ANY',
+                'ROLE_APPOINTMENT_EDIT_ANY',
+                'ROLE_APPOINTMENT_CREATE',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_APPOINTMENT_VIEW_ANY',
+                'ROLE_APPOINTMENT_EDIT_ANY',
+                'ROLE_APPOINTMENT_CREATE',
+            ],
+            'ROLE_REGISTRAR' => [
+                'ROLE_APPOINTMENT_VIEW_ANY',
+                'ROLE_APPOINTMENT_EDIT_ANY',
+                'ROLE_APPOINTMENT_CREATE',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_APPOINTMENT_VIEW_OWN',
+                'ROLE_APPOINTMENT_EDIT_OWN',
+                'ROLE_APPOINTMENT_CREATE',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_APPOINTMENT_VIEW_OWN',
+            ],
+            'ROLE_BILLING' => [
+                'ROLE_APPOINTMENT_VIEW_ANY',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
     }
 }
