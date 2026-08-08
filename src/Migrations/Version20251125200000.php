@@ -40,15 +40,21 @@ final class Version20251125200000 extends AbstractMigration
     {
         $table = $schema->getTable('appointments');
         $table->addColumn('waitlist_id', 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addIndex(['waitlist_id']);
-        $table->addForeignKeyConstraint('waitlists', ['waitlist_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => 'CASCADE']);
+        $table->addIndex(['waitlist_id'], 'idx_appointments_waitlist_id');
+        $table->addForeignKeyConstraint(
+            'waitlists',
+            ['waitlist_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => 'CASCADE'],
+            'fk_appointments_waitlist_id'
+        );
     }
 
     public function down(Schema $schema) : void
     {
         $table = $schema->getTable('appointments');
-        $table->removeForeignKeyConstraint('waitlist_id');
-        $table->dropIndex(['waitlist_id']);
+        $table->removeForeignKey('fk_appointments_waitlist_id');
+        $table->dropIndex('idx_appointments_waitlist_id');
         $table->dropColumn('waitlist_id');
     }
 }

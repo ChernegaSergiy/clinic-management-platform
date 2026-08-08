@@ -42,13 +42,13 @@ final class Version20251124100200 extends AbstractMigration
         $table->addColumn('ticket_number', 'string', ['length' => 32, 'notnull' => false]);
         $table->addColumn('contact_phone', 'string', ['length' => 50, 'notnull' => false]);
         $table->addColumn('contact_email', 'string', ['length' => 191, 'notnull' => false]);
-        $table->addUniqueIndex(['ticket_number']);
+        $table->addUniqueIndex(['ticket_number'], 'uniq_waitlists_ticket_number');
     }
 
     public function down(Schema $schema) : void
     {
         $table = $schema->getTable('waitlists');
-        $table->dropIndex(['ticket_number']);
+        $table->dropIndex('uniq_waitlists_ticket_number');
         $table->dropColumn('contact_email');
         $table->dropColumn('contact_phone');
         $table->dropColumn('ticket_number');

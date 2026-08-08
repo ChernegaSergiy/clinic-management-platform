@@ -40,15 +40,21 @@ final class Version20260103130000 extends AbstractMigration
     {
         $table = $schema->getTable('appointments');
         $table->addColumn('room_id', 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addIndex(['room_id']);
-        $table->addForeignKeyConstraint('rooms', ['room_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => 'NO_ACTION']);
+        $table->addIndex(['room_id'], 'idx_appointments_room_id');
+        $table->addForeignKeyConstraint(
+            'rooms',
+            ['room_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => 'NO_ACTION'],
+            'fk_appointments_room_id'
+        );
     }
 
     public function down(Schema $schema) : void
     {
         $table = $schema->getTable('appointments');
-        $table->removeForeignKeyConstraint('room_id');
-        $table->dropIndex('room_id');
+        $table->removeForeignKey('fk_appointments_room_id');
+        $table->dropIndex('idx_appointments_room_id');
         $table->dropColumn('room_id');
     }
 }
