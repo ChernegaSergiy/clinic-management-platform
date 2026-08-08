@@ -40,7 +40,13 @@ final class Version20260105230000 extends AbstractMigration
     {
         $table = $schema->getTable('employees');
         $table->addColumn('department_id', 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addForeignKeyConstraint('departments', ['department_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => 'NO_ACTION']);
+        $table->addForeignKeyConstraint(
+            'departments',
+            ['department_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => 'NO_ACTION'],
+            'fk_employees_department_id'
+        );
 
         $this->addSql("
             UPDATE employees e 
@@ -58,7 +64,7 @@ final class Version20260105230000 extends AbstractMigration
     public function down(Schema $schema) : void
     {
         $table = $schema->getTable('employees');
-        $table->removeForeignKeyConstraint('department_id');
+        $table->removeForeignKey('fk_employees_department_id');
         $table->dropColumn('department_id');
     }
 }
