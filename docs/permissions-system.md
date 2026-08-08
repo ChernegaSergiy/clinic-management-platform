@@ -121,12 +121,12 @@ Gate::setPolicyRegistry($policyRegistry);
 
 ## Advantages of the New System
 
-1. **Modularity** - each module manages its own permissions independently
-2. **Flexibility** - easy to add new permissions and policies
-3. **Type safety** - policies are typed and validated
-4. **No hardcode** - permissions are not hardcoded in the core
-5. **Easy testing** - policies are easy to mock for tests
-6. **Readability** - access logic is clear and structured
+1. **Modularity** — each module manages its own permissions independently
+2. **Flexibility** — easy to add new permissions and policies
+3. **Type safety** — policies are typed and validated
+4. **No hardcode** — permissions are not hardcoded in the core
+5. **Easy testing** — policies are easy to mock for tests
+6. **Readability** — access logic is clear and structured
 
 ## Migration from Old System
 
