@@ -76,8 +76,15 @@ class DashboardController extends \App\Core\Controller\AbstractController
         }
 
         $exporter = new \App\Core\Export\CsvExporter($headers, $data);
-        $exporter->download('dashboard_report.csv');
-        return new \Symfony\Component\HttpFoundation\Response('', 200); // download will exit, but just in case
+        $csvContent = $exporter->generate();
+
+        $response = new \Symfony\Component\HttpFoundation\Response($csvContent);
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.csv"');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 
     #[Route('/dashboard/export-pdf', name: 'dashboard_export_pdf', methods: ['GET'])]
@@ -95,8 +102,13 @@ class DashboardController extends \App\Core\Controller\AbstractController
         $exporter = new \App\Core\Export\PdfExporter();
         $exporter->loadHtml($html);
         $exporter->render();
-        $exporter->download('dashboard_report.pdf');
-        return new \Symfony\Component\HttpFoundation\Response('', 200);
+        $pdfContent = $exporter->output();
+
+        $response = new \Symfony\Component\HttpFoundation\Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.pdf"');
+
+        return $response;
     }
 
     #[Route('/dashboard/export-excel', name: 'dashboard_export_excel', methods: ['GET'])]
@@ -119,7 +131,13 @@ class DashboardController extends \App\Core\Controller\AbstractController
         }
 
         $exporter = new \App\Core\Export\ExcelExporter();
-        $exporter->export($headers, $data, 'dashboard_report.xlsx');
-        return new \Symfony\Component\HttpFoundation\Response('', 200);
+        $excelContent = $exporter->generate($headers, $data);
+
+        $response = new \Symfony\Component\HttpFoundation\Response($excelContent);
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.xlsx"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 }
