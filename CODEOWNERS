@@ -13,7 +13,6 @@ src/Controller/ @ChernegaSergiy
 # Modules
 src/Controller/PageController.php @ChernegaSergiy
 src/Event/ @Sameer6305
-src/Infrastructure/Module/ @Sameer6305
 src/Bundles/AdminBundle/ @ChernegaSergiy
 src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
 src/Bundles/BillingBundle/ @ChernegaSergiy
@@ -50,7 +49,7 @@ tests/ @ChernegaSergiy
 .github/workflows/ @makztezerest @ChernegaSergiy
 
 # Configuration files
-phpunit.xml @makztezerest @ChernegaSergiy
+phpunit.xml.dist @makztezerest @ChernegaSergiy
 .gitignore @makztezerest @ChernegaSergiy
 
 # Dependencies
