@@ -2,7 +2,7 @@
     <div class="field {% if error %}error{% endif %}">
         <label for="{{ name }}">{{ label }}</label>
         <input type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" placeholder="{{ placeholder }}" {{ _self.html_attributes(attributes) }}>
-        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+        {% if error %}<div class="ui basic red pointing label">{% if error is iterable %}{% for e in error %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% else %}{{ error }}{% endif %}</div>{% endif %}
     </div>
 {% endmacro %}
 
@@ -10,7 +10,7 @@
     <div class="field {% if error %}error{% endif %}">
         <label for="{{ name }}">{{ label }}</label>
         <textarea id="{{ name }}" name="{{ name }}" placeholder="{{ placeholder }}" {{ _self.html_attributes(attributes) }}>{{ value }}</textarea>
-        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+        {% if error %}<div class="ui basic red pointing label">{% if error is iterable %}{% for e in error %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% else %}{{ error }}{% endif %}</div>{% endif %}
     </div>
 {% endmacro %}
 
@@ -22,7 +22,7 @@
                 <option value="{{ option_value }}" {% if option_value == selected %}selected{% endif %}>{{ option_label }}</option>
             {% endfor %}
         </select>
-        {% if error %}<div class="ui basic red pointing label">{{ error }}</div>{% endif %}
+        {% if error %}<div class="ui basic red pointing label">{% if error is iterable %}{% for e in error %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% else %}{{ error }}{% endif %}</div>{% endif %}
     </div>
 {% endmacro %}
 
@@ -46,17 +46,17 @@
         <div class="eight wide field {% if errors['items['~index~'][medication_name]'] %}error{% endif %}">
             <label>{{ 'prescription.new.medication_name_label'|trans }}</label>
             <input type="text" name="items[{{ index }}][medication_name]" placeholder="{{ 'prescription.new.medication_name_placeholder'|trans }}" value="{{ item.medication_name ?? '' }}" required>
-            {% if errors['items['~index~'][medication_name]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][medication_name]'] | first }}</div>{% endif %}
+            {% if errors['items['~index~'][medication_name]'] %}<div class="ui red basic pointing label">{% for e in errors['items['~index~'][medication_name]'] %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
         </div>
         <div class="three wide field {% if errors['items['~index~'][dosage]'] %}error{% endif %}">
             <label>{{ 'prescription.new.dosage_label'|trans }}</label>
             <input type="text" name="items[{{ index }}][dosage]" placeholder="{{ 'prescription.new.dosage_placeholder'|trans }}" value="{{ item.dosage ?? '' }}" required>
-            {% if errors['items['~index~'][dosage]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][dosage]'] | first }}</div>{% endif %}
+            {% if errors['items['~index~'][dosage]'] %}<div class="ui red basic pointing label">{% for e in errors['items['~index~'][dosage]'] %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
         </div>
         <div class="three wide field {% if errors['items['~index~'][frequency]'] %}error{% endif %}">
             <label>{{ 'prescription.new.frequency_label'|trans }}</label>
             <input type="text" name="items[{{ index }}][frequency]" placeholder="{{ 'prescription.new.frequency_placeholder'|trans }}" value="{{ item.frequency ?? '' }}" required>
-            {% if errors['items['~index~'][frequency]'] %}<div class="ui red basic pointing label">{{ errors['items['~index~'][frequency]'] | first }}</div>{% endif %}
+            {% if errors['items['~index~'][frequency]'] %}<div class="ui red basic pointing label">{% for e in errors['items['~index~'][frequency]'] %}{{ e }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
         </div>
         <div class="one wide field">
             <label>&nbsp;</label>
