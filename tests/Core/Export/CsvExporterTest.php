@@ -1,25 +1,52 @@
 <?php
 
-namespace Tests\Core\Export;
+namespace Tests\Core\Export {
 
-use App\Core\Export\CsvExporter;
-use PHPUnit\Framework\TestCase;
+    use App\Core\Export\CsvExporter;
+    use PHPUnit\Framework\TestCase;
 
-class CsvExporterTest extends TestCase
-{
-    public function testGenerateReturnsValidCsv() : void
+    class CsvExporterTest extends TestCase
     {
-        $headers = ['Name', 'Age'];
-        $data = [
-            ['John', 30],
-            ['Jane', 25]
-        ];
+        public static bool $failFopen = false;
 
-        $exporter = new CsvExporter($headers, $data);
-        $csv = $exporter->generate();
+        protected function tearDown() : void
+        {
+            self::$failFopen = false;
+            parent::tearDown();
+        }
 
-        $this->assertStringContainsString('Name,Age', $csv);
-        $this->assertStringContainsString('John,30', $csv);
-        $this->assertStringContainsString('Jane,25', $csv);
+        public function testGenerateReturnsValidCsv() : void
+        {
+            $headers = ['Name', 'Age'];
+            $data = [
+                ['John', 30],
+                ['Jane', 25]
+            ];
+
+            $exporter = new CsvExporter($headers, $data);
+            $csv = $exporter->generate();
+
+            $this->assertStringContainsString('Name,Age', $csv);
+            $this->assertStringContainsString('John,30', $csv);
+            $this->assertStringContainsString('Jane,25', $csv);
+        }
+
+        public function testGenerateReturnsEmptyStringWhenFopenFails() : void
+        {
+            self::$failFopen = true;
+            $exporter = new CsvExporter([], []);
+            $this->assertSame('', $exporter->generate());
+        }
+    }
+
+}
+
+namespace App\Core\Export {
+    function fopen($filename, $mode)
+    {
+        if (\Tests\Core\Export\CsvExporterTest::$failFopen ?? false) {
+            return false;
+        }
+        return \fopen($filename, $mode);
     }
 }
