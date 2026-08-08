@@ -25,9 +25,6 @@
 namespace App\Bundles\PatientBundle\Controller;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
-use App\Bundles\BillingBundle\Repository\InvoiceRepositoryInterface;
-use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
-use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
 use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
@@ -45,10 +42,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
     private InsuranceService $insuranceService;
-    private InsuranceCompanyRepository $insuranceCompanyRepository;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
-    private ClaimRepository $claimRepository;
-    private InvoiceRepositoryInterface $invoiceRepository;
     private Validator $validator;
 
     public function __construct(
@@ -56,19 +50,13 @@ class PatientController extends \App\Core\Controller\AbstractController
         MedicalRecordRepositoryInterface $medicalRecordRepository,
         AppointmentRepositoryInterface $appointmentRepository,
         InsuranceService $insuranceService,
-        InsuranceCompanyRepository $insuranceCompanyRepository,
         PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
-        ClaimRepository $claimRepository,
-        InvoiceRepositoryInterface $invoiceRepository,
         Validator $validator
     ) {
         $this->patientRepository = $patientRepository;
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->appointmentRepository = $appointmentRepository;
-        $this->insuranceCompanyRepository = $insuranceCompanyRepository;
         $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
-        $this->claimRepository = $claimRepository;
-        $this->invoiceRepository = $invoiceRepository;
         $this->insuranceService = $insuranceService;
         $this->validator = $validator;
     }
