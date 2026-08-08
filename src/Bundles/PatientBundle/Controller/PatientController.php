@@ -227,6 +227,9 @@ class PatientController extends \App\Core\Controller\AbstractController
         $patients = $this->patientRepository->findAll();
 
         $headers = !empty($patients) ? array_keys($patients[0]) : ['id', 'first_name', 'last_name', 'birth_date', 'gender', 'phone', 'email', 'address', 'tax_id'];
+        if (empty($patients)) {
+            $patients[] = array_combine($headers, ['N/A', '', '', '', '', '', '', '', '']);
+        }
         $exporter = new CsvExporter($headers, $patients);
         $csvContent = $exporter->generate();
 

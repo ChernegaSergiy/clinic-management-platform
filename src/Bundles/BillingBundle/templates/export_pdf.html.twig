@@ -31,6 +31,10 @@
                     <td>{{ invoice.status }}</td>
                     <td>{{ invoice.issued_date }}</td>
                 </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">{{ 'billing.list.no_invoices'|trans }}</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>

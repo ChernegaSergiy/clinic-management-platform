@@ -441,6 +441,10 @@ class BillingController extends \App\Core\Controller\AbstractController
             ];
         }
 
+        if (empty($exportData)) {
+            $exportData[] = ['N/A', '', '', '', '', '', '', ''];
+        }
+
         $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
         $csvContent = $exporter->generate();
 
@@ -495,6 +499,10 @@ class BillingController extends \App\Core\Controller\AbstractController
                 $invoice['status'],
                 $invoice['issued_date']
             ];
+        }
+
+        if (empty($data)) {
+            $data[] = ['N/A', '', '', '', ''];
         }
 
         $excelExporter = new ExcelExporter();
