@@ -43,4 +43,99 @@ class Contract
     #[ORM\Column(length: 50, nullable: true)] private ?string $status = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function getTitle() : ?string
+    {
+        return $this->title;
+    }
+    public function setTitle(?string $title) : self
+    {
+        $this->title = $title;
+        return $this;
+    }
+    public function getDescription() : ?string
+    {
+        return $this->description;
+    }
+    public function setDescription(?string $description) : self
+    {
+        $this->description = $description;
+        return $this;
+    }
+    public function getStartDate() : ?\DateTimeInterface
+    {
+        return $this->start_date;
+    }
+    public function setStartDate(?\DateTimeInterface $start_date) : self
+    {
+        $this->start_date = $start_date;
+        return $this;
+    }
+    public function getEndDate() : ?\DateTimeInterface
+    {
+        return $this->end_date;
+    }
+    public function setEndDate(?\DateTimeInterface $end_date) : self
+    {
+        $this->end_date = $end_date;
+        return $this;
+    }
+    public function getPartyA() : ?string
+    {
+        return $this->party_a;
+    }
+    public function setPartyA(?string $party_a) : self
+    {
+        $this->party_a = $party_a;
+        return $this;
+    }
+    public function getPartyB() : ?string
+    {
+        return $this->party_b;
+    }
+    public function setPartyB(?string $party_b) : self
+    {
+        $this->party_b = $party_b;
+        return $this;
+    }
+    public function getFilePath() : ?string
+    {
+        return $this->file_path;
+    }
+    public function setFilePath(?string $file_path) : self
+    {
+        $this->file_path = $file_path;
+        return $this;
+    }
+    public function getStatus() : ?string
+    {
+        return $this->status;
+    }
+    public function setStatus(?string $status) : self
+    {
+        $this->status = $status;
+        return $this;
+    }
+    public function getCreatedAt() : ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+    public function setCreatedAt(?\DateTimeInterface $created_at) : self
+    {
+        $this->created_at = $created_at;
+        return $this;
+    }
+    public function getUpdatedAt() : ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+    public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
+    {
+        $this->updated_at = $updated_at;
+        return $this;
+    }
 }

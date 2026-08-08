@@ -37,71 +37,113 @@ class ContractRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM contracts ORDER BY created_at DESC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('c')
+            ->orderBy('c.created_at', 'DESC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM contracts WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO contracts (title, description, start_date, end_date, party_a, party_b, file_path, status) 
-                VALUES (:title, :description, :start_date, :end_date, :party_a, :party_b, :file_path, :status)";
+        $contract = new Contract();
+        $contract->setTitle($data['title']);
+        $contract->setDescription($data['description'] ?? null);
 
-        $success = $conn->executeStatement($sql, [
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'] ?? null,
-            'party_a' => $data['party_a'] ?? null,
-            'party_b' => $data['party_b'] ?? null,
-            'file_path' => $data['file_path'] ?? null,
-            'status' => $data['status'] ?? 'active',
-        ]) > 0;
+        try {
+            if (!empty($data['start_date'])) {
+                $contract->setStartDate(new \DateTime($data['start_date']));
+            }
+            if (!empty($data['end_date'])) {
+                $contract->setEndDate(new \DateTime($data['end_date']));
+            }
+        } catch (\Exception $e) {
+            // ignore invalid dates
+        }
 
-        return $success ? (int)$conn->lastInsertId() : null;
+        $contract->setPartyA($data['party_a'] ?? null);
+        $contract->setPartyB($data['party_b'] ?? null);
+        $contract->setFilePath($data['file_path'] ?? null);
+        $contract->setStatus($data['status'] ?? 'active');
+
+        try {
+            $this->getEntityManager()->persist($contract);
+            $this->getEntityManager()->flush();
+            return $contract->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE contracts SET 
-                    title = :title, 
-                    description = :description, 
-                    start_date = :start_date, 
-                    end_date = :end_date, 
-                    party_a = :party_a, 
-                    party_b = :party_b, 
-                    file_path = :file_path, 
-                    status = :status 
-                WHERE id = :id";
+        /** @var Contract|null $contract */
+        $contract = $this->find($id);
+        if (!$contract) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'] ?? null,
-            'party_a' => $data['party_a'] ?? null,
-            'party_b' => $data['party_b'] ?? null,
-            'file_path' => $data['file_path'] ?? null,
-            'status' => $data['status'] ?? 'active',
-        ]) > 0;
+        if (isset($data['title'])) {
+            $contract->setTitle($data['title']);
+        }
+        if (array_key_exists('description', $data)) {
+            $contract->setDescription($data['description']);
+        }
+
+        try {
+            if (isset($data['start_date'])) {
+                $contract->setStartDate(new \DateTime($data['start_date']));
+            }
+            if (array_key_exists('end_date', $data)) {
+                $contract->setEndDate($data['end_date'] ? new \DateTime($data['end_date']) : null);
+            }
+        } catch (\Exception $e) {
+            // ignore invalid dates
+        }
+
+        if (array_key_exists('party_a', $data)) {
+            $contract->setPartyA($data['party_a']);
+        }
+        if (array_key_exists('party_b', $data)) {
+            $contract->setPartyB($data['party_b']);
+        }
+        if (array_key_exists('file_path', $data)) {
+            $contract->setFilePath($data['file_path']);
+        }
+        if (isset($data['status'])) {
+            $contract->setStatus($data['status']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM contracts WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var Contract|null $contract */
+        $contract = $this->find($id);
+        if (!$contract) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($contract);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
