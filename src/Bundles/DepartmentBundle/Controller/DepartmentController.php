@@ -44,7 +44,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    #[Route('/admin/departments', name: 'admin_departments_index', methods: ['GET'])]
+    #[Route('/departments', name: 'admin_departments_index', methods: ['GET'])]
     public function index() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -57,7 +57,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/departments/new', name: 'admin_departments_new', methods: ['GET'])]
+    #[Route('/departments/new', name: 'admin_departments_new', methods: ['GET'])]
     public function create() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -71,7 +71,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/departments/new', name: 'admin_departments_new_post', methods: ['POST'])]
+    #[Route('/departments/new', name: 'admin_departments_new_post', methods: ['POST'])]
     public function store() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -108,7 +108,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
     }
 
-    #[Route('/admin/departments/show', name: 'admin_departments_show', methods: ['GET'])]
+    #[Route('/departments/show', name: 'admin_departments_show', methods: ['GET'])]
     public function show() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -130,7 +130,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/departments/edit', name: 'admin_departments_edit', methods: ['GET'])]
+    #[Route('/departments/edit', name: 'admin_departments_edit', methods: ['GET'])]
     public function edit() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -152,7 +152,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/departments/edit', name: 'admin_departments_edit_post', methods: ['POST'])]
+    #[Route('/departments/edit', name: 'admin_departments_edit_post', methods: ['POST'])]
     public function update() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -194,7 +194,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments/show?id=' . $id);
     }
 
-    #[Route('/admin/departments/delete', name: 'admin_departments_delete', methods: ['POST'])]
+    #[Route('/departments/delete', name: 'admin_departments_delete', methods: ['POST'])]
     public function delete() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
@@ -214,7 +214,7 @@ class DepartmentController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
     }
 
-    #[Route('/admin/departments/toggle-status', name: 'admin_departments_toggle_status', methods: ['POST'])]
+    #[Route('/departments/toggle-status', name: 'admin_departments_toggle_status', methods: ['POST'])]
     public function toggleStatus() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();

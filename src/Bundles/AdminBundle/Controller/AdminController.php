@@ -71,7 +71,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    #[Route('/admin/settings', name: 'admin_settings', methods: ['GET'])]
+    #[Route('/settings', name: 'admin_settings', methods: ['GET'])]
     public function showSettings() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -94,7 +94,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/settings', name: 'admin_settings_post', methods: ['POST'])]
+    #[Route('/settings', name: 'admin_settings_post', methods: ['POST'])]
     public function updateSettings() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -120,7 +120,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
 
-    #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
+    #[Route('/users', name: 'admin_users', methods: ['GET'])]
     public function users() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -143,7 +143,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/users/new', name: 'admin_users_new', methods: ['GET'])]
+    #[Route('/users/new', name: 'admin_users_new', methods: ['GET'])]
     public function createUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -162,7 +162,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/users/new', name: 'admin_users_new_post', methods: ['POST'])]
+    #[Route('/users/new', name: 'admin_users_new_post', methods: ['POST'])]
     public function storeUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -191,7 +191,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
     }
 
-    #[Route('/admin/users/show', name: 'admin_users_show', methods: ['GET'])]
+    #[Route('/users/show', name: 'admin_users_show', methods: ['GET'])]
     public function showUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -209,7 +209,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/users/show.html.twig', ['user' => $user]);
     }
 
-    #[Route('/admin/users/edit', name: 'admin_users_edit', methods: ['GET'])]
+    #[Route('/users/edit', name: 'admin_users_edit', methods: ['GET'])]
     public function editUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -267,7 +267,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $roleOptions;
     }
 
-    #[Route('/admin/users/edit', name: 'admin_users_edit_post', methods: ['POST'])]
+    #[Route('/users/edit', name: 'admin_users_edit_post', methods: ['POST'])]
     public function updateUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -309,7 +309,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/show?id=' . $id);
     }
 
-    #[Route('/admin/users/delete', name: 'admin_users_delete', methods: ['POST'])]
+    #[Route('/users/delete', name: 'admin_users_delete', methods: ['POST'])]
     public function deleteUser() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -332,7 +332,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
     }
 
-    #[Route('/admin/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
+    #[Route('/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
     public function disableUserMfa() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -351,7 +351,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Role Management ---
-    #[Route('/admin/roles', name: 'admin_roles', methods: ['GET'])]
+    #[Route('/roles', name: 'admin_roles', methods: ['GET'])]
     public function listRoles() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -359,7 +359,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/roles/index.html.twig', ['roles' => $roles]);
     }
 
-    #[Route('/admin/roles/new', name: 'admin_roles_new', methods: ['GET'])]
+    #[Route('/roles/new', name: 'admin_roles_new', methods: ['GET'])]
     public function createRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -371,7 +371,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/roles/new', name: 'admin_roles_new_post', methods: ['POST'])]
+    #[Route('/roles/new', name: 'admin_roles_new_post', methods: ['POST'])]
     public function storeRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -393,7 +393,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles');
     }
 
-    #[Route('/admin/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
+    #[Route('/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
     public function editRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -414,7 +414,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/roles/edit', name: 'admin_roles_edit_post', methods: ['POST'])]
+    #[Route('/roles/edit', name: 'admin_roles_edit_post', methods: ['POST'])]
     public function updateRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -443,7 +443,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/roles');
     }
 
-    #[Route('/admin/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
+    #[Route('/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
     public function deleteRole() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -461,7 +461,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Dictionary Management ---
-    #[Route('/admin/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
+    #[Route('/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
     public function listDictionaries() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -469,7 +469,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
-    #[Route('/admin/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
+    #[Route('/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
     public function showDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -487,7 +487,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new', methods: ['GET'])]
+    #[Route('/dictionaries/new', name: 'admin_dictionaries_new', methods: ['GET'])]
     public function createDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -499,7 +499,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/dictionaries/new', name: 'admin_dictionaries_new_post', methods: ['POST'])]
+    #[Route('/dictionaries/new', name: 'admin_dictionaries_new_post', methods: ['POST'])]
     public function storeDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -521,7 +521,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
     }
 
-    #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
+    #[Route('/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
     public function editDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -542,7 +542,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/dictionaries/edit', name: 'admin_dictionaries_edit_post', methods: ['POST'])]
+    #[Route('/dictionaries/edit', name: 'admin_dictionaries_edit_post', methods: ['POST'])]
     public function updateDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -571,7 +571,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
     }
 
-    #[Route('/admin/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
+    #[Route('/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
     public function deleteDictionary() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -583,7 +583,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Dictionary Value Management ---
-    #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new', methods: ['GET'])]
+    #[Route('/dictionaries/values/new', name: 'admin_dictionaries_values_new', methods: ['GET'])]
     public function createDictionaryValue() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -597,7 +597,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/dictionaries/values/new', name: 'admin_dictionaries_values_new_post', methods: ['POST'])]
+    #[Route('/dictionaries/values/new', name: 'admin_dictionaries_values_new_post', methods: ['POST'])]
     public function storeDictionaryValue() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -621,7 +621,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
     }
 
-    #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
+    #[Route('/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
     public function editDictionaryValue() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -642,7 +642,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/dictionaries/values/edit', name: 'admin_dictionaries_values_edit_post', methods: ['POST'])]
+    #[Route('/dictionaries/values/edit', name: 'admin_dictionaries_values_edit_post', methods: ['POST'])]
     public function updateDictionaryValue() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -669,7 +669,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
     }
 
-    #[Route('/admin/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
+    #[Route('/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
     public function deleteDictionaryValue() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -684,7 +684,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Auth Configuration Management ---
-    #[Route('/admin/auth_configs', name: 'admin_auth_configs', methods: ['GET'])]
+    #[Route('/auth_configs', name: 'admin_auth_configs', methods: ['GET'])]
     public function listAuthConfigs() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -692,7 +692,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
-    #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
+    #[Route('/auth_configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
     public function createAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -707,7 +707,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/auth_configs/new', name: 'admin_auth_configs_new_post', methods: ['POST'])]
+    #[Route('/auth_configs/new', name: 'admin_auth_configs_new_post', methods: ['POST'])]
     public function storeAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -731,7 +731,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
-    #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
+    #[Route('/auth_configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
     public function editAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -754,7 +754,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/auth_configs/edit', name: 'admin_auth_configs_edit_post', methods: ['POST'])]
+    #[Route('/auth_configs/edit', name: 'admin_auth_configs_edit_post', methods: ['POST'])]
     public function updateAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -785,7 +785,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
-    #[Route('/admin/auth_configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
+    #[Route('/auth_configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
     public function deleteAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -796,7 +796,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
     }
 
-    #[Route('/admin/auth_configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
+    #[Route('/auth_configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
     public function showAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -817,7 +817,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Backup Policy Management ---
-    #[Route('/admin/backup_policies', name: 'admin_backup_policies', methods: ['GET'])]
+    #[Route('/backup_policies', name: 'admin_backup_policies', methods: ['GET'])]
     public function listBackupPolicies() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -825,7 +825,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
-    #[Route('/admin/backup_policies/new', name: 'admin_backup_policies_new', methods: ['GET'])]
+    #[Route('/backup_policies/new', name: 'admin_backup_policies_new', methods: ['GET'])]
     public function createBackupPolicy() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -837,7 +837,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/backup_policies/new', name: 'admin_backup_policies_new_post', methods: ['POST'])]
+    #[Route('/backup_policies/new', name: 'admin_backup_policies_new_post', methods: ['POST'])]
     public function storeBackupPolicy() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -861,7 +861,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
-    #[Route('/admin/backup_policies/edit', name: 'admin_backup_policies_edit', methods: ['GET'])]
+    #[Route('/backup_policies/edit', name: 'admin_backup_policies_edit', methods: ['GET'])]
     public function editBackupPolicy() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -882,7 +882,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/backup_policies/edit', name: 'admin_backup_policies_edit_post', methods: ['POST'])]
+    #[Route('/backup_policies/edit', name: 'admin_backup_policies_edit_post', methods: ['POST'])]
     public function updateBackupPolicy() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -913,7 +913,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
     }
 
-    #[Route('/admin/backup_policies/delete', name: 'admin_backup_policies_delete', methods: ['POST'])]
+    #[Route('/backup_policies/delete', name: 'admin_backup_policies_delete', methods: ['POST'])]
     public function deleteBackupPolicy() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -925,7 +925,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- KPI Definition Management ---
-    #[Route('/admin/kpi_definitions', name: 'admin_kpi_definitions', methods: ['GET'])]
+    #[Route('/kpi_definitions', name: 'admin_kpi_definitions', methods: ['GET'])]
     public function listKpiDefinitions() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -933,7 +933,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
-    #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
+    #[Route('/kpi_definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -945,7 +945,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/kpi_definitions/new', name: 'admin_kpi_definitions_new_post', methods: ['POST'])]
+    #[Route('/kpi_definitions/new', name: 'admin_kpi_definitions_new_post', methods: ['POST'])]
     public function storeKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -973,7 +973,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
-    #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
+    #[Route('/kpi_definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
     public function editKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -994,7 +994,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/kpi_definitions/edit', name: 'admin_kpi_definitions_edit_post', methods: ['POST'])]
+    #[Route('/kpi_definitions/edit', name: 'admin_kpi_definitions_edit_post', methods: ['POST'])]
     public function updateKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1029,7 +1029,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/kpi_definitions');
     }
 
-    #[Route('/admin/kpi_definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
+    #[Route('/kpi_definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
     public function deleteKpiDefinition() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1041,7 +1041,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Management ---
-    #[Route('/admin/services', name: 'admin_services', methods: ['GET'])]
+    #[Route('/services', name: 'admin_services', methods: ['GET'])]
     public function listServices() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1050,7 +1050,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/services/index.html.twig', ['services' => $services]);
     }
 
-    #[Route('/admin/services/new', name: 'admin_services_new', methods: ['GET'])]
+    #[Route('/services/new', name: 'admin_services_new', methods: ['GET'])]
     public function createService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1070,7 +1070,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/services/new', name: 'admin_services_new_post', methods: ['POST'])]
+    #[Route('/services/new', name: 'admin_services_new_post', methods: ['POST'])]
     public function storeService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1097,7 +1097,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
     }
 
-    #[Route('/admin/services/edit', name: 'admin_services_edit', methods: ['GET'])]
+    #[Route('/services/edit', name: 'admin_services_edit', methods: ['GET'])]
     public function editService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1126,7 +1126,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
+    #[Route('/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
     public function updateService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1160,7 +1160,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
     }
 
-    #[Route('/admin/services/delete', name: 'admin_services_delete', methods: ['POST'])]
+    #[Route('/services/delete', name: 'admin_services_delete', methods: ['POST'])]
     public function deleteService() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1173,7 +1173,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Category Management ---
-    #[Route('/admin/service-categories', name: 'admin_service_categories', methods: ['GET'])]
+    #[Route('/service-categories', name: 'admin_service_categories', methods: ['GET'])]
     public function listServiceCategories() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1182,7 +1182,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $this->render('@Admin/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
-    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
+    #[Route('/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
     public function createServiceCategory() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1195,7 +1195,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
+    #[Route('/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
     public function storeServiceCategory() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1218,7 +1218,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
-    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
+    #[Route('/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
     public function editServiceCategory() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1240,7 +1240,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
+    #[Route('/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
     public function updateServiceCategory() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
@@ -1270,7 +1270,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
-    #[Route('/admin/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
+    #[Route('/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
     public function deleteServiceCategory() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();

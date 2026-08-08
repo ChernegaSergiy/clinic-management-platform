@@ -42,7 +42,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    #[Route('/admin/rooms', name: 'admin_rooms_index', methods: ['GET'])]
+    #[Route('/rooms', name: 'admin_rooms_index', methods: ['GET'])]
     public function index() : Response
     {
         $this->authorizeAdmin();
@@ -55,7 +55,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
+    #[Route('/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
     public function create() : Response
     {
         $this->authorizeAdmin();
@@ -68,7 +68,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
+    #[Route('/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
     public function store() : Response
     {
         $this->authorizeAdmin();
@@ -93,7 +93,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return new RedirectResponse('/admin/rooms');
     }
 
-    #[Route('/admin/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
+    #[Route('/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
     public function show() : Response
     {
         $this->authorizeAdmin();
@@ -108,7 +108,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return $this->render('@Room/show.html.twig', ['room' => $room]);
     }
 
-    #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
+    #[Route('/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
         $this->authorizeAdmin();
@@ -129,7 +129,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
+    #[Route('/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
     public function update() : Response
     {
         $this->authorizeAdmin();
@@ -160,7 +160,7 @@ class RoomController extends \App\Core\Controller\AbstractController
         return new RedirectResponse('/admin/rooms/show?id=' . $id);
     }
 
-    #[Route('/admin/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
+    #[Route('/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
     public function delete() : Response
     {
         $this->authorizeAdmin();
