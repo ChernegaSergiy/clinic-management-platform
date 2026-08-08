@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'prescription_items')]
 class PrescriptionItem
 {
-    /** @phpstan-ignore-next-line */
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
     #[ORM\Column(type: Types::INTEGER)] private ?int $prescription_id = null;
     #[ORM\Column(length: 255)] private ?string $medication_name = null;
@@ -21,6 +20,12 @@ class PrescriptionItem
     public function getId() : ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id) : self
+    {
+        $this->id = $id;
+        return $this;
     }
     public function getPrescriptionId() : ?int
     {
