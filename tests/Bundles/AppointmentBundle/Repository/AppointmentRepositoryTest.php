@@ -2,6 +2,7 @@
 
 namespace App\Tests\Bundles\AppointmentBundle\Repository;
 
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Entity\Appointment;
 use App\Tests\RepositoryTestCase;
 use Doctrine\DBAL\Connection;
