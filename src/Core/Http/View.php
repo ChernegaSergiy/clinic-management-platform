@@ -44,7 +44,6 @@ class View
         $this->mfaGuard = $mfaGuard;
 
         $this->addGlobals();
-        $this->setupLocale();
     }
 
     private function addGlobals() : void
@@ -69,40 +68,6 @@ class View
         foreach ($globals as $key => $value) {
             $this->twig->addGlobal($key, $value);
         }
-    }
-
-    private function setupLocale() : void
-    {
-        $globals = $this->twig->getGlobals();
-        $preferredLocale = ($globals['system_locale'] ?? null) ?? $this->detectBrowserLanguage() ?? 'uk';
-        $rawAvailableLocales = array_keys($this->translationService->getAvailableLocales());
-        $finalLocale = 'uk';
-        if (in_array($preferredLocale, $rawAvailableLocales)) {
-            $finalLocale = $preferredLocale;
-        }
-        $this->translationService->setLocale($finalLocale);
-    }
-
-    private function detectBrowserLanguage() : ?string
-    {
-        $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
-        if (empty($acceptLang)) {
-            return null;
-        }
-
-        $supportedLocales = array_keys($this->translationService->getAvailableLocales());
-
-        $languages = explode(',', $acceptLang);
-        foreach ($languages as $lang) {
-            $lang = trim(explode(';', $lang)[0]);
-            $lang = explode('-', $lang)[0];
-
-            if (in_array($lang, $supportedLocales)) {
-                return $lang;
-            }
-        }
-
-        return null;
     }
 
     public function render(string $template, array $data = []) : void
