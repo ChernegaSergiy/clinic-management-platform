@@ -295,12 +295,11 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
 
     public function attachIcdCodes(int $medicalRecordId, array $icdCodeIds) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $conn->executeStatement(
-            "DELETE FROM medical_record_icd WHERE medical_record_id = :medical_record_id",
-            ['medical_record_id' => $medicalRecordId]
-        );
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->delete('medical_record_icd')
+           ->where('medical_record_id = :medical_record_id')
+           ->setParameter('medical_record_id', $medicalRecordId)
+           ->executeStatement();
 
         $icdCodeIds = array_filter($icdCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
@@ -308,42 +307,39 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
             return true;
         }
 
-        $insertSql = "INSERT INTO medical_record_icd (medical_record_id, icd_code_id) VALUES ";
-        $values = [];
-        $params = [];
-        foreach ($icdCodeIds as $index => $icdCodeId) {
-            $values[] = "(:medical_record_id_{$index}, :icd_code_id_{$index})";
-            $params["medical_record_id_{$index}"] = $medicalRecordId;
-            $params["icd_code_id_{$index}"] = $icdCodeId;
+        $inserted = 0;
+        foreach ($icdCodeIds as $icdCodeId) {
+            $insertQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $inserted += $insertQb->insert('medical_record_icd')
+                ->setValue('medical_record_id', ':medical_record_id')
+                ->setValue('icd_code_id', ':icd_code_id')
+                ->setParameter('medical_record_id', $medicalRecordId)
+                ->setParameter('icd_code_id', $icdCodeId)
+                ->executeStatement();
         }
-        $insertSql .= implode(', ', $values);
 
-        return $conn->executeStatement($insertSql, $params) > 0;
+        return $inserted > 0;
     }
 
     public function getIcdCodesForMedicalRecord(int $medicalRecordId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                ic.id,
-                ic.code,
-                ic.description
-            FROM medical_record_icd mri
-            JOIN icd_codes ic ON mri.icd_code_id = ic.id
-            WHERE mri.medical_record_id = :medical_record_id
-        ";
-        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('ic.id', 'ic.code', 'ic.description')
+           ->from('medical_record_icd', 'mri')
+           ->join('mri', 'icd_codes', 'ic', 'mri.icd_code_id = ic.id')
+           ->where('mri.medical_record_id = :medical_record_id')
+           ->setParameter('medical_record_id', $medicalRecordId);
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function attachInterventionCodes(int $medicalRecordId, array $interventionCodeIds) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $conn->executeStatement(
-            "DELETE FROM medical_record_intervention WHERE medical_record_id = :medical_record_id",
-            ['medical_record_id' => $medicalRecordId]
-        );
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->delete('medical_record_intervention')
+           ->where('medical_record_id = :medical_record_id')
+           ->setParameter('medical_record_id', $medicalRecordId)
+           ->executeStatement();
 
         $interventionCodeIds = array_filter($interventionCodeIds, fn ($id) => is_numeric($id) && $id > 0);
 
@@ -351,31 +347,29 @@ class MedicalRecordRepository extends ServiceEntityRepository implements Medical
             return true;
         }
 
-        $insertSql = "INSERT INTO medical_record_intervention (medical_record_id, intervention_code_id) VALUES ";
-        $values = [];
-        $params = [];
-        foreach ($interventionCodeIds as $index => $interventionCodeId) {
-            $values[] = "(:medical_record_id_{$index}, :intervention_code_id_{$index})";
-            $params["medical_record_id_{$index}"] = $medicalRecordId;
-            $params["intervention_code_id_{$index}"] = $interventionCodeId;
+        $inserted = 0;
+        foreach ($interventionCodeIds as $interventionCodeId) {
+            $insertQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $inserted += $insertQb->insert('medical_record_intervention')
+                ->setValue('medical_record_id', ':medical_record_id')
+                ->setValue('intervention_code_id', ':intervention_code_id')
+                ->setParameter('medical_record_id', $medicalRecordId)
+                ->setParameter('intervention_code_id', $interventionCodeId)
+                ->executeStatement();
         }
-        $insertSql .= implode(', ', $values);
 
-        return $conn->executeStatement($insertSql, $params) > 0;
+        return $inserted > 0;
     }
 
     public function getInterventionCodesForMedicalRecord(int $medicalRecordId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                ic.id,
-                ic.code,
-                ic.description
-            FROM medical_record_intervention mri
-            JOIN intervention_codes ic ON mri.intervention_code_id = ic.id
-            WHERE mri.medical_record_id = :medical_record_id
-        ";
-        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('ic.id', 'ic.code', 'ic.description')
+           ->from('medical_record_intervention', 'mri')
+           ->join('mri', 'intervention_codes', 'ic', 'mri.intervention_code_id = ic.id')
+           ->where('mri.medical_record_id = :medical_record_id')
+           ->setParameter('medical_record_id', $medicalRecordId);
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }
