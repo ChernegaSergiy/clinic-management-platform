@@ -8,9 +8,7 @@
         <h2 class="ui header">{{ 'kpi.results.header'|trans }}</h2>
         <div class="ui divider"></div>
 
-        {% if results is empty %}
-            <p>{{ 'kpi.results.no_results'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -34,9 +32,12 @@
                             <td>{{ result.notes ?: 'kpi.results.no_notes'|trans }}</td>
                             <td>{{ result.created_at|date('Y-m-d H:i') }}</td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="center aligned">{{ 'kpi.results.no_results'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
