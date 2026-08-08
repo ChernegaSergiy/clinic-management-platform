@@ -92,9 +92,7 @@
 
         <div class="ui divider"></div>
 
-        {% if attachments is empty %}
-            <p>{{ 'medical_record.show.attachments.no_attachments'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -121,10 +119,13 @@
                                 </a> #}
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="center aligned">{{ 'medical_record.show.attachments.no_attachments'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 
     <div class="ui segment">
