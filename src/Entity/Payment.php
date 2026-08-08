@@ -38,4 +38,63 @@ class Payment
     #[ORM\Column(length: 255, nullable: true)] private ?string $transaction_id = null;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $notes = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $payment_date = null;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
+    public function getInvoiceId() : ?int
+    {
+        return $this->invoice_id;
+    }
+    public function setInvoiceId(?int $invoice_id) : self
+    {
+        $this->invoice_id = $invoice_id;
+        return $this;
+    }
+    public function getAmount() : ?float
+    {
+        return $this->amount;
+    }
+    public function setAmount(?float $amount) : self
+    {
+        $this->amount = $amount;
+        return $this;
+    }
+    public function getPaymentMethod() : ?string
+    {
+        return $this->payment_method;
+    }
+    public function setPaymentMethod(?string $payment_method) : self
+    {
+        $this->payment_method = $payment_method;
+        return $this;
+    }
+    public function getTransactionId() : ?string
+    {
+        return $this->transaction_id;
+    }
+    public function setTransactionId(?string $transaction_id) : self
+    {
+        $this->transaction_id = $transaction_id;
+        return $this;
+    }
+    public function getNotes() : ?string
+    {
+        return $this->notes;
+    }
+    public function setNotes(?string $notes) : self
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+    public function getPaymentDate() : ?\DateTimeInterface
+    {
+        return $this->payment_date;
+    }
+    public function setPaymentDate(?\DateTimeInterface $payment_date) : self
+    {
+        $this->payment_date = $payment_date;
+        return $this;
+    }
 }

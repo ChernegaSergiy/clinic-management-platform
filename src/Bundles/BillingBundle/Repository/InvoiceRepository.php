@@ -43,53 +43,52 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
 
     public function findAll(string $searchTerm = '') : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                i.id, 
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                i.amount,
-                i.status,
-                i.issued_date
-            FROM invoices i
-            JOIN patients p ON i.patient_id = p.id
-        ";
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.id', 'p.last_name', 'p.first_name', 'i.amount', 'i.status', 'i.issued_date')
+            ->join(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id');
 
-        $params = [];
         if (!empty($searchTerm)) {
-            $sql .= " WHERE (p.last_name LIKE :term OR p.first_name LIKE :term"
-                . " OR CONCAT(p.last_name, ' ', p.first_name) LIKE :term OR i.status LIKE :term";
+            $orX = $qb->expr()->orX(
+                $qb->expr()->like('p.last_name', ':term'),
+                $qb->expr()->like('p.first_name', ':term'),
+                $qb->expr()->like("CONCAT(p.last_name, ' ', p.first_name)", ':term'),
+                $qb->expr()->like('i.status', ':term')
+            );
             if (is_numeric($searchTerm)) {
-                $sql .= " OR i.id = :idExact";
-                $params['idExact'] = (int)$searchTerm;
+                $orX->add($qb->expr()->eq('i.id', ':idExact'));
+                $qb->setParameter('idExact', (int)$searchTerm);
             }
-            $sql .= ")";
-            $params['term'] = '%' . $searchTerm . '%';
+            $qb->where($orX);
+            $qb->setParameter('term', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY i.issued_date DESC";
+        $qb->orderBy('i.issued_date', 'DESC');
+        $results = $qb->getQuery()->getArrayResult();
 
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql, $params);
+        return array_map(function ($row) {
+            $row['patient_name'] = trim(($row['last_name'] ?? '') . ' ' . ($row['first_name'] ?? ''));
+            if ($row['issued_date'] instanceof \DateTimeInterface) {
+                $row['issued_date'] = $row['issued_date']->format('Y-m-d H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function save(array $data) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO invoices (patient_id, appointment_id, medical_record_id, amount, status, notes, type) 
-                VALUES (:patient_id, :appointment_id, :medical_record_id, :amount, :status, :notes, :type)";
+        $invoice = new Invoice();
+        $invoice->setPatientId((int)$data['patient_id']);
+        $invoice->setAppointmentId(!empty($data['appointment_id']) ? (int)$data['appointment_id'] : null);
+        $invoice->setMedicalRecordId(!empty($data['medical_record_id']) ? (int)$data['medical_record_id'] : null);
+        $invoice->setAmount((float)$data['amount']);
+        $invoice->setStatus($data['status'] ?? 'pending');
+        $invoice->setNotes($data['notes'] ?? null);
+        $invoice->setType($data['type'] ?? 'invoice');
 
-        $conn->executeStatement($sql, [
-            'patient_id' => $data['patient_id'],
-            'appointment_id' => $data['appointment_id'] ?? null,
-            'medical_record_id' => $data['medical_record_id'] ?? null,
-            'amount' => $data['amount'],
-            'status' => $data['status'] ?? 'pending',
-            'notes' => $data['notes'] ?? null,
-            'type' => $data['type'] ?? 'invoice',
-        ]);
+        $this->getEntityManager()->persist($invoice);
+        $this->getEntityManager()->flush();
 
-        $invoiceId = (int)$conn->lastInsertId();
+        $invoiceId = $invoice->getId();
 
         $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $invoiceId, 'create', null, $data));
         $this->eventDispatcher->dispatch(new PatientNotificationEvent(
@@ -104,37 +103,52 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
 
     public function updateInsuranceDue(int $invoiceId, float $insuranceDue, float $patientDue) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE invoices SET insurance_due = :insurance_due, patient_due = :patient_due WHERE id = :id";
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->update(Invoice::class, 'i')
+            ->set('i.insurance_due', ':insurance_due')
+            ->set('i.patient_due', ':patient_due')
+            ->where('i.id = :id')
+            ->setParameter('insurance_due', $insuranceDue)
+            ->setParameter('patient_due', $patientDue)
+            ->setParameter('id', $invoiceId);
 
-        return $conn->executeStatement($sql, [
-            'id' => $invoiceId,
-            'insurance_due' => $insuranceDue,
-            'patient_due' => $patientDue,
-        ]) > 0;
+        return $qb->getQuery()->execute() > 0;
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                i.*,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name
-            FROM invoices i
-            JOIN patients p ON i.patient_id = p.id
-            WHERE i.id = :id
-        ";
+        $qb = $this->createQueryBuilder('i')
+            ->select('i', 'p.last_name', 'p.first_name')
+            ->join(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id')
+            ->where('i.id = :id')
+            ->setParameter('id', $id);
 
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
-        if ($result) {
-            $result['payments'] = $this->getPaymentsForInvoice($id);
-            $result['total_paid'] = array_sum(array_column($result['payments'], 'amount'));
-            $result['remaining_amount'] = $result['amount'] - $result['total_paid'];
+        if ($result && isset($result[0])) {
+            $flat = $result[0];
+            $flat['patient_name'] = trim(($result['last_name'] ?? '') . ' ' . ($result['first_name'] ?? ''));
+
+            if ($flat['issued_date'] instanceof \DateTimeInterface) {
+                $flat['issued_date'] = $flat['issued_date']->format('Y-m-d H:i:s');
+            }
+            if ($flat['paid_date'] instanceof \DateTimeInterface) {
+                $flat['paid_date'] = $flat['paid_date']->format('Y-m-d H:i:s');
+            }
+            if ($flat['created_at'] instanceof \DateTimeInterface) {
+                $flat['created_at'] = $flat['created_at']->format('Y-m-d H:i:s');
+            }
+            if ($flat['updated_at'] instanceof \DateTimeInterface) {
+                $flat['updated_at'] = $flat['updated_at']->format('Y-m-d H:i:s');
+            }
+
+            $flat['payments'] = $this->getPaymentsForInvoice($id);
+            $flat['total_paid'] = array_sum(array_column($flat['payments'], 'amount'));
+            $flat['remaining_amount'] = $flat['amount'] - $flat['total_paid'];
+            return $flat;
         }
 
-        return $result ?: null;
+        return null;
     }
 
     public function update(int $id, array $data) : bool
@@ -144,36 +158,49 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
             return false;
         }
 
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE invoices SET 
-                    patient_id = :patient_id, 
-                    appointment_id = :appointment_id, 
-                    medical_record_id = :medical_record_id, 
-                    amount = :amount, 
-                    status = :status, 
-                    notes = :notes,
-                    paid_date = :paid_date,
-                    type = :type
-                WHERE id = :id";
-
-        $result = $conn->executeStatement($sql, [
-            'id' => $id,
-            'patient_id' => $data['patient_id'],
-            'appointment_id' => $data['appointment_id'] ?? null,
-            'medical_record_id' => $data['medical_record_id'] ?? null,
-            'amount' => $data['amount'],
-            'status' => $data['status'],
-            'notes' => $data['notes'] ?? null,
-            'paid_date' => ('paid' === $data['status'] && !empty($data['paid_date'])) ? $data['paid_date'] : null,
-            'type' => $data['type'] ?? 'invoice',
-        ]);
-
-        if ($result > 0) {
-            $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
-            return true;
+        /** @var Invoice|null $invoice */
+        $invoice = $this->find($id);
+        if (!$invoice) {
+            return false;
         }
 
-        return false;
+        $invoice->setPatientId((int)$data['patient_id']);
+
+        if (array_key_exists('appointment_id', $data)) {
+            $invoice->setAppointmentId(!empty($data['appointment_id']) ? (int)$data['appointment_id'] : null);
+        }
+        if (array_key_exists('medical_record_id', $data)) {
+            $invoice->setMedicalRecordId(!empty($data['medical_record_id']) ? (int)$data['medical_record_id'] : null);
+        }
+
+        $invoice->setAmount((float)$data['amount']);
+        $invoice->setStatus($data['status']);
+
+        if (array_key_exists('notes', $data)) {
+            $invoice->setNotes($data['notes']);
+        }
+
+        if ('paid' === $data['status'] && !empty($data['paid_date'])) {
+            try {
+                $invoice->setPaidDate(new \DateTime($data['paid_date']));
+            } catch (\Exception $e) {
+                // ignore
+            }
+        } elseif ('paid' !== $data['status']) {
+            $invoice->setPaidDate(null);
+        }
+
+        if (array_key_exists('type', $data)) {
+            $invoice->setType($data['type'] ?? 'invoice');
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('invoice', $id, 'update', $oldInvoice, $data));
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function addPayment(
@@ -183,49 +210,58 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         ?string $transactionId = null,
         ?string $notes = null
     ) : bool {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
 
         try {
-            $sql = "INSERT INTO payments (invoice_id, amount, payment_method, transaction_id, notes) 
-                    VALUES (:invoice_id, :amount, :payment_method, :transaction_id, :notes)";
+            $payment = new \App\Entity\Payment();
+            $payment->setInvoiceId($invoiceId);
+            $payment->setAmount($amount);
+            $payment->setPaymentMethod($paymentMethod);
+            $payment->setTransactionId($transactionId);
+            $payment->setNotes($notes);
 
-            $success = $conn->executeStatement($sql, [
-                'invoice_id' => $invoiceId,
-                'amount' => $amount,
-                'payment_method' => $paymentMethod,
-                'transaction_id' => $transactionId,
-                'notes' => $notes,
-            ]);
+            $em->persist($payment);
+            $em->flush();
 
-            if ($success > 0) {
-                $invoice = $this->findById($invoiceId);
-                if (
-                    $invoice &&
-                    $invoice['remaining_amount'] <= 0.01 &&
-                    'paid' !== $invoice['status']
-                ) {
-                    $updateData = array_merge($invoice, [
-                        'status' => 'paid',
-                        'paid_date' => date('Y-m-d H:i:s')
-                    ]);
-                    $this->update($invoiceId, $updateData);
-                }
+            $invoiceData = $this->findById($invoiceId);
+            if (
+                $invoiceData &&
+                $invoiceData['remaining_amount'] <= 0.01 &&
+                'paid' !== $invoiceData['status']
+            ) {
+                $updateData = array_merge($invoiceData, [
+                    'status' => 'paid',
+                    'paid_date' => date('Y-m-d H:i:s')
+                ]);
+                $this->update($invoiceId, $updateData);
             }
 
-            $conn->commit();
-            return $success > 0;
+            $em->commit();
+            return true;
         } catch (\Exception $e) {
-            $conn->rollBack();
+            $em->rollback();
             return false;
         }
     }
 
     public function getPaymentsForInvoice(int $invoiceId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM payments WHERE invoice_id = :invoice_id ORDER BY payment_date DESC";
-        return $conn->fetchAllAssociative($sql, ['invoice_id' => $invoiceId]);
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('p')
+            ->from(\App\Entity\Payment::class, 'p')
+            ->where('p.invoice_id = :invoice_id')
+            ->setParameter('invoice_id', $invoiceId)
+            ->orderBy('p.payment_date', 'DESC');
+
+        $results = $qb->getQuery()->getArrayResult();
+
+        return array_map(function ($row) {
+            if ($row['payment_date'] instanceof \DateTimeInterface) {
+                $row['payment_date'] = $row['payment_date']->format('Y-m-d H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function logFinancialTransaction(
@@ -240,56 +276,108 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
 
     public function sumTotalAmountByDate(string $date) : float
     {
-        $conn = $this->getEntityManager()->getConnection();
+        $startDate = new \DateTime($date . ' 00:00:00');
+        $endDate = new \DateTime($date . ' 23:59:59');
 
-        $paymentsSql = "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE DATE(payment_date) = :date";
-        $paymentsSum = (float)$conn->fetchOne($paymentsSql, ['date' => $date]);
+        $paymentsQb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COALESCE(SUM(p.amount), 0)')
+            ->from(\App\Entity\Payment::class, 'p')
+            ->where('p.payment_date >= :startDate')
+            ->andWhere('p.payment_date <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
 
-        $invoicesSql = "
-            SELECT COALESCE(SUM(i.amount), 0)
-            FROM invoices i
-            WHERE i.status = 'paid'
-              AND DATE(COALESCE(i.paid_date, i.issued_date)) = :date
-              AND NOT EXISTS (
-                  SELECT 1 FROM payments p WHERE p.invoice_id = i.id
-              )
-        ";
-        $invoicesSum = (float)$conn->fetchOne($invoicesSql, ['date' => $date]);
+        $paymentsSum = (float) $paymentsQb->getQuery()->getSingleScalarResult();
+
+        $invoicesQb = $this->createQueryBuilder('i')
+            ->select('i.amount')
+            ->where("i.status = 'paid'");
+
+        $invoicesQb->andWhere(
+            $invoicesQb->expr()->orX(
+                $invoicesQb->expr()->andX(
+                    $invoicesQb->expr()->isNotNull('i.paid_date'),
+                    'i.paid_date >= :startDate',
+                    'i.paid_date <= :endDate'
+                ),
+                $invoicesQb->expr()->andX(
+                    $invoicesQb->expr()->isNull('i.paid_date'),
+                    'i.issued_date >= :startDate',
+                    'i.issued_date <= :endDate'
+                )
+            )
+        );
+        $invoicesQb->setParameter('startDate', $startDate);
+        $invoicesQb->setParameter('endDate', $endDate);
+
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('1')
+            ->from(\App\Entity\Payment::class, 'p2')
+            ->where('p2.invoice_id = i.id');
+
+        $invoicesQb->andWhere($invoicesQb->expr()->not($invoicesQb->expr()->exists($sub->getDQL())));
+
+        $invoices = $invoicesQb->getQuery()->getArrayResult();
+        $invoicesSum = (float) array_sum(array_column($invoices, 'amount'));
 
         return $paymentsSum + $invoicesSum;
     }
 
     public function getDailyRevenueForPeriod(string $startDate, string $endDate) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                DATE(issued_date) as date,
-                SUM(amount) as total_revenue
-            FROM invoices
-            WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
-            GROUP BY DATE(issued_date)
-            ORDER BY DATE(issued_date) ASC
-        ";
+        $start = new \DateTime($startDate . ' 00:00:00');
+        $end = new \DateTime($endDate . ' 23:59:59');
 
-        return $conn->fetchAllAssociative($sql, [
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-        ]);
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.amount', 'i.issued_date')
+            ->where("i.status = 'paid'")
+            ->andWhere('i.issued_date >= :start')
+            ->andWhere('i.issued_date <= :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('i.issued_date', 'ASC');
+
+        $invoices = $qb->getQuery()->getArrayResult();
+
+        $daily = [];
+        foreach ($invoices as $invoice) {
+            /** @var \DateTimeInterface $dateObj */
+            $dateObj = $invoice['issued_date'];
+            $dateStr = $dateObj ? $dateObj->format('Y-m-d') : null;
+            if (!$dateStr) {
+                continue;
+            }
+
+            if (!isset($daily[$dateStr])) {
+                $daily[$dateStr] = 0.0;
+            }
+            $daily[$dateStr] += (float)$invoice['amount'];
+        }
+
+        $result = [];
+        foreach ($daily as $date => $total) {
+            $result[] = [
+                'date' => $date,
+                'total_revenue' => $total
+            ];
+        }
+
+        return $result;
     }
 
     public function sumRevenueForPeriod(string $startDate, string $endDate) : float
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT COALESCE(SUM(amount), 0) 
-            FROM invoices 
-            WHERE status = 'paid' AND DATE(issued_date) BETWEEN :start_date AND :end_date
-        ";
+        $start = new \DateTime($startDate . ' 00:00:00');
+        $end = new \DateTime($endDate . ' 23:59:59');
 
-        return (float)$conn->fetchOne($sql, [
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-        ]);
+        $qb = $this->createQueryBuilder('i')
+            ->select('COALESCE(SUM(i.amount), 0)')
+            ->where("i.status = 'paid'")
+            ->andWhere('i.issued_date >= :start')
+            ->andWhere('i.issued_date <= :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end);
+
+        return (float) $qb->getQuery()->getSingleScalarResult();
     }
 }
