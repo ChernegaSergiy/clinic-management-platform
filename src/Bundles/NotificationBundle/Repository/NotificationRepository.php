@@ -56,8 +56,8 @@ class NotificationRepository extends ServiceEntityRepository
         // DBAL executes with PDO internally but fetchAllAssociative handles limit well if passed correctly.
         // Alternatively, using standard query.
         $stmt = $conn->prepare($sql);
-        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue('user_id', $userId, \Doctrine\DBAL\ParameterType::INTEGER);
+        $stmt->bindValue('limit', $limit, \Doctrine\DBAL\ParameterType::INTEGER);
         $result = $stmt->executeQuery();
         return $result->fetchAllAssociative();
     }
@@ -73,9 +73,9 @@ class NotificationRepository extends ServiceEntityRepository
             LIMIT :limit OFFSET :offset
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->bindValue('user_id', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $stmt->bindValue('user_id', $userId, \Doctrine\DBAL\ParameterType::INTEGER);
+        $stmt->bindValue('limit', $limit, \Doctrine\DBAL\ParameterType::INTEGER);
+        $stmt->bindValue('offset', $offset, \Doctrine\DBAL\ParameterType::INTEGER);
         $result = $stmt->executeQuery();
         return $result->fetchAllAssociative();
     }
