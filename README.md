@@ -7,10 +7,6 @@
 
 A robust, three-tier healthcare information system designed to automate key workflows in modern medical centers. This platform is built with a modular architecture, prioritizing scalability, security, and compliance with national regulatory requirements.
 
-## Overview
-
-The platform provides a comprehensive suite of tools for healthcare providers, covering the full patient service cycle from initial appointment booking to the maintenance of detailed electronic medical records (EMR). Built with a modular three-tier architecture, the system integrates resource management, staff scheduling, and automated reporting into a single workspace, ensuring scalability and compliance with national regulatory standards. Currently, the project is undergoing a strategic transition to a Symfony-based component architecture to further enhance its flexibility and long-term maintainability.
-
 ## Technology Stack
 
 - **Backend:** PHP 8.2+
