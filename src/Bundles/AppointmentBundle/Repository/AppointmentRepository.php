@@ -120,21 +120,41 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                a.*, 
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name,
-                r.name as room_name
-            FROM appointments a
-            JOIN patients p ON a.patient_id = p.id
-            JOIN users u ON a.doctor_id = u.id
-            LEFT JOIN rooms r ON a.room_id = r.id
-            WHERE a.id = :id
-        ";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('a')
+            ->select(
+                'a.id',
+                'a.start_time',
+                'a.end_time',
+                'a.status',
+                'a.notes',
+                'a.waitlist_id',
+                'a.room_id',
+                'a.ehealth_episode_id',
+                'a.created_at',
+                'a.updated_at',
+                'IDENTITY(a.patient) as patient_id',
+                'IDENTITY(a.doctor) as doctor_id'
+            )
+            ->addSelect("CONCAT(p.last_name, ' ', p.first_name) as patient_name")
+            ->addSelect("CONCAT(u.last_name, ' ', u.first_name) as doctor_name")
+            ->addSelect("r.name as room_name")
+            ->join('a.patient', 'p')
+            ->join('a.doctor', 'u')
+            ->leftJoin(\App\Entity\Room::class, 'r', 'WITH', 'a.room_id = r.id')
+            ->where('a.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        if ($result) {
+            foreach (['start_time', 'end_time', 'created_at', 'updated_at'] as $field) {
+                if (isset($result[$field]) && $result[$field] instanceof \DateTimeInterface) {
+                    $result[$field] = $result[$field]->format('Y-m-d H:i:s');
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function update(int $id, array $data) : bool
