@@ -11,7 +11,7 @@ admin_routes_department:
     type: attribute
     prefix: /admin
 admin_routes_kpi:
-    resource: { path: ../src/Bundles/KpiBundle/Controller/, namespace: App\Bundles\KpiBundle\Controller\ }
+    resource: { path: ../src/Bundles/KpiBundle/Controller/Admin/, namespace: App\Bundles\KpiBundle\Controller\Admin\ }
     type: attribute
     prefix: /admin
 admin_routes_room:
@@ -45,6 +45,10 @@ app_routes_prescription:
     prefix: /app
 app_routes_lab_order:
     resource: { path: ../src/Bundles/LabOrderBundle/Controller/, namespace: App\Bundles\LabOrderBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_kpi:
+    resource: { path: ../src/Bundles/KpiBundle/Controller/App/, namespace: App\Bundles\KpiBundle\Controller\App\ }
     type: attribute
     prefix: /app
 app_routes_hrm:
