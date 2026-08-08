@@ -24,28 +24,28 @@
 
 namespace App\Bundles\NewsBundle;
 
-use App\Core\Auth\Policy;
 use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class NewsPolicy implements Policy
+class NewsVoter extends Voter
 {
-    public function view(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        return $user->hasPermission('news.read');
+        return false;
     }
 
-    public function create(User $user, array $context) : bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
-        return $user->hasPermission('news.manage');
-    }
+        $user = $token->getUser();
 
-    public function update(User $user, array $context) : bool
-    {
-        return $user->hasPermission('news.manage');
-    }
+        if (!$user instanceof User) {
+            return false;
+        }
 
-    public function delete(User $user, array $context) : bool
-    {
-        return $user->hasPermission('news.manage');
+        switch ($attribute) {
+        }
+
+        return false;
     }
 }
