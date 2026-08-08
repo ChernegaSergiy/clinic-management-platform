@@ -168,8 +168,8 @@ class AuthController extends \App\Core\Controller\AbstractController
     /**
      * Redirects to the specified OAuth provider for authentication.
      *
-     * @param  string $provider
-     * @return void
+     * @param  string                                     $provider
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route('/oauth/redirect/{provider}', name: 'oauth_login', methods: ['GET'])]
     public function redirectToProvider(string $provider) : \Symfony\Component\HttpFoundation\Response
