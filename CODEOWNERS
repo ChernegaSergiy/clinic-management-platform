@@ -8,8 +8,9 @@
 
 # Core functionality
 src/Core/ @ChernegaSergiy
-# Modules
 src/Event/ @ChernegaSergiy
+
+# Modules
 src/Bundles/AdminBundle/ @ChernegaSergiy
 src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
 src/Bundles/BillingBundle/ @ChernegaSergiy
