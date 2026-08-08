@@ -26,8 +26,28 @@ namespace App\Bundles\ScheduleBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class ScheduleExtension extends Extension
+class ScheduleExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_SCHEDULES_MANAGE_ALL',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_SCHEDULES_MANAGE_ALL',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_SCHEDULES_MANAGE_OWN',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
