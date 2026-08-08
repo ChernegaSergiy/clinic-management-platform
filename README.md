@@ -7,6 +7,16 @@
 
 A robust, three-tier healthcare information system designed to automate key workflows in modern medical centers. This platform is built with a modular architecture, prioritizing scalability, security, and compliance with national regulatory requirements.
 
+## Features
+
+- **Electronic Medical Records**: Comprehensive tracking of patient history, diagnoses, and treatment plans.
+- **Appointment Scheduling**: Interactive calendars for doctors and staff to manage patient visits efficiently.
+- **Advanced Access Control**: Modular Role-Based Access Control (RBAC) with granular, policy-based permissions for each bundle.
+- **Billing and Insurance**: Integrated tracking of invoices, payments, and insurance claims.
+- **Laboratory Management**: Seamless processing of lab orders and test results.
+- **Inventory Tracking**: Monitoring of medical supplies, pharmaceuticals, and equipment.
+- **Extensible Architecture**: Built on a modern, decoupled bundle system ready for future scaling.
+
 ## Technology Stack
 
 - **Backend:** PHP 8.2+
