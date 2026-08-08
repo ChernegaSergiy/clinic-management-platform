@@ -12,7 +12,7 @@ src/Controller/ @ChernegaSergiy
 
 # Modules
 src/Controller/PageController.php @ChernegaSergiy
-src/Event/ @Sameer6305
+src/Event/ @ChernegaSergiy
 src/Bundles/AdminBundle/ @ChernegaSergiy
 src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
 src/Bundles/BillingBundle/ @ChernegaSergiy
