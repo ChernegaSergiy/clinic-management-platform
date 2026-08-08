@@ -37,127 +37,199 @@ class ServiceRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT s.*, sc.name as category_name, s.duration_minutes
-            FROM services s
-            LEFT JOIN service_categories sc ON s.category_id = sc.id
-            ORDER BY s.name ASC
-        ";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('s')
+            ->select('s', 'sc.name as category_name')
+            ->leftJoin(\App\Entity\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
+            ->orderBy('s.name', 'ASC');
+
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            // Flatten if needed since getArrayResult with scalar selects returns nested array
+            if (isset($row[0])) {
+                $flat = $row[0];
+                $flat['category_name'] = $row['category_name'] ?? null;
+                return $flat;
+            }
+            return $row;
+        }, $results);
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT s.*, sc.name as category_name, s.duration_minutes
-            FROM services s
-            LEFT JOIN service_categories sc ON s.category_id = sc.id
-            WHERE s.id = :id
-        ";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
+        $qb = $this->createQueryBuilder('s')
+            ->select('s', 'sc.name as category_name')
+            ->leftJoin(\App\Entity\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
+            ->where('s.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        if ($result && isset($result[0])) {
+            $flat = $result[0];
+            $flat['category_name'] = $result['category_name'] ?? null;
+            return $flat;
+        }
+
         return $result ?: null;
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO services (name, description, price, category_id, is_active) 
-                VALUES (:name, :description, :price, :category_id, :is_active)";
+        $service = new Service();
+        $service->setName($data['name']);
+        $service->setDescription($data['description'] ?? null);
+        $service->setPrice((float)$data['price']);
+        $service->setCategoryId(!empty($data['category_id']) ? (int)$data['category_id'] : null);
+        $service->setIsActive((bool)($data['is_active'] ?? true));
+        // Note: duration_minutes isn't in original save method parameters but we should map it if available
+        if (isset($data['duration_minutes'])) {
+            $service->setDurationMinutes((int)$data['duration_minutes']);
+        }
 
-        $success = $conn->executeStatement($sql, [
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'price' => $data['price'],
-            'category_id' => $data['category_id'] ?? null,
-            'is_active' => $data['is_active'] ?? true,
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($service);
+            $this->getEntityManager()->flush();
+            return $service->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE services SET 
-                    name = :name, 
-                    description = :description, 
-                    price = :price, 
-                    category_id = :category_id, 
-                    is_active = :is_active 
-                WHERE id = :id";
+        /** @var Service|null $service */
+        $service = $this->find($id);
+        if (!$service) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'price' => $data['price'],
-            'category_id' => $data['category_id'] ?? null,
-            'is_active' => $data['is_active'] ?? true,
-        ]) > 0;
+        if (isset($data['name'])) {
+            $service->setName($data['name']);
+        }
+        if (array_key_exists('description', $data)) {
+            $service->setDescription($data['description']);
+        }
+        if (isset($data['price'])) {
+            $service->setPrice((float)$data['price']);
+        }
+        if (array_key_exists('category_id', $data)) {
+            $service->setCategoryId(!empty($data['category_id']) ? (int)$data['category_id'] : null);
+        }
+        if (isset($data['is_active'])) {
+            $service->setIsActive((bool)$data['is_active']);
+        }
+        if (array_key_exists('duration_minutes', $data)) {
+            $service->setDurationMinutes(!empty($data['duration_minutes']) ? (int)$data['duration_minutes'] : null);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM services WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var Service|null $service */
+        $service = $this->find($id);
+        if (!$service) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($service);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function findCategories() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT id, name, description FROM service_categories ORDER BY name ASC";
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('c.id', 'c.name', 'c.description')
+            ->from(\App\Entity\ServiceCategory::class, 'c')
+            ->orderBy('c.name', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function saveCategory(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO service_categories (name, description) VALUES (:name, :description)";
+        $category = new \App\Entity\ServiceCategory();
+        $category->setName($data['name']);
+        $category->setDescription($data['description'] ?? null);
 
-        $success = $conn->executeStatement($sql, [
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($category);
+            $this->getEntityManager()->flush();
+            return $category->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function findCategoryById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM service_categories WHERE id = :id";
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('c')
+            ->from(\App\Entity\ServiceCategory::class, 'c')
+            ->where('c.id = :id')
+            ->setParameter('id', $id);
 
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function updateCategory(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE service_categories SET name = :name, description = :description WHERE id = :id";
+        /** @var \App\Entity\ServiceCategory|null $category */
+        $category = $this->getEntityManager()->getRepository(\App\Entity\ServiceCategory::class)->find($id);
+        if (!$category) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-        ]) > 0;
+        if (isset($data['name'])) {
+            $category->setName($data['name']);
+        }
+        if (array_key_exists('description', $data)) {
+            $category->setDescription($data['description']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function deleteCategory(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM service_categories WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var \App\Entity\ServiceCategory|null $category */
+        $category = $this->getEntityManager()->getRepository(\App\Entity\ServiceCategory::class)->find($id);
+        if (!$category) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($category);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function categoryHasServices(int $categoryId) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT COUNT(*) FROM services WHERE category_id = :category_id";
-        return (int)$conn->fetchOne($sql, ['category_id' => $categoryId]) > 0;
+        $qb = $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.category_id = :category_id')
+            ->setParameter('category_id', $categoryId);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 }
