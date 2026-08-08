@@ -696,7 +696,7 @@ class AdminController extends \App\Core\Controller\AbstractController
     public function createAuthConfig() : \Symfony\Component\HttpFoundation\Response
     {
         $this->authorizeAdmin();
-        $supportedProviders = \App\Bundles\UserBundle\OAuthController::getSupportedProviders();
+        $supportedProviders = \App\Bundles\UserBundle\Controller\OAuthController::getSupportedProviders();
 
         $response = $this->render('@Admin/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -742,7 +742,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         if (!$config) {
             return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
         }
-        $supportedProviders = \App\Bundles\UserBundle\OAuthController::getSupportedProviders();
+        $supportedProviders = \App\Bundles\UserBundle\Controller\OAuthController::getSupportedProviders();
 
         $response = $this->render('@Admin/auth_configs/edit.html.twig', [
             'config' => $config,
