@@ -24,9 +24,9 @@
 
 namespace App\Bundles\MedicalRecordBundle;
 
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Core\Auth\Policy;
 use App\Core\Model\User;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 
 class MedicalRecordPolicy implements Policy
 {
