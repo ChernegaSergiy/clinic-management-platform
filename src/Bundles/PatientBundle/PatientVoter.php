@@ -26,10 +26,11 @@ namespace App\Bundles\PatientBundle;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
-use App\Core\Auth\Policy;
 use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class PatientPolicy implements Policy
+class PatientVoter extends Voter
 {
     private AppointmentRepositoryInterface $appointmentRepository;
     /** @phpstan-ignore property.onlyWritten */
@@ -43,44 +44,52 @@ class PatientPolicy implements Policy
         $this->patientRepository = $patientRepository;
     }
 
-    public function view(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        if ($user->hasPermission('patient.view.any')) {
-            return true;
+        return in_array($attribute, ['ROLE_PATIENT_VIEW', 'ROLE_PATIENT_EDIT']);
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
+    {
+        $user = $token->getUser();
+
+        if (!$user instanceof User) {
+            return false;
         }
 
-        if ($user->hasPermission('patient.view.own')) {
-            $patientId = $context['id'] ?? null;
-            if (!$patientId) {
-                return false;
-            }
+        $context = is_array($subject) ? $subject : [];
 
-            return $this->isUserAssignedToPatient($user, (int)$patientId);
+        switch ($attribute) {
+            case 'ROLE_PATIENT_VIEW':
+                if ($user->hasPermission('patient.view.any')) {
+                    return true;
+                }
+                if ($user->hasPermission('patient.view.own')) {
+                    $patientId = $context['id'] ?? null;
+                    if (!$patientId) {
+                        return false;
+                    }
+
+                    return $this->isUserAssignedToPatient($user, (int)$patientId);
+                }
+                return false;
+
+            case 'ROLE_PATIENT_EDIT':
+                if ($user->hasPermission('patient.edit.any')) {
+                    return true;
+                }
+                if ($user->hasPermission('patient.edit.own')) {
+                    $patientId = $context['id'] ?? null;
+                    if (!$patientId) {
+                        return false;
+                    }
+
+                    return $this->isUserAssignedToPatient($user, (int)$patientId);
+                }
+                return false;
         }
 
         return false;
-    }
-
-    public function edit(User $user, array $context) : bool
-    {
-        if ($user->hasPermission('patient.edit.any')) {
-            return true;
-        }
-
-        if ($user->hasPermission('patient.edit.own')) {
-            $patientId = $context['id'] ?? null;
-            if (!$patientId) {
-                return false;
-            }
-
-            return $this->isUserAssignedToPatient($user, (int)$patientId);
-        }
-        return false;
-    }
-
-    public function create(User $user, array $context) : bool
-    {
-        return $user->hasPermission('patient.create');
     }
 
     private function isUserAssignedToPatient(User $user, int $patientId) : bool
