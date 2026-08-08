@@ -45,9 +45,7 @@
         <div class="ui divider"></div>
 
         <h3 class="ui header">{{ 'prescription.show.items_title'|trans }}</h3>
-        {% if prescription.items is empty %}
-            <p>{{ 'prescription.show.no_items'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -67,10 +65,13 @@
                             <td>{{ item.duration ?: 'prescription.show.not_specified'|trans }}</td>
                             <td>{{ item.notes ?: 'prescription.show.no_notes'|trans }}</td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="center aligned">{{ 'prescription.show.no_items'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
 
         <div class="ui divider"></div>
 
