@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if dictionaries is empty %}
-            <p>{{ 'admin.dictionaries.no_dictionaries'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -53,9 +51,12 @@
                                 </form>
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="center aligned">{{ 'admin.dictionaries.no_dictionaries'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
