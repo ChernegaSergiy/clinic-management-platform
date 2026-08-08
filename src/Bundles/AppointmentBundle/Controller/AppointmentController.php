@@ -28,8 +28,6 @@ use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Bundles\RoomBundle\Repository\RoomRepository;
-use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
-use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
@@ -44,8 +42,6 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
     private RoomRepository $roomRepository;
-    private DoctorScheduleRepository $doctorScheduleRepository;
-    private ScheduleExceptionRepository $scheduleExceptionRepository;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
@@ -54,8 +50,6 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         UserRepositoryInterface $userRepository,
         NotificationService $notificationService,
         SchedulingService $schedulingService,
-        DoctorScheduleRepository $doctorScheduleRepository,
-        ScheduleExceptionRepository $scheduleExceptionRepository,
         ServiceRepository $serviceRepository,
         RoomRepository $roomRepository,
         \App\Core\Validation\Validator $validator
