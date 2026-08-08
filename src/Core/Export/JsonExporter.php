@@ -33,4 +33,9 @@ class JsonExporter
         echo json_encode($data, JSON_PRETTY_PRINT);
         exit;
     }
+
+    public function generate(array $data) : string
+    {
+        return json_encode($data, JSON_PRETTY_PRINT);
+    }
 }

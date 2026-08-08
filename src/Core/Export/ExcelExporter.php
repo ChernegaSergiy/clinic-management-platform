@@ -45,4 +45,19 @@ class ExcelExporter
         $writer->save('php://output');
         exit;
     }
+
+    public function generate(array $headers, array $data) : string
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray($headers, null, 'A1');
+        $sheet->fromArray($data, null, 'A2');
+
+        $writer = new Xlsx($spreadsheet);
+
+        ob_start();
+        $writer->save('php://output');
+        return ob_get_clean();
+    }
 }

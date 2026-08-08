@@ -60,4 +60,9 @@ class PdfExporter
     {
         $this->dompdf->stream($filename, ['Attachment' => true]);
     }
+
+    public function output() : string
+    {
+        return $this->dompdf->output();
+    }
 }
