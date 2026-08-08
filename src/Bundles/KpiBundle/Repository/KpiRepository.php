@@ -38,214 +38,240 @@ class KpiRepository extends ServiceEntityRepository
     // --- KPI Definitions ---
     public function findAllKpiDefinitions() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM kpi_definitions ORDER BY name ASC";
-        return $conn->fetchAllAssociative($sql);
+        return $this->createQueryBuilder('k')
+            ->orderBy('k.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function findActiveKpiDefinitions() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM kpi_definitions WHERE is_active = 1 ORDER BY name ASC";
-        return $conn->fetchAllAssociative($sql);
+        return $this->createQueryBuilder('k')
+            ->where('k.is_active = 1')
+            ->orderBy('k.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function findKpiDefinitionById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM kpi_definitions WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $result = $this->createQueryBuilder('k')
+            ->where('k.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
+        return $result ? $result[0] : null;
     }
 
     public function saveKpiDefinition(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO kpi_definitions (name, description, kpi_type, target_value, unit, is_active, period) 
-                VALUES (:name, :description, :kpi_type, :target_value, :unit, :is_active, :period)";
+        $em = $this->getEntityManager();
+        try {
+            $kpi = new KpiDefinition();
+            $kpi->setName($data['name']);
+            if (isset($data['description'])) {
+                $kpi->setDescription($data['description']);
+            }
+            $kpi->setKpiType($data['kpi_type']);
+            if (isset($data['target_value'])) {
+                $kpi->setTargetValue((float)$data['target_value']);
+            }
+            if (isset($data['unit'])) {
+                $kpi->setUnit($data['unit']);
+            }
+            $kpi->setIsActive((bool)($data['is_active'] ?? true));
+            $kpi->setPeriod($data['period'] ?? 'day');
 
-        $success = $conn->executeStatement($sql, [
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'kpi_type' => $data['kpi_type'],
-            'target_value' => $data['target_value'] ?? null,
-            'unit' => $data['unit'] ?? null,
-            'is_active' => (int)($data['is_active'] ?? true),
-            'period' => $data['period'] ?? 'day',
-        ]) > 0;
+            $em->persist($kpi);
+            $em->flush();
 
-        return $success ? (int)$conn->lastInsertId() : null;
+            return $kpi->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function updateKpiDefinition(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE kpi_definitions SET 
-                    name = :name, 
-                    description = :description, 
-                    kpi_type = :kpi_type, 
-                    target_value = :target_value, 
-                    unit = :unit, 
-                    is_active = :is_active,
-                    period = :period
-                WHERE id = :id";
+        $em = $this->getEntityManager();
+        try {
+            $kpi = $this->find($id);
+            if (!$kpi) {
+                return false;
+            }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'kpi_type' => $data['kpi_type'],
-            'target_value' => $data['target_value'] ?? null,
-            'unit' => $data['unit'] ?? null,
-            'is_active' => (int)($data['is_active'] ?? true),
-            'period' => $data['period'] ?? 'day',
-        ]) > 0;
+            $kpi->setName($data['name']);
+            if (array_key_exists('description', $data)) {
+                $kpi->setDescription($data['description']);
+            }
+            $kpi->setKpiType($data['kpi_type']);
+            if (array_key_exists('target_value', $data)) {
+                $kpi->setTargetValue((string)$data['target_value']);
+            }
+            if (array_key_exists('unit', $data)) {
+                $kpi->setUnit($data['unit']);
+            }
+            $kpi->setIsActive((bool)($data['is_active'] ?? true));
+            $kpi->setPeriod($data['period'] ?? 'day');
+
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function deleteKpiDefinition(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM kpi_definitions WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        $em = $this->getEntityManager();
+        try {
+            $kpi = $this->find($id);
+            if (!$kpi) {
+                return false;
+            }
+
+            $em->remove($kpi);
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     // --- KPI Results ---
     public function saveKpiResult(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO kpi_results (kpi_id, user_id, period_start, period_end, calculated_value, notes) 
-                VALUES (:kpi_id, :user_id, :period_start, :period_end, :calculated_value, :notes)
-                ON DUPLICATE KEY UPDATE 
-                    calculated_value = VALUES(calculated_value),
-                    notes = VALUES(notes)";
+        $em = $this->getEntityManager();
+        try {
+            $kpiResultRepo = $em->getRepository(\App\Entity\KpiResult::class);
+            $kpiResult = $kpiResultRepo->findOneBy([
+                'kpi_id' => $data['kpi_id'],
+                'user_id' => $data['user_id'],
+                'period_start' => new \DateTime($data['period_start']),
+                'period_end' => new \DateTime($data['period_end']),
+            ]);
 
-        $success = $conn->executeStatement($sql, [
-            'kpi_id' => $data['kpi_id'],
-            'user_id' => $data['user_id'],
-            'period_start' => $data['period_start'],
-            'period_end' => $data['period_end'],
-            'calculated_value' => $data['calculated_value'],
-            'notes' => $data['notes'] ?? null,
-        ]) > 0;
+            if (!$kpiResult) {
+                $kpiResult = new \App\Entity\KpiResult();
+                $kpiResult->setKpiId($data['kpi_id']);
+                $kpiResult->setUserId($data['user_id']);
+                $kpiResult->setPeriodStart(new \DateTime($data['period_start']));
+                $kpiResult->setPeriodEnd(new \DateTime($data['period_end']));
+            }
 
-        if (!$success) {
+            $kpiResult->setCalculatedValue((float)$data['calculated_value']);
+            if (isset($data['notes'])) {
+                $kpiResult->setNotes($data['notes']);
+            }
+
+            $em->persist($kpiResult);
+            $em->flush();
+
+            return $kpiResult->getId();
+        } catch (\Exception $e) {
             return null;
         }
-
-        $lastId = (int)$conn->lastInsertId();
-        if ($lastId > 0) {
-            return $lastId;
-        }
-
-        $sql = "
-            SELECT id FROM kpi_results 
-            WHERE kpi_id = :kpi_id 
-              AND user_id = :user_id 
-              AND period_start = :period_start 
-              AND period_end = :period_end
-            LIMIT 1
-        ";
-
-        $row = $conn->fetchAssociative($sql, [
-            'kpi_id' => $data['kpi_id'],
-            'user_id' => $data['user_id'],
-            'period_start' => $data['period_start'],
-            'period_end' => $data['period_end'],
-        ]);
-
-        return $row ? (int)$row['id'] : null;
     }
 
     public function findKpiResultsForUser(int $userId, ?string $periodStart = null, ?string $periodEnd = null) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                kr.*,
-                kd.name as kpi_name,
-                kd.unit
-            FROM kpi_results kr
-            JOIN kpi_definitions kd ON kr.kpi_id = kd.id
-            WHERE kr.user_id = :user_id
-        ";
-        $params = ['user_id' => $userId];
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select(
+            'kr.id',
+            'kr.kpi_id',
+            'kr.user_id',
+            'kr.period_start',
+            'kr.period_end',
+            'kr.calculated_value',
+            'kr.notes',
+            'kd.name as kpi_name',
+            'kd.unit'
+        )
+           ->from(\App\Entity\KpiResult::class, 'kr')
+           ->join(\App\Entity\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
+           ->where('kr.user_id = :user_id')
+           ->setParameter('user_id', $userId);
 
         if ($periodStart) {
-            $sql .= " AND kr.period_start >= :period_start";
-            $params['period_start'] = $periodStart;
+            $qb->andWhere('kr.period_start >= :period_start')
+               ->setParameter('period_start', $periodStart);
         }
         if ($periodEnd) {
-            $sql .= " AND kr.period_end <= :period_end";
-            $params['period_end'] = $periodEnd;
+            $qb->andWhere('kr.period_end <= :period_end')
+               ->setParameter('period_end', $periodEnd);
         }
-        $sql .= " ORDER BY kr.period_start DESC";
+        $qb->orderBy('kr.period_start', 'DESC');
 
-        return $conn->fetchAllAssociative($sql, $params);
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findAllKpiResults() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                kr.*,
-                kd.name as kpi_name,
-                kd.unit,
-                CONCAT(u.last_name, ' ', u.first_name) as user_name
-            FROM kpi_results kr
-            JOIN kpi_definitions kd ON kr.kpi_id = kd.id
-            JOIN users u ON kr.user_id = u.id
-            ORDER BY kr.period_start DESC
-        ";
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select(
+            'kr.id',
+            'kr.kpi_id',
+            'kr.user_id',
+            'kr.period_start',
+            'kr.period_end',
+            'kr.calculated_value',
+            'kr.notes',
+            'kd.name AS kpi_name',
+            'kd.unit',
+            'CONCAT(u.last_name, CONCAT(\' \', u.first_name)) AS user_name'
+        )
+        ->from(\App\Entity\KpiResult::class, 'kr')
+        ->join(\App\Entity\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
+        ->join(\App\Entity\User::class, 'u', 'WITH', 'kr.user_id = u.id')
+        ->orderBy('kr.period_start', 'DESC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findLatestKpiResult(int $kpiId, string $periodType) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT kr.*
-            FROM kpi_results kr
-            WHERE kr.kpi_id = :kpi_id
-        ";
-        $params = ['kpi_id' => $kpiId];
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('kr')
+           ->from(\App\Entity\KpiResult::class, 'kr')
+           ->where('kr.kpi_id = :kpi_id')
+           ->setParameter('kpi_id', $kpiId);
 
         switch ($periodType) {
             case 'day':
-                $sql .= " AND kr.period_start = kr.period_end";
+                $qb->andWhere('kr.period_start = kr.period_end');
                 break;
             case 'week':
-                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 6";
+                $qb->andWhere('DATE_DIFF(kr.period_end, kr.period_start) = 6');
                 break;
             case 'month':
-                $sql .= " AND DATEDIFF(kr.period_end, kr.period_start) = 29";
+                $qb->andWhere('DATE_DIFF(kr.period_end, kr.period_start) = 29');
                 break;
             default:
                 break;
         }
 
-        $sql .= " ORDER BY kr.period_end DESC, kr.id DESC LIMIT 1";
+        $qb->orderBy('kr.period_end', 'DESC')
+           ->addOrderBy('kr.id', 'DESC')
+           ->setMaxResults(1);
 
-        $result = $conn->fetchAssociative($sql, $params);
-        return $result ?: null;
+        $result = $qb->getQuery()->getArrayResult();
+        return $result ? $result[0] : null;
     }
 
     public function findKpiResultForPreviousPeriod(int $kpiId, string $currentPeriodEnd, string $periodType = 'day') : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT kr.*
-            FROM kpi_results kr
-            WHERE kr.kpi_id = :kpi_id AND kr.period_end < :current_period_end
-            ORDER BY kr.period_end DESC, kr.updated_at DESC, kr.created_at DESC, kr.id DESC
-            LIMIT 1
-        ";
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('kr')
+           ->from(\App\Entity\KpiResult::class, 'kr')
+           ->where('kr.kpi_id = :kpi_id')
+           ->andWhere('kr.period_end < :current_period_end')
+           ->setParameter('kpi_id', $kpiId)
+           ->setParameter('current_period_end', $currentPeriodEnd)
+           ->orderBy('kr.period_end', 'DESC')
+           ->addOrderBy('kr.id', 'DESC')
+           ->setMaxResults(1);
 
-        $result = $conn->fetchAssociative($sql, [
-            'kpi_id' => $kpiId,
-            'current_period_end' => $currentPeriodEnd
-        ]);
-
-        return $result ?: null;
+        $result = $qb->getQuery()->getArrayResult();
+        return $result ? $result[0] : null;
     }
 }
