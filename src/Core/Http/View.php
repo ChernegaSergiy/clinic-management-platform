@@ -26,21 +26,18 @@ namespace App\Core\Http;
 
 use App\Core\Auth\MfaGuard;
 use App\Core\Service\TranslationService;
-use Doctrine\Persistence\ManagerRegistry;
 use Twig\Environment;
 
 class View
 {
     private Environment $twig;
     private TranslationService $translationService;
-    private ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
 
-    public function __construct(Environment $twig, TranslationService $translationService, ManagerRegistry $registry, MfaGuard $mfaGuard)
+    public function __construct(Environment $twig, TranslationService $translationService, MfaGuard $mfaGuard)
     {
         $this->twig = $twig;
         $this->translationService = $translationService;
-        $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
     }
 
