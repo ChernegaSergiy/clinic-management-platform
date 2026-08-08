@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if policies is empty %}
-            <p>{{ 'admin.backup_policies.index.no_policies'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -62,9 +60,12 @@
                                 </form>
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="center aligned">{{ 'admin.backup_policies.index.no_policies'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
