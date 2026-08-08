@@ -20,9 +20,7 @@
         <div class="ui divider"></div>
 
         <h3 class="ui header">{{ 'appointment.analytics.subheader'|trans({'%date%': date}) }}</h3>
-        {% if doctorLoad is empty %}
-            <p>{{ 'appointment.analytics.no_data'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -38,9 +36,12 @@
                             <td>{{ entry.total_appointments }}</td>
                             <td>{{ entry.total_hours_booked | number_format(2) }}</td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="center aligned">{{ 'appointment.analytics.no_data'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
