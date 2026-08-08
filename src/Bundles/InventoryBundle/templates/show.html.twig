@@ -80,9 +80,7 @@
 
     <div class="ui segment">
         <h3 class="ui header">{{ 'inventory.show.movement_history'|trans }}</h3>
-        {% if movementHistory is empty %}
-            <p>{{ 'inventory.show.no_movements'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -104,9 +102,12 @@
                             <td>{{ movement.user_name ?: 'inventory.show.movements_table.system'|trans }}</td>
                             <td>{{ movement.created_at|date('Y-m-d H:i') }}</td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="center aligned">{{ 'inventory.show.no_movements'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
