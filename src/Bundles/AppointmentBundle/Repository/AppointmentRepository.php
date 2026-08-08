@@ -250,14 +250,14 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
                 'wl.contact_email',
                 'wl.status',
                 'wl.created_at',
-                'IDENTITY(wl.patient) as patient_id',
-                'IDENTITY(wl.desired_doctor) as desired_doctor_id'
+                'wl.patient_id',
+                'wl.desired_doctor_id'
             )
             ->addSelect("COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name")
             ->addSelect("COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name")
             ->from(\App\Entity\Waitlist::class, 'wl')
-            ->leftJoin('wl.patient', 'p')
-            ->leftJoin('wl.desired_doctor', 'u')
+            ->leftJoin(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.patient_id = p.id')
+            ->leftJoin(\App\Entity\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
             ->where('wl.id = :id')
             ->setParameter('id', $id);
 
@@ -385,8 +385,8 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             ->addSelect("COALESCE(CONCAT(p.last_name, ' ', p.first_name), 'Невідомий пацієнт') as patient_name")
             ->addSelect("COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name")
             ->from(\App\Entity\Waitlist::class, 'wl')
-            ->leftJoin('wl.patient', 'p')
-            ->leftJoin('wl.desired_doctor', 'u')
+            ->leftJoin(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.patient_id = p.id')
+            ->leftJoin(\App\Entity\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
             ->orderBy('wl.created_at', 'ASC');
 
         if (null !== $status) {
