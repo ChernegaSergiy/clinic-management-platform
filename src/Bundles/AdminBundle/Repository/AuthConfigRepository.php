@@ -37,77 +37,103 @@ class AuthConfigRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM auth_configs ORDER BY provider ASC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('a')
+            ->orderBy('a.provider', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findActive() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM auth_configs WHERE is_active = 1 ORDER BY provider ASC";
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('a')
+            ->where('a.is_active = 1')
+            ->orderBy('a.provider', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM auth_configs WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('a')
+            ->where('a.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findByProvider(string $provider) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM auth_configs WHERE provider = :provider";
-        $result = $conn->fetchAssociative($sql, ['provider' => $provider]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('a')
+            ->where('a.provider = :provider')
+            ->setParameter('provider', $provider);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO auth_configs (provider, client_id, client_secret, is_active, config) 
-                VALUES (:provider, :client_id, :client_secret, :is_active, :config)";
+        $config = new AuthConfig();
+        $config->setProvider($data['provider']);
+        $config->setClientId($data['client_id'] ?? null);
+        $config->setClientSecret($data['client_secret'] ?? null);
+        $config->setIsActive((bool)($data['is_active'] ?? false));
+        $config->setConfig($data['config'] ?? null);
 
-        $success = $conn->executeStatement($sql, [
-            'provider' => $data['provider'],
-            'client_id' => $data['client_id'] ?? null,
-            'client_secret' => $data['client_secret'] ?? null,
-            'is_active' => $data['is_active'] ?? false,
-            'config' => $data['config'] ?? null,
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($config);
+            $this->getEntityManager()->flush();
+            return $config->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE auth_configs SET 
-                    provider = :provider, 
-                    client_id = :client_id, 
-                    client_secret = :client_secret, 
-                    is_active = :is_active, 
-                    config = :config 
-                WHERE id = :id";
+        /** @var AuthConfig|null $config */
+        $config = $this->find($id);
+        if (!$config) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'provider' => $data['provider'],
-            'client_id' => $data['client_id'] ?? null,
-            'client_secret' => $data['client_secret'] ?? null,
-            'is_active' => $data['is_active'] ?? false,
-            'config' => $data['config'] ?? null,
-        ]) > 0;
+        if (isset($data['provider'])) {
+            $config->setProvider($data['provider']);
+        }
+        if (array_key_exists('client_id', $data)) {
+            $config->setClientId($data['client_id']);
+        }
+        if (array_key_exists('client_secret', $data)) {
+            $config->setClientSecret($data['client_secret']);
+        }
+        if (isset($data['is_active'])) {
+            $config->setIsActive((bool)$data['is_active']);
+        }
+        if (array_key_exists('config', $data)) {
+            $config->setConfig($data['config']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM auth_configs WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var AuthConfig|null $config */
+        $config = $this->find($id);
+        if (!$config) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($config);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
