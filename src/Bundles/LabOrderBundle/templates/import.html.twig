@@ -18,7 +18,7 @@
             </div>
         {% endif %}
 
-        {% if success_message %}
+        {% if success_message is defined and success_message %}
             <div class="ui success message">
                 <div class="header">{{ 'lab_order.import.success_header'|trans }}</div>
                 <p>{{ success_message }}</p>

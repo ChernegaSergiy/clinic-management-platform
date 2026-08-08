@@ -10,7 +10,7 @@
         {% if errors.import is defined %}
             <div class="ui negative message">{{ errors.import }}</div>
         {% endif %}
-        {% if success_message %}
+        {% if success_message is defined and success_message %}
             <div class="ui positive message">{{ success_message }}</div>
         {% endif %}
 

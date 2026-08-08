@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        {% if success_message %}
+        {% if success_message is defined and success_message %}
             <div class="ui success message">
                 <i class="close icon"></i>
                 <div class="header">{{ 'clinical_reference.success'|trans }}</div>

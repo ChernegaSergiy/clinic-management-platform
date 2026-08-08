@@ -8,7 +8,7 @@
         <h2 class="ui header">{{ 'patient.import_json.header'|trans }}</h2>
         <div class="ui divider"></div>
 
-        {% if success_message %}
+        {% if success_message is defined and success_message %}
             <div class="ui success message">
                 <div class="header">{{ 'patient.import_json.success_header'|trans }}</div>
                 <p>{{ success_message }}</p>

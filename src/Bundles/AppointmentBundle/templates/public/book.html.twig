@@ -11,7 +11,7 @@
             <p class="section__description" style="margin: 0 auto 1.5rem; max-width: 500px;">{{ 'appointment.public.book.description'|trans }}</p>
         </header>
 
-        {% if success_message %}
+        {% if success_message is defined and success_message %}
             <div style="border: 1px solid #1c7c2f; background: #e6f7eb; padding: 0.8rem; margin-bottom: 1.5rem; text-align: center; color: #0f3d1a; font-weight: 700; font-size: 0.85rem;">
                 {{ success_message }}
             </div>
