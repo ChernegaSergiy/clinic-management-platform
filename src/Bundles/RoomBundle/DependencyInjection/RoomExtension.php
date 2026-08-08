@@ -26,8 +26,22 @@ namespace App\Bundles\RoomBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class RoomExtension extends Extension
+class RoomExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_ROOMS_MANAGE',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
