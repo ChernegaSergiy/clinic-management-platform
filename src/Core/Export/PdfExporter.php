@@ -51,16 +51,6 @@ class PdfExporter
         $this->dompdf->render();
     }
 
-    public function stream(string $filename = 'document.pdf') : void
-    {
-        $this->dompdf->stream($filename);
-    }
-
-    public function download(string $filename = 'document.pdf') : void
-    {
-        $this->dompdf->stream($filename, ['Attachment' => true]);
-    }
-
     public function output() : string
     {
         return $this->dompdf->output();
