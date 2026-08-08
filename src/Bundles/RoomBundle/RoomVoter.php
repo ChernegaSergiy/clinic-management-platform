@@ -24,13 +24,18 @@
 
 namespace App\Bundles\RoomBundle;
 
-use App\Core\Auth\Policy;
-use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class RoomPolicy implements Policy
+class RoomVoter extends Voter
 {
-    public function manage(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        return $user->hasPermission('rooms.manage');
+        return false;
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
+    {
+        return false;
     }
 }
