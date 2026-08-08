@@ -34,6 +34,8 @@ interface PatientRepositoryInterface
     public function update(int $id, array $data) : bool;
     public function updateStatus(int $id, string $status) : bool;
     public function findAllActive() : array;
+    public function findByEmail(string $email) : ?array;
+    public function findByIds(array $ids, string $searchTerm = '') : array;
     public function getLastError() : ?string;
     // public function delete(int $id): bool;
 }
