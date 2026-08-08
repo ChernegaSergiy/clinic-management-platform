@@ -152,4 +152,11 @@ class ServiceRepository extends ServiceEntityRepository
         $sql = "DELETE FROM service_categories WHERE id = :id";
         return $conn->executeStatement($sql, ['id' => $id]) > 0;
     }
+
+    public function categoryHasServices(int $categoryId) : bool
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) FROM services WHERE category_id = :category_id";
+        return (int)$conn->fetchOne($sql, ['category_id' => $categoryId]) > 0;
+    }
 }
