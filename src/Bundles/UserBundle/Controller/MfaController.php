@@ -38,19 +38,22 @@ class MfaController extends \App\Core\Controller\AbstractController
     private SettingsRepository $settingsRepository;
     private RoleRepositoryInterface $roleRepository;
     private \Doctrine\Persistence\ManagerRegistry $registry;
+    private MfaGuard $mfaGuard;
 
     public function __construct(
         MfaService $mfaService,
         UserRepositoryInterface $userRepository,
         SettingsRepository $settingsRepository,
         RoleRepositoryInterface $roleRepository,
-        \Doctrine\Persistence\ManagerRegistry $registry
+        \Doctrine\Persistence\ManagerRegistry $registry,
+        MfaGuard $mfaGuard
     ) {
         $this->mfaService = $mfaService;
         $this->userRepository = $userRepository;
         $this->settingsRepository = $settingsRepository;
         $this->roleRepository = $roleRepository;
         $this->registry = $registry;
+        $this->mfaGuard = $mfaGuard;
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode) : void
@@ -287,7 +290,7 @@ class MfaController extends \App\Core\Controller\AbstractController
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію HOTP успішно увімкнено!';
                     return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
                 } else {
-                    MfaGuard::clearRequired();
+                    $this->mfaGuard->clearRequired();
                     $user = $this->userRepository->findById($userId);
                     $role = $this->roleRepository->findById((int)$user['role_id']);
 
@@ -336,7 +339,7 @@ class MfaController extends \App\Core\Controller\AbstractController
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
                     return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
                 } else {
-                    MfaGuard::clearRequired();
+                    $this->mfaGuard->clearRequired();
                     $user = $this->userRepository->findById($userId);
                     $role = $this->roleRepository->findById((int)$user['role_id']);
 
@@ -400,7 +403,7 @@ class MfaController extends \App\Core\Controller\AbstractController
                 $this->mfaService->enableHotpForUser($userId, $secret, $backupCodes, $verifiedCounter + 1);
 
                 unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter'], $_SESSION['hotp_setup_last_counter']);
-                MfaGuard::clearRequired();
+                $this->mfaGuard->clearRequired();
 
                 $user = $this->userRepository->findById($userId);
                 $role = $this->roleRepository->findById((int)$user['role_id']);
@@ -442,7 +445,7 @@ class MfaController extends \App\Core\Controller\AbstractController
                 $this->mfaService->enableMfaForUser($userId, $secret, $backupCodes, 'totp');
 
                 unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
-                MfaGuard::clearRequired();
+                $this->mfaGuard->clearRequired();
 
                 $user = $this->userRepository->findById($userId);
                 $role = $this->roleRepository->findById((int)$user['role_id']);
@@ -535,7 +538,7 @@ class MfaController extends \App\Core\Controller\AbstractController
 
         if ($this->mfaService->verifyUserMfa($userId, $code)) {
             unset($_SESSION['mfa_pending_user_id']);
-            MfaGuard::clearRequired();
+            $this->mfaGuard->clearRequired();
 
             $user = $this->userRepository->findById($userId);
             $role = $this->roleRepository->findById((int)$user['role_id']);
