@@ -41,174 +41,171 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
 
     public function findAll(string $searchTerm = '') : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM inventory_items";
-        $params = [];
+        $qb = $this->createQueryBuilder('i');
 
         if (!empty($searchTerm)) {
-            $sql .= " WHERE name LIKE :term OR inn LIKE :term OR supplier LIKE :term OR batch_number LIKE :term";
-            $params['term'] = '%' . $searchTerm . '%';
+            $qb->andWhere('i.name LIKE :term OR i.inn LIKE :term OR i.supplier LIKE :term OR i.batch_number LIKE :term')
+               ->setParameter('term', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY name";
+        $qb->orderBy('i.name', 'ASC');
 
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql, $params);
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findItemsBelowMinStock() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT * 
-            FROM inventory_items 
-            WHERE quantity < min_stock_level 
-            ORDER BY name
-        ";
-        return $conn->fetchAllAssociative($sql);
+        return $this->createQueryBuilder('i')
+            ->where('i.quantity < i.min_stock_level')
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function countItemsBelowMinStock() : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT COUNT(*) FROM inventory_items WHERE quantity < min_stock_level";
-        return (int)$conn->fetchOne($sql);
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.quantity < i.min_stock_level')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function findItemsAboveMaxStock() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT * 
-            FROM inventory_items 
-            WHERE quantity > max_stock_level 
-            ORDER BY name
-        ";
-        return $conn->fetchAllAssociative($sql);
+        return $this->createQueryBuilder('i')
+            ->where('i.quantity > i.max_stock_level')
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function save(array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $sql = "INSERT INTO inventory_items (name, description, inn, batch_number, expiry_date, 
-                                                supplier, cost, quantity, min_stock_level, 
-                                                max_stock_level, location) 
-                    VALUES (:name, :description, :inn, :batch_number, :expiry_date, 
-                            :supplier, :cost, :quantity, :min_stock_level, 
-                            :max_stock_level, :location)";
-
-            $success = $conn->executeStatement($sql, [
-                'name' => $data['name'],
-                'description' => $data['description'] ?? null,
-                'inn' => $data['inn'] ?? null,
-                'batch_number' => $data['batch_number'] ?? null,
-                'expiry_date' => $data['expiry_date'] ?? null,
-                'supplier' => $data['supplier'] ?? null,
-                'cost' => $data['cost'] ?? 0.00,
-                'quantity' => $data['quantity'] ?? 0,
-                'min_stock_level' => $data['min_stock_level'] ?? 0,
-                'max_stock_level' => $data['max_stock_level'] ?? 0,
-                'location' => $data['location'] ?? null,
-            ]);
-
-            if ($success > 0) {
-                $itemId = (int)$conn->lastInsertId();
-                if (($data['quantity'] ?? 0) > 0) {
-                    $this->logMovement(
-                        $itemId,
-                        $_SESSION['user']['id'] ?? null,
-                        'in',
-                        $data['quantity'],
-                        $data['quantity'],
-                        'Початковий запас',
-                        $data['cost'] ?? 0.00
-                    );
-                }
-                $conn->commit();
-                return true;
+            $item = new InventoryItem();
+            $item->setName($data['name']);
+            if (isset($data['description'])) {
+                $item->setDescription($data['description']);
             }
-            $conn->rollBack();
-            return false;
+            if (isset($data['inn'])) {
+                $item->setInn($data['inn']);
+            }
+            if (isset($data['batch_number'])) {
+                $item->setBatchNumber($data['batch_number']);
+            }
+            if (!empty($data['expiry_date'])) {
+                $item->setExpiryDate(new \DateTime($data['expiry_date']));
+            }
+            if (isset($data['supplier'])) {
+                $item->setSupplier($data['supplier']);
+            }
+            $item->setCost((string)($data['cost'] ?? 0.00));
+            $item->setQuantity((int)($data['quantity'] ?? 0));
+            $item->setMinStockLevel((int)($data['min_stock_level'] ?? 0));
+            $item->setMaxStockLevel((int)($data['max_stock_level'] ?? 0));
+            if (isset($data['location'])) {
+                $item->setLocation($data['location']);
+            }
+
+            $em->persist($item);
+            $em->flush();
+
+            $itemId = $item->getId();
+            if (($data['quantity'] ?? 0) > 0) {
+                $this->logMovement(
+                    $itemId,
+                    $_SESSION['user']['id'] ?? null,
+                    'in',
+                    $data['quantity'],
+                    $data['quantity'],
+                    'Початковий запас',
+                    (float)($data['cost'] ?? 0.00)
+                );
+            }
+            $em->commit();
+            return true;
         } catch (\Exception $e) {
-            $conn->rollBack();
+            $em->rollBack();
             return false;
         }
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM inventory_items WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $result = $this->createQueryBuilder('i')
+            ->where('i.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
+        return $result ? $result[0] : null;
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $oldItem = $this->findById($id);
-            if (!$oldItem) {
-                $conn->rollBack();
+            $item = $this->find($id);
+            if (!$item) {
+                $em->rollBack();
                 return false;
             }
-            $oldQuantity = $oldItem['quantity'];
+            $oldQuantity = $item->getQuantity();
             $newQuantity = $data['quantity'] ?? $oldQuantity;
-            $oldCost = $oldItem['cost'];
-            $newCost = $data['cost'] ?? $oldCost;
+            $oldCost = (float)$item->getCost();
+            $newCost = (float)($data['cost'] ?? $oldCost);
 
-            $sql = "UPDATE inventory_items SET 
-                        name = :name, 
-                        description = :description, 
-                        inn = :inn, 
-                        batch_number = :batch_number, 
-                        expiry_date = :expiry_date, 
-                        supplier = :supplier, 
-                        cost = :cost, 
-                        quantity = :quantity, 
-                        min_stock_level = :min_stock_level, 
-                        max_stock_level = :max_stock_level, 
-                        location = :location 
-                    WHERE id = :id";
-
-            $success = $conn->executeStatement($sql, [
-                'id' => $id,
-                'name' => $data['name'],
-                'description' => $data['description'] ?? null,
-                'inn' => $data['inn'] ?? null,
-                'batch_number' => $data['batch_number'] ?? null,
-                'expiry_date' => $data['expiry_date'] ?? null,
-                'supplier' => $data['supplier'] ?? null,
-                'cost' => $newCost,
-                'quantity' => $newQuantity,
-                'min_stock_level' => $data['min_stock_level'] ?? 0,
-                'max_stock_level' => $data['max_stock_level'] ?? 0,
-                'location' => $data['location'] ?? null,
-            ]);
-
-            if ($success > 0) {
-                if ($newQuantity !== $oldQuantity) {
-                    $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
-                    $quantityChange = abs($newQuantity - $oldQuantity);
-                    $reason = $data['movement_reason'] ?? 'Оновлення позиції';
-                    $this->logMovement(
-                        $id,
-                        $_SESSION['user']['id'] ?? null,
-                        $movementType,
-                        $quantityChange,
-                        $newQuantity,
-                        $reason,
-                        $newCost
-                    );
-                }
+            $item->setName($data['name']);
+            if (array_key_exists('description', $data)) {
+                $item->setDescription($data['description']);
             }
-            $conn->commit();
-            return $success > 0;
+            if (array_key_exists('inn', $data)) {
+                $item->setInn($data['inn']);
+            }
+            if (array_key_exists('batch_number', $data)) {
+                $item->setBatchNumber($data['batch_number']);
+            }
+            if (array_key_exists('expiry_date', $data)) {
+                $item->setExpiryDate($data['expiry_date'] ? new \DateTime($data['expiry_date']) : null);
+            }
+            if (array_key_exists('supplier', $data)) {
+                $item->setSupplier($data['supplier']);
+            }
+            $item->setCost((string)$newCost);
+            $item->setQuantity((int)$newQuantity);
+            if (array_key_exists('min_stock_level', $data)) {
+                $item->setMinStockLevel((int)$data['min_stock_level']);
+            }
+            if (array_key_exists('max_stock_level', $data)) {
+                $item->setMaxStockLevel((int)$data['max_stock_level']);
+            }
+            if (array_key_exists('location', $data)) {
+                $item->setLocation($data['location']);
+            }
+
+            $em->flush();
+
+            if ($newQuantity !== $oldQuantity) {
+                $movementType = $newQuantity > $oldQuantity ? 'in' : 'out';
+                $quantityChange = abs($newQuantity - $oldQuantity);
+                $reason = $data['movement_reason'] ?? 'Оновлення позиції';
+                $this->logMovement(
+                    $id,
+                    $_SESSION['user']['id'] ?? null,
+                    $movementType,
+                    $quantityChange,
+                    $newQuantity,
+                    $reason,
+                    $newCost
+                );
+            }
+            $em->commit();
+            return true;
         } catch (\Exception $e) {
-            $conn->rollBack();
+            $em->rollBack();
             return false;
         }
     }
@@ -222,19 +219,27 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
         string $reason,
         float $itemCost
     ) : bool {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO inventory_movements (inventory_item_id, user_id, movement_type, 
-                                                quantity_change, new_quantity, reason) 
-                VALUES (:inventory_item_id, :user_id, :movement_type, 
-                        :quantity_change, :new_quantity, :reason)";
-        $success = $conn->executeStatement($sql, [
-            'inventory_item_id' => $itemId,
-            'user_id' => $userId,
-            'movement_type' => $movementType,
-            'quantity_change' => $quantityChange,
-            'new_quantity' => $newQuantity,
-            'reason' => $reason,
-        ]);
+        $em = $this->getEntityManager();
+        $qb = $em->getConnection()->createQueryBuilder();
+
+        $success = $qb->insert('inventory_movements')
+            ->values([
+                'inventory_item_id' => ':inventory_item_id',
+                'user_id' => ':user_id',
+                'movement_type' => ':movement_type',
+                'quantity_change' => ':quantity_change',
+                'new_quantity' => ':new_quantity',
+                'reason' => ':reason',
+            ])
+            ->setParameters([
+                'inventory_item_id' => $itemId,
+                'user_id' => $userId,
+                'movement_type' => $movementType,
+                'quantity_change' => $quantityChange,
+                'new_quantity' => $newQuantity,
+                'reason' => $reason,
+            ])
+            ->executeStatement();
 
         if ($success > 0) {
             $amount = $quantityChange * $itemCost;
@@ -257,7 +262,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
                     "Рух складу: %s %d одиниць '%s'. Причина: %s",
                     'in' === $movementType ? 'Прихід' : 'Вибуття',
                     $quantityChange,
-                    $itemDetails['name'],
+                    $itemDetails['name'] ?? 'Unknown',
                     $reason
                 ),
                 $itemId
@@ -268,49 +273,48 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
 
     public function getMovementHistory(int $itemId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                im.*,
-                CONCAT(u.last_name, ' ', u.first_name) as user_name
-            FROM inventory_movements im
-            LEFT JOIN users u ON im.user_id = u.id
-            WHERE im.inventory_item_id = :inventory_item_id
-            ORDER BY im.created_at DESC
-        ";
-        return $conn->fetchAllAssociative($sql, ['inventory_item_id' => $itemId]);
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('im.*', "CONCAT(u.last_name, ' ', u.first_name) as user_name")
+           ->from('inventory_movements', 'im')
+           ->leftJoin('im', 'users', 'u', 'im.user_id = u.id')
+           ->where('im.inventory_item_id = :inventory_item_id')
+           ->setParameter('inventory_item_id', $itemId)
+           ->orderBy('im.created_at', 'DESC');
+
+        return $qb->fetchAllAssociative();
     }
 
     public function findByName(string $name) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM inventory_items WHERE name = :name";
-        $result = $conn->fetchAssociative($sql, ['name' => $name]);
-        return $result ?: null;
+        $result = $this->createQueryBuilder('i')
+            ->where('i.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getArrayResult();
+        return $result ? $result[0] : null;
     }
 
     public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту') : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $item = $this->findById($itemId);
-            if (!$item || $item['quantity'] < $quantity) {
-                $conn->rollBack();
+            $item = $this->find($itemId);
+            if (!$item || $item->getQuantity() < $quantity) {
+                $em->rollBack();
                 return false;
             }
 
-            $newQuantity = $item['quantity'] - $quantity;
-            $sql = "UPDATE inventory_items SET quantity = :quantity WHERE id = :id";
-            $success = $conn->executeStatement($sql, ['quantity' => $newQuantity, 'id' => $itemId]);
+            $newQuantity = $item->getQuantity() - $quantity;
+            $item->setQuantity($newQuantity);
+            $em->flush();
 
-            if ($success > 0) {
-                $this->logMovement($itemId, $userId, 'out', $quantity, $newQuantity, $reason, $item['cost']);
-            }
-            $conn->commit();
-            return $success > 0;
+            $this->logMovement($itemId, $userId, 'out', $quantity, $newQuantity, $reason, (float)$item->getCost());
+
+            $em->commit();
+            return true;
         } catch (\Exception $e) {
-            $conn->rollBack();
+            $em->rollBack();
             return false;
         }
     }
