@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if definitions is empty %}
-            <p>{{ 'kpi.definitions.no_definitions'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -62,9 +60,12 @@
                                 </form>
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="center aligned">{{ 'kpi.definitions.no_definitions'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
