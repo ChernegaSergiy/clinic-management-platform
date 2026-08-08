@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class NewsController extends \App\Core\Controller\AbstractController
+class AdminNewsController extends \App\Core\Controller\AbstractController
 {
     private NewsRepository $newsRepository;
     private UserRepositoryInterface $userRepository;
@@ -44,34 +44,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         $this->validator = $validator;
     }
 
-    #[Route('/news', name: 'news_index', methods: ['GET'])]
-    public function index() : Response
-    {
-        $newsArticles = $this->newsRepository->findAll();
-        return $this->render('@News/public/index.html.twig', [
-            'newsArticles' => $newsArticles,
-        ]);
-    }
-
-    #[Route('/news/{id}', name: 'news_show', methods: ['GET'])]
-    public function show(array $args) : Response
-    {
-        $id = (int)($args['id'] ?? 0);
-        $newsArticle = $this->newsRepository->findById($id);
-
-        if (!$newsArticle || !$newsArticle['is_published']) {
-            return $this->render('errors/error.html.twig', [
-                'message' => 'Новина не знайдена або не опублікована.',
-                'detail' => 'Немає статті за вказаним ідентифікатором.'
-            ]);
-        }
-
-        return $this->render('@News/public/show.html.twig', [
-            'newsArticle' => $newsArticle,
-        ]);
-    }
-
-    #[Route('/admin/news', name: 'admin_news_index', methods: ['GET'])]
+    #[Route('/news', name: 'admin_news_index', methods: ['GET'])]
     public function adminIndex() : Response
     {
         $this->checkAuth();
@@ -83,7 +56,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         ]);
     }
 
-    #[Route('/admin/news/new', name: 'admin_news_new', methods: ['GET'])]
+    #[Route('/news/new', name: 'admin_news_new', methods: ['GET'])]
     public function create() : Response
     {
         $this->checkAuth();
@@ -104,7 +77,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/news/new', name: 'admin_news_store', methods: ['POST'])]
+    #[Route('/news/new', name: 'admin_news_store', methods: ['POST'])]
     public function store() : Response
     {
         $this->checkAuth();
@@ -130,7 +103,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         return new RedirectResponse('/admin/news');
     }
 
-    #[Route('/admin/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
+    #[Route('/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
     public function edit(array $args) : Response
     {
         $this->checkAuth();
@@ -162,7 +135,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    #[Route('/admin/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
+    #[Route('/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
     public function update(array $args) : Response
     {
         $this->checkAuth();
@@ -198,7 +171,7 @@ class NewsController extends \App\Core\Controller\AbstractController
         return new RedirectResponse('/admin/news');
     }
 
-    #[Route('/admin/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
+    #[Route('/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
     public function delete(array $args) : Response
     {
         $this->checkAuth();
