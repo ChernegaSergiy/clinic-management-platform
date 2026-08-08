@@ -74,7 +74,11 @@ Ensure the web server user (`www-data`) has proper write permissions to the `var
 sudo chown -R $USER:www-data var/
 sudo chmod -R 775 var/
 ```
-*(For a more robust permission setup, consider using ACLs: `sudo setfacl -R -m u:www-data:rwX -m u:$(whoami):rwX var`)*
+> [!TIP]
+> For a more robust permission setup, consider using ACLs:
+> ```bash
+> sudo setfacl -R -m u:www-data:rwX -m u:$(whoami):rwX var
+> ```
 
 ## 7. Nginx Configuration
 
