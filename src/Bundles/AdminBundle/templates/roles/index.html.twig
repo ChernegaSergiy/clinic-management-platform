@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if roles is empty %}
-            <p>{{ 'admin.roles.no_roles'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -48,9 +46,12 @@
                                 </form>
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="center aligned">{{ 'admin.roles.no_roles'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
