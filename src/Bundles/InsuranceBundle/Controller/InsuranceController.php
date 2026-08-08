@@ -66,7 +66,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
         $company = $this->insuranceService->getInsuranceCompany($id);
 
         if (!$company) {
-            return $this->render('errors/error.html.twig', ['message' => '404 Not Found: Insurance company not found.'], new Response('', 404));
+            return new Response('404 Not Found: Insurance company not found.', 404);
         }
 
         return $this->render('@Insurance/companies/show.html.twig', [
