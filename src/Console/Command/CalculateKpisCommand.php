@@ -24,7 +24,7 @@
 
 namespace App\Console\Command;
 
-use App\Module\Dashboard\Service\KpiCalculatorService;
+use App\Bundles\DashboardBundle\Service\KpiCalculatorService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +33,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CalculateKpisCommand extends Command
 {
     protected static $defaultName = 'kpis:calculate';
+
+    private KpiCalculatorService $kpiCalculatorService;
+
+    public function __construct(KpiCalculatorService $kpiCalculatorService)
+    {
+        parent::__construct();
+        $this->kpiCalculatorService = $kpiCalculatorService;
+    }
 
     protected function configure() : void
     {
@@ -46,9 +54,8 @@ class CalculateKpisCommand extends Command
     {
         $dateArg = $input->getArgument('date');
 
-        $service = new KpiCalculatorService();
         $output->writeln("Running KPI calculation for date: " . ($dateArg ?: 'today'));
-        $service->calculateAndStoreAll($dateArg);
+        $this->kpiCalculatorService->calculateAndStoreAll($dateArg);
         $output->writeln("Done.");
         $output->writeln("KPI calculations completed.");
 
