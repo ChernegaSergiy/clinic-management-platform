@@ -24,28 +24,32 @@
 
 namespace App\Bundles\KpiBundle;
 
-use App\Core\Auth\Policy;
 use App\Core\Model\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class KpiPolicy implements Policy
+class KpiVoter extends Voter
 {
-    public function view(User $user, array $context) : bool
+    protected function supports(string $attribute, mixed $subject) : bool
     {
-        return $user->hasPermission('kpi.read');
+        return in_array($attribute, ['ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE']);
     }
 
-    public function create(User $user, array $context) : bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
-        return $user->isAdmin();
-    }
+        $user = $token->getUser();
 
-    public function update(User $user, array $context) : bool
-    {
-        return $user->isAdmin();
-    }
+        if (!$user instanceof User) {
+            return false;
+        }
 
-    public function delete(User $user, array $context) : bool
-    {
-        return $user->isAdmin();
+        switch ($attribute) {
+            case 'ROLE_CREATE':
+            case 'ROLE_UPDATE':
+            case 'ROLE_DELETE':
+                return $user->isAdmin();
+        }
+
+        return false;
     }
 }
