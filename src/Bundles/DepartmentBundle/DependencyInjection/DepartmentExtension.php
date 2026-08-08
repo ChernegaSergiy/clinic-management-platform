@@ -26,8 +26,29 @@ namespace App\Bundles\DepartmentBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class DepartmentExtension extends Extension
+class DepartmentExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_DEPARTMENT_READ',
+                'ROLE_DEPARTMENT_WRITE',
+                'ROLE_DEPARTMENT_DELETE',
+                'ROLE_DEPARTMENT_MANAGE',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_DEPARTMENT_READ',
+                'ROLE_DEPARTMENT_WRITE',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
