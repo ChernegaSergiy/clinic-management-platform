@@ -36,9 +36,7 @@
         <div class="row">
             <div class="sixteen wide mobile eight wide tablet eight wide computer column">
                 <h3 class="ui header">{{ 'dashboard.simple.upcoming_appointments'|trans }}</h3>
-                {% if upcoming_appointments is empty %}
-                    <div class="ui message">{{ 'dashboard.simple.no_upcoming_appointments'|trans }}</div>
-                {% else %}
+                
                     <table class="ui single line striped selectable unstackable table">
                         <thead>
                         <tr>
@@ -54,16 +52,17 @@
                                 <td>{{ appointment.doctor_name }}</td>
                                 <td>{{ appointment.start_time|date('Y-m-d H:i') }}</td>
                             </tr>
-                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="center aligned">{{ 'dashboard.simple.no_upcoming_appointments'|trans }}</td>
+                        </tr>
+                    {% endfor %}
                         </tbody>
                     </table>
-                {% endif %}
             </div>
             <div class="sixteen wide mobile eight wide tablet eight wide computer column">
                 <h3 class="ui header">{{ 'dashboard.simple.low_stock_items'|trans }}</h3>
-                {% if low_stock_items is empty %}
-                    <div class="ui message">{{ 'dashboard.simple.no_low_stock_items'|trans }}</div>
-                {% else %}
+                
                     <table class="ui single line striped selectable unstackable table">
                         <thead>
                         <tr>
@@ -79,10 +78,13 @@
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.min_stock_level }}</td>
                             </tr>
-                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="center aligned">{{ 'dashboard.simple.no_low_stock_items'|trans }}</td>
+                        </tr>
+                    {% endfor %}
                         </tbody>
                     </table>
-                {% endif %}
             </div>
         </div>
     </div>
