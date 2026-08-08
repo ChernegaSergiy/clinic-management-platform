@@ -45,6 +45,4 @@ class PolicyRegistryTest extends TestCase
     }
 }
 
-class DummyPolicy
-{
-}
+class DummyPolicy {}
