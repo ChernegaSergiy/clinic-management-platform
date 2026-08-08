@@ -26,8 +26,27 @@ namespace App\Bundles\BillingBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class BillingExtension extends Extension
+class BillingExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_BILLING_READ',
+                'ROLE_BILLING_MANAGE',
+            ],
+            'ROLE_BILLING' => [
+                'ROLE_BILLING_READ',
+                'ROLE_BILLING_MANAGE',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
