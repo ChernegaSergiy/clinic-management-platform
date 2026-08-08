@@ -8,10 +8,7 @@
 
 # Core functionality
 src/Core/ @ChernegaSergiy
-src/Controller/ @ChernegaSergiy
-
 # Modules
-src/Controller/PageController.php @ChernegaSergiy
 src/Event/ @ChernegaSergiy
 src/Bundles/AdminBundle/ @ChernegaSergiy
 src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
