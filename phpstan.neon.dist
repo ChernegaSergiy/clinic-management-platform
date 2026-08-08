@@ -3,18 +3,3 @@ parameters:
     paths:
         - src
         - public
-    ignoreErrors:
-        -
-            # These classes are pure Doctrine ORM mapping definitions: properties are
-            # populated and read via reflection during entity hydration/persistence,
-            # not through getters/setters (this codebase reads data via raw SQL in
-            # its Repository classes instead of hydrated entity objects). PHPStan
-            # cannot see that reflection-based access, so it flags every mapped
-            # property as "only written" / "never assigned a non-default value".
-            # phpstan-doctrine would resolve this properly, but isn't installable in
-            # this environment (no network access to the package registry).
-            identifier: property.onlyWritten
-            path: src/Entity/*
-        -
-            identifier: property.unusedType
-            path: src/Entity/*
