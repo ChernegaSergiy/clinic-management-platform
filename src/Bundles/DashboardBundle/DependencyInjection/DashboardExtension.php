@@ -26,13 +26,54 @@ namespace App\Bundles\DashboardBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class DashboardExtension extends Extension
+class DashboardExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $container->setParameter('dashboard.features.export', $config['features']['export']);
+    }
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_DASHBOARD_VIEW',
+                'ROLE_DASHBOARD_EXPORT',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_DASHBOARD_VIEW',
+                'ROLE_DASHBOARD_EXPORT',
+            ],
+            'ROLE_REGISTRAR' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+            'ROLE_LAB_TECHNICIAN' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+            'ROLE_BILLING' => [
+                'ROLE_DASHBOARD_VIEW',
+                'ROLE_DASHBOARD_EXPORT',
+            ],
+            'ROLE_INVENTORY_MANAGER' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+            'ROLE_HR_MANAGER' => [
+                'ROLE_DASHBOARD_VIEW',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
     }
 }
