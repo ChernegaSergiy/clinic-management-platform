@@ -6,6 +6,7 @@ admin_routes:
             - ../src/Bundles/DepartmentBundle/Controller/
             - ../src/Bundles/KpiBundle/Controller/
             - ../src/Bundles/RoomBundle/Controller/
+            - ../src/Bundles/NewsBundle/Controller/AdminNewsController.php
     type: attribute
     prefix: /admin
 
@@ -32,5 +33,5 @@ site_routes:
         path:
             - ../src/Bundles/SiteBundle/Controller/
             - ../src/Bundles/UserBundle/Controller/
-            - ../src/Bundles/NewsBundle/Controller/
+            - ../src/Bundles/NewsBundle/Controller/PublicNewsController.php
     type: attribute
