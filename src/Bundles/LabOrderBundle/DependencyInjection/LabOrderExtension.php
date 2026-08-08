@@ -26,8 +26,40 @@ namespace App\Bundles\LabOrderBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class LabOrderExtension extends Extension
+class LabOrderExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_LAB_ORDER_VIEW_ANY',
+                'ROLE_LAB_ORDER_EDIT_ANY',
+                'ROLE_LAB_ORDER_CREATE',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_LAB_ORDER_VIEW_ANY',
+            ],
+            'ROLE_LAB_TECHNICIAN' => [
+                'ROLE_LAB_ORDER_VIEW_ANY',
+                'ROLE_LAB_ORDER_EDIT_ANY',
+                'ROLE_LAB_ORDER_CREATE',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_LAB_ORDER_VIEW_OWN',
+                'ROLE_LAB_ORDER_EDIT_OWN',
+                'ROLE_LAB_ORDER_CREATE',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_LAB_ORDER_VIEW_OWN',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
