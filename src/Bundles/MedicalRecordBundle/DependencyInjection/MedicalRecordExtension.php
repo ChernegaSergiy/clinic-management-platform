@@ -26,8 +26,36 @@ namespace App\Bundles\MedicalRecordBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class MedicalRecordExtension extends Extension
+class MedicalRecordExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_MEDICAL_RECORD_VIEW_ANY',
+                'ROLE_MEDICAL_RECORD_EDIT_ANY',
+                'ROLE_MEDICAL_RECORD_CREATE',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_MEDICAL_RECORD_VIEW_ANY',
+                'ROLE_MEDICAL_RECORD_EDIT_ANY',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_MEDICAL_RECORD_VIEW_OWN',
+                'ROLE_MEDICAL_RECORD_EDIT_OWN',
+                'ROLE_MEDICAL_RECORD_CREATE',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_MEDICAL_RECORD_VIEW_OWN',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
