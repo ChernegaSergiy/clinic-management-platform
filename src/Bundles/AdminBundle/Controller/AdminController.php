@@ -114,9 +114,8 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->settingsRepository->setMfaForceRoles($mfaForceRoles);
         $this->settingsRepository->set('system_locale', $locale);
 
-        // Clear View cache to force re-initialization with new locale
-        $this->view->clearCache();
-
+        // A new View instance is built for every request, so the updated
+        // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
