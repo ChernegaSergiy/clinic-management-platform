@@ -45,12 +45,14 @@ abstract class RepositoryTestCase extends TestCase
             $query->method('getOneOrNullResult')->willReturn($result);
         } else {
             $query->method('getResult')->willReturn($result ?? []);
+            $query->method('getArrayResult')->willReturn($result ?? []);
         }
 
         $queryBuilder->method('getQuery')->willReturn($query);
 
         // Allow method chaining
         $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('addSelect')->willReturnSelf();
         $queryBuilder->method('from')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
         $queryBuilder->method('andWhere')->willReturnSelf();
@@ -61,6 +63,8 @@ abstract class RepositoryTestCase extends TestCase
         $queryBuilder->method('leftJoin')->willReturnSelf();
         $queryBuilder->method('innerJoin')->willReturnSelf();
         $queryBuilder->method('join')->willReturnSelf();
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($queryBuilder);
 
         return $queryBuilder;
     }
