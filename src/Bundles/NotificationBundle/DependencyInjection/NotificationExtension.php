@@ -26,8 +26,46 @@ namespace App\Bundles\NotificationBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
-class NotificationExtension extends Extension
+class NotificationExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container) : void {}
+
+    public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
+    {
+        $roleHierarchy = [
+            'ROLE_ADMIN' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_MEDICAL_MANAGER' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_REGISTRAR' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_DOCTOR' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_NURSE' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_LAB_TECHNICIAN' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_BILLING' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_INVENTORY_MANAGER' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+            'ROLE_HR_MANAGER' => [
+                'ROLE_NOTIFICATIONS_READ',
+            ],
+        ];
+
+        $container->prependExtensionConfig('security', [
+            'role_hierarchy' => $roleHierarchy,
+        ]);
+    }
 }
