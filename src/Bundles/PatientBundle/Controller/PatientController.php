@@ -226,15 +226,17 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $patients = $this->patientRepository->findAll();
 
-        if (empty($patients)) {
-            return new RedirectResponse('/patients');
-        }
-
-        $headers = array_keys($patients[0]);
+        $headers = !empty($patients) ? array_keys($patients[0]) : ['id', 'first_name', 'last_name', 'birth_date', 'gender', 'phone', 'email', 'address', 'tax_id'];
         $exporter = new CsvExporter($headers, $patients);
-        $exporter->download('patients_export.csv');
+        $csvContent = $exporter->generate();
 
-        return new Response();
+        $response = new Response($csvContent);
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="patients_export.csv"');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 
     #[Route('/patients/export-json', name: 'patient_export_json', methods: ['GET'])]
@@ -245,15 +247,14 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $patients = $this->patientRepository->findAll();
 
-        if (empty($patients)) {
-            $_SESSION['errors']['export'] = 'Немає пацієнтів для експорту.';
-            return new RedirectResponse('/patients');
-        }
-
         $jsonExporter = new JsonExporter();
-        $jsonExporter->export($patients, 'patients_export.json');
+        $jsonContent = $jsonExporter->generate($patients);
 
-        return new Response();
+        $response = new Response($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Content-Disposition', 'attachment; filename="patients_export.json"');
+
+        return $response;
     }
 
     #[Route('/patients/import-json', name: 'patient_import_json', methods: ['GET', 'POST'])]
