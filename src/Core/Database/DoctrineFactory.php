@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Infrastructure\Database;
+namespace App\Core\Database;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;

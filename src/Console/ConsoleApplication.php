@@ -26,7 +26,7 @@ namespace App\Console;
 
 use App\Console\Command\CalculateKpisCommand;
 use App\Console\Command\MigrateCommand;
-use App\Infrastructure\Database\DoctrineFactory;
+use App\Core\Database\DoctrineFactory;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\PhpFile;
 use Doctrine\Migrations\DependencyFactory;

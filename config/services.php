@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Reference;
 return function (ContainerBuilder $container) {
     // Doctrine EntityManager
     $container->register(\Doctrine\ORM\EntityManagerInterface::class)
-        ->setFactory([\App\Infrastructure\Database\DoctrineFactory::class, 'createEntityManager'])
+        ->setFactory([\App\Core\Database\DoctrineFactory::class, 'createEntityManager'])
         ->setPublic(true);
 
     // PDO service via existing Database singleton.
