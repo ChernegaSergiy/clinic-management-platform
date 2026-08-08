@@ -59,8 +59,6 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $this->userRepository = $userRepository;
         $this->notificationService = $notificationService;
         $this->schedulingService = $schedulingService;
-        $this->doctorScheduleRepository = $doctorScheduleRepository;
-        $this->scheduleExceptionRepository = $scheduleExceptionRepository;
         $this->serviceRepository = $serviceRepository;
         $this->roomRepository = $roomRepository;
         $this->validator = $validator;
@@ -386,6 +384,8 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $rawInput = $_POST;
         $waitlistId = (int)($rawInput['waitlist_id'] ?? 0);
         $errors = null;
+        $selectedDoctorId = $submittedDoctorId;
+        $startTime = null;
 
         $validator = $this->validator;
         $rules = [
@@ -502,7 +502,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
 
         $patient = $this->patientRepository->findById((int)$rawInput['patient_id']);
         $doctor = $this->userRepository->findById($selectedDoctorId);
-        if ($patient && $doctor) {
+        if ($patient && $doctor && $startTime instanceof \DateTime) {
             $message = sprintf(
                 'New appointment: Patient %s with Dr. %s at %s.',
                 $patient['first_name'] . ' ' . $patient['last_name'],
