@@ -1,5 +1,36 @@
-bundles:
+admin_routes:
     resource:
-        path: ../src/Bundles/
-        namespace: App\Bundles\
+        path: 
+            - ../src/Bundles/AdminBundle/Controller/
+            - ../src/Bundles/ClinicalReferenceBundle/Controller/
+            - ../src/Bundles/DepartmentBundle/Controller/
+            - ../src/Bundles/KpiBundle/Controller/
+            - ../src/Bundles/RoomBundle/Controller/
+    type: attribute
+    prefix: /admin
+
+app_routes:
+    resource:
+        path:
+            - ../src/Bundles/DashboardBundle/Controller/
+            - ../src/Bundles/PatientBundle/Controller/
+            - ../src/Bundles/MedicalRecordBundle/Controller/
+            - ../src/Bundles/PrescriptionBundle/Controller/
+            - ../src/Bundles/LabOrderBundle/Controller/
+            - ../src/Bundles/HrmBundle/Controller/
+            - ../src/Bundles/InsuranceBundle/Controller/
+            - ../src/Bundles/InventoryBundle/Controller/
+            - ../src/Bundles/NotificationBundle/Controller/
+            - ../src/Bundles/BillingBundle/Controller/
+            - ../src/Bundles/AppointmentBundle/Controller/
+            - ../src/Bundles/ScheduleBundle/Controller/
+    type: attribute
+    prefix: /app
+
+site_routes:
+    resource:
+        path:
+            - ../src/Bundles/SiteBundle/Controller/
+            - ../src/Bundles/UserBundle/Controller/
+            - ../src/Bundles/NewsBundle/Controller/
     type: attribute
