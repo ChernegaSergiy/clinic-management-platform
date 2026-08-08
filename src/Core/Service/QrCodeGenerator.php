@@ -34,9 +34,9 @@ class QrCodeGenerator
     {
         $options = new QROptions([
             'outputInterface' => QRGdImagePNG::class,
-            'eccLevel'   => 'L',
-            'scale'      => 5,
-            'outputBase64' => true,
+            'eccLevel'        => 'L',
+            'scale'           => 5,
+            'outputBase64'    => true,
         ]);
 
         return (new QRCode($options))->render($data);
