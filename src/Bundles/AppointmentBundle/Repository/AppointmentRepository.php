@@ -339,12 +339,10 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         $waitlist = new \App\Entity\Waitlist();
         $waitlist->setTicketNumber($ticket);
 
-        $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
-        $waitlist->setPatient($patient);
+        $waitlist->setPatientId((int)$data['patient_id']);
 
         if (!empty($data['desired_doctor_id'])) {
-            $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['desired_doctor_id']);
-            $waitlist->setDesiredDoctor($doctor);
+            $waitlist->setDesiredDoctorId((int)$data['desired_doctor_id']);
         }
 
         if (!empty($data['desired_start_time'])) {
