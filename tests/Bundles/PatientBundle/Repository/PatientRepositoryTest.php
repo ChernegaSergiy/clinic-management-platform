@@ -2,6 +2,7 @@
 
 namespace App\Tests\Bundles\PatientBundle\Repository;
 
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use App\Core\Service\AuditLogger;
 use App\Entity\Patient;
 use App\Tests\RepositoryTestCase;
