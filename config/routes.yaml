@@ -1,37 +1,83 @@
-admin_routes:
-    resource:
-        path: 
-            - ../src/Bundles/AdminBundle/Controller/
-            - ../src/Bundles/ClinicalReferenceBundle/Controller/
-            - ../src/Bundles/DepartmentBundle/Controller/
-            - ../src/Bundles/KpiBundle/Controller/
-            - ../src/Bundles/RoomBundle/Controller/
-            - ../src/Bundles/NewsBundle/Controller/AdminNewsController.php
+admin_routes_admin:
+    resource: { path: ../src/Bundles/AdminBundle/Controller/, namespace: App\Bundles\AdminBundle\Controller\ }
+    type: attribute
+    prefix: /admin
+admin_routes_clinical:
+    resource: { path: ../src/Bundles/ClinicalReferenceBundle/Controller/, namespace: App\Bundles\ClinicalReferenceBundle\Controller\ }
+    type: attribute
+    prefix: /admin
+admin_routes_department:
+    resource: { path: ../src/Bundles/DepartmentBundle/Controller/, namespace: App\Bundles\DepartmentBundle\Controller\ }
+    type: attribute
+    prefix: /admin
+admin_routes_kpi:
+    resource: { path: ../src/Bundles/KpiBundle/Controller/, namespace: App\Bundles\KpiBundle\Controller\ }
+    type: attribute
+    prefix: /admin
+admin_routes_room:
+    resource: { path: ../src/Bundles/RoomBundle/Controller/, namespace: App\Bundles\RoomBundle\Controller\ }
+    type: attribute
+    prefix: /admin
+admin_routes_news:
+    resource: { path: ../src/Bundles/NewsBundle/Controller/AdminNewsController.php, namespace: App\Bundles\NewsBundle\Controller\ }
     type: attribute
     prefix: /admin
 
-app_routes:
-    resource:
-        path:
-            - ../src/Bundles/DashboardBundle/Controller/
-            - ../src/Bundles/PatientBundle/Controller/
-            - ../src/Bundles/MedicalRecordBundle/Controller/
-            - ../src/Bundles/PrescriptionBundle/Controller/
-            - ../src/Bundles/LabOrderBundle/Controller/
-            - ../src/Bundles/HrmBundle/Controller/
-            - ../src/Bundles/InsuranceBundle/Controller/
-            - ../src/Bundles/InventoryBundle/Controller/
-            - ../src/Bundles/NotificationBundle/Controller/
-            - ../src/Bundles/BillingBundle/Controller/
-            - ../src/Bundles/AppointmentBundle/Controller/
-            - ../src/Bundles/ScheduleBundle/Controller/
+app_routes_dashboard:
+    resource: { path: ../src/Bundles/DashboardBundle/Controller/, namespace: App\Bundles\DashboardBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_patient:
+    resource: { path: ../src/Bundles/PatientBundle/Controller/, namespace: App\Bundles\PatientBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_medical_record:
+    resource: { path: ../src/Bundles/MedicalRecordBundle/Controller/, namespace: App\Bundles\MedicalRecordBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_prescription:
+    resource: { path: ../src/Bundles/PrescriptionBundle/Controller/, namespace: App\Bundles\PrescriptionBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_lab_order:
+    resource: { path: ../src/Bundles/LabOrderBundle/Controller/, namespace: App\Bundles\LabOrderBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_hrm:
+    resource: { path: ../src/Bundles/HrmBundle/Controller/, namespace: App\Bundles\HrmBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_insurance:
+    resource: { path: ../src/Bundles/InsuranceBundle/Controller/, namespace: App\Bundles\InsuranceBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_inventory:
+    resource: { path: ../src/Bundles/InventoryBundle/Controller/, namespace: App\Bundles\InventoryBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_notification:
+    resource: { path: ../src/Bundles/NotificationBundle/Controller/, namespace: App\Bundles\NotificationBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_billing:
+    resource: { path: ../src/Bundles/BillingBundle/Controller/, namespace: App\Bundles\BillingBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_appointment:
+    resource: { path: ../src/Bundles/AppointmentBundle/Controller/, namespace: App\Bundles\AppointmentBundle\Controller\ }
+    type: attribute
+    prefix: /app
+app_routes_schedule:
+    resource: { path: ../src/Bundles/ScheduleBundle/Controller/, namespace: App\Bundles\ScheduleBundle\Controller\ }
     type: attribute
     prefix: /app
 
-site_routes:
-    resource:
-        path:
-            - ../src/Bundles/SiteBundle/Controller/
-            - ../src/Bundles/UserBundle/Controller/
-            - ../src/Bundles/NewsBundle/Controller/PublicNewsController.php
+site_routes_site:
+    resource: { path: ../src/Bundles/SiteBundle/Controller/, namespace: App\Bundles\SiteBundle\Controller\ }
+    type: attribute
+site_routes_user:
+    resource: { path: ../src/Bundles/UserBundle/Controller/, namespace: App\Bundles\UserBundle\Controller\ }
+    type: attribute
+site_routes_news:
+    resource: { path: ../src/Bundles/NewsBundle/Controller/PublicNewsController.php, namespace: App\Bundles\NewsBundle\Controller\ }
     type: attribute
