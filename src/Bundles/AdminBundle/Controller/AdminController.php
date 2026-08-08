@@ -28,7 +28,6 @@ use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
 use App\Bundles\AdminBundle\Repository\DictionaryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
-use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
@@ -41,7 +40,6 @@ class AdminController extends \App\Core\Controller\AbstractController
     private DictionaryRepository $dictionaryRepository;
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
-    private KpiRepository $kpiRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
     private \App\Bundles\UserBundle\Service\MfaService $mfaService;
@@ -53,7 +51,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         DictionaryRepository $dictionaryRepository,
         AuthConfigRepository $authConfigRepository,
         BackupPolicyRepository $backupPolicyRepository,
-        KpiRepository $kpiRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
         \App\Bundles\UserBundle\Service\MfaService $mfaService,
@@ -64,7 +61,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->dictionaryRepository = $dictionaryRepository;
         $this->authConfigRepository = $authConfigRepository;
         $this->backupPolicyRepository = $backupPolicyRepository;
-        $this->kpiRepository = $kpiRepository;
         $this->serviceRepository = $serviceRepository;
         $this->settingsRepository = $settingsRepository;
         $this->mfaService = $mfaService;
