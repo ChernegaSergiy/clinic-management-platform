@@ -43,63 +43,65 @@ class PrescriptionRepository extends ServiceEntityRepository
 
     public function findAll(string $searchTerm = '') : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT
-                p.id,
-                CONCAT(pat.last_name, ' ', pat.first_name) as patient_name,
-                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name,
-                p.issue_date,
-                p.expiry_date
-            FROM prescriptions p
-            JOIN patients pat ON p.patient_id = pat.id
-            JOIN users doc ON p.doctor_id = doc.id
-        ";
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.id', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first', 'p.issue_date', 'p.expiry_date')
+            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id');
 
-        $params = [];
         if (!empty($searchTerm)) {
-            $sql .= " WHERE CONCAT(pat.last_name, ' ', pat.first_name) LIKE :searchTerm 
-                      OR CONCAT(doc.last_name, ' ', doc.first_name) LIKE :searchTerm";
-            $params['searchTerm'] = '%' . $searchTerm . '%';
+            $qb->where(
+                $qb->expr()->orX(
+                    $qb->expr()->like("CONCAT(pat.last_name, ' ', pat.first_name)", ':searchTerm'),
+                    $qb->expr()->like("CONCAT(doc.last_name, ' ', doc.first_name)", ':searchTerm')
+                )
+            )->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY p.issue_date DESC";
+        $qb->orderBy('p.issue_date', 'DESC');
 
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql, $params);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $row['patient_name'] = trim(($row['pat_last'] ?? '') . ' ' . ($row['pat_first'] ?? ''));
+            $row['doctor_name'] = trim(($row['doc_last'] ?? '') . ' ' . ($row['doc_first'] ?? ''));
+            unset($row['pat_last'], $row['pat_first'], $row['doc_last'], $row['doc_first']);
+
+            if ($row['issue_date'] instanceof \DateTimeInterface) {
+                $row['issue_date'] = $row['issue_date']->format('Y-m-d H:i:s');
+            }
+            if ($row['expiry_date'] instanceof \DateTimeInterface) {
+                $row['expiry_date'] = $row['expiry_date']->format('Y-m-d H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $sql = "INSERT INTO prescriptions (patient_id, doctor_id, medical_record_id, 
-                                            issue_date, expiry_date, notes) 
-                    VALUES (
-                        :patient_id, 
-                        :doctor_id, 
-                        :medical_record_id, 
-                        :issue_date, 
-                        :expiry_date, 
-                        :notes
-                    )";
+            $prescription = new Prescription();
+            $prescription->setPatientId((int)$data['patient_id']);
+            $prescription->setDoctorId((int)$data['doctor_id']);
+            $prescription->setMedicalRecordId(!empty($data['medical_record_id']) ? (int)$data['medical_record_id'] : null);
 
-            $conn->executeStatement($sql, [
-                'patient_id' => $data['patient_id'],
-                'doctor_id' => $data['doctor_id'],
-                'medical_record_id' => $data['medical_record_id'] ?? null,
-                'issue_date' => $data['issue_date'],
-                'expiry_date' => $data['expiry_date'] ?? null,
-                'notes' => $data['notes'] ?? null,
-            ]);
-            $prescriptionId = (int)$conn->lastInsertId();
+            if (!empty($data['issue_date'])) {
+                $prescription->setIssueDate(new \DateTime($data['issue_date']));
+            }
+            if (!empty($data['expiry_date'])) {
+                $prescription->setExpiryDate(new \DateTime($data['expiry_date']));
+            }
+            $prescription->setNotes($data['notes'] ?? null);
+
+            $em->persist($prescription);
+            $em->flush();
+            $prescriptionId = $prescription->getId();
 
             if (!empty($data['items']) && is_array($data['items'])) {
                 $this->saveItems($prescriptionId, $data['items']);
             }
 
-            $conn->commit();
+            $em->commit();
 
             $this->eventDispatcher->dispatch(new EntityChangedEvent('prescription', $prescriptionId, 'create', null, $data));
             $this->eventDispatcher->dispatch(new PatientNotificationEvent(
@@ -110,88 +112,120 @@ class PrescriptionRepository extends ServiceEntityRepository
             ));
             return $prescriptionId;
         } catch (\Exception $e) {
-            $conn->rollBack();
+            $em->rollBack();
             return null;
         }
     }
 
     private function saveItems(int $prescriptionId, array $items) : void
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO prescription_items (prescription_id, medication_name, dosage, frequency, duration, notes) 
-                VALUES (:prescription_id, :medication_name, :dosage, :frequency, :duration, :notes)";
-
+        $em = $this->getEntityManager();
         foreach ($items as $item) {
-            $conn->executeStatement($sql, [
-                'prescription_id' => $prescriptionId,
-                'medication_name' => $item['medication_name'],
-                'dosage' => $item['dosage'],
-                'frequency' => $item['frequency'],
-                'duration' => $item['duration'] ?? null,
-                'notes' => $item['notes'] ?? null,
-            ]);
+            $pi = new \App\Entity\PrescriptionItem();
+            $pi->setPrescriptionId($prescriptionId);
+            $pi->setMedicationName($item['medication_name']);
+            $pi->setDosage($item['dosage']);
+            $pi->setFrequency($item['frequency']);
+            $pi->setDuration($item['duration'] ?? null);
+            $pi->setNotes($item['notes'] ?? null);
+            $em->persist($pi);
         }
+        $em->flush();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT p.*, 
-                CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, 
-                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name 
-                FROM prescriptions p 
-                JOIN patients pat ON p.patient_id = pat.id 
-                JOIN users doc ON p.doctor_id = doc.id 
-                WHERE p.id = :id";
+        $qb = $this->createQueryBuilder('p')
+            ->select('p', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first')
+            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id')
+            ->where('p.id = :id')
+            ->setParameter('id', $id);
 
-        $prescription = $conn->fetchAssociative($sql, ['id' => $id]);
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
-        if ($prescription) {
-            $prescription['items'] = $this->findItemsByPrescriptionId($id);
+        if ($result && isset($result[0])) {
+            $flat = $result[0];
+            $flat['patient_name'] = trim(($result['pat_last'] ?? '') . ' ' . ($result['pat_first'] ?? ''));
+            $flat['doctor_name'] = trim(($result['doc_last'] ?? '') . ' ' . ($result['doc_first'] ?? ''));
+
+            if ($flat['issue_date'] instanceof \DateTimeInterface) {
+                $flat['issue_date'] = $flat['issue_date']->format('Y-m-d H:i:s');
+            }
+            if ($flat['expiry_date'] instanceof \DateTimeInterface) {
+                $flat['expiry_date'] = $flat['expiry_date']->format('Y-m-d H:i:s');
+            }
+
+            $flat['items'] = $this->findItemsByPrescriptionId($id);
+            return $flat;
         }
-        return $prescription ?: null;
+        return null;
     }
 
     public function findItemsByPrescriptionId(int $prescriptionId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM prescription_items WHERE prescription_id = :prescription_id";
-        return $conn->fetchAllAssociative($sql, ['prescription_id' => $prescriptionId]);
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('pi')
+            ->from(\App\Entity\PrescriptionItem::class, 'pi')
+            ->where('pi.prescription_id = :prescription_id')
+            ->setParameter('prescription_id', $prescriptionId);
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findByPatientId(int $patientId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT p.id, p.issue_date, p.expiry_date, 
-                CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name 
-                FROM prescriptions p 
-                JOIN users doc ON p.doctor_id = doc.id 
-                WHERE p.patient_id = :patient_id 
-                ORDER BY p.issue_date DESC";
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.id', 'p.issue_date', 'p.expiry_date', 'doc.last_name as doc_last', 'doc.first_name as doc_first')
+            ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id')
+            ->where('p.patient_id = :patient_id')
+            ->setParameter('patient_id', $patientId)
+            ->orderBy('p.issue_date', 'DESC');
 
-        return $conn->fetchAllAssociative($sql, ['patient_id' => $patientId]);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $row['doctor_name'] = trim(($row['doc_last'] ?? '') . ' ' . ($row['doc_first'] ?? ''));
+            unset($row['doc_last'], $row['doc_first']);
+            if ($row['issue_date'] instanceof \DateTimeInterface) {
+                $row['issue_date'] = $row['issue_date']->format('Y-m-d H:i:s');
+            }
+            if ($row['expiry_date'] instanceof \DateTimeInterface) {
+                $row['expiry_date'] = $row['expiry_date']->format('Y-m-d H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function findByDoctorId(int $doctorId, string $searchTerm = '') : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT p.id, p.issue_date, p.expiry_date, 
-                       CONCAT(pat.last_name, ' ', pat.first_name) as patient_name, 
-                       CONCAT(doc.last_name, ' ', doc.first_name) as doctor_name 
-                FROM prescriptions p 
-                JOIN patients pat ON p.patient_id = pat.id 
-                JOIN users doc ON p.doctor_id = doc.id 
-                WHERE p.doctor_id = :doctor_id";
-
-        $params = ['doctor_id' => $doctorId];
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.id', 'p.issue_date', 'p.expiry_date', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first')
+            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id')
+            ->where('p.doctor_id = :doctor_id')
+            ->setParameter('doctor_id', $doctorId);
 
         if (!empty($searchTerm)) {
-            $sql .= " AND (CONCAT(pat.last_name, ' ', pat.first_name) LIKE :searchTerm)";
-            $params['searchTerm'] = '%' . $searchTerm . '%';
+            $qb->andWhere(
+                $qb->expr()->like("CONCAT(pat.last_name, ' ', pat.first_name)", ':searchTerm')
+            )->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
-        $sql .= " ORDER BY p.issue_date DESC";
+        $qb->orderBy('p.issue_date', 'DESC');
 
-        return $conn->fetchAllAssociative($sql, $params);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $row['patient_name'] = trim(($row['pat_last'] ?? '') . ' ' . ($row['pat_first'] ?? ''));
+            $row['doctor_name'] = trim(($row['doc_last'] ?? '') . ' ' . ($row['doc_first'] ?? ''));
+            unset($row['pat_last'], $row['pat_first'], $row['doc_last'], $row['doc_first']);
+
+            if ($row['issue_date'] instanceof \DateTimeInterface) {
+                $row['issue_date'] = $row['issue_date']->format('Y-m-d H:i:s');
+            }
+            if ($row['expiry_date'] instanceof \DateTimeInterface) {
+                $row['expiry_date'] = $row['expiry_date']->format('Y-m-d H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 }
