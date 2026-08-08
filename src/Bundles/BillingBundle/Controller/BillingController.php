@@ -423,11 +423,6 @@ class BillingController extends \App\Core\Controller\AbstractController
         // Fetch all invoices
         $invoices = $this->invoiceRepository->findAll();
 
-        if (empty($invoices)) {
-            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
-        }
-
         // Prepare data for CSV
         $headers = [
             'ID', 'Пацієнт', 'Сума', 'Статус', 'Дата виставлення', 'Дата оплати', 'Тип', 'Примітки'
@@ -447,8 +442,15 @@ class BillingController extends \App\Core\Controller\AbstractController
         }
 
         $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
-        $exporter->download('invoices_export.csv');
-        return new \Symfony\Component\HttpFoundation\Response();
+        $csvContent = $exporter->generate();
+
+        $response = new \Symfony\Component\HttpFoundation\Response($csvContent);
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.csv"');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 
     #[Route('/billing/export-pdf', name: 'billing_export_pdf', methods: ['GET'])]
@@ -459,18 +461,18 @@ class BillingController extends \App\Core\Controller\AbstractController
 
         $invoices = $this->invoiceRepository->findAll();
 
-        if (empty($invoices)) {
-            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
-        }
-
         $html = $this->view->renderToString('@Billing/export_pdf.html.twig', ['invoices' => $invoices]);
 
         $pdfExporter = new PdfExporter();
         $pdfExporter->loadHtml($html);
         $pdfExporter->render();
-        $pdfExporter->download('invoices_export.pdf');
-        return new \Symfony\Component\HttpFoundation\Response();
+        $pdfContent = $pdfExporter->output();
+
+        $response = new \Symfony\Component\HttpFoundation\Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.pdf"');
+
+        return $response;
     }
 
     #[Route('/billing/export-excel', name: 'billing_export_excel', methods: ['GET'])]
@@ -480,11 +482,6 @@ class BillingController extends \App\Core\Controller\AbstractController
         $this->gate->authorize('billing.read');
 
         $invoices = $this->invoiceRepository->findAll();
-
-        if (empty($invoices)) {
-            $_SESSION['errors']['export'] = 'Немає рахунків для експорту.';
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
-        }
 
         $headers = [
             'ID', 'Пацієнт', 'Сума', 'Статус', 'Дата виставлення'
@@ -501,7 +498,13 @@ class BillingController extends \App\Core\Controller\AbstractController
         }
 
         $excelExporter = new ExcelExporter();
-        $excelExporter->export($headers, $data, 'invoices_export.xlsx');
-        return new \Symfony\Component\HttpFoundation\Response();
+        $excelContent = $excelExporter->generate($headers, $data);
+
+        $response = new \Symfony\Component\HttpFoundation\Response($excelContent);
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.xlsx"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 }
