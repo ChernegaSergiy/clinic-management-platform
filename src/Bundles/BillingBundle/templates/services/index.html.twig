@@ -18,9 +18,7 @@
 
         <div class="ui divider"></div>
 
-        {% if services is empty %}
-            <p>{{ 'billing.services.no_services'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -55,9 +53,12 @@
                                 </a> #}
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="center aligned">{{ 'billing.services.no_services'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
     </div>
 {% endblock %}
