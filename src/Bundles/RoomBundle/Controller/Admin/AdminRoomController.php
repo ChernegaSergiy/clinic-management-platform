@@ -22,16 +22,15 @@
  *
  */
 
-namespace App\Bundles\RoomBundle\Controller;
+namespace App\Bundles\RoomBundle\Controller\Admin;
 
 use App\Bundles\RoomBundle\Repository\RoomRepository;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class RoomController extends \App\Core\Controller\AbstractController
+class AdminRoomController extends \App\Core\Controller\AbstractController
 {
     private RoomRepository $roomRepository;
     private Validator $validator;
@@ -175,27 +174,6 @@ class RoomController extends \App\Core\Controller\AbstractController
         $this->roomRepository->delete($id);
         $_SESSION['success_message'] = "Кімнату успішно видалено.";
         return new RedirectResponse('/admin/rooms');
-    }
-
-    // API endpoints for calendar integration
-    #[Route('/api/calendar/rooms', name: 'api_calendar_rooms_get', methods: ['GET'])]
-    public function apiRooms() : JsonResponse
-    {
-        $rooms = $this->roomRepository->findAvailable();
-        $resources = [];
-
-        foreach ($rooms as $room) {
-            $resources[] = [
-                'id' => 'room_' . $room['id'],
-                'title' => $room['name'] . ' (' . $room['type'] . ')',
-                'type' => 'room',
-                'capacity' => $room['capacity'],
-                'location' => $room['location'],
-                'equipment' => $room['equipment']
-            ];
-        }
-
-        return new JsonResponse($resources);
     }
 
     private function authorizeAdmin() : void
