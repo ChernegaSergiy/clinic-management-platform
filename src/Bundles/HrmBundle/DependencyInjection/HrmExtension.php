@@ -34,24 +34,22 @@ class HrmExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_HRM_READ',
-                'ROLE_HRM_WRITE',
-                'ROLE_HRM_MANAGE',
-            ],
-            'ROLE_HR_MANAGER' => [
-                'ROLE_HRM_READ',
-                'ROLE_HRM_WRITE',
-                'ROLE_HRM_MANAGE',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_HRM_READ',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_HRM_READ',
+                    'ROLE_HRM_WRITE',
+                    'ROLE_HRM_MANAGE',
+                ],
+                'ROLE_HR_MANAGER' => [
+                    'ROLE_HRM_READ',
+                    'ROLE_HRM_WRITE',
+                    'ROLE_HRM_MANAGE',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_HRM_READ',
+                ],
+            ],
         ]);
     }
 }

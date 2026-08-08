@@ -34,17 +34,15 @@ class InventoryExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_INVENTORY_MANAGE',
-            ],
-            'ROLE_INVENTORY_MANAGER' => [
-                'ROLE_INVENTORY_MANAGE',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_INVENTORY_MANAGE',
+                ],
+                'ROLE_INVENTORY_MANAGER' => [
+                    'ROLE_INVENTORY_MANAGE',
+                ],
+            ],
         ]);
     }
 }

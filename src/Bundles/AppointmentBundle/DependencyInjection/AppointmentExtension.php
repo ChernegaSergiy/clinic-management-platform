@@ -40,37 +40,35 @@ class AppointmentExtension extends Extension implements PrependExtensionInterfac
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_APPOINTMENT_VIEW_ANY',
-                'ROLE_APPOINTMENT_EDIT_ANY',
-                'ROLE_APPOINTMENT_CREATE',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_APPOINTMENT_VIEW_ANY',
-                'ROLE_APPOINTMENT_EDIT_ANY',
-                'ROLE_APPOINTMENT_CREATE',
-            ],
-            'ROLE_REGISTRAR' => [
-                'ROLE_APPOINTMENT_VIEW_ANY',
-                'ROLE_APPOINTMENT_EDIT_ANY',
-                'ROLE_APPOINTMENT_CREATE',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_APPOINTMENT_VIEW_OWN',
-                'ROLE_APPOINTMENT_EDIT_OWN',
-                'ROLE_APPOINTMENT_CREATE',
-            ],
-            'ROLE_NURSE' => [
-                'ROLE_APPOINTMENT_VIEW_OWN',
-            ],
-            'ROLE_BILLING' => [
-                'ROLE_APPOINTMENT_VIEW_ANY',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_APPOINTMENT_VIEW_ANY',
+                    'ROLE_APPOINTMENT_EDIT_ANY',
+                    'ROLE_APPOINTMENT_CREATE',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_APPOINTMENT_VIEW_ANY',
+                    'ROLE_APPOINTMENT_EDIT_ANY',
+                    'ROLE_APPOINTMENT_CREATE',
+                ],
+                'ROLE_REGISTRAR' => [
+                    'ROLE_APPOINTMENT_VIEW_ANY',
+                    'ROLE_APPOINTMENT_EDIT_ANY',
+                    'ROLE_APPOINTMENT_CREATE',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_APPOINTMENT_VIEW_OWN',
+                    'ROLE_APPOINTMENT_EDIT_OWN',
+                    'ROLE_APPOINTMENT_CREATE',
+                ],
+                'ROLE_NURSE' => [
+                    'ROLE_APPOINTMENT_VIEW_OWN',
+                ],
+                'ROLE_BILLING' => [
+                    'ROLE_APPOINTMENT_VIEW_ANY',
+                ],
+            ],
         ]);
     }
 }

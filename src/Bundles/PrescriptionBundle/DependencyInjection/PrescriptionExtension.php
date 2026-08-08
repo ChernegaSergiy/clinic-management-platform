@@ -34,29 +34,27 @@ class PrescriptionExtension extends Extension implements PrependExtensionInterfa
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_PRESCRIPTION_VIEW_ANY',
-                'ROLE_PRESCRIPTION_EDIT_ANY',
-                'ROLE_PRESCRIPTION_CREATE_ANY',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_PRESCRIPTION_VIEW_ANY',
-                'ROLE_PRESCRIPTION_EDIT_ANY',
-                'ROLE_PRESCRIPTION_CREATE_ANY',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_PRESCRIPTION_VIEW_OWN',
-                'ROLE_PRESCRIPTION_EDIT_OWN',
-                'ROLE_PRESCRIPTION_CREATE_OWN',
-            ],
-            'ROLE_NURSE' => [
-                'ROLE_PRESCRIPTION_VIEW_OWN',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_PRESCRIPTION_VIEW_ANY',
+                    'ROLE_PRESCRIPTION_EDIT_ANY',
+                    'ROLE_PRESCRIPTION_CREATE_ANY',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_PRESCRIPTION_VIEW_ANY',
+                    'ROLE_PRESCRIPTION_EDIT_ANY',
+                    'ROLE_PRESCRIPTION_CREATE_ANY',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_PRESCRIPTION_VIEW_OWN',
+                    'ROLE_PRESCRIPTION_EDIT_OWN',
+                    'ROLE_PRESCRIPTION_CREATE_OWN',
+                ],
+                'ROLE_NURSE' => [
+                    'ROLE_PRESCRIPTION_VIEW_OWN',
+                ],
+            ],
         ]);
     }
 }

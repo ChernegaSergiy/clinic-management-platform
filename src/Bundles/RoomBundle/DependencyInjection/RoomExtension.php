@@ -34,14 +34,12 @@ class RoomExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_ROOMS_MANAGE',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_ROOMS_MANAGE',
+                ],
+            ],
         ]);
     }
 }

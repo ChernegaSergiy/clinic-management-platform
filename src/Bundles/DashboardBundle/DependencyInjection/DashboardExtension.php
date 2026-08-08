@@ -39,41 +39,39 @@ class DashboardExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_DASHBOARD_VIEW',
-                'ROLE_DASHBOARD_EXPORT',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_DASHBOARD_VIEW',
-                'ROLE_DASHBOARD_EXPORT',
-            ],
-            'ROLE_REGISTRAR' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-            'ROLE_NURSE' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-            'ROLE_LAB_TECHNICIAN' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-            'ROLE_BILLING' => [
-                'ROLE_DASHBOARD_VIEW',
-                'ROLE_DASHBOARD_EXPORT',
-            ],
-            'ROLE_INVENTORY_MANAGER' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-            'ROLE_HR_MANAGER' => [
-                'ROLE_DASHBOARD_VIEW',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_DASHBOARD_VIEW',
+                    'ROLE_DASHBOARD_EXPORT',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_DASHBOARD_VIEW',
+                    'ROLE_DASHBOARD_EXPORT',
+                ],
+                'ROLE_REGISTRAR' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+                'ROLE_NURSE' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+                'ROLE_LAB_TECHNICIAN' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+                'ROLE_BILLING' => [
+                    'ROLE_DASHBOARD_VIEW',
+                    'ROLE_DASHBOARD_EXPORT',
+                ],
+                'ROLE_INVENTORY_MANAGER' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+                'ROLE_HR_MANAGER' => [
+                    'ROLE_DASHBOARD_VIEW',
+                ],
+            ],
         ]);
     }
 }

@@ -41,31 +41,29 @@ class PatientExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_PATIENT_VIEW_ANY',
-                'ROLE_PATIENT_EDIT_ANY',
-                'ROLE_PATIENT_CREATE',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_PATIENT_VIEW_ANY',
-            ],
-            'ROLE_REGISTRAR' => [
-                'ROLE_PATIENT_VIEW_ANY',
-                'ROLE_PATIENT_EDIT_ANY',
-                'ROLE_PATIENT_CREATE',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_PATIENT_VIEW_OWN',
-                'ROLE_PATIENT_EDIT_OWN',
-            ],
-            'ROLE_NURSE' => [
-                'ROLE_PATIENT_VIEW_OWN',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_PATIENT_VIEW_ANY',
+                    'ROLE_PATIENT_EDIT_ANY',
+                    'ROLE_PATIENT_CREATE',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_PATIENT_VIEW_ANY',
+                ],
+                'ROLE_REGISTRAR' => [
+                    'ROLE_PATIENT_VIEW_ANY',
+                    'ROLE_PATIENT_EDIT_ANY',
+                    'ROLE_PATIENT_CREATE',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_PATIENT_VIEW_OWN',
+                    'ROLE_PATIENT_EDIT_OWN',
+                ],
+                'ROLE_NURSE' => [
+                    'ROLE_PATIENT_VIEW_OWN',
+                ],
+            ],
         ]);
     }
 }

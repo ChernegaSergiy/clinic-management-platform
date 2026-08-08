@@ -34,18 +34,16 @@ class KpiExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_KPI_READ',
-                'ROLE_KPI_MANAGE',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_KPI_READ',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_KPI_READ',
+                    'ROLE_KPI_MANAGE',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_KPI_READ',
+                ],
+            ],
         ]);
     }
 }

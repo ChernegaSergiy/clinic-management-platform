@@ -34,20 +34,18 @@ class ScheduleExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_SCHEDULES_MANAGE_ALL',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_SCHEDULES_MANAGE_ALL',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_SCHEDULES_MANAGE_OWN',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_SCHEDULES_MANAGE_ALL',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_SCHEDULES_MANAGE_ALL',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_SCHEDULES_MANAGE_OWN',
+                ],
+            ],
         ]);
     }
 }

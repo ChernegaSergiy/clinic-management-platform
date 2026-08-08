@@ -34,38 +34,36 @@ class NotificationExtension extends Extension implements PrependExtensionInterfa
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_REGISTRAR' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_DOCTOR' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_NURSE' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_LAB_TECHNICIAN' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_BILLING' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_INVENTORY_MANAGER' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-            'ROLE_HR_MANAGER' => [
-                'ROLE_NOTIFICATIONS_READ',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_REGISTRAR' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_DOCTOR' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_NURSE' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_LAB_TECHNICIAN' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_BILLING' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_INVENTORY_MANAGER' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+                'ROLE_HR_MANAGER' => [
+                    'ROLE_NOTIFICATIONS_READ',
+                ],
+            ],
         ]);
     }
 }

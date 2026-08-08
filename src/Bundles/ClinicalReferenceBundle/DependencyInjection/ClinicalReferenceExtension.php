@@ -34,17 +34,15 @@ class ClinicalReferenceExtension extends Extension implements PrependExtensionIn
 
     public function prepend(\Symfony\Component\DependencyInjection\ContainerBuilder $container) : void
     {
-        $roleHierarchy = [
-            'ROLE_ADMIN' => [
-                'ROLE_CLINICAL_MANAGE',
-            ],
-            'ROLE_MEDICAL_MANAGER' => [
-                'ROLE_CLINICAL_MANAGE',
-            ],
-        ];
-
         $container->prependExtensionConfig('security', [
-            'role_hierarchy' => $roleHierarchy,
+            'role_hierarchy' => [
+                'ROLE_ADMIN' => [
+                    'ROLE_CLINICAL_MANAGE',
+                ],
+                'ROLE_MEDICAL_MANAGER' => [
+                    'ROLE_CLINICAL_MANAGE',
+                ],
+            ],
         ]);
     }
 }
