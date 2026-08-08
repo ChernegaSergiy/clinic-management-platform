@@ -67,7 +67,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'start_time' => '2024-06-15 10:00:00'],
             ['id' => 2, 'start_time' => '2024-06-16 14:00:00']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected);
         $result = $this->repository->findByPatientId(1);
         $this->assertCount(2, $result);
     }
@@ -78,7 +78,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'patient_name' => 'John Doe'],
             ['id' => 2, 'patient_name' => 'Jane Smith']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected);
         $result = $this->repository->findByDoctorId(1);
         $this->assertCount(2, $result);
     }
@@ -89,35 +89,35 @@ class AppointmentRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'patient_name' => 'John Doe'],
             ['id' => 2, 'patient_name' => 'Jane Smith']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected);
         $result = $this->repository->findUpcoming();
         $this->assertCount(2, $result);
     }
 
     public function testIsPatientAssignedToDoctorReturnsTrue() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(1);
+        $this->createMockQueryBuilder(1, true);
         $result = $this->repository->isPatientAssignedToDoctor(1, 1);
         $this->assertTrue($result);
     }
 
     public function testIsPatientAssignedToDoctorReturnsFalse() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(false);
+        $this->createMockQueryBuilder(null, true);
         $result = $this->repository->isPatientAssignedToDoctor(1, 1);
         $this->assertFalse($result);
     }
 
     public function testIsAppointmentOwnedByDoctorReturnsTrue() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(1);
+        $this->createMockQueryBuilder(1, true);
         $result = $this->repository->isAppointmentOwnedByDoctor(1, 1);
         $this->assertTrue($result);
     }
 
     public function testGenerateWaitlistTicketFormat() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(5);
+        $this->createMockQueryBuilder(5, true);
         $result = $this->repository->generateWaitlistTicket();
         $this->assertStringStartsWith('WL-', $result);
         $this->assertStringContainsString('-00006', $result);
@@ -125,14 +125,14 @@ class AppointmentRepositoryTest extends RepositoryTestCase
 
     public function testCountScheduledByDate() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(10);
+        $this->createMockQueryBuilder(10, true);
         $result = $this->repository->countScheduledByDate('2024-06-15');
         $this->assertEquals(10, $result);
     }
 
     public function testCountAppointmentsByDate() : void
     {
-        $this->mockConnection->method('fetchOne')->willReturn(15);
+        $this->createMockQueryBuilder(15, true);
         $result = $this->repository->countAppointmentsByDate('2024-06-15');
         $this->assertEquals(15, $result);
     }
@@ -143,7 +143,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
             ['id' => 1, 'start_time' => '2024-06-15 10:00:00'],
             ['id' => 2, 'start_time' => '2024-06-15 14:00:00']
         ];
-        $this->mockConnection->method('fetchAllAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected);
         $result = $this->repository->findByDateRange('2024-06-15 00:00:00', '2024-06-15 23:59:59');
         $this->assertCount(2, $result);
     }

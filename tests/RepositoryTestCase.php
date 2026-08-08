@@ -43,10 +43,13 @@ abstract class RepositoryTestCase extends TestCase
 
         if ($isSingleResult) {
             $query->method('getOneOrNullResult')->willReturn($result);
+            $query->method('getSingleScalarResult')->willReturn($result);
         } else {
             $query->method('getResult')->willReturn($result ?? []);
             $query->method('getArrayResult')->willReturn($result ?? []);
+            $query->method('getSingleColumnResult')->willReturn($result ?? []);
         }
+        $query->method('execute')->willReturn($result ?? true);
 
         $queryBuilder->method('getQuery')->willReturn($query);
 
@@ -63,6 +66,11 @@ abstract class RepositoryTestCase extends TestCase
         $queryBuilder->method('leftJoin')->willReturnSelf();
         $queryBuilder->method('innerJoin')->willReturnSelf();
         $queryBuilder->method('join')->willReturnSelf();
+        $queryBuilder->method('setMaxResults')->willReturnSelf();
+        $queryBuilder->method('groupBy')->willReturnSelf();
+        $queryBuilder->method('having')->willReturnSelf();
+        $queryBuilder->method('update')->willReturnSelf();
+        $queryBuilder->method('set')->willReturnSelf();
 
         $this->entityManager->method('createQueryBuilder')->willReturn($queryBuilder);
 
