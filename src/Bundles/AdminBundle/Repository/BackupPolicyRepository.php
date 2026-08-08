@@ -37,64 +37,92 @@ class BackupPolicyRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM backup_policies ORDER BY name ASC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('b')
+            ->orderBy('b.name', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM backup_policies WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('b')
+            ->where('b.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO backup_policies (name, description, frequency, retention_days, status) 
-                VALUES (:name, :description, :frequency, :retention_days, :status)";
+        $policy = new BackupPolicy();
+        $policy->setName($data['name']);
+        $policy->setDescription($data['description'] ?? null);
+        $policy->setFrequency($data['frequency'] ?? 'daily');
+        $policy->setRetentionDays((int)($data['retention_days'] ?? 30));
+        $policy->setStatus($data['status'] ?? 'inactive');
 
-        $success = $conn->executeStatement($sql, [
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'frequency' => $data['frequency'] ?? 'daily',
-            'retention_days' => $data['retention_days'] ?? 30,
-            'status' => $data['status'] ?? 'inactive',
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($policy);
+            $this->getEntityManager()->flush();
+            return $policy->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE backup_policies SET 
-                    name = :name, 
-                    description = :description, 
-                    frequency = :frequency, 
-                    retention_days = :retention_days, 
-                    last_run_at = :last_run_at, 
-                    status = :status 
-                WHERE id = :id";
+        /** @var BackupPolicy|null $policy */
+        $policy = $this->find($id);
+        if (!$policy) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'frequency' => $data['frequency'] ?? 'daily',
-            'retention_days' => $data['retention_days'] ?? 30,
-            'last_run_at' => $data['last_run_at'] ?? null,
-            'status' => $data['status'] ?? 'inactive',
-        ]) > 0;
+        if (isset($data['name'])) {
+            $policy->setName($data['name']);
+        }
+        if (array_key_exists('description', $data)) {
+            $policy->setDescription($data['description']);
+        }
+        if (isset($data['frequency'])) {
+            $policy->setFrequency($data['frequency']);
+        }
+        if (isset($data['retention_days'])) {
+            $policy->setRetentionDays((int)$data['retention_days']);
+        }
+        if (isset($data['status'])) {
+            $policy->setStatus($data['status']);
+        }
+        if (isset($data['last_run_at'])) {
+            try {
+                $policy->setLastRunAt(new \DateTime($data['last_run_at']));
+            } catch (\Exception $e) {
+                // ignore invalid dates
+            }
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM backup_policies WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var BackupPolicy|null $policy */
+        $policy = $this->find($id);
+        if (!$policy) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($policy);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
