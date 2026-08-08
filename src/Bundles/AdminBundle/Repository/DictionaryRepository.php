@@ -38,115 +38,169 @@ class DictionaryRepository extends ServiceEntityRepository
     // --- Dictionary Definitions ---
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM dictionaries ORDER BY name ASC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('d')
+            ->orderBy('d.name', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM dictionaries WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('d')
+            ->where('d.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function save(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO dictionaries (name, description, type) VALUES (:name, :description, :type)";
+        $dictionary = new Dictionary();
+        $dictionary->setName($data['name']);
+        $dictionary->setDescription($data['description'] ?? null);
+        $dictionary->setType($data['type'] ?? null);
 
-        $success = $conn->executeStatement($sql, [
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'type' => $data['type'] ?? null,
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($dictionary);
+            $this->getEntityManager()->flush();
+            return $dictionary->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE dictionaries SET name = :name, description = :description, type = :type WHERE id = :id";
+        /** @var Dictionary|null $dictionary */
+        $dictionary = $this->find($id);
+        if (!$dictionary) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'type' => $data['type'] ?? null,
-        ]) > 0;
+        if (isset($data['name'])) {
+            $dictionary->setName($data['name']);
+        }
+        if (array_key_exists('description', $data)) {
+            $dictionary->setDescription($data['description']);
+        }
+        if (array_key_exists('type', $data)) {
+            $dictionary->setType($data['type']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM dictionaries WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var Dictionary|null $dictionary */
+        $dictionary = $this->find($id);
+        if (!$dictionary) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($dictionary);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     // --- Dictionary Values ---
     public function findValuesByDictionaryId(int $dictionaryId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM dictionary_values 
-                WHERE dictionary_id = :dictionary_id 
-                ORDER BY order_num ASC, label ASC";
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('dv')
+            ->from(\App\Entity\DictionaryValue::class, 'dv')
+            ->where('dv.dictionary_id = :dictionary_id')
+            ->setParameter('dictionary_id', $dictionaryId)
+            ->orderBy('dv.order_num', 'ASC')
+            ->addOrderBy('dv.label', 'ASC');
 
-        return $conn->fetchAllAssociative($sql, ['dictionary_id' => $dictionaryId]);
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findValueById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM dictionary_values WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('dv')
+            ->from(\App\Entity\DictionaryValue::class, 'dv')
+            ->where('dv.id = :id')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function saveValue(array $data) : ?int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO dictionary_values (dictionary_id, value, label, order_num, is_active) 
-                VALUES (:dictionary_id, :value, :label, :order_num, :is_active)";
+        $value = new \App\Entity\DictionaryValue();
+        $value->setDictionaryId($data['dictionary_id']);
+        $value->setValue($data['value']);
+        $value->setLabel($data['label']);
+        $value->setOrderNum((int)($data['order_num'] ?? 0));
+        $value->setIsActive((bool)($data['is_active'] ?? true));
 
-        $success = $conn->executeStatement($sql, [
-            'dictionary_id' => $data['dictionary_id'],
-            'value' => $data['value'],
-            'label' => $data['label'],
-            'order_num' => $data['order_num'] ?? 0,
-            'is_active' => $data['is_active'] ?? true,
-        ]) > 0;
-
-        return $success ? (int)$conn->lastInsertId() : null;
+        try {
+            $this->getEntityManager()->persist($value);
+            $this->getEntityManager()->flush();
+            return $value->getId();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function updateValue(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE dictionary_values SET 
-                    dictionary_id = :dictionary_id, 
-                    value = :value, 
-                    label = :label, 
-                    order_num = :order_num, 
-                    is_active = :is_active 
-                WHERE id = :id";
+        /** @var \App\Entity\DictionaryValue|null $value */
+        $value = $this->getEntityManager()->getRepository(\App\Entity\DictionaryValue::class)->find($id);
+        if (!$value) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'dictionary_id' => $data['dictionary_id'],
-            'value' => $data['value'],
-            'label' => $data['label'],
-            'order_num' => $data['order_num'] ?? 0,
-            'is_active' => $data['is_active'] ?? true,
-        ]) > 0;
+        if (isset($data['dictionary_id'])) {
+            $value->setDictionaryId($data['dictionary_id']);
+        }
+        if (isset($data['value'])) {
+            $value->setValue($data['value']);
+        }
+        if (isset($data['label'])) {
+            $value->setLabel($data['label']);
+        }
+        if (isset($data['order_num'])) {
+            $value->setOrderNum((int)$data['order_num']);
+        }
+        if (isset($data['is_active'])) {
+            $value->setIsActive((bool)$data['is_active']);
+        }
+
+        try {
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function deleteValue(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM dictionary_values WHERE id = :id";
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        /** @var \App\Entity\DictionaryValue|null $value */
+        $value = $this->getEntityManager()->getRepository(\App\Entity\DictionaryValue::class)->find($id);
+        if (!$value) {
+            return false;
+        }
+
+        try {
+            $this->getEntityManager()->remove($value);
+            $this->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
