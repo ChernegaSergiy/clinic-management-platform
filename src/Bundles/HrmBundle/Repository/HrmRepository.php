@@ -37,111 +37,123 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT e.*, d.name as department_name 
-                FROM employees e
-                LEFT JOIN departments d ON e.department_id = d.id
-                ORDER BY e.last_name, e.first_name";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('e')
+            ->select('e, d.name as department_name')
+            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->orderBy('e.last_name', 'ASC')
+            ->addOrderBy('e.first_name', 'ASC');
+
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $flat = $row[0];
+            $flat['department_name'] = $row['department_name'] ?? null;
+            return $flat;
+        }, $results);
     }
 
     public function save(array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO employees (first_name, last_name, middle_name, position, department_id, hire_date, salary, contact_phone, status, user_id) 
-                VALUES (:first_name, :last_name, :middle_name, :position, :department_id, :hire_date, :salary, :contact_phone, :status, :user_id)";
+        $employee = new Employee();
+        $employee->setFirstName($data['first_name']);
+        $employee->setLastName($data['last_name']);
+        $employee->setMiddleName($data['middle_name'] ?? null);
+        $employee->setPosition($data['position']);
+        $employee->setDepartmentId($data['department_id'] ?? null);
+        $employee->setHireDate(new \DateTime($data['hire_date']));
+        $employee->setSalary(!empty($data['salary']) ? (float)$data['salary'] : null);
+        $employee->setContactPhone($data['contact_phone'] ?? null);
+        $employee->setStatus($data['status'] ?? 'active');
+        $employee->setUserId(!empty($data['user_id']) ? (int)$data['user_id'] : null);
 
-        return $conn->executeStatement($sql, [
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'middle_name' => $data['middle_name'] ?? null,
-            'position' => $data['position'],
-            'department_id' => $data['department_id'] ?? null,
-            'hire_date' => $data['hire_date'],
-            'salary' => $data['salary'] ?: null,
-            'contact_phone' => $data['contact_phone'] ?? null,
-            'status' => $data['status'] ?? 'active',
-            'user_id' => $data['user_id'] ?: null,
-        ]) > 0;
+        $this->getEntityManager()->persist($employee);
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT e.*, d.name as department_name 
-                FROM employees e 
-                LEFT JOIN departments d ON e.department_id = d.id 
-                WHERE e.id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('e')
+            ->select('e, d.name as department_name')
+            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->where('e.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        if (!$result) {
+            return null;
+        }
+
+        $flat = $result[0];
+        $flat['department_name'] = $result['department_name'] ?? null;
+        return $flat;
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE employees SET
-                    first_name = :first_name,
-                    last_name = :last_name,
-                    middle_name = :middle_name,
-                    position = :position,
-                    department_id = :department_id,
-                    hire_date = :hire_date,
-                    fire_date = :fire_date,
-                    salary = :salary,
-                    contact_phone = :contact_phone,
-                    status = :status,
-                    user_id = :user_id
-                WHERE id = :id";
+        $employee = $this->find($id);
+        if (!$employee) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'middle_name' => $data['middle_name'] ?? null,
-            'position' => $data['position'],
-            'department_id' => $data['department_id'] ?? null,
-            'hire_date' => $data['hire_date'],
-            'fire_date' => empty($data['fire_date']) ? null : $data['fire_date'],
-            'salary' => $data['salary'] ?: null,
-            'contact_phone' => $data['contact_phone'] ?? null,
-            'status' => $data['status'] ?? 'active',
-            'user_id' => $data['user_id'] ?: null,
-        ]) > 0;
+        $employee->setFirstName($data['first_name']);
+        $employee->setLastName($data['last_name']);
+        $employee->setMiddleName($data['middle_name'] ?? null);
+        $employee->setPosition($data['position']);
+        $employee->setDepartmentId($data['department_id'] ?? null);
+        $employee->setHireDate(new \DateTime($data['hire_date']));
+        $employee->setFireDate(!empty($data['fire_date']) ? new \DateTime($data['fire_date']) : null);
+        $employee->setSalary(!empty($data['salary']) ? (float)$data['salary'] : null);
+        $employee->setContactPhone($data['contact_phone'] ?? null);
+        $employee->setStatus($data['status'] ?? 'active');
+        $employee->setUserId(!empty($data['user_id']) ? (int)$data['user_id'] : null);
+
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     public function updateStatus(int $id, string $status) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE employees SET status = :status WHERE id = :id";
-        return $conn->executeStatement($sql, ['status' => $status, 'id' => $id]) > 0;
+        $employee = $this->find($id);
+        if (!$employee) {
+            return false;
+        }
+
+        $employee->setStatus($status);
+        $this->getEntityManager()->flush();
+
+        return true;
     }
 
     public function findByUserId(int $userId) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM employees WHERE user_id = :user_id";
-        $result = $conn->fetchAssociative($sql, ['user_id' => $userId]);
-        return $result ?: null;
+        return $this->createQueryBuilder('e')
+            ->where('e.user_id = :user_id')
+            ->setParameter('user_id', $userId)
+            ->getQuery()
+            ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function findByDepartment(int $departmentId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                e.*, 
-                d.name as department_name, 
-                dp.name as parent_name,
-                u.email as user_email
-            FROM employees e 
-            LEFT JOIN departments d ON e.department_id = d.id 
-            LEFT JOIN departments dp ON d.parent_id = dp.id 
-            LEFT JOIN users u ON e.user_id = u.id
-            WHERE e.department_id = :department_id 
-            ORDER BY e.last_name, e.first_name
-        ";
+        $qb = $this->createQueryBuilder('e')
+            ->select('e, d.name as department_name, dp.name as parent_name, u.email as user_email')
+            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->leftJoin('App\Entity\Department', 'dp', 'WITH', 'd.parent_id = dp.id')
+            ->leftJoin('App\Entity\User', 'u', 'WITH', 'e.user_id = u.id')
+            ->where('e.department_id = :department_id')
+            ->setParameter('department_id', $departmentId)
+            ->orderBy('e.last_name', 'ASC')
+            ->addOrderBy('e.first_name', 'ASC');
 
-        return $conn->fetchAllAssociative($sql, ['department_id' => $departmentId]);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            $flat = $row[0];
+            $flat['department_name'] = $row['department_name'] ?? null;
+            $flat['parent_name'] = $row['parent_name'] ?? null;
+            $flat['user_email'] = $row['user_email'] ?? null;
+            return $flat;
+        }, $results);
     }
 }
