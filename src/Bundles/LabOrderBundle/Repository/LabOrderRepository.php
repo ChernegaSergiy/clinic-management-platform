@@ -43,35 +43,33 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
 
     public function findByMedicalRecordId(int $medicalRecordId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT *
-            FROM lab_orders
-            WHERE medical_record_id = :medical_record_id
-            ORDER BY created_at DESC
-        ";
-        return $conn->fetchAllAssociative($sql, ['medical_record_id' => $medicalRecordId]);
+        return $this->createQueryBuilder('lo')
+            ->where('lo.medical_record_id = :medical_record_id')
+            ->setParameter('medical_record_id', $medicalRecordId)
+            ->orderBy('lo.created_at', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function save(array $data) : int|false
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO lab_orders (patient_id, doctor_id, medical_record_id, 
-                                        order_code, results, status) 
-                VALUES (:patient_id, :doctor_id, :medical_record_id, 
-                        :order_code, :results, :status)";
+        $em = $this->getEntityManager();
+        try {
+            $labOrder = new LabOrder();
+            $labOrder->setPatientId($data['patient_id']);
+            $labOrder->setDoctorId($data['doctor_id']);
+            $labOrder->setMedicalRecordId($data['medical_record_id']);
+            $labOrder->setOrderCode($data['order_code']);
+            if (isset($data['results'])) {
+                $labOrder->setResults($data['results']);
+            }
+            $labOrder->setStatus($data['status'] ?? 'ordered');
 
-        $success = $conn->executeStatement($sql, [
-            'patient_id' => $data['patient_id'],
-            'doctor_id' => $data['doctor_id'],
-            'medical_record_id' => $data['medical_record_id'],
-            'order_code' => $data['order_code'],
-            'results' => $data['results'] ?? null,
-            'status' => $data['status'] ?? 'ordered',
-        ]) > 0;
+            $em->persist($labOrder);
+            $em->flush();
 
-        if ($success) {
-            $labOrderId = (int)$conn->lastInsertId();
+            $labOrderId = $labOrder->getId();
+
             $this->eventDispatcher->dispatch(new EntityChangedEvent('lab_order', $labOrderId, 'create', null, $data));
             $this->eventDispatcher->dispatch(new PatientNotificationEvent(
                 $data['patient_id'],
@@ -80,65 +78,83 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
                 ['lab_order_id' => $labOrderId]
             ));
             return $labOrderId;
+        } catch (\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "
-            SELECT 
-                lo.*,
-                CONCAT(p.last_name, ' ', p.first_name) as patient_name,
-                CONCAT(u.last_name, ' ', u.first_name) as doctor_name
-            FROM lab_orders lo
-            JOIN patients p ON lo.patient_id = p.id
-            JOIN users u ON lo.doctor_id = u.id
-            WHERE lo.id = :id
-        ";
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $qb = $this->createQueryBuilder('lo');
+        $qb->select(
+            'lo.id',
+            'lo.patient_id',
+            'lo.doctor_id',
+            'lo.medical_record_id',
+            'lo.order_code',
+            'lo.status',
+            'lo.results',
+            'lo.notes',
+            'lo.qr_code_hash',
+            'lo.created_at',
+            'lo.updated_at',
+            'CONCAT(p.last_name, CONCAT(\' \', p.first_name)) AS patient_name',
+            'CONCAT(u.last_name, CONCAT(\' \', u.first_name)) AS doctor_name'
+        )
+           ->join(\App\Entity\Patient::class, 'p', 'WITH', 'lo.patient_id = p.id')
+           ->join(\App\Entity\User::class, 'u', 'WITH', 'lo.doctor_id = u.id')
+           ->where('lo.id = :id')
+           ->setParameter('id', $id);
+
+        $result = $qb->getQuery()->getArrayResult();
+        return $result ? $result[0] : null;
     }
 
     public function update(int $id, array $data) : bool
     {
-        $oldLabOrder = $this->findById($id);
-        if (!$oldLabOrder) {
+        $em = $this->getEntityManager();
+        try {
+            $labOrder = $this->find($id);
+            if (!$labOrder) {
+                return false;
+            }
+
+            $oldLabOrder = $this->findById($id);
+
+            $labOrder->setOrderCode($data['order_code']);
+            $labOrder->setStatus($data['status']);
+            if (array_key_exists('results', $data)) {
+                $labOrder->setResults($data['results']);
+            }
+            if (array_key_exists('notes', $data)) {
+                $labOrder->setNotes($data['notes']);
+            }
+
+            $em->flush();
+
+            $this->eventDispatcher->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
+
+            return true;
+        } catch (\Exception $e) {
             return false;
         }
-
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE lab_orders SET 
-                    order_code = :order_code, 
-                    status = :status, 
-                    results = :results, 
-                    notes = :notes 
-                WHERE id = :id";
-
-        $result = $conn->executeStatement($sql, [
-            'id' => $id,
-            'order_code' => $data['order_code'],
-            'status' => $data['status'],
-            'results' => $data['results'] ?? null,
-            'notes' => $data['notes'] ?? null,
-        ]) > 0;
-
-        if ($result) {
-            $this->eventDispatcher->dispatch(new EntityChangedEvent('lab_order', $id, 'update', $oldLabOrder, $data));
-        }
-
-        return $result;
     }
 
     public function updateQrCodeHash(int $id, string $qrCodeHash) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE lab_orders SET qr_code_hash = :qr_code_hash WHERE id = :id";
-        return $conn->executeStatement($sql, [
-            'qr_code_hash' => $qrCodeHash,
-            'id' => $id,
-        ]) > 0;
+        $em = $this->getEntityManager();
+        try {
+            $labOrder = $this->find($id);
+            if (!$labOrder) {
+                return false;
+            }
+
+            $labOrder->setQrCodeHash($qrCodeHash);
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function countByStatus(array $statuses) : int
@@ -146,12 +162,12 @@ class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepo
         if (empty($statuses)) {
             return 0;
         }
-        $conn = $this->getEntityManager()->getConnection();
 
-        $placeholders = implode(',', array_fill(0, count($statuses), '?'));
-        $sql = "SELECT COUNT(*) FROM lab_orders WHERE status IN ($placeholders)";
-
-        $stmt = $conn->executeQuery($sql, $statuses);
-        return (int)$stmt->fetchOne();
+        return (int) $this->createQueryBuilder('lo')
+            ->select('COUNT(lo.id)')
+            ->where('lo.status IN (:statuses)')
+            ->setParameter('statuses', $statuses)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
