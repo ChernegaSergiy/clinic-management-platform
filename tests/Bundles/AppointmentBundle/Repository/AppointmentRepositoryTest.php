@@ -48,7 +48,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
 
     public function testFindByIdReturnsNullWhenNotFound() : void
     {
-        $this->mockConnection->method('fetchAssociative')->willReturn(false);
+        $this->createMockQueryBuilder(null, true);
         $result = $this->repository->findById(999);
         $this->assertNull($result);
     }
@@ -56,7 +56,7 @@ class AppointmentRepositoryTest extends RepositoryTestCase
     public function testFindByIdReturnsAppointment() : void
     {
         $expected = ['id' => 1, 'patient_name' => 'John Doe'];
-        $this->mockConnection->method('fetchAssociative')->willReturn($expected);
+        $this->createMockQueryBuilder($expected, true);
         $result = $this->repository->findById(1);
         $this->assertEquals($expected, $result);
     }
