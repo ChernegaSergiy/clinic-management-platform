@@ -1047,7 +1047,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         $this->authorizeAdmin();
         $this->gate->authorize('admin.manage_services'); // Specific permission for service management
         $services = $this->serviceRepository->findAll();
-        return $this->render('@Admin/settings/index.html.twig', ['settings' => $settingsArray]);
+        return $this->render('@Admin/services/index.html.twig', ['services' => $services]);
     }
 
     #[Route('/admin/services/new', name: 'admin_services_new', methods: ['GET'])]
