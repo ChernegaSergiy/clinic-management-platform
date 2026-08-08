@@ -46,4 +46,9 @@ interface AppointmentRepositoryInterface
     public function countDistinctDoctorsByRange(string $from, string $to) : int;
     public function countReadmittedPatients(string $from, string $to) : int;
     public function countDistinctPatientsByRange(string $from, string $to) : int;
+    public function findByDateRange(string $start, string $end) : array;
+    public function findByDoctorIdAndDateRange(int $doctorId, string $start, string $end) : array;
+    public function addToWaitlist(array $data) : bool;
+    public function getWaitlistEntries(?string $status = 'pending') : array;
+    public function getDoctorDailyLoad(string $date) : array;
 }
