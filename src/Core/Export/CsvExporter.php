@@ -58,15 +58,4 @@ class CsvExporter
 
         return $csv;
     }
-
-    public function download(string $filename = 'export.csv') : void
-    {
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        echo $this->generate();
-        exit();
-    }
 }
