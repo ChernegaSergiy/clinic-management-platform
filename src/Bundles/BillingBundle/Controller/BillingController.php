@@ -28,9 +28,6 @@ use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
-use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
-use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
-use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
@@ -47,9 +44,6 @@ class BillingController extends \App\Core\Controller\AbstractController
     private ServiceRepository $serviceRepository;
     private ServiceBundleRepository $serviceBundleRepository;
     private InsuranceService $insuranceService;
-    private InsuranceCompanyRepository $insuranceCompanyRepository;
-    private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
-    private ClaimRepository $claimRepository;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
@@ -60,9 +54,6 @@ class BillingController extends \App\Core\Controller\AbstractController
         ServiceRepository $serviceRepository,
         ServiceBundleRepository $serviceBundleRepository,
         InsuranceService $insuranceService,
-        InsuranceCompanyRepository $insuranceCompanyRepository,
-        PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
-        ClaimRepository $claimRepository,
         \App\Core\Validation\Validator $validator
     ) {
         $this->invoiceRepository = $invoiceRepository;
@@ -71,9 +62,6 @@ class BillingController extends \App\Core\Controller\AbstractController
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->serviceRepository = $serviceRepository;
         $this->serviceBundleRepository = $serviceBundleRepository;
-        $this->insuranceCompanyRepository = $insuranceCompanyRepository;
-        $this->patientInsurancePolicyRepository = $patientInsurancePolicyRepository;
-        $this->claimRepository = $claimRepository;
         $this->insuranceService = $insuranceService;
         $this->validator = $validator;
     }
