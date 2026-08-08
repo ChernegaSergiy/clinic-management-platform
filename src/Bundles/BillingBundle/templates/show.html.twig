@@ -87,9 +87,7 @@
             </div>
         {% endif %}
 
-        {% if invoice.payments is empty %}
-            <p>{{ 'billing.show.no_payments'|trans }}</p>
-        {% else %}
+        
             <table class="ui celled unstackable table">
                 <thead>
                     <tr>
@@ -111,10 +109,13 @@
                             <td>{{ payment.payment_date|date('Y-m-d H:i') }}</td>
                             <td>{{ payment.notes ?: 'billing.show.payments_table.no_notes'|trans }}</td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="center aligned">{{ 'billing.show.no_payments'|trans }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
 
         <div class="ui divider"></div>
 
