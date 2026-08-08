@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\ScheduleBundle\Controller;
+namespace App\Bundles\ScheduleBundle\Controller\Admin;
 
 use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
 use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;

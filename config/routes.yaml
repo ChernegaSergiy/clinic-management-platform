@@ -19,11 +19,11 @@ admin_routes_room:
     type: attribute
     prefix: /admin
 admin_routes_news:
-    resource: { path: ../src/Bundles/NewsBundle/Controller/AdminNewsController.php, namespace: App\Bundles\NewsBundle\Controller\ }
+    resource: { path: ../src/Bundles/NewsBundle/Controller/Admin/, namespace: App\Bundles\NewsBundle\Controller\Admin\ }
     type: attribute
     prefix: /admin
 admin_routes_schedule:
-    resource: { path: ../src/Bundles/ScheduleBundle/Controller/AdminScheduleController.php, namespace: App\Bundles\ScheduleBundle\Controller\ }
+    resource: { path: ../src/Bundles/ScheduleBundle/Controller/Admin/, namespace: App\Bundles\ScheduleBundle\Controller\Admin\ }
     type: attribute
     prefix: /admin
 
@@ -72,7 +72,7 @@ app_routes_appointment:
     type: attribute
     prefix: /app
 app_routes_schedule:
-    resource: { path: ../src/Bundles/ScheduleBundle/Controller/AppScheduleController.php, namespace: App\Bundles\ScheduleBundle\Controller\ }
+    resource: { path: ../src/Bundles/ScheduleBundle/Controller/App/, namespace: App\Bundles\ScheduleBundle\Controller\App\ }
     type: attribute
     prefix: /app
 
@@ -83,5 +83,5 @@ site_routes_user:
     resource: { path: ../src/Bundles/UserBundle/Controller/, namespace: App\Bundles\UserBundle\Controller\ }
     type: attribute
 site_routes_news:
-    resource: { path: ../src/Bundles/NewsBundle/Controller/PublicNewsController.php, namespace: App\Bundles\NewsBundle\Controller\ }
+    resource: { path: ../src/Bundles/NewsBundle/Controller/Site/, namespace: App\Bundles\NewsBundle\Controller\Site\ }
     type: attribute
