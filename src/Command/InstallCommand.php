@@ -63,7 +63,7 @@ class InstallCommand extends Command
             // Drop schema if exists and recreate (or just update)
             // Using updateSchema is safer if tables already exist, but createSchema is more robust for fresh install
             // Let's use updateSchema to be safe and create missing tables without dropping
-            $schemaTool->updateSchema($metadata, true);
+            $schemaTool->updateSchema($metadata);
 
             $io->success('Database schema is successfully synchronized.');
         } catch (\Exception $e) {
@@ -124,10 +124,8 @@ class InstallCommand extends Command
         $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
         $user->setRole($role);
 
-        // Disable MFA by default for the first admin, or keep default
-        if (method_exists($user, 'setMfaEnabled')) {
-            $user->setMfaEnabled(false);
-        }
+        // Disable MFA by default for the first admin
+        $user->setMfaEnabled(false);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
