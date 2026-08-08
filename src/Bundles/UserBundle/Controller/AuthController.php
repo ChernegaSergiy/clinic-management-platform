@@ -189,7 +189,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/');
     }
 
-    #[Route('/dashboard_redirect', name: 'dashboard_redirect', methods: ['GET'])]
+    #[Route('/dashboard-redirect', name: 'dashboard_redirect', methods: ['GET'])]
     public function dashboard() : \Symfony\Component\HttpFoundation\Response
     {
         $this->checkAuth();
