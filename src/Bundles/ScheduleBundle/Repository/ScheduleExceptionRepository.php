@@ -37,80 +37,118 @@ class ScheduleExceptionRepository extends ServiceEntityRepository
 
     public function create(array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO schedule_exceptions (doctor_id, exception_date, start_time, end_time, is_available, notes)
-                VALUES (:doctor_id, :exception_date, :start_time, :end_time, :is_available, :notes)";
+        $em = $this->getEntityManager();
+        $exception = new ScheduleException();
+        $exception->setDoctorId($data['doctor_id']);
+        $exception->setExceptionDate(new \DateTime($data['exception_date']));
+        $exception->setStartTime(new \DateTime($data['start_time']));
+        $exception->setEndTime(new \DateTime($data['end_time']));
+        $exception->setIsAvailable($data['is_available'] ?? false);
+        $exception->setNotes($data['notes'] ?? null);
 
-        return $conn->executeStatement($sql, [
-            'doctor_id' => $data['doctor_id'],
-            'exception_date' => $data['exception_date'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'is_available' => $data['is_available'] ?? false,
-            'notes' => $data['notes'] ?? null,
-        ]) > 0;
+        $em->persist($exception);
+        $em->flush();
+        return true;
     }
 
     public function findById(int $id) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM schedule_exceptions WHERE id = :id";
+        $qb = $this->createQueryBuilder('se')
+            ->where('se.id = :id')
+            ->setParameter('id', $id);
 
-        $result = $conn->fetchAssociative($sql, ['id' => $id]);
-        return $result ?: null;
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        if ($result) {
+            if ($result['exception_date'] instanceof \DateTimeInterface) {
+                $result['exception_date'] = $result['exception_date']->format('Y-m-d');
+            }
+            if ($result['start_time'] instanceof \DateTimeInterface) {
+                $result['start_time'] = $result['start_time']->format('H:i:s');
+            }
+            if ($result['end_time'] instanceof \DateTimeInterface) {
+                $result['end_time'] = $result['end_time']->format('H:i:s');
+            }
+        }
+        return $result;
     }
 
     public function findByDoctorAndDate(int $doctorId, string $date) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM schedule_exceptions WHERE doctor_id = :doctor_id AND exception_date = :exception_date ORDER BY start_time ASC";
+        $qb = $this->createQueryBuilder('se')
+            ->where('se.doctor_id = :doctor_id')
+            ->andWhere('se.exception_date = :exception_date')
+            ->setParameter('doctor_id', $doctorId)
+            ->setParameter('exception_date', $date)
+            ->orderBy('se.start_time', 'ASC');
 
-        return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId, 'exception_date' => $date]);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            if ($row['exception_date'] instanceof \DateTimeInterface) {
+                $row['exception_date'] = $row['exception_date']->format('Y-m-d');
+            }
+            if ($row['start_time'] instanceof \DateTimeInterface) {
+                $row['start_time'] = $row['start_time']->format('H:i:s');
+            }
+            if ($row['end_time'] instanceof \DateTimeInterface) {
+                $row['end_time'] = $row['end_time']->format('H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function findByDoctorAndDateRange(int $doctorId, string $startDate, string $endDate) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM schedule_exceptions 
-                WHERE doctor_id = :doctor_id 
-                AND exception_date BETWEEN :start_date AND :end_date 
-                ORDER BY exception_date ASC, start_time ASC";
+        $qb = $this->createQueryBuilder('se')
+            ->where('se.doctor_id = :doctor_id')
+            ->andWhere('se.exception_date BETWEEN :start_date AND :end_date')
+            ->setParameter('doctor_id', $doctorId)
+            ->setParameter('start_date', $startDate)
+            ->setParameter('end_date', $endDate)
+            ->orderBy('se.exception_date', 'ASC')
+            ->addOrderBy('se.start_time', 'ASC');
 
-        return $conn->fetchAllAssociative($sql, [
-            'doctor_id' => $doctorId,
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-        ]);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            if ($row['exception_date'] instanceof \DateTimeInterface) {
+                $row['exception_date'] = $row['exception_date']->format('Y-m-d');
+            }
+            if ($row['start_time'] instanceof \DateTimeInterface) {
+                $row['start_time'] = $row['start_time']->format('H:i:s');
+            }
+            if ($row['end_time'] instanceof \DateTimeInterface) {
+                $row['end_time'] = $row['end_time']->format('H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE schedule_exceptions SET
-                    doctor_id = :doctor_id,
-                    exception_date = :exception_date,
-                    start_time = :start_time,
-                    end_time = :end_time,
-                    is_available = :is_available,
-                    notes = :notes
-                WHERE id = :id";
+        $em = $this->getEntityManager();
+        $exception = $em->getRepository(ScheduleException::class)->find($id);
+        if (!$exception) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'doctor_id' => $data['doctor_id'],
-            'exception_date' => $data['exception_date'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'is_available' => $data['is_available'],
-            'notes' => $data['notes'],
-        ]) > 0;
+        $exception->setDoctorId($data['doctor_id']);
+        $exception->setExceptionDate(new \DateTime($data['exception_date']));
+        $exception->setStartTime(new \DateTime($data['start_time']));
+        $exception->setEndTime(new \DateTime($data['end_time']));
+        $exception->setIsAvailable($data['is_available']);
+        $exception->setNotes($data['notes']);
+
+        $em->flush();
+        return true;
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM schedule_exceptions WHERE id = :id";
+        $qb = $this->createQueryBuilder('se')
+            ->delete()
+            ->where('se.id = :id')
+            ->setParameter('id', $id);
 
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        return $qb->getQuery()->execute() > 0;
     }
 }

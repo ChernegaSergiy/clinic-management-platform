@@ -37,62 +37,84 @@ class DoctorScheduleRepository extends ServiceEntityRepository
 
     public function create(array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "INSERT INTO doctor_schedules (doctor_id, day_of_week, start_time, end_time, is_available)
-                VALUES (:doctor_id, :day_of_week, :start_time, :end_time, :is_available)";
+        $em = $this->getEntityManager();
+        $schedule = new DoctorSchedule();
+        $schedule->setDoctorId($data['doctor_id']);
+        $schedule->setDayOfWeek($data['day_of_week']);
+        $schedule->setStartTime(new \DateTime($data['start_time']));
+        $schedule->setEndTime(new \DateTime($data['end_time']));
+        $schedule->setIsAvailable($data['is_available'] ?? true);
 
-        return $conn->executeStatement($sql, [
-            'doctor_id' => $data['doctor_id'],
-            'day_of_week' => $data['day_of_week'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'is_available' => $data['is_available'] ?? true,
-        ]) > 0;
+        $em->persist($schedule);
+        $em->flush();
+        return true;
     }
 
     public function findByDoctorAndDay(int $doctorId, int $dayOfWeek) : ?array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM doctor_schedules WHERE doctor_id = :doctor_id AND day_of_week = :day_of_week";
+        $qb = $this->createQueryBuilder('ds')
+            ->where('ds.doctor_id = :doctor_id')
+            ->andWhere('ds.day_of_week = :day_of_week')
+            ->setParameter('doctor_id', $doctorId)
+            ->setParameter('day_of_week', $dayOfWeek);
 
-        $result = $conn->fetchAssociative($sql, ['doctor_id' => $doctorId, 'day_of_week' => $dayOfWeek]);
-        return $result ?: null;
+        $result = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        if ($result) {
+            if ($result['start_time'] instanceof \DateTimeInterface) {
+                $result['start_time'] = $result['start_time']->format('H:i:s');
+            }
+            if ($result['end_time'] instanceof \DateTimeInterface) {
+                $result['end_time'] = $result['end_time']->format('H:i:s');
+            }
+        }
+        return $result;
     }
 
     public function findByDoctor(int $doctorId) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * FROM doctor_schedules WHERE doctor_id = :doctor_id ORDER BY day_of_week ASC";
+        $qb = $this->createQueryBuilder('ds')
+            ->where('ds.doctor_id = :doctor_id')
+            ->setParameter('doctor_id', $doctorId)
+            ->orderBy('ds.day_of_week', 'ASC');
 
-        return $conn->fetchAllAssociative($sql, ['doctor_id' => $doctorId]);
+        $results = $qb->getQuery()->getArrayResult();
+        return array_map(function ($row) {
+            if ($row['start_time'] instanceof \DateTimeInterface) {
+                $row['start_time'] = $row['start_time']->format('H:i:s');
+            }
+            if ($row['end_time'] instanceof \DateTimeInterface) {
+                $row['end_time'] = $row['end_time']->format('H:i:s');
+            }
+            return $row;
+        }, $results);
     }
 
     public function update(int $id, array $data) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "UPDATE doctor_schedules SET
-                    doctor_id = :doctor_id,
-                    day_of_week = :day_of_week,
-                    start_time = :start_time,
-                    end_time = :end_time,
-                    is_available = :is_available
-                WHERE id = :id";
+        $em = $this->getEntityManager();
+        $schedule = $em->getRepository(DoctorSchedule::class)->find($id);
+        if (!$schedule) {
+            return false;
+        }
 
-        return $conn->executeStatement($sql, [
-            'id' => $id,
-            'doctor_id' => $data['doctor_id'],
-            'day_of_week' => $data['day_of_week'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'is_available' => $data['is_available'],
-        ]) > 0;
+        $schedule->setDoctorId($data['doctor_id']);
+        $schedule->setDayOfWeek($data['day_of_week']);
+        $schedule->setStartTime(new \DateTime($data['start_time']));
+        $schedule->setEndTime(new \DateTime($data['end_time']));
+        $schedule->setIsAvailable($data['is_available']);
+
+        $em->flush();
+        return true;
     }
 
     public function delete(int $id) : bool
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "DELETE FROM doctor_schedules WHERE id = :id";
+        $qb = $this->createQueryBuilder('ds')
+            ->delete()
+            ->where('ds.id = :id')
+            ->setParameter('id', $id);
 
-        return $conn->executeStatement($sql, ['id' => $id]) > 0;
+        return $qb->getQuery()->execute() > 0;
     }
 }
