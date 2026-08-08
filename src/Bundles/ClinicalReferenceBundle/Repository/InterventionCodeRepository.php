@@ -37,26 +37,27 @@ class InterventionCodeRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT id, code, description FROM intervention_codes ORDER BY code ASC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.id', 'i.code', 'i.description')
+            ->orderBy('i.code', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function countAll() : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        return (int)$conn->fetchOne("SELECT COUNT(*) FROM intervention_codes");
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     public function replaceAll(array $rows) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $conn->executeStatement("DELETE FROM intervention_codes");
-
-            $sql = "INSERT INTO intervention_codes (code, description) VALUES (:code, :description)";
+            $em->createQuery('DELETE FROM App\Entity\InterventionCode')->execute();
 
             $count = 0;
             $seen = [];
@@ -70,28 +71,38 @@ class InterventionCodeRepository extends ServiceEntityRepository
                 }
                 $description = $row['description'] ?? '';
 
-                $conn->executeStatement($sql, [
-                    'code' => $code,
-                    'description' => $description,
-                ]);
+                $intervention = new InterventionCode();
+                $intervention->setCode($code);
+                $intervention->setDescription($description);
+                $em->persist($intervention);
+
                 $seen[$code] = true;
                 $count++;
+
+                if (0 === $count % 1000) {
+                    $em->flush();
+                    $em->clear();
+                }
             }
-            $conn->commit();
+            $em->flush();
+            $em->commit();
             return $count;
         } catch (\Throwable $e) {
-            $conn->rollBack();
+            $em->rollBack();
             throw $e;
         }
     }
 
     public function searchByCodeOrDescription(string $searchTerm) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT id, code, description FROM intervention_codes 
-                WHERE code LIKE :term OR description LIKE :term 
-                ORDER BY code ASC LIMIT 20";
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.id', 'i.code', 'i.description')
+            ->where('i.code LIKE :term')
+            ->orWhere('i.description LIKE :term')
+            ->setParameter('term', '%' . $searchTerm . '%')
+            ->orderBy('i.code', 'ASC')
+            ->setMaxResults(20);
 
-        return $conn->fetchAllAssociative($sql, ['term' => '%' . $searchTerm . '%']);
+        return $qb->getQuery()->getArrayResult();
     }
 }

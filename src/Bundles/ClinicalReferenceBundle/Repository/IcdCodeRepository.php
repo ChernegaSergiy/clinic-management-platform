@@ -37,26 +37,27 @@ class IcdCodeRepository extends ServiceEntityRepository
 
     public function findAll() : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT id, code, description FROM icd_codes ORDER BY code ASC";
-        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
-        return $conn->fetchAllAssociative($sql);
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.id', 'i.code', 'i.description')
+            ->orderBy('i.code', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function countAll() : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        return (int)$conn->fetchOne("SELECT COUNT(*) FROM icd_codes");
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     public function replaceAll(array $rows) : int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $conn->executeStatement("DELETE FROM icd_codes");
-
-            $sql = "INSERT INTO icd_codes (code, description) VALUES (:code, :description)";
+            $em->createQuery('DELETE FROM App\Entity\IcdCode')->execute();
 
             $count = 0;
             $seen = [];
@@ -70,28 +71,38 @@ class IcdCodeRepository extends ServiceEntityRepository
                 }
                 $description = $row['description'] ?? '';
 
-                $conn->executeStatement($sql, [
-                    'code' => $code,
-                    'description' => $description,
-                ]);
+                $icd = new IcdCode();
+                $icd->setCode($code);
+                $icd->setDescription($description);
+                $em->persist($icd);
+
                 $seen[$code] = true;
                 $count++;
+
+                if (0 === $count % 1000) {
+                    $em->flush();
+                    $em->clear();
+                }
             }
-            $conn->commit();
+            $em->flush();
+            $em->commit();
             return $count;
         } catch (\Throwable $e) {
-            $conn->rollBack();
+            $em->rollBack();
             throw $e;
         }
     }
 
     public function searchByCodeOrDescription(string $searchTerm) : array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT id, code, description FROM icd_codes 
-                WHERE code LIKE :term OR description LIKE :term 
-                ORDER BY code ASC LIMIT 20";
+        $qb = $this->createQueryBuilder('i')
+            ->select('i.id', 'i.code', 'i.description')
+            ->where('i.code LIKE :term')
+            ->orWhere('i.description LIKE :term')
+            ->setParameter('term', '%' . $searchTerm . '%')
+            ->orderBy('i.code', 'ASC')
+            ->setMaxResults(20);
 
-        return $conn->fetchAllAssociative($sql, ['term' => '%' . $searchTerm . '%']);
+        return $qb->getQuery()->getArrayResult();
     }
 }
