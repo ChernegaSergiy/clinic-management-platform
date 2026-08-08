@@ -343,10 +343,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         foreach ($invoices as $invoice) {
             /** @var \DateTimeInterface $dateObj */
             $dateObj = $invoice['issued_date'];
-            $dateStr = $dateObj ? $dateObj->format('Y-m-d') : null;
-            if (!$dateStr) {
-                continue;
-            }
+            $dateStr = $dateObj->format('Y-m-d');
 
             if (!isset($daily[$dateStr])) {
                 $daily[$dateStr] = 0.0;
