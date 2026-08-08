@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Console\Command;
+namespace App\Command;
 
 use App\Bundles\DashboardBundle\Service\KpiCalculatorService;
 use Symfony\Component\Console\Command\Command;
