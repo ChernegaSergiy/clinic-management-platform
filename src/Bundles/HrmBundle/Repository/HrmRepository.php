@@ -42,6 +42,7 @@ class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInte
                 FROM employees e
                 LEFT JOIN departments d ON e.department_id = d.id
                 ORDER BY e.last_name, e.first_name";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

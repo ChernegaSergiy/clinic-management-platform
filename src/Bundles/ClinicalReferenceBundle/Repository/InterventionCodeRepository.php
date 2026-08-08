@@ -39,6 +39,7 @@ class InterventionCodeRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, code, description FROM intervention_codes ORDER BY code ASC";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

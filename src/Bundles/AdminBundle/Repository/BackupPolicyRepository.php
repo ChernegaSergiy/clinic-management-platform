@@ -39,6 +39,7 @@ class BackupPolicyRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM backup_policies ORDER BY name ASC";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

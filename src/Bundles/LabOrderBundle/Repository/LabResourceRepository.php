@@ -40,6 +40,7 @@ class LabResourceRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT id, name, type, capacity, 
                 is_available, notes FROM lab_resources ORDER BY name ASC";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

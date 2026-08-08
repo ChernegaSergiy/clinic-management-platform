@@ -52,6 +52,7 @@ class InventoryItemRepository extends ServiceEntityRepository implements Invento
 
         $sql .= " ORDER BY name";
 
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql, $params);
     }
 

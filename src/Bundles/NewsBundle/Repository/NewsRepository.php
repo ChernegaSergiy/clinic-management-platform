@@ -39,6 +39,7 @@ class NewsRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM news_articles ORDER BY published_at DESC";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

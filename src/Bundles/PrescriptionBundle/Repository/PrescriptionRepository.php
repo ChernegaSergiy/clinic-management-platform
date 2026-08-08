@@ -65,6 +65,7 @@ class PrescriptionRepository extends ServiceEntityRepository
 
         $sql .= " ORDER BY p.issue_date DESC";
 
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql, $params);
     }
 

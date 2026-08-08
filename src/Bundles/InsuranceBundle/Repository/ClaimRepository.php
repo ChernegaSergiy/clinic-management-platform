@@ -98,6 +98,7 @@ class ClaimRepository extends ServiceEntityRepository
             JOIN insurance_companies ic ON pip.insurance_company_id = ic.id
             ORDER BY c.created_at DESC
         ";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

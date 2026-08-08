@@ -69,6 +69,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
 
         $sql .= " ORDER BY i.issued_date DESC";
 
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql, $params);
     }
 

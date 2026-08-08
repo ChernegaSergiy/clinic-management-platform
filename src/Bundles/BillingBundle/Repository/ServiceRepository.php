@@ -44,6 +44,7 @@ class ServiceRepository extends ServiceEntityRepository
             LEFT JOIN service_categories sc ON s.category_id = sc.id
             ORDER BY s.name ASC
         ";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 

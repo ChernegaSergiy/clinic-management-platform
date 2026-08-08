@@ -61,6 +61,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             LEFT JOIN rooms r ON a.room_id = r.id
             ORDER BY a.start_time DESC
         ";
+        // @phpstan-ignore-next-line return.type (repository returns raw DB rows, not hydrated entities)
         return $conn->fetchAllAssociative($sql);
     }
 
