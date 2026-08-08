@@ -36,6 +36,19 @@ class SettingsRepository
         $this->em = $em;
     }
 
+    public function getAll() : array
+    {
+        $settings = $this->em->getRepository(Settings::class)->findAll();
+        $result = [];
+        foreach ($settings as $setting) {
+            $val = $setting->getValue();
+            if (null !== $val && '' !== $val) {
+                $result[$setting->getKey()] = $val;
+            }
+        }
+        return $result;
+    }
+
     public function get(string $key, mixed $default = null) : mixed
     {
         $setting = $this->em->find(Settings::class, $key);
