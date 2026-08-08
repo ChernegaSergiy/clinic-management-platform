@@ -19,6 +19,20 @@ A robust, three-tier healthcare information system designed to automate key work
 - **Inventory Tracking**: Monitoring of medical supplies, pharmaceuticals, and equipment.
 - **Extensible Architecture**: Built on a modern, decoupled bundle system ready for future scaling.
 
+## Screenshots
+
+| Public Landing Page | Staff Login |
+| :---: | :---: |
+| ![Public Landing Page](docs/images/01-landing-page.png) | ![Staff Login](docs/images/02-staff-login.png) |
+| **Staff Profile** | **Patient Card** |
+| ![Staff Profile](docs/images/03-staff-profile.png) | ![Patient Card](docs/images/04-patient-card.png) |
+| **Medical Record Details** | **Doctor's Weekly Schedule** |
+| ![Medical Record Details](docs/images/05-medical-record-details.png) | ![Doctor's Weekly Schedule](docs/images/06-doctor-schedule.png) |
+| **New Appointment — Time Slot** | **New Appointment — Patient & Room** |
+| ![New Appointment — Time Slot](docs/images/07-new-appointment-step1.png) | ![New Appointment — Patient & Room](docs/images/08-new-appointment-step2.png) |
+| **Admin: Medical Record & Lab Orders** | **Two-Factor Authentication Setup** |
+| ![Admin: Medical Record & Lab Orders](docs/images/09-admin-medical-record.png) | ![Two-Factor Authentication Setup](docs/images/10-two-factor-setup.png) |
+
 ## Technology Stack
 
 - **Backend:** PHP 8.2+
