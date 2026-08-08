@@ -42,33 +42,8 @@ class View
         $this->translationService = $translationService;
         $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
-
-        $this->addGlobals();
     }
 
-    private function addGlobals() : void
-    {
-        $this->twig->addGlobal('session', $_SESSION);
-
-        $globals = [
-            'clinic_name' => 'Міська клінічна лікарня №1',
-        ];
-
-        try {
-            $conn = $this->registry->getConnection();
-            $sql = "SELECT `key`, value FROM settings";
-            $result = $conn->executeQuery($sql);
-            while ($row = $result->fetchAssociative()) {
-                $globals[$row['key']] = $row['value'];
-            }
-        } catch (\Exception $e) {
-            // DB not available
-        }
-
-        foreach ($globals as $key => $value) {
-            $this->twig->addGlobal($key, $value);
-        }
-    }
 
     public function render(string $template, array $data = []) : void
     {
