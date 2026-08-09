@@ -24,26 +24,37 @@
 
 namespace App\Bundles\HrmBundle;
 
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class HrmVoter extends Voter
 {
+    public const MANAGE = 'HRM_MANAGE';
+
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return false;
+        return self::MANAGE === $attribute;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
         $user = $token->getUser();
-
         if (!$user instanceof User) {
             return false;
         }
 
-        switch ($attribute) {
+        // HR Managers, Administrators and Medical Managers can manage human resources
+        if ($this->security->isGranted('ROLE_HR_MANAGER') || $this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
         }
 
         return false;
