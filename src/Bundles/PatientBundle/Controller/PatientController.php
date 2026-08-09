@@ -32,11 +32,11 @@ use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PatientController extends \App\Core\Controller\AbstractController
+class PatientController extends AbstractController
 {
     private PatientRepositoryInterface $patientRepository;
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
@@ -64,18 +64,16 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients', name: 'patient_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PATIENT_VIEW');
         $searchTerm = $_GET['search'] ?? '';
-        $user = $this->gate->getUser();
+        $user = $this->getUser();
         $patients = [];
 
-        if ($this->gate->allows('patient.view.any')) {
+        if ($this->isGranted('PATIENT_VIEW_ALL')) {
             $patients = $this->patientRepository->findAll($searchTerm);
-        } elseif ($this->gate->allows('patient.view.own')) {
-            if ($user && $user->getId()) {
-                $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($user->getId());
-                $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
-            }
+        } elseif ($user && $user->getId()) {
+            $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($user->getId());
+            $patients = $this->patientRepository->findByIds($patientIds, $searchTerm);
         }
 
         return $this->render('@Patient/index.html.twig', [
@@ -87,16 +85,14 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/new', name: 'patient_create', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.create');
+        $this->denyAccessUnlessGranted('PATIENT_CREATE');
         return $this->render('@Patient/new.html.twig');
     }
 
     #[Route('/patients/new', name: 'patient_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.create');
+        $this->denyAccessUnlessGranted('PATIENT_CREATE');
 
         $validator = $this->validator;
         $rules = [
@@ -130,15 +126,14 @@ class PatientController extends \App\Core\Controller\AbstractController
             ]);
         }
 
-        return new RedirectResponse('/patients');
+        return $this->redirectToRoute('patient_index');
     }
 
     #[Route('/patients/show', name: 'patient_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PATIENT_VIEW');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('patient.view', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -159,9 +154,8 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/edit', name: 'patient_edit', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -175,9 +169,8 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/edit', name: 'patient_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('patient.edit', ['id' => $id]);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -215,14 +208,13 @@ class PatientController extends \App\Core\Controller\AbstractController
                 'patient' => array_merge($patient, $_POST),
             ]);
         }
-        return new RedirectResponse('/patients/show?id=' . $id);
+        return $this->redirectToRoute('patient_show', ['id' => $id]);
     }
 
     #[Route('/patients/export-csv', name: 'patient_export_csv', methods: ['GET'])]
     public function exportCsv() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.view.any');
+        $this->denyAccessUnlessGranted('PATIENT_VIEW_ALL');
 
         $patients = $this->patientRepository->findAll();
 
@@ -245,8 +237,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/export-json', name: 'patient_export_json', methods: ['GET'])]
     public function exportPatientsToJson() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.view.any');
+        $this->denyAccessUnlessGranted('PATIENT_VIEW_ALL');
 
         $patients = $this->patientRepository->findAll();
 
@@ -263,8 +254,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/import-json', name: 'patient_import_json', methods: ['GET', 'POST'])]
     public function importPatientsFromJson() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.create');
+        $this->denyAccessUnlessGranted('PATIENT_CREATE');
         if ('GET' === $_SERVER['REQUEST_METHOD']) {
             $response = $this->render('@Patient/import_json.html.twig', [
                 'errors' => $_SESSION['errors'] ?? [],
@@ -274,17 +264,16 @@ class PatientController extends \App\Core\Controller\AbstractController
             return $response;
         }
 
-        // Handle POST request (process uploaded file)
         if (empty($_FILES['json_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть JSON файл для завантаження.';
-            return new RedirectResponse('/patients/import-json');
+            return $this->redirectToRoute('patient_import_json');
         }
 
         $file = $_FILES['json_file'];
 
         if (UPLOAD_ERR_OK !== $file['error']) {
             $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
-            return new RedirectResponse('/patients/import-json');
+            return $this->redirectToRoute('patient_import_json');
         }
 
         $jsonContent = file_get_contents($file['tmp_name']);
@@ -292,12 +281,12 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             $_SESSION['errors']['file'] = 'Помилка парсингу JSON файлу: ' . json_last_error_msg();
-            return new RedirectResponse('/patients/import-json');
+            return $this->redirectToRoute('patient_import_json');
         }
 
         if (!is_array($patientsData) || empty($patientsData)) {
             $_SESSION['errors']['file'] = 'JSON файл не містить коректних даних пацієнтів.';
-            return new RedirectResponse('/patients/import-json');
+            return $this->redirectToRoute('patient_import_json');
         }
 
         $importedCount = 0;
@@ -351,14 +340,13 @@ class PatientController extends \App\Core\Controller\AbstractController
 
         $_SESSION['success_message'] = "Імпортовано {$importedCount} пацієнтів. "
                                        . "Не вдалося імпортувати: {$failedCount}.";
-        return new RedirectResponse('/patients/import-json');
+        return $this->redirectToRoute('patient_import_json');
     }
 
     #[Route('/patients/toggle-status', name: 'patient_toggle_status', methods: ['POST'])]
     public function toggleStatus() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit.any');
+        $this->denyAccessUnlessGranted('PATIENT_EDIT_ALL');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);
@@ -368,14 +356,13 @@ class PatientController extends \App\Core\Controller\AbstractController
             $this->patientRepository->updateStatus($id, $newStatus);
         }
 
-        return new RedirectResponse('/patients/show?id=' . $id);
+        return $this->redirectToRoute('patient_show', ['id' => $id]);
     }
 
     #[Route('/patients/{patientId}/policies/add', name: 'patient_policy_add', methods: ['GET'])]
     public function addPolicy(int $patientId) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit', ['id' => $patientId]);
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -393,8 +380,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/{patientId}/policies/store', name: 'patient_policy_store', methods: ['POST'])]
     public function storePolicy(int $patientId) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit', ['id' => $patientId]);
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -430,14 +416,13 @@ class PatientController extends \App\Core\Controller\AbstractController
             $isActive
         );
 
-        return new RedirectResponse('/patients/show?id=' . $patientId);
+        return $this->redirectToRoute('patient_show', ['id' => $patientId]);
     }
 
     #[Route('/patients/{patientId}/policies/edit', name: 'patient_policy_edit', methods: ['GET'])]
     public function editPolicy(int $patientId) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit', ['id' => $patientId]);
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -459,8 +444,7 @@ class PatientController extends \App\Core\Controller\AbstractController
     #[Route('/patients/{patientId}/policies/update', name: 'patient_policy_update', methods: ['POST'])]
     public function updatePolicy(int $patientId) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit', ['id' => $patientId]);
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -501,14 +485,13 @@ class PatientController extends \App\Core\Controller\AbstractController
             $isActive
         );
 
-        return new RedirectResponse('/patients/show?id=' . $patientId);
+        return $this->redirectToRoute('patient_show', ['id' => $patientId]);
     }
 
     #[Route('/patients/{patientId}/policies/delete', name: 'patient_policy_delete', methods: ['POST'])]
     public function deletePolicy(int $patientId) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('patient.edit', ['id' => $patientId]);
+        $this->denyAccessUnlessGranted('PATIENT_EDIT');
 
         $policyId = (int)($_POST['id'] ?? 0);
         $policy = $this->insuranceService->getPatientPolicy($policyId);
@@ -517,6 +500,6 @@ class PatientController extends \App\Core\Controller\AbstractController
             $this->insuranceService->deletePatientPolicy($policyId);
         }
 
-        return new RedirectResponse('/patients/show?id=' . $patientId);
+        return $this->redirectToRoute('patient_show', ['id' => $patientId]);
     }
 }
