@@ -35,35 +35,29 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminController extends \App\Core\Controller\AbstractController
 {
-    private UserRepositoryInterface $userRepository;
     private RoleRepositoryInterface $roleRepository;
     private DictionaryRepository $dictionaryRepository;
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
-    private \App\Bundles\UserBundle\Service\MfaService $mfaService;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
-        UserRepositoryInterface $userRepository,
         RoleRepositoryInterface $roleRepository,
         DictionaryRepository $dictionaryRepository,
         AuthConfigRepository $authConfigRepository,
         BackupPolicyRepository $backupPolicyRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
-        \App\Bundles\UserBundle\Service\MfaService $mfaService,
         \App\Core\Validation\Validator $validator
     ) {
-        $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
         $this->dictionaryRepository = $dictionaryRepository;
         $this->authConfigRepository = $authConfigRepository;
         $this->backupPolicyRepository = $backupPolicyRepository;
         $this->serviceRepository = $serviceRepository;
         $this->settingsRepository = $settingsRepository;
-        $this->mfaService = $mfaService;
         $this->validator = $validator;
     }
 
@@ -116,235 +110,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
 
-    #[Route('/users', name: 'admin_users', methods: ['GET'])]
-    public function users() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $searchTerm = $_GET['search'] ?? '';
-        $users = $this->userRepository->findAll($searchTerm);
-        $roles = $this->roleRepository->findAll();
-        $roleMap = [];
-        foreach ($roles as $role) {
-            $roleMap[$role['id']] = $role['name'];
-        }
-
-        foreach ($users as &$user) {
-            $user['role_name'] = $roleMap[$user['role_id']] ?? 'Невідома';
-        }
-        unset($user); // Break the reference with the last element
-
-        return $this->render('@Admin/users/index.html.twig', [
-            'users' => $users,
-            'searchTerm' => $searchTerm,
-        ]);
-    }
-
-    #[Route('/users/new', name: 'admin_users_new', methods: ['GET'])]
-    public function createUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $roleOptions = $this->buildRoleOptionsByPriority();
-
-        $old = $_SESSION['old'] ?? [];
-        unset($_SESSION['old']);
-        $errors = $_SESSION['errors'] ?? [];
-        unset($_SESSION['errors']);
-
-        return $this->render('@Admin/users/new.html.twig', [
-            'roles' => $roleOptions,
-            'old' => $old,
-            'errors' => $errors,
-        ]);
-    }
-
-    #[Route('/users/new', name: 'admin_users_new_post', methods: ['POST'])]
-    public function storeUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'first_name' => ['required'],
-            'last_name' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:6'],
-            'role_id' => ['required', 'numeric'],
-        ]);
-
-        if ($this->userRepository->findByEmail($_POST['email'])) {
-            $validator->addError('email', 'Цей email вже використовується.');
-        }
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/new');
-        }
-
-        $this->userRepository->save($_POST);
-        $_SESSION['success_message'] = "Користувача успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
-    }
-
-    #[Route('/users/show', name: 'admin_users_show', methods: ['GET'])]
-    public function showUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
-        }
-
-        $role = $this->roleRepository->findById($user['role_id']);
-        $user['role_name'] = $role['name'] ?? 'Невідома';
-
-        return $this->render('@Admin/users/show.html.twig', ['user' => $user]);
-    }
-
-    #[Route('/users/edit', name: 'admin_users_edit', methods: ['GET'])]
-    public function editUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
-        }
-
-        $roleOptions = $this->buildRoleOptionsByPriority();
-
-        $old = $_SESSION['old'] ?? [];
-        unset($_SESSION['old']);
-        $errors = $_SESSION['errors'] ?? [];
-        unset($_SESSION['errors']);
-
-        return $this->render('@Admin/users/edit.html.twig', [
-            'user' => $user,
-            'roles' => $roleOptions,
-            'old' => $old,
-            'errors' => $errors,
-        ]);
-    }
-
-    private function buildRoleOptionsByPriority() : array
-    {
-        $roles = $this->roleRepository->findAll();
-        $priority = [
-            'admin' => 1,
-            'medical_manager' => 2,
-            'doctor' => 3,
-            'registrar' => 4,
-            'nurse' => 5,
-            'lab_technician' => 6,
-            'billing' => 7,
-            'inventory_manager' => 8,
-        ];
-
-        usort($roles, function ($a, $b) use ($priority) {
-            $pa = $priority[$a['name']] ?? 999;
-            $pb = $priority[$b['name']] ?? 999;
-            if ($pa === $pb) {
-                return strcasecmp($a['name'], $b['name']);
-            }
-            return $pa <=> $pb;
-        });
-
-        $roleOptions = [];
-        foreach ($roles as $role) {
-            $roleOptions[$role['id']] = $role['name'];
-        }
-
-        return $roleOptions;
-    }
-
-    #[Route('/users/edit', name: 'admin_users_edit_post', methods: ['POST'])]
-    public function updateUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
-        }
-
-        // TODO: Add validation
-        $validator = $this->validator;
-        $rules = [
-            'first_name' => ['required'],
-            'last_name' => ['required'],
-            'email' => ['required', 'email'],
-            'role_id' => ['required', 'numeric'],
-        ];
-
-        if (!empty($_POST['password'])) {
-            $rules['password'] = ['min:6'];
-        }
-
-        $validator->validate($_POST, $rules);
-
-        if ($this->userRepository->findByEmailExcludingId($_POST['email'], $id)) {
-            $validator->addError('email', 'Цей email вже використовується іншим користувачем.');
-        }
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/edit?id=' . $id);
-        }
-
-        $this->userRepository->update($id, $_POST);
-        $_SESSION['success_message'] = "Дані користувача успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users/show?id=' . $id);
-    }
-
-    #[Route('/users/delete', name: 'admin_users_delete', methods: ['POST'])]
-    public function deleteUser() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
-        }
-
-        // Prevent admin from deleting themselves
-        if ($user['id'] === $_SESSION['user']['id']) {
-            $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
-        }
-
-        $this->userRepository->delete($id);
-        $_SESSION['success_message'] = "Користувача успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
-    }
-
-    #[Route('/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
-    public function disableUserMfa() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $user = $this->userRepository->findById($id);
-
-        if (!$user) {
-            return new \Symfony\Component\HttpFoundation\Response("Користувача не знайдено", 404);
-        }
-
-        $this->mfaService->disableMfaForUser($id);
-
-        $_SESSION['success_message'] = "2FA для користувача " . $user['email'] . " успішно вимкнено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/users');
-    }
 
     // --- Role Management ---
     #[Route('/roles', name: 'admin_roles', methods: ['GET'])]
