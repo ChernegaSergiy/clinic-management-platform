@@ -24,7 +24,6 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
@@ -34,7 +33,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminController extends \App\Core\Controller\AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
-    private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
@@ -42,14 +40,12 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
-        AuthConfigRepository $authConfigRepository,
         BackupPolicyRepository $backupPolicyRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
         \App\Core\Validation\Validator $validator
     ) {
         $this->roleRepository = $roleRepository;
-        $this->authConfigRepository = $authConfigRepository;
         $this->backupPolicyRepository = $backupPolicyRepository;
         $this->serviceRepository = $serviceRepository;
         $this->settingsRepository = $settingsRepository;
@@ -103,141 +99,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
-    }
-
-
-
-    // --- Auth Configuration Management ---
-    #[Route('/auth-configs', name: 'admin_auth_configs', methods: ['GET'])]
-    public function listAuthConfigs() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $configs = $this->authConfigRepository->findAll();
-        return $this->render('@Admin/auth_configs/index.html.twig', ['configs' => $configs]);
-    }
-
-    #[Route('/auth-configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
-    public function createAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $supportedProviders = \App\Bundles\UserBundle\Controller\OAuthController::getSupportedProviders();
-
-        $response = $this->render('@Admin/auth_configs/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-            'supportedProviders' => $supportedProviders,
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/auth-configs/new', name: 'admin_auth_configs_new_post', methods: ['POST'])]
-    public function storeAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'provider' => ['required', 'unique:auth_configs,provider'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs/new');
-        }
-
-        $data = $_POST;
-        $data['is_active'] = isset($_POST['is_active']) ? 1 : 0;
-
-        $this->authConfigRepository->save($data);
-        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
-    }
-
-    #[Route('/auth-configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
-    public function editAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $config = $this->authConfigRepository->findById($id);
-
-        if (!$config) {
-            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
-        }
-        $supportedProviders = \App\Bundles\UserBundle\Controller\OAuthController::getSupportedProviders();
-
-        $response = $this->render('@Admin/auth_configs/edit.html.twig', [
-            'config' => $config,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-            'supportedProviders' => $supportedProviders,
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/auth-configs/edit', name: 'admin_auth_configs_edit_post', methods: ['POST'])]
-    public function updateAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $config = $this->authConfigRepository->findById($id);
-
-        if (!$config) {
-            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'provider' => ['required', 'unique:auth_configs,provider,' . $id],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs/edit?id=' . $id);
-        }
-
-        $data = $_POST;
-        $data['is_active'] = isset($_POST['is_active']) ? 1 : 0;
-
-        $this->authConfigRepository->update($id, $data);
-        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
-    }
-
-    #[Route('/auth-configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
-    public function deleteAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $this->authConfigRepository->delete($id);
-        $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/auth_configs');
-    }
-
-    #[Route('/auth-configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
-    public function showAuthConfig() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $config = $this->authConfigRepository->findById($id);
-
-        if (!$config) {
-            return new \Symfony\Component\HttpFoundation\Response("Конфігурацію аутентифікації не знайдено", 404);
-        }
-
-        $redirectUri = $_ENV['APP_BASE_URL'] . '/oauth/callback/' . $config['provider'];
-
-        return $this->render('@Admin/auth_configs/show.html.twig', [
-            'config' => $config,
-            'redirectUri' => $redirectUri,
-        ]);
     }
 
     // --- Backup Policy Management ---
