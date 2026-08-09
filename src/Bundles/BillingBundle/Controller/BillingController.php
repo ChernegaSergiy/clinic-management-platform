@@ -33,9 +33,11 @@ use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class BillingController extends \App\Core\Controller\AbstractController
+class BillingController extends AbstractController
 {
     private InvoiceRepository $invoiceRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -67,10 +69,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing', name: 'billing_index', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('BILLING_VIEW');
         $searchTerm = $_GET['search'] ?? '';
         $invoices = $this->invoiceRepository->findAll($searchTerm);
         return $this->render('@Billing/index.html.twig', [
@@ -80,18 +81,16 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Management ---
-    public function listServices() : \Symfony\Component\HttpFoundation\Response
+    public function listServices() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $services = $this->serviceRepository->findAll();
         return $this->render('@Billing/services/index.html.twig', ['services' => $services]);
     }
 
-    public function createService() : \Symfony\Component\HttpFoundation\Response
+    public function createService() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $categories = $this->serviceRepository->findCategories();
         $response = $this->render('@Billing/services/new.html.twig', [
             'categories' => $categories,
@@ -102,10 +101,9 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    public function storeService() : \Symfony\Component\HttpFoundation\Response
+    public function storeService() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -125,18 +123,16 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     // --- Service Bundle Management ---
-    public function listServiceBundles() : \Symfony\Component\HttpFoundation\Response
+    public function listServiceBundles() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $bundles = $this->serviceBundleRepository->findAll();
         return $this->render('@Billing/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
-    public function createServiceBundle() : \Symfony\Component\HttpFoundation\Response
+    public function createServiceBundle() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $services = $this->serviceRepository->findAll();
         $response = $this->render('@Billing/bundles/new.html.twig', [
             'services' => $services,
@@ -147,10 +143,9 @@ class BillingController extends \App\Core\Controller\AbstractController
         return $response;
     }
 
-    public function storeServiceBundle() : \Symfony\Component\HttpFoundation\Response
+    public function storeServiceBundle() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -171,10 +166,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/new', name: 'billing_new', methods: ['GET'])]
-    public function create() : \Symfony\Component\HttpFoundation\Response
+    public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $patientId = $_GET['patient_id'] ?? null;
 
@@ -218,10 +212,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/new', name: 'billing_store', methods: ['POST'])]
-    public function store() : \Symfony\Component\HttpFoundation\Response
+    public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -269,16 +262,15 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/show', name: 'billing_show', methods: ['GET'])]
-    public function show() : \Symfony\Component\HttpFoundation\Response
+    public function show() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('BILLING_VIEW');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
+            return new Response("Рахунок не знайдено", 404);
         }
 
         $response = $this->render('@Billing/show.html.twig', [
@@ -290,16 +282,15 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/add-payment', name: 'billing_add_payment', methods: ['POST'])]
-    public function addPayment() : \Symfony\Component\HttpFoundation\Response
+    public function addPayment() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $invoiceId = (int)($_POST['invoice_id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($invoiceId);
 
         if (!$invoice) {
-            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
+            return new Response("Рахунок не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -327,16 +318,15 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/edit', name: 'billing_edit', methods: ['GET'])]
-    public function edit() : \Symfony\Component\HttpFoundation\Response
+    public function edit() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
+            return new Response("Рахунок не знайдено", 404);
         }
 
         $patientId = $invoice['patient_id'];
@@ -382,16 +372,15 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/edit', name: 'billing_update', methods: ['POST'])]
-    public function update() : \Symfony\Component\HttpFoundation\Response
+    public function update() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $invoice = $this->invoiceRepository->findById($id);
 
         if (!$invoice) {
-            return new \Symfony\Component\HttpFoundation\Response("Рахунок не знайдено", 404);
+            return new Response("Рахунок не знайдено", 404);
         }
 
         // TODO: Add validation
@@ -415,10 +404,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-csv', name: 'billing_export_csv', methods: ['GET'])]
-    public function exportInvoicesToCsv() : \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToCsv() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('BILLING_VIEW');
 
         // Fetch all invoices
         $invoices = $this->invoiceRepository->findAll();
@@ -448,7 +436,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
         $csvContent = $exporter->generate();
 
-        $response = new \Symfony\Component\HttpFoundation\Response($csvContent);
+        $response = new Response($csvContent);
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.csv"');
         $response->headers->set('Pragma', 'no-cache');
@@ -458,10 +446,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-pdf', name: 'billing_export_pdf', methods: ['GET'])]
-    public function exportInvoicesToPdf() : \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToPdf() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('BILLING_VIEW');
 
         $invoices = $this->invoiceRepository->findAll();
 
@@ -472,7 +459,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $pdfExporter->render();
         $pdfContent = $pdfExporter->output();
 
-        $response = new \Symfony\Component\HttpFoundation\Response($pdfContent);
+        $response = new Response($pdfContent);
         $response->headers->set('Content-Type', 'application/pdf');
         $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.pdf"');
 
@@ -480,10 +467,9 @@ class BillingController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/export-excel', name: 'billing_export_excel', methods: ['GET'])]
-    public function exportInvoicesToExcel() : \Symfony\Component\HttpFoundation\Response
+    public function exportInvoicesToExcel() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('BILLING_VIEW');
 
         $invoices = $this->invoiceRepository->findAll();
 
@@ -508,7 +494,7 @@ class BillingController extends \App\Core\Controller\AbstractController
         $excelExporter = new ExcelExporter();
         $excelContent = $excelExporter->generate($headers, $data);
 
-        $response = new \Symfony\Component\HttpFoundation\Response($excelContent);
+        $response = new Response($excelContent);
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment; filename="invoices_export.xlsx"');
         $response->headers->set('Cache-Control', 'max-age=0');
