@@ -28,7 +28,6 @@ use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\UserBundle\Controller\OAuthController;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -79,7 +78,7 @@ class AuthConfigController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/auth_configs/new');
+            return $this->redirectToRoute('admin_auth_configs_new');
         }
 
         $data = $_POST;
@@ -87,7 +86,7 @@ class AuthConfigController extends AbstractController
 
         $this->authConfigRepository->save($data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно створено.";
-        return new RedirectResponse('/admin/auth_configs');
+        return $this->redirectToRoute('admin_auth_configs');
     }
 
     #[Route('/auth-configs/edit', name: 'admin_auth_configs_edit', methods: ['GET'])]
@@ -133,7 +132,7 @@ class AuthConfigController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/auth_configs/edit?id=' . $id);
+            return $this->redirectToRoute('admin_auth_configs_edit', ['id' => $id]);
         }
 
         $data = $_POST;
@@ -141,7 +140,7 @@ class AuthConfigController extends AbstractController
 
         $this->authConfigRepository->update($id, $data);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно оновлено.";
-        return new RedirectResponse('/admin/auth_configs');
+        return $this->redirectToRoute('admin_auth_configs');
     }
 
     #[Route('/auth-configs/delete', name: 'admin_auth_configs_delete', methods: ['POST'])]
@@ -152,7 +151,7 @@ class AuthConfigController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->authConfigRepository->delete($id);
         $_SESSION['success_message'] = "Конфігурацію аутентифікації успішно видалено.";
-        return new RedirectResponse('/admin/auth_configs');
+        return $this->redirectToRoute('admin_auth_configs');
     }
 
     #[Route('/auth-configs/show', name: 'admin_auth_configs_show', methods: ['GET'])]
