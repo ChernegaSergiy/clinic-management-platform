@@ -27,11 +27,11 @@ namespace App\Bundles\NewsBundle\Controller\Admin;
 use App\Bundles\NewsBundle\Repository\NewsRepository;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AdminNewsController extends \App\Core\Controller\AbstractController
+class AdminNewsController extends AbstractController
 {
     private NewsRepository $newsRepository;
     private UserRepositoryInterface $userRepository;
@@ -47,8 +47,7 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
     #[Route('/news', name: 'admin_news_index', methods: ['GET'])]
     public function adminIndex() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $newsArticles = $this->newsRepository->findAll();
         return $this->render('@News/index.html.twig', [
@@ -59,8 +58,7 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
     #[Route('/news/new', name: 'admin_news_new', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $authorsRaw = $this->userRepository->findAllByRole('admin');
         $authors = array_reduce($authorsRaw, function ($acc, $author) {
@@ -80,8 +78,7 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
     #[Route('/news/new', name: 'admin_news_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -96,18 +93,17 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/news/new');
+            return $this->redirectToRoute('admin_news_new');
         }
 
         $this->newsRepository->create($_POST);
-        return new RedirectResponse('/admin/news');
+        return $this->redirectToRoute('admin_news_index');
     }
 
     #[Route('/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
     public function edit(array $args) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
@@ -138,8 +134,7 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
     #[Route('/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
     public function update(array $args) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
@@ -164,22 +159,21 @@ class AdminNewsController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse("/admin/news/edit/{$id}");
+            return $this->redirectToRoute('admin_news_edit', ['id' => $id]);
         }
 
         $this->newsRepository->update($id, $_POST);
-        return new RedirectResponse('/admin/news');
+        return $this->redirectToRoute('admin_news_index');
     }
 
     #[Route('/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
     public function delete(array $args) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('news.manage');
+        $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $id = (int)($args['id'] ?? 0);
         $this->newsRepository->delete($id);
 
-        return new RedirectResponse('/admin/news');
+        return $this->redirectToRoute('admin_news_index');
     }
 }
