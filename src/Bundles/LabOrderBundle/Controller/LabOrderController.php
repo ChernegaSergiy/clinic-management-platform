@@ -31,11 +31,12 @@ use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class LabOrderController extends \App\Core\Controller\AbstractController
+class LabOrderController extends AbstractController
 {
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private LabOrderRepositoryInterface $labOrderRepository;
@@ -66,8 +67,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/new', name: 'lab_orders_new_get', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.create');
+        $this->denyAccessUnlessGranted('LAB_ORDER_CREATE');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -91,8 +91,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/new', name: 'lab_orders_new_post', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.create');
+        $this->denyAccessUnlessGranted('LAB_ORDER_CREATE');
 
         $recordId = (int)($_GET['record_id'] ?? 0);
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
@@ -145,8 +144,6 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
-
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
 
@@ -154,7 +151,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        $this->gate->authorize('lab_order.view', ['id' => $id]);
+        $this->denyAccessUnlessGranted('LAB_ORDER_VIEW', $id);
 
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
@@ -168,8 +165,6 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->checkAuth();
-
         $id = (int)($_GET['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
 
@@ -177,7 +172,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        $this->gate->authorize('lab_order.edit', ['id' => $id]);
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT', $id);
 
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -194,8 +189,6 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/edit', name: 'lab_orders_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->checkAuth();
-
         $id = (int)($_POST['id'] ?? 0);
         $order = $this->labOrderRepository->findById($id);
 
@@ -203,7 +196,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
             return new Response("Лабораторне замовлення не знайдено", 404);
         }
 
-        $this->gate->authorize('lab_order.edit', ['id' => $id]);
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT', $id);
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -225,8 +218,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/import', name: 'lab_orders_import', methods: ['GET'])]
     public function import() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.edit.any');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
 
         $response = $this->render('@LabOrder/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -239,8 +231,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/import', name: 'lab_orders_import_post', methods: ['POST'])]
     public function processImport() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.edit.any');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -283,8 +274,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/import/confirm', name: 'lab_orders_import_confirm', methods: ['GET'])]
     public function confirmImport() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.edit.any');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -302,8 +292,7 @@ class LabOrderController extends \App\Core\Controller\AbstractController
     #[Route('/lab-orders/import/finalize', name: 'lab_orders_import_finalize', methods: ['POST'])]
     public function finalizeImport() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('lab_order.edit.any');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
