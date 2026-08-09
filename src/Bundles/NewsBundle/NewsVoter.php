@@ -54,9 +54,11 @@ class NewsVoter extends Voter
         }
 
         // Administrators, Medical Managers, and HR Managers can manage news
-        if ($this->security->isGranted('ROLE_ADMIN') ||
+        if (
+            $this->security->isGranted('ROLE_ADMIN') ||
             $this->security->isGranted('ROLE_MEDICAL_MANAGER') ||
-            $this->security->isGranted('ROLE_HR_MANAGER')) {
+            $this->security->isGranted('ROLE_HR_MANAGER')
+        ) {
             return true;
         }
 
