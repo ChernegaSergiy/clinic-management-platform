@@ -32,13 +32,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class AppointmentVoter extends Voter
 {
-    public const string VIEW = 'APPOINTMENT_VIEW';
-    public const string VIEW_ALL = 'APPOINTMENT_VIEW_ALL';
-    public const string VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
-    public const string CREATE = 'APPOINTMENT_CREATE';
-    public const string EDIT = 'APPOINTMENT_EDIT';
-    public const string EDIT_ALL = 'APPOINTMENT_EDIT_ALL';
-    public const string CANCEL = 'APPOINTMENT_CANCEL';
+    public const VIEW = 'APPOINTMENT_VIEW';
+    public const VIEW_ALL = 'APPOINTMENT_VIEW_ALL';
+    public const VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
+    public const CREATE = 'APPOINTMENT_CREATE';
+    public const EDIT = 'APPOINTMENT_EDIT';
+    public const EDIT_ALL = 'APPOINTMENT_EDIT_ALL';
+    public const CANCEL = 'APPOINTMENT_CANCEL';
 
     private AppointmentRepositoryInterface $appointmentRepository;
     private Security $security;
