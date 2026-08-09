@@ -28,9 +28,11 @@ use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
 use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class HrmController extends \App\Core\Controller\AbstractController
+class HrmController extends AbstractController
 {
     private HrmRepositoryInterface $hrmRepository;
     private UserRepositoryInterface $userRepository;
@@ -50,10 +52,9 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm', name: 'hrm_index', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('hrm.read');
+        $this->denyAccessUnlessGranted('HRM_VIEW');
 
         $employees = $this->hrmRepository->findAll();
 
@@ -63,10 +64,9 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
-    public function create() : \Symfony\Component\HttpFoundation\Response
+    public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('hrm.write');
+        $this->denyAccessUnlessGranted('HRM_WRITE');
 
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
@@ -78,10 +78,9 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
-    public function store() : \Symfony\Component\HttpFoundation\Response
+    public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('hrm.write');
+        $this->denyAccessUnlessGranted('HRM_WRITE');
 
         $validator = $this->validator;
         $rules = [
@@ -107,20 +106,19 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося додати співробітника.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm');
+        return $this->redirectToRoute('hrm_index');
     }
 
     #[Route('/hrm/show', name: 'hrm_show', methods: ['GET'])]
-    public function show() : \Symfony\Component\HttpFoundation\Response
+    public function show() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('HRM_VIEW');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('hrm.read');
 
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
+            return new Response("Співробітника не знайдено", 404);
         }
 
         return $this->render('@Hrm/show.html.twig', [
@@ -129,16 +127,15 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
-    public function edit() : \Symfony\Component\HttpFoundation\Response
+    public function edit() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('HRM_WRITE');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('hrm.write');
 
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
+            return new Response("Співробітника не знайдено", 404);
         }
 
         $users = $this->userRepository->findAll();
@@ -152,16 +149,15 @@ class HrmController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
-    public function update() : \Symfony\Component\HttpFoundation\Response
+    public function update() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('HRM_WRITE');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('hrm.write');
 
         $employee = $this->hrmRepository->findById($id);
 
         if (!$employee) {
-            return new \Symfony\Component\HttpFoundation\Response("Співробітника не знайдено", 404);
+            return new Response("Співробітника не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -188,14 +184,13 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося оновити дані.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm/show?id=' . $id);
+        return $this->redirectToRoute('hrm_show', ['id' => $id]);
     }
 
     #[Route('/hrm/toggle-status', name: 'hrm_toggle_status', methods: ['POST'])]
-    public function toggleStatus() : \Symfony\Component\HttpFoundation\Response
+    public function toggleStatus() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('hrm.manage');
+        $this->denyAccessUnlessGranted('HRM_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $employee = $this->hrmRepository->findById($id);
@@ -206,6 +201,6 @@ class HrmController extends \App\Core\Controller\AbstractController
             $_SESSION['success_message'] = 'Статус співробітника оновлено.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/hrm/show?id=' . $id);
+        return $this->redirectToRoute('hrm_show', ['id' => $id]);
     }
 }
