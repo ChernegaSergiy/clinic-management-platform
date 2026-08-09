@@ -29,7 +29,6 @@ use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
 use App\Bundles\AdminBundle\Repository\DictionaryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Component\Routing\Attribute\Route;
 
