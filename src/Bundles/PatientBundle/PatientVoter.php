@@ -26,27 +26,33 @@ namespace App\Bundles\PatientBundle;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class PatientVoter extends Voter
 {
+    public const VIEW = 'PATIENT_VIEW';
+    public const EDIT = 'PATIENT_EDIT';
+
     private AppointmentRepositoryInterface $appointmentRepository;
-    /** @phpstan-ignore property.onlyWritten */
     private PatientRepositoryInterface $patientRepository;
+    private Security $security;
 
     public function __construct(
         AppointmentRepositoryInterface $appointmentRepository,
-        PatientRepositoryInterface $patientRepository
+        PatientRepositoryInterface $patientRepository,
+        Security $security
     ) {
         $this->appointmentRepository = $appointmentRepository;
         $this->patientRepository = $patientRepository;
+        $this->security = $security;
     }
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_PATIENT_VIEW_OWN', 'ROLE_PATIENT_EDIT_OWN']);
+        return in_array($attribute, [self::VIEW, self::EDIT]);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -57,30 +63,66 @@ class PatientVoter extends Voter
             return false;
         }
 
-        $context = is_array($subject) ? $subject : [];
+        // Administrators can do anything with patients
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
+        }
+
+        // Determine patient ID from subject
+        $patientId = $this->extractPatientId($subject);
 
         switch ($attribute) {
-            case 'ROLE_PATIENT_VIEW_OWN':
-                $patientId = $context['id'] ?? null;
-                if (!$patientId) {
-                    return false;
-                }
-
-                return $this->isUserAssignedToPatient($user, (int)$patientId);
-            case 'ROLE_PATIENT_EDIT_OWN':
-                $patientId = $context['id'] ?? null;
-                if (!$patientId) {
-                    return false;
-                }
-
-                return $this->isUserAssignedToPatient($user, (int)$patientId);
+            case self::VIEW:
+                return $this->canView($user, $patientId);
+            case self::EDIT:
+                return $this->canEdit($user, $patientId);
         }
 
         return false;
     }
 
-    private function isUserAssignedToPatient(User $user, int $patientId) : bool
+    private function canView(User $user, ?int $patientId) : bool
     {
-        return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
+        // Doctors, registrars, and nurses can view ALL patients
+        if ($this->security->isGranted('ROLE_DOCTOR') ||
+            $this->security->isGranted('ROLE_REGISTRAR') ||
+            $this->security->isGranted('ROLE_NURSE')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function canEdit(User $user, ?int $patientId) : bool
+    {
+        // Registrars can edit any patient
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+            return true;
+        }
+
+        // Doctors can only edit if they are assigned to this specific patient
+        if ($patientId && $this->security->isGranted('ROLE_DOCTOR')) {
+            return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
+        }
+
+        return false;
+    }
+
+    private function extractPatientId(mixed $subject) : ?int
+    {
+        if (is_int($subject) || is_string($subject)) {
+            return (int) $subject;
+        }
+
+        if (is_array($subject) && isset($subject['id'])) {
+            return (int) $subject['id'];
+        }
+
+        // If subject is a Patient entity (assuming one exists)
+        if (is_object($subject) && method_exists($subject, 'getId')) {
+            return (int) $subject->getId();
+        }
+
+        return null;
     }
 }
