@@ -30,11 +30,15 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class AppointmentVoter extends Voter
+final class AppointmentVoter extends Voter
 {
-    public const VIEW = 'APPOINTMENT_VIEW';
-    public const EDIT = 'APPOINTMENT_EDIT';
-    public const CANCEL = 'APPOINTMENT_CANCEL';
+    public const string VIEW = 'APPOINTMENT_VIEW';
+    public const string VIEW_ALL = 'APPOINTMENT_VIEW_ALL';
+    public const string VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
+    public const string CREATE = 'APPOINTMENT_CREATE';
+    public const string EDIT = 'APPOINTMENT_EDIT';
+    public const string EDIT_ALL = 'APPOINTMENT_EDIT_ALL';
+    public const string CANCEL = 'APPOINTMENT_CANCEL';
 
     private AppointmentRepositoryInterface $appointmentRepository;
     private Security $security;
@@ -49,7 +53,15 @@ class AppointmentVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT, self::CANCEL], true);
+        return in_array($attribute, [
+            self::VIEW,
+            self::VIEW_ALL,
+            self::VIEW_OWN,
+            self::CREATE,
+            self::EDIT,
+            self::EDIT_ALL,
+            self::CANCEL,
+        ], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -67,16 +79,31 @@ class AppointmentVoter extends Voter
 
         $appointmentId = $this->extractAppointmentId($subject);
 
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($user, $appointmentId);
-            case self::EDIT:
-                return $this->canEdit($user, $appointmentId);
-            case self::CANCEL:
-                return $this->canCancel($user, $appointmentId);
-        }
+        return match ($attribute) {
+            self::VIEW => $this->canView($user, $appointmentId),
+            self::VIEW_ALL => $this->canViewAll(),
+            self::VIEW_OWN => $this->canViewOwn(),
+            self::CREATE => $this->canCreate(),
+            self::EDIT => $this->canEdit($user, $appointmentId),
+            self::EDIT_ALL => $this->canEditAll(),
+            self::CANCEL => $this->canCancel($user, $appointmentId),
+            default => false,
+        };
+    }
 
-        return false;
+    private function canViewAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
+    }
+
+    private function canViewOwn() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
+    }
+
+    private function canCreate() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
     }
 
     private function canView(User $user, ?int $appointmentId) : bool
@@ -107,6 +134,11 @@ class AppointmentVoter extends Voter
         }
 
         return false;
+    }
+
+    private function canEditAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
     }
 
     private function canCancel(User $user, ?int $appointmentId) : bool
