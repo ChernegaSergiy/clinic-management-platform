@@ -1,16 +1,12 @@
-/vendor
 /.env
-/var/
 uploads/*
 !uploads/.gitkeep
 node_modules/
 .phpunit.result.cache
-.phpunit.cache/
 build/
 public/uploads/*
 composer.phar
 composer-setup.php
-.php-cs-fixer.cache
 
 ###> symfony/framework-bundle ###
 /.env.local
