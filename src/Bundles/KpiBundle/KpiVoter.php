@@ -32,24 +32,11 @@ class KpiVoter extends Voter
 {
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE']);
+        return false;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
-        $user = $token->getUser();
-
-        if (!$user instanceof User) {
-            return false;
-        }
-
-        switch ($attribute) {
-            case 'ROLE_CREATE':
-            case 'ROLE_UPDATE':
-            case 'ROLE_DELETE':
-                return $user->isAdmin();
-        }
-
         return false;
     }
 }
