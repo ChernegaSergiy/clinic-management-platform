@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class InsuranceVoter extends Voter
 {
+    public const VIEW = 'INSURANCE_VIEW';
     public const MANAGE = 'INSURANCE_MANAGE';
 
     private Security $security;
@@ -42,7 +43,7 @@ class InsuranceVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return self::MANAGE === $attribute;
+        return in_array($attribute, [self::VIEW, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -52,11 +53,23 @@ class InsuranceVoter extends Voter
             return false;
         }
 
-        // Administrators and Medical Managers can manage insurance providers
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
+        return match ($attribute) {
+            self::VIEW => $this->canView(),
+            self::MANAGE => $this->canManage(),
+            default => false,
+        };
+    }
 
-        return false;
+    private function canView() : bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN')
+            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
+            || $this->security->isGranted('ROLE_REGISTRAR');
+    }
+
+    private function canManage() : bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN')
+            || $this->security->isGranted('ROLE_MEDICAL_MANAGER');
     }
 }
