@@ -26,18 +26,21 @@ namespace App\Bundles\DepartmentBundle\Controller;
 
 use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
 use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
+use App\Core\Validation\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class DepartmentController extends \App\Core\Controller\AbstractController
+class DepartmentController extends AbstractController
 {
     private DepartmentRepository $departmentRepository;
     private HrmRepositoryInterface $hrmRepository;
-    private \App\Core\Validation\Validator $validator;
+    private Validator $validator;
 
     public function __construct(
         DepartmentRepository $departmentRepository,
         HrmRepositoryInterface $hrmRepository,
-        \App\Core\Validation\Validator $validator
+        Validator $validator
     ) {
         $this->departmentRepository = $departmentRepository;
         $this->hrmRepository = $hrmRepository;
@@ -45,10 +48,9 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/departments', name: 'admin_departments_index', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('department.read');
+        $this->denyAccessUnlessGranted('DEPARTMENT_VIEW');
 
         $departments = $this->departmentRepository->findAll();
 
@@ -58,10 +60,9 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/departments/new', name: 'admin_departments_new', methods: ['GET'])]
-    public function create() : \Symfony\Component\HttpFoundation\Response
+    public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('department.write');
+        $this->denyAccessUnlessGranted('DEPARTMENT_EDIT');
 
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
@@ -72,10 +73,9 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/departments/new', name: 'admin_departments_new_post', methods: ['POST'])]
-    public function store() : \Symfony\Component\HttpFoundation\Response
+    public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('department.write');
+        $this->denyAccessUnlessGranted('DEPARTMENT_EDIT');
 
         $validator = $this->validator;
         $rules = [
@@ -105,20 +105,19 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося створити відділ.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
+        return $this->redirectToRoute('admin_departments_index');
     }
 
     #[Route('/departments/show', name: 'admin_departments_show', methods: ['GET'])]
-    public function show() : \Symfony\Component\HttpFoundation\Response
+    public function show() : Response
     {
-        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('department.read');
+        $this->denyAccessUnlessGranted('DEPARTMENT_VIEW', $id);
 
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
+            return new Response("Відділ не знайдено", 404);
         }
 
         // Отримуємо співробітників цього відділу
@@ -131,16 +130,15 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/departments/edit', name: 'admin_departments_edit', methods: ['GET'])]
-    public function edit() : \Symfony\Component\HttpFoundation\Response
+    public function edit() : Response
     {
-        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('department.write');
+        $this->denyAccessUnlessGranted('DEPARTMENT_EDIT', $id);
 
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
+            return new Response("Відділ не знайдено", 404);
         }
 
         $departments = $this->departmentRepository->findAll();
@@ -153,16 +151,15 @@ class DepartmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/departments/edit', name: 'admin_departments_edit_post', methods: ['POST'])]
-    public function update() : \Symfony\Component\HttpFoundation\Response
+    public function update() : Response
     {
-        $this->checkAuth();
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('department.write');
+        $this->denyAccessUnlessGranted('DEPARTMENT_EDIT', $id);
 
         $department = $this->departmentRepository->findById($id);
 
         if (!$department) {
-            return new \Symfony\Component\HttpFoundation\Response("Відділ не знайдено", 404);
+            return new Response("Відділ не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -191,14 +188,13 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['error_message'] = 'Не вдалося оновити дані.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments/show?id=' . $id);
+        return $this->redirectToRoute('admin_departments_show', ['id' => $id]);
     }
 
     #[Route('/departments/delete', name: 'admin_departments_delete', methods: ['POST'])]
-    public function delete() : \Symfony\Component\HttpFoundation\Response
+    public function delete() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('department.delete');
+        $this->denyAccessUnlessGranted('DEPARTMENT_DELETE');
 
         $id = (int)($_POST['id'] ?? 0);
         $department = $this->departmentRepository->findById($id);
@@ -211,14 +207,13 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             }
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
+        return $this->redirectToRoute('admin_departments_index');
     }
 
     #[Route('/departments/toggle-status', name: 'admin_departments_toggle_status', methods: ['POST'])]
-    public function toggleStatus() : \Symfony\Component\HttpFoundation\Response
+    public function toggleStatus() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('department.manage');
+        $this->denyAccessUnlessGranted('DEPARTMENT_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $department = $this->departmentRepository->findById($id);
@@ -229,6 +224,6 @@ class DepartmentController extends \App\Core\Controller\AbstractController
             $_SESSION['success_message'] = 'Статус відділу оновлено.';
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/departments');
+        return $this->redirectToRoute('admin_departments_index');
     }
 }
