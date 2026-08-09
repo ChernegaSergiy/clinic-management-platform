@@ -26,7 +26,6 @@ namespace App\Bundles\AdminBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
-use App\Bundles\AdminBundle\Repository\DictionaryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
@@ -35,7 +34,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminController extends \App\Core\Controller\AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
-    private DictionaryRepository $dictionaryRepository;
     private AuthConfigRepository $authConfigRepository;
     private BackupPolicyRepository $backupPolicyRepository;
     private ServiceRepository $serviceRepository;
@@ -44,7 +42,6 @@ class AdminController extends \App\Core\Controller\AbstractController
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
-        DictionaryRepository $dictionaryRepository,
         AuthConfigRepository $authConfigRepository,
         BackupPolicyRepository $backupPolicyRepository,
         ServiceRepository $serviceRepository,
@@ -52,7 +49,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         \App\Core\Validation\Validator $validator
     ) {
         $this->roleRepository = $roleRepository;
-        $this->dictionaryRepository = $dictionaryRepository;
         $this->authConfigRepository = $authConfigRepository;
         $this->backupPolicyRepository = $backupPolicyRepository;
         $this->serviceRepository = $serviceRepository;
@@ -109,228 +105,7 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
 
-    // --- Dictionary Management ---
-    #[Route('/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
-    public function listDictionaries() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $dictionaries = $this->dictionaryRepository->findAll();
-        return $this->render('@Admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
-    }
 
-    #[Route('/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
-    public function showDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $id = (int)($_GET['id'] ?? 0);
-        $dictionary = $this->dictionaryRepository->findById($id);
-
-        if (!$dictionary) {
-            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
-        }
-
-        $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
-        return $this->render('@Admin/dictionaries/show.html.twig', [
-            'dictionary' => $dictionary,
-            'values' => $values,
-        ]);
-    }
-
-    #[Route('/dictionaries/new', name: 'admin_dictionaries_new', methods: ['GET'])]
-    public function createDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $response = $this->render('@Admin/dictionaries/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/dictionaries/new', name: 'admin_dictionaries_new_post', methods: ['POST'])]
-    public function storeDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:dictionaries,name'], // Corrected unique validation
-            'description' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/new');
-        }
-
-        $this->dictionaryRepository->save($_POST);
-        $_SESSION['success_message'] = "Словник успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
-    }
-
-    #[Route('/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
-    public function editDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $dictionary = $this->dictionaryRepository->findById($id);
-
-        if (!$dictionary) {
-            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
-        }
-
-        $response = $this->render('@Admin/dictionaries/edit.html.twig', [
-            'dictionary' => $dictionary,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/dictionaries/edit', name: 'admin_dictionaries_edit_post', methods: ['POST'])]
-    public function updateDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $dictionary = $this->dictionaryRepository->findById($id);
-
-        if (!$dictionary) {
-            return new \Symfony\Component\HttpFoundation\Response("Словник не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:dictionaries,name,' . $id], // Corrected unique validation
-            'description' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/edit?id=' . $id);
-        }
-
-        $this->dictionaryRepository->update($id, $_POST);
-        $_SESSION['success_message'] = "Словник успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
-    }
-
-    #[Route('/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
-    public function deleteDictionary() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $this->dictionaryRepository->delete($id);
-        $_SESSION['success_message'] = "Словник успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries');
-    }
-
-    // --- Dictionary Value Management ---
-    #[Route('/dictionaries/values/new', name: 'admin_dictionaries_values_new', methods: ['GET'])]
-    public function createDictionaryValue() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        $response = $this->render('@Admin/dictionaries/values/new.html.twig', [
-            'dictionary_id' => $dictionaryId,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/dictionaries/values/new', name: 'admin_dictionaries_values_new_post', methods: ['POST'])]
-    public function storeDictionaryValue() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $dictionaryId = (int)($_POST['dictionary_id'] ?? 0);
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'dictionary_id' => ['required'],
-            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId],
-            'label' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
-        }
-
-        $this->dictionaryRepository->saveValue($_POST);
-        $_SESSION['success_message'] = "Значення словника успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
-    }
-
-    #[Route('/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
-    public function editDictionaryValue() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-
-        if (!$value) {
-            return new \Symfony\Component\HttpFoundation\Response("Значення словника не знайдено", 404);
-        }
-
-        $response = $this->render('@Admin/dictionaries/values/edit.html.twig', [
-            'value' => $value,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/dictionaries/values/edit', name: 'admin_dictionaries_values_edit_post', methods: ['POST'])]
-    public function updateDictionaryValue() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-        $dictionaryId = $value['dictionary_id'];
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'dictionary_id' => ['required'],
-            'value' => ['required', 'unique:dictionary_values,value,dictionary_id,' . $dictionaryId . ',id,' . $id],
-            'label' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/values/edit?id=' . $id);
-        }
-
-        $this->dictionaryRepository->updateValue($id, $_POST);
-        $_SESSION['success_message'] = "Значення словника успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
-    }
-
-    #[Route('/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
-    public function deleteDictionaryValue() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
-        $dictionaryId = $value['dictionary_id'];
-
-        $this->dictionaryRepository->deleteValue($id);
-        $_SESSION['success_message'] = "Значення словника успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
-    }
 
     // --- Auth Configuration Management ---
     #[Route('/auth-configs', name: 'admin_auth_configs', methods: ['GET'])]
