@@ -33,7 +33,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class PatientVoter extends Voter
 {
     public const VIEW = 'PATIENT_VIEW';
+    public const VIEW_ALL = 'PATIENT_VIEW_ALL';
+    public const VIEW_OWN = 'PATIENT_VIEW_OWN';
+    public const CREATE = 'PATIENT_CREATE';
     public const EDIT = 'PATIENT_EDIT';
+    public const EDIT_ALL = 'PATIENT_EDIT_ALL';
 
     private AppointmentRepositoryInterface $appointmentRepository;
     private Security $security;
@@ -48,7 +52,7 @@ class PatientVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT], true);
+        return in_array($attribute, [self::VIEW, self::VIEW_ALL, self::VIEW_OWN, self::CREATE, self::EDIT, self::EDIT_ALL], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -64,14 +68,21 @@ class PatientVoter extends Voter
             return true;
         }
 
-        // Determine patient ID from subject
         $patientId = $this->extractPatientId($subject);
 
         switch ($attribute) {
             case self::VIEW:
                 return $this->canView($user, $patientId);
+            case self::VIEW_ALL:
+                return $this->canViewAll();
+            case self::VIEW_OWN:
+                return $this->canViewOwn();
+            case self::CREATE:
+                return $this->canCreate();
             case self::EDIT:
                 return $this->canEdit($user, $patientId);
+            case self::EDIT_ALL:
+                return $this->canEditAll();
         }
 
         return false;
@@ -79,32 +90,48 @@ class PatientVoter extends Voter
 
     private function canView(User $user, ?int $patientId) : bool
     {
-        // Registrars and administrators can view any patient
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+        if ($this->canViewAll()) {
             return true;
         }
 
-        // Doctors and nurses can ONLY view their own assigned patients
-        if ($patientId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+        if ($patientId && $this->canViewOwn()) {
             return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
         }
 
         return false;
     }
 
+    private function canViewAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
+    }
+
+    private function canViewOwn() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
+    }
+
+    private function canCreate() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR') || $this->security->isGranted('ROLE_DOCTOR');
+    }
+
     private function canEdit(User $user, ?int $patientId) : bool
     {
-        // Registrars can edit general data for any patient
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+        if ($this->canEditAll()) {
             return true;
         }
 
-        // Doctors can only edit (add records, etc.) their own assigned patients
         if ($patientId && $this->security->isGranted('ROLE_DOCTOR')) {
             return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
         }
 
         return false;
+    }
+
+    private function canEditAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
     }
 
     private function extractPatientId(mixed $subject) : ?int
@@ -117,7 +144,6 @@ class PatientVoter extends Voter
             return (int) $subject['id'];
         }
 
-        // If subject is a Patient entity (assuming one exists)
         if (is_object($subject) && method_exists($subject, 'getId')) {
             return (int) $subject->getId();
         }
