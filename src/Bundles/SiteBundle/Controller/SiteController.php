@@ -24,10 +24,11 @@
 
 namespace App\Bundles\SiteBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class SiteController extends \App\Core\Controller\AbstractController
+class SiteController extends AbstractController
 {
     #[Route('/', name: 'site_home')]
     public function home() : Response
