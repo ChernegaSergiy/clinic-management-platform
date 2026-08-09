@@ -33,15 +33,15 @@ class RoleFixture extends Fixture
     public function load(ObjectManager $manager) : void
     {
         $roles = [
-            ['name' => 'admin', 'description' => 'Адміністратор системи'],
-            ['name' => 'medical_manager', 'description' => 'Медичний керівник / методолог'],
-            ['name' => 'doctor', 'description' => 'Лікар'],
-            ['name' => 'registrar', 'description' => 'Реєстратор'],
-            ['name' => 'nurse', 'description' => 'Медсестра / асистент'],
-            ['name' => 'lab_technician', 'description' => 'Лаборант'],
-            ['name' => 'billing', 'description' => 'Білінг / бухгалтерія'],
-            ['name' => 'inventory_manager', 'description' => 'Комірник / менеджер складу'],
-            ['name' => 'hr_manager', 'description' => 'HR-менеджер / Менеджер з персоналу'],
+            ['name' => 'ROLE_ADMIN', 'description' => 'Адміністратор системи'],
+            ['name' => 'ROLE_MEDICAL_MANAGER', 'description' => 'Медичний керівник / методолог'],
+            ['name' => 'ROLE_DOCTOR', 'description' => 'Лікар'],
+            ['name' => 'ROLE_REGISTRAR', 'description' => 'Реєстратор'],
+            ['name' => 'ROLE_NURSE', 'description' => 'Медсестра / асистент'],
+            ['name' => 'ROLE_LAB_TECHNICIAN', 'description' => 'Лаборант'],
+            ['name' => 'ROLE_BILLING', 'description' => 'Білінг / бухгалтерія'],
+            ['name' => 'ROLE_INVENTORY_MANAGER', 'description' => 'Комірник / менеджер складу'],
+            ['name' => 'ROLE_HR_MANAGER', 'description' => 'HR-менеджер / Менеджер з персоналу'],
         ];
 
         foreach ($roles as $data) {
