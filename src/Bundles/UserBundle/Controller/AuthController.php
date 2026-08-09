@@ -31,10 +31,13 @@ use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Validation\Validator;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AuthController extends \App\Core\Controller\AbstractController
+class AuthController extends AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private AuthConfigRepository $authConfigRepository;
@@ -66,7 +69,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
-    public function showLoginForm() : \Symfony\Component\HttpFoundation\Response
+    public function showLoginForm() : Response
     {
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
@@ -85,7 +88,7 @@ class AuthController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/login', name: 'login_post', methods: ['POST'])]
-    public function login() : \Symfony\Component\HttpFoundation\Response
+    public function login() : Response
     {
         // Admin creation should be done via CLI commands or fixtures in Symfony
 
@@ -98,7 +101,7 @@ class AuthController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $email = $_POST['email'];
@@ -122,9 +125,13 @@ class AuthController extends \App\Core\Controller\AbstractController
                     'role_name' => $role['name'] ?? null,
                 ];
                 $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
-                $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+                if ($redirect) {
+                    return new RedirectResponse($redirect);
+                }
+
+                return $this->redirectToRoute('dashboard');
             }
 
             $roleRequiresMfa = in_array((int)$user['role_id'], $mfaForceRoles, true);
@@ -133,17 +140,17 @@ class AuthController extends \App\Core\Controller\AbstractController
                 $_SESSION['mfa_required'] = true;
                 $_SESSION['mfa_required_type'] = 'totp';
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
-                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
+                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
+                return $this->redirectToRoute('mfa_required_choice');
             }
 
             if ($mfaService->isMfaEnabled($user['id'])) {
                 $_SESSION['mfa_pending_user_id'] = $user['id'];
                 $_SESSION['mfa_type'] = $mfaService->getUserMfaStatus($user['id'])['type'];
-                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? '/dashboard';
+                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/verify');
+                return $this->redirectToRoute('mfa_verify');
             }
 
             $_SESSION['user'] = [
@@ -155,30 +162,34 @@ class AuthController extends \App\Core\Controller\AbstractController
                 'role_name' => $role['name'] ?? null,
             ];
             $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
-            $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+            $redirect = $_SESSION['intended_url'] ?? null;
             unset($_SESSION['intended_url']);
-            return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+            if ($redirect) {
+                return new RedirectResponse($redirect);
+            }
+
+            return $this->redirectToRoute('dashboard');
         } else {
             $_SESSION['errors'] = ['login' => 'Невірний email або пароль.'];
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
     }
 
     /**
      * Redirects to the specified OAuth provider for authentication.
      *
-     * @param  string                                     $provider
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  string   $provider
+     * @return Response
      */
     #[Route('/oauth/redirect/{provider}', name: 'oauth_login', methods: ['GET'])]
-    public function redirectToProvider(string $provider) : \Symfony\Component\HttpFoundation\Response
+    public function redirectToProvider(string $provider) : Response
     {
         return $this->oauthController->redirect($provider);
     }
 
     #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
-    public function logout() : \Symfony\Component\HttpFoundation\Response
+    public function logout() : Response
     {
         $userId = $_SESSION['user']['id'] ?? null;
         $userEmail = $_SESSION['user']['email'] ?? null;
@@ -186,13 +197,13 @@ class AuthController extends \App\Core\Controller\AbstractController
             $this->eventDispatcher->dispatch(new UserLoggedOutEvent($userId, $userEmail));
         }
         session_destroy();
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/');
+        return $this->redirectToRoute('dashboard_redirect');
     }
 
     #[Route('/dashboard-redirect', name: 'dashboard_redirect', methods: ['GET'])]
-    public function dashboard() : \Symfony\Component\HttpFoundation\Response
+    public function dashboard() : Response
     {
-        $this->checkAuth();
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/dashboard');
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        return $this->redirectToRoute('dashboard');
     }
 }

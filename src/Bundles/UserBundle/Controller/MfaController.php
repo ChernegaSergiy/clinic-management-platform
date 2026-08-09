@@ -29,9 +29,12 @@ use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Auth\MfaGuard;
 use App\Core\Repository\SettingsRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class MfaController extends \App\Core\Controller\AbstractController
+class MfaController extends AbstractController
 {
     private MfaService $mfaService;
     private UserRepositoryInterface $userRepository;
@@ -82,40 +85,40 @@ class MfaController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/mfa/setup/{type}', name: 'mfa_setup', methods: ['GET'], defaults: ['type' => 'totp'])]
-    public function showMfaSetup(string $type = 'totp') : \Symfony\Component\HttpFoundation\Response
+    public function showMfaSetup(string $type = 'totp') : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
             $type = 'totp';
         }
 
         if (isset($_SESSION['user'])) {
-            $this->checkAuth();
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
             if ('disabled' === $mfaPolicy) {
                 $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+                return $this->redirectToRoute('user_profile');
             }
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $isReset = isset($_GET['reset']) && '1' === $_GET['reset'];
 
         if ($this->mfaService->isMfaEnabled($userId) && !$isReset) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+            return $this->redirectToRoute('user_profile');
         }
 
         if ('hotp' === $type) {
@@ -151,19 +154,19 @@ class MfaController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/mfa/required', name: 'mfa_required_choice', methods: ['GET'])]
-    public function showMfaRequiredChoice() : \Symfony\Component\HttpFoundation\Response
+    public function showMfaRequiredChoice() : Response
     {
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         return $this->render('@User/mfa_required_choice.html.twig', [
@@ -172,23 +175,23 @@ class MfaController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/mfa/required/{type}', name: 'mfa_required', methods: ['GET'], defaults: ['type' => 'totp'])]
-    public function showMfaRequired(string $type = 'totp') : \Symfony\Component\HttpFoundation\Response
+    public function showMfaRequired(string $type = 'totp') : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
+            return $this->redirectToRoute('mfa_required_choice');
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         if ('hotp' === $type) {
@@ -234,27 +237,27 @@ class MfaController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/mfa/setup/{type}', name: 'mfa_setup_verify', methods: ['POST'], defaults: ['type' => 'totp'])]
-    public function verifyMfaSetup(string $type = 'totp') : \Symfony\Component\HttpFoundation\Response
+    public function verifyMfaSetup(string $type = 'totp') : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
             $type = 'totp';
         }
 
         if (isset($_SESSION['user'])) {
-            $this->checkAuth();
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
             if ('disabled' === $mfaPolicy) {
                 $_SESSION['error_message'] = 'Двофакторна автентифікація вимкнена в налаштуваннях системи.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+                return $this->redirectToRoute('user_profile');
             }
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $isReset = isset($_GET['reset']) && '1' === $_GET['reset'];
@@ -266,7 +269,7 @@ class MfaController extends \App\Core\Controller\AbstractController
 
             if (!$secret) {
                 $redirectUrl = $isReset ? '/user/mfa/setup/hotp?reset=1' : '/user/mfa/setup/hotp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
 
             $code = $_POST['code'] ?? '';
@@ -274,7 +277,7 @@ class MfaController extends \App\Core\Controller\AbstractController
             if (empty($code)) {
                 $_SESSION['error_message'] = 'Будь ласка, введіть код.';
                 $redirectUrl = $isReset ? '/user/mfa/setup/hotp?reset=1' : '/user/mfa/setup/hotp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
 
             $lastCounter = $_SESSION['hotp_setup_last_counter'] ?? 0;
@@ -288,7 +291,7 @@ class MfaController extends \App\Core\Controller\AbstractController
 
                 if (isset($_SESSION['user'])) {
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію HOTP успішно увімкнено!';
-                    return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+                    return $this->redirectToRoute('user_profile');
                 } else {
                     $this->mfaGuard->clearRequired();
                     $user = $this->userRepository->findById($userId);
@@ -303,15 +306,18 @@ class MfaController extends \App\Core\Controller\AbstractController
                         'role_name' => $role['name'] ?? null,
                     ];
 
-                    $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                    $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
+                    if ($redirect) {
+                        return new RedirectResponse($redirect);
+                    }
 
-                    return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+                    return $this->redirectToRoute('dashboard');
                 }
             } else {
                 $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
                 $redirectUrl = $isReset ? '/user/mfa/setup/hotp?reset=1' : '/user/mfa/setup/hotp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
         } else {
             $secret = $_SESSION['mfa_setup_secret'] ?? null;
@@ -319,7 +325,7 @@ class MfaController extends \App\Core\Controller\AbstractController
 
             if (!$secret) {
                 $redirectUrl = $isReset ? '/user/mfa/setup/totp?reset=1' : '/user/mfa/setup/totp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
 
             $code = $_POST['code'] ?? '';
@@ -327,7 +333,7 @@ class MfaController extends \App\Core\Controller\AbstractController
             if (empty($code)) {
                 $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
                 $redirectUrl = $isReset ? '/user/mfa/setup/totp?reset=1' : '/user/mfa/setup/totp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
 
             if ($this->mfaService->verifyCode($secret, $code)) {
@@ -337,7 +343,7 @@ class MfaController extends \App\Core\Controller\AbstractController
 
                 if (isset($_SESSION['user'])) {
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
-                    return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+                    return $this->redirectToRoute('user_profile');
                 } else {
                     $this->mfaGuard->clearRequired();
                     $user = $this->userRepository->findById($userId);
@@ -352,30 +358,33 @@ class MfaController extends \App\Core\Controller\AbstractController
                         'role_name' => $role['name'] ?? null,
                     ];
 
-                    $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                    $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
+                    if ($redirect) {
+                        return new RedirectResponse($redirect);
+                    }
 
-                    return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+                    return $this->redirectToRoute('dashboard');
                 }
             } else {
                 $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
                 $redirectUrl = $isReset ? '/user/mfa/setup/totp?reset=1' : '/user/mfa/setup/totp';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirectUrl);
+                return $this->redirectToRoute('mfa_setup', ['type' => 'hotp', 'reset' => 1]);
             }
         }
     }
 
     #[Route('/user/mfa/required/{type}', name: 'mfa_required_verify', methods: ['POST'], defaults: ['type' => 'totp'])]
-    public function verifyMfaRequired(string $type = 'totp') : \Symfony\Component\HttpFoundation\Response
+    public function verifyMfaRequired(string $type = 'totp') : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required');
+            return $this->redirectToRoute('mfa_required_choice');
         }
 
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         if ('hotp' === $type) {
@@ -385,14 +394,14 @@ class MfaController extends \App\Core\Controller\AbstractController
 
             if (!$secret) {
                 $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/hotp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'hotp']);
             }
 
             $code = $_POST['code'] ?? '';
 
             if (empty($code)) {
                 $_SESSION['error_message'] = 'Будь ласка, введіть код.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/hotp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'hotp']);
             }
 
             $lastCounter = $_SESSION['hotp_setup_last_counter'] ?? 0;
@@ -417,13 +426,16 @@ class MfaController extends \App\Core\Controller\AbstractController
                     'role_name' => $role['name'] ?? null,
                 ];
 
-                $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
+                if ($redirect) {
+                    return new RedirectResponse($redirect);
+                }
 
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+                return $this->redirectToRoute('dashboard');
             } else {
                 $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/hotp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'hotp']);
             }
         } else {
             $secret = $_SESSION['mfa_setup_secret'] ?? null;
@@ -431,14 +443,14 @@ class MfaController extends \App\Core\Controller\AbstractController
 
             if (!$secret) {
                 $_SESSION['error_message'] = 'Помилка генерування коду. Спробуйте ще раз.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/totp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'totp']);
             }
 
             $code = $_POST['code'] ?? '';
 
             if (empty($code)) {
                 $_SESSION['error_message'] = 'Будь ласка, введіть код з додатку.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/totp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'totp']);
             }
 
             if ($this->mfaService->verifyCode($secret, $code)) {
@@ -459,21 +471,24 @@ class MfaController extends \App\Core\Controller\AbstractController
                     'role_name' => $role['name'] ?? null,
                 ];
 
-                $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+                $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
+                if ($redirect) {
+                    return new RedirectResponse($redirect);
+                }
 
-                return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+                return $this->redirectToRoute('dashboard');
             } else {
                 $_SESSION['error_message'] = 'Невірний код. Спробуйте ще раз.';
-                return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/required/totp');
+                return $this->redirectToRoute('mfa_required', ['type' => 'totp']);
             }
         }
     }
 
     #[Route('/user/mfa/disable', name: 'mfa_disable', methods: ['POST'])]
-    public function disableMfa() : \Symfony\Component\HttpFoundation\Response
+    public function disableMfa() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $userId = $_SESSION['user']['id'];
         $password = $_POST['password'] ?? '';
@@ -489,23 +504,23 @@ class MfaController extends \App\Core\Controller\AbstractController
         $this->mfaService->disableMfaForUser($userId);
 
         $_SESSION['success_message'] = 'Двофакторну автентифікацію вимкнено.';
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+        return $this->redirectToRoute('user_profile');
     }
 
     #[Route('/user/mfa/verify', name: 'mfa_verify', methods: ['GET'])]
-    public function showMfaVerify() : \Symfony\Component\HttpFoundation\Response
+    public function showMfaVerify() : Response
     {
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $user = $this->userRepository->findById($userId);
 
         if (!$user) {
             session_destroy();
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $errorMessage = $_SESSION['mfa_error'] ?? null;
@@ -521,19 +536,19 @@ class MfaController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/user/mfa/verify', name: 'mfa_verify_post', methods: ['POST'])]
-    public function verifyMfa() : \Symfony\Component\HttpFoundation\Response
+    public function verifyMfa() : Response
     {
         $userId = $_SESSION['mfa_pending_user_id'] ?? null;
 
         if (!$userId) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/login');
+            return $this->redirectToRoute('login_form');
         }
 
         $code = $_POST['code'] ?? '';
 
         if (empty($code)) {
             $_SESSION['mfa_error'] = 'Будь ласка, введіть код.';
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/verify');
+            return $this->redirectToRoute('mfa_verify');
         }
 
         if ($this->mfaService->verifyUserMfa($userId, $code)) {
@@ -552,20 +567,23 @@ class MfaController extends \App\Core\Controller\AbstractController
                 'role_name' => $role['name'] ?? null,
             ];
 
-            $redirect = $_SESSION['intended_url'] ?? '/dashboard';
+            $redirect = $_SESSION['intended_url'] ?? null;
             unset($_SESSION['intended_url']);
+            if ($redirect) {
+                return new RedirectResponse($redirect);
+            }
 
-            return new \Symfony\Component\HttpFoundation\RedirectResponse($redirect);
+            return $this->redirectToRoute('dashboard');
         } else {
             $_SESSION['mfa_error'] = 'Невірний код. Спробуйте ще раз.';
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/mfa/verify');
+            return $this->redirectToRoute('mfa_verify');
         }
     }
 
     #[Route('/user/mfa/regenerate-backup-codes', name: 'mfa_regenerate_backup_codes', methods: ['POST'])]
-    public function regenerateBackupCodes() : \Symfony\Component\HttpFoundation\Response
+    public function regenerateBackupCodes() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $userId = $_SESSION['user']['id'];
         $password = $_POST['password'] ?? '';
@@ -579,7 +597,7 @@ class MfaController extends \App\Core\Controller\AbstractController
         }
 
         if (!$this->mfaService->isMfaEnabled($userId)) {
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+            return $this->redirectToRoute('user_profile');
         }
 
         $backupCodes = $this->mfaService->generateBackupCodes();
@@ -590,13 +608,13 @@ class MfaController extends \App\Core\Controller\AbstractController
         ", ['id' => $userId, 'codes' => json_encode($backupCodes)]);
 
         $_SESSION['new_backup_codes'] = $backupCodes;
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+        return $this->redirectToRoute('user_profile');
     }
 
     #[Route('/user/mfa/clear-backup-codes', name: 'mfa_clear_backup_codes', methods: ['GET', 'POST'])]
-    public function clearNewBackupCodes() : \Symfony\Component\HttpFoundation\Response
+    public function clearNewBackupCodes() : Response
     {
         unset($_SESSION['new_backup_codes']);
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/user/profile');
+        return $this->redirectToRoute('user_profile');
     }
 }
