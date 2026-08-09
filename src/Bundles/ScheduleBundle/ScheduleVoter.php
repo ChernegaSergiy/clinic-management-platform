@@ -33,6 +33,8 @@ class ScheduleVoter extends Voter
 {
     public const VIEW = 'SCHEDULE_VIEW';
     public const UPDATE = 'SCHEDULE_UPDATE';
+    public const MANAGE_OWN = 'SCHEDULE_MANAGE_OWN';
+    public const MANAGE_ALL = 'SCHEDULE_MANAGE_ALL';
 
     private Security $security;
 
@@ -43,7 +45,7 @@ class ScheduleVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::UPDATE], true);
+        return in_array($attribute, [self::VIEW, self::UPDATE, self::MANAGE_OWN, self::MANAGE_ALL], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -66,6 +68,10 @@ class ScheduleVoter extends Voter
                 return $this->canView($user, $doctorId);
             case self::UPDATE:
                 return $this->canUpdate($user, $doctorId);
+            case self::MANAGE_OWN:
+                return $this->canManageOwn($user, $doctorId);
+            case self::MANAGE_ALL:
+                return $this->canManageAll($user, $doctorId);
         }
 
         return false;
@@ -102,6 +108,34 @@ class ScheduleVoter extends Voter
                 return true;
             }
             return $user->getId() === $doctorId;
+        }
+
+        return false;
+    }
+
+    private function canManageOwn(User $user, ?int $doctorId) : bool
+    {
+        // Doctors can manage their own schedule
+        if ($this->security->isGranted('ROLE_DOCTOR')) {
+            if (!$doctorId) {
+                return true;
+            }
+            return $user->getId() === $doctorId;
+        }
+
+        return false;
+    }
+
+    private function canManageAll(User $user, ?int $doctorId) : bool
+    {
+        // Administrators and Medical Managers can manage all schedules
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
+        }
+
+        // Registrars can also manage all schedules
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+            return true;
         }
 
         return false;
