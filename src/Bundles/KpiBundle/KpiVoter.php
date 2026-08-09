@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class KpiVoter extends Voter
 {
+    public const VIEW = 'KPI_VIEW';
     public const MANAGE = 'KPI_MANAGE';
 
     private Security $security;
@@ -42,7 +43,7 @@ class KpiVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return self::MANAGE === $attribute;
+        return in_array($attribute, [self::VIEW, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -53,14 +54,33 @@ class KpiVoter extends Voter
         }
 
         // Administrators, Medical Managers, and HR Managers can manage KPIs
-        if (
-            $this->security->isGranted('ROLE_ADMIN') ||
-            $this->security->isGranted('ROLE_MEDICAL_MANAGER') ||
-            $this->security->isGranted('ROLE_HR_MANAGER')
-        ) {
-            return true;
+        switch ($attribute) {
+            case self::VIEW:
+                return $this->canView();
+            case self::MANAGE:
+                return $this->canManage();
+            default:
+                return false;
         }
+    }
 
-        return false;
+    private function canView() : bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN')
+            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
+            || $this->security->isGranted('ROLE_HR_MANAGER')
+            || $this->security->isGranted('ROLE_REGISTRAR')
+            || $this->security->isGranted('ROLE_DOCTOR')
+            || $this->security->isGranted('ROLE_NURSE')
+            || $this->security->isGranted('ROLE_BILLING')
+            || $this->security->isGranted('ROLE_LAB_TECHNICIAN')
+            || $this->security->isGranted('ROLE_INVENTORY_MANAGER');
+    }
+
+    private function canManage() : bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN')
+            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
+            || $this->security->isGranted('ROLE_HR_MANAGER');
     }
 }
