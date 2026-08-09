@@ -81,6 +81,7 @@ class BillingController extends AbstractController
     }
 
     // --- Service Management ---
+    #[Route('/billing/services', name: 'billing_services_index', methods: ['GET'])]
     public function listServices() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
@@ -88,6 +89,7 @@ class BillingController extends AbstractController
         return $this->render('@Billing/services/index.html.twig', ['services' => $services]);
     }
 
+    #[Route('/billing/services/new', name: 'billing_services_new_get', methods: ['GET'])]
     public function createService() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
@@ -101,6 +103,7 @@ class BillingController extends AbstractController
         return $response;
     }
 
+    #[Route('/billing/services/new', name: 'billing_services_new_post', methods: ['POST'])]
     public function storeService() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
@@ -123,6 +126,7 @@ class BillingController extends AbstractController
     }
 
     // --- Service Bundle Management ---
+    #[Route('/billing/bundles', name: 'billing_bundles_index', methods: ['GET'])]
     public function listServiceBundles() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
@@ -130,6 +134,7 @@ class BillingController extends AbstractController
         return $this->render('@Billing/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
+    #[Route('/billing/bundles/new', name: 'billing_bundles_new_get', methods: ['GET'])]
     public function createServiceBundle() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
@@ -143,6 +148,7 @@ class BillingController extends AbstractController
         return $response;
     }
 
+    #[Route('/billing/bundles/new', name: 'billing_bundles_new_post', methods: ['POST'])]
     public function storeServiceBundle() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
