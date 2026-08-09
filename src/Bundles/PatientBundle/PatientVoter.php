@@ -25,7 +25,6 @@
 namespace App\Bundles\PatientBundle;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -37,16 +36,13 @@ class PatientVoter extends Voter
     public const EDIT = 'PATIENT_EDIT';
 
     private AppointmentRepositoryInterface $appointmentRepository;
-    private PatientRepositoryInterface $patientRepository;
     private Security $security;
 
     public function __construct(
         AppointmentRepositoryInterface $appointmentRepository,
-        PatientRepositoryInterface $patientRepository,
         Security $security
     ) {
         $this->appointmentRepository = $appointmentRepository;
-        $this->patientRepository = $patientRepository;
         $this->security = $security;
     }
 
