@@ -27,10 +27,11 @@ namespace App\Entity;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
-class User
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -229,5 +230,21 @@ class User
     {
         $this->id = $id;
         return $this;
+    }
+
+    public function getRoles() : array
+    {
+        $roleName = $this->role ? $this->role->getName() : 'USER';
+        return ['ROLE_' . strtoupper($roleName)];
+    }
+
+    public function eraseCredentials() : void
+    {
+        // No temporary credentials to erase
+    }
+
+    public function getUserIdentifier() : string
+    {
+        return (string) $this->username;
     }
 }
