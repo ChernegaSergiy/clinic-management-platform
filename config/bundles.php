@@ -25,4 +25,6 @@ return [
     App\Bundles\AdminBundle\AdminBundle::class => ['all' => true],
     App\Bundles\NewsBundle\NewsBundle::class => ['all' => true],
     App\Bundles\SiteBundle\SiteBundle::class => ['all' => true],
+    Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
+    Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
 ];
