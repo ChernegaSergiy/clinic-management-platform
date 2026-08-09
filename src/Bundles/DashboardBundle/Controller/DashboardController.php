@@ -25,9 +25,11 @@
 namespace App\Bundles\DashboardBundle\Controller;
 
 use App\Bundles\DashboardBundle\Service\DashboardService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class DashboardController extends \App\Core\Controller\AbstractController
+class DashboardController extends AbstractController
 {
     private DashboardService $dashboardService;
 
@@ -37,14 +39,13 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth(); // Ensure user is authenticated
-        $this->gate->authorize('dashboard.view');
+        $this->denyAccessUnlessGranted('DASHBOARD_VIEW');
 
-        $canSeeFinance = $this->gate->allows('billing.read');
-        $canSeeKpi = $this->gate->allows('kpi.read');
-        $canExport = $this->gate->allows('dashboard.export');
+        $canSeeFinance = $this->isGranted('BILLING_VIEW');
+        $canSeeKpi = $this->isGranted('KPI_VIEW');
+        $canExport = $this->isGranted('DASHBOARD_EXPORT');
 
         $dashboardData = $this->dashboardService->getDashboardData();
 
@@ -57,10 +58,9 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export-csv', name: 'dashboard_export_csv', methods: ['GET'])]
-    public function exportCsv() : \Symfony\Component\HttpFoundation\Response
+    public function exportCsv() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('dashboard.export');
+        $this->denyAccessUnlessGranted('DASHBOARD_EXPORT');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
@@ -88,14 +88,13 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export-pdf', name: 'dashboard_export_pdf', methods: ['GET'])]
-    public function exportPdf() : \Symfony\Component\HttpFoundation\Response
+    public function exportPdf() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('dashboard.export');
+        $this->denyAccessUnlessGranted('DASHBOARD_EXPORT');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         // Render the Twig template into an HTML string
-        $html = $this->view->renderToString('dashboard/pdf_report.html.twig', [
+        $html = $this->renderView('dashboard/pdf_report.html.twig', [
             'dashboardData' => $dashboardData,
         ]);
 
@@ -112,10 +111,9 @@ class DashboardController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/dashboard/export-excel', name: 'dashboard_export_excel', methods: ['GET'])]
-    public function exportExcel() : \Symfony\Component\HttpFoundation\Response
+    public function exportExcel() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('dashboard.export');
+        $this->denyAccessUnlessGranted('DASHBOARD_EXPORT');
         $dashboardData = $this->dashboardService->getDashboardData()['kpis'];
 
         $headers = ['Показник', 'Значення', 'Тренд', 'Опис'];
