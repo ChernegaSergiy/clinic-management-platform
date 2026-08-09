@@ -49,40 +49,6 @@ class RoleController extends AbstractController
         return $this->render('@Admin/roles/index.html.twig', ['roles' => $roles]);
     }
 
-    #[Route('/roles/new', name: 'admin_roles_new', methods: ['GET'])]
-    public function createRole() : Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
-        $response = $this->render('@Admin/roles/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/roles/new', name: 'admin_roles_new_post', methods: ['POST'])]
-    public function storeRole() : Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:roles'], // Need to implement unique validation in Validator
-            'description' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return $this->redirectToRoute('admin_roles_new');
-        }
-
-        $this->roleRepository->save($_POST);
-        $_SESSION['success_message'] = "Роль успішно створено.";
-        return $this->redirectToRoute('admin_roles');
-    }
-
     #[Route('/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
     public function editRole() : Response
     {
@@ -118,7 +84,6 @@ class RoleController extends AbstractController
 
         $validator = $this->validator;
         $validator->validate($_POST, [
-            'name' => ['required', 'unique:roles,name,' . $id], // Need to implement unique validation in Validator
             'description' => ['required'],
         ]);
 
@@ -128,25 +93,11 @@ class RoleController extends AbstractController
             return $this->redirectToRoute('admin_roles_edit', ['id' => $id]);
         }
 
-        $this->roleRepository->update($id, $_POST);
+        // We only allow updating the description to prevent breaking the application's RBAC logic
+        $this->roleRepository->update($id, [
+            'description' => $_POST['description']
+        ]);
         $_SESSION['success_message'] = "Роль успішно оновлено.";
-        return $this->redirectToRoute('admin_roles');
-    }
-
-    #[Route('/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
-    public function deleteRole() : Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
-
-        $id = (int)($_POST['id'] ?? 0);
-        $role = $this->roleRepository->findById($id);
-
-        if (!$role) {
-            return new Response("Роль не знайдено", 404);
-        }
-
-        $this->roleRepository->delete($id);
-        $_SESSION['success_message'] = "Роль успішно видалено.";
         return $this->redirectToRoute('admin_roles');
     }
 }
