@@ -26,11 +26,11 @@ namespace App\Bundles\ScheduleBundle\Controller\App;
 
 use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
 use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AppScheduleController extends \App\Core\Controller\AbstractController
+class AppScheduleController extends AbstractController
 {
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
@@ -44,8 +44,7 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
     #[Route('/doctor/schedule', name: 'doctor_schedule_index', methods: ['GET'])]
     public function index() : Response
     {
-        // Personal schedule for doctors
-        $this->gate->authorize('schedules.manage_own');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_OWN');
 
         $userId = (int)$_SESSION['user']['id'];
         $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
@@ -72,13 +71,13 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if ($this->gate->allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            $this->gate->authorize('schedules.manage_all');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -101,8 +100,8 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
             }
         }
 
-        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/app/doctor/schedule';
-        return new RedirectResponse($redirectUrl);
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? 'admin_schedules_index' : 'doctor_schedule_index';
+        return $this->redirectToRoute($redirectUrl);
     }
 
     #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
@@ -111,13 +110,13 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
         $sessionUserId = (int)$_SESSION['user']['id'];
         $targetDoctorId = $sessionUserId; // Default
 
-        if ($this->gate->allows('schedules.manage_all') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            $this->gate->authorize('schedules.manage_all');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
         }
 
         $exceptionData = [
@@ -131,8 +130,8 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
 
         $this->scheduleExceptionRepository->create($exceptionData);
 
-        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/app/doctor/schedule';
-        return new RedirectResponse($redirectUrl);
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? 'admin_schedules_index' : 'doctor_schedule_index';
+        return $this->redirectToRoute($redirectUrl);
     }
 
     #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
@@ -144,22 +143,22 @@ class AppScheduleController extends \App\Core\Controller\AbstractController
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
 
         if (!$exception) {
-            return new RedirectResponse('/app/doctor/schedule');
+            return $this->redirectToRoute('doctor_schedule_index');
         }
 
         $targetDoctorId = (int)$exception['doctor_id'];
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== $sessionUserId) {
-            $this->gate->authorize('schedules.manage_all');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
         }
 
         // Final check that exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === $sessionUserId || $this->gate->allows('schedules.manage_all')) {
+        if ($targetDoctorId === $sessionUserId || $this->isGranted('SCHEDULE_MANAGE_ALL')) {
             $this->scheduleExceptionRepository->delete($exceptionId);
         }
 
-        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? '/admin/schedules' : '/app/doctor/schedule';
-        return new RedirectResponse($redirectUrl);
+        $redirectUrl = ($targetDoctorId !== $sessionUserId) ? 'admin_schedules_index' : 'doctor_schedule_index';
+        return $this->redirectToRoute($redirectUrl);
     }
 }
