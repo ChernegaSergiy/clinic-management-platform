@@ -28,7 +28,6 @@ use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use App\Core\Service\TranslationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -94,6 +93,6 @@ class SettingsController extends AbstractController
         // A new View instance is built for every request, so the updated
         // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
-        return new RedirectResponse('/admin/settings');
+        return $this->redirectToRoute('admin_settings');
     }
 }
