@@ -34,6 +34,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class PrescriptionVoter extends Voter
 {
     public const VIEW = 'PRESCRIPTION_VIEW';
+    public const VIEW_ALL = 'PRESCRIPTION_VIEW_ALL';
+    public const VIEW_OWN = 'PRESCRIPTION_VIEW_OWN';
     public const CREATE = 'PRESCRIPTION_CREATE';
     public const EDIT = 'PRESCRIPTION_EDIT';
 
@@ -53,7 +55,7 @@ class PrescriptionVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT], true);
+        return in_array($attribute, [self::VIEW, self::VIEW_ALL, self::VIEW_OWN, self::CREATE, self::EDIT], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -73,6 +75,10 @@ class PrescriptionVoter extends Voter
         switch ($attribute) {
             case self::VIEW:
                 return $this->canView($user, $prescriptionId);
+            case self::VIEW_ALL:
+                return $this->canViewAll();
+            case self::VIEW_OWN:
+                return $this->canViewOwn();
             case self::CREATE:
                 return $this->canCreate($user, $subject);
             case self::EDIT:
@@ -85,16 +91,26 @@ class PrescriptionVoter extends Voter
     private function canView(User $user, ?int $prescriptionId) : bool
     {
         // Registrars can view all prescriptions (e.g. for printing)
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+        if ($this->canViewAll()) {
             return true;
         }
 
         // Doctors and nurses can view prescriptions if they own them or are assigned to the patient
-        if ($prescriptionId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+        if ($prescriptionId && $this->canViewOwn()) {
             return $this->isOwner($user, $prescriptionId);
         }
 
         return false;
+    }
+
+    private function canViewAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
+    }
+
+    private function canViewOwn() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
     }
 
     private function canCreate(User $user, mixed $subject) : bool
