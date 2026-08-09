@@ -33,6 +33,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class MedicalRecordVoter extends Voter
 {
     public const VIEW = 'MEDICAL_RECORD_VIEW';
+    public const VIEW_ALL = 'MEDICAL_RECORD_VIEW_ALL';
+    public const VIEW_OWN = 'MEDICAL_RECORD_VIEW_OWN';
+    public const CREATE = 'MEDICAL_RECORD_CREATE';
     public const EDIT = 'MEDICAL_RECORD_EDIT';
 
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
@@ -48,7 +51,7 @@ class MedicalRecordVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT], true);
+        return in_array($attribute, [self::VIEW, self::VIEW_ALL, self::VIEW_OWN, self::CREATE, self::EDIT], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -69,6 +72,12 @@ class MedicalRecordVoter extends Voter
         switch ($attribute) {
             case self::VIEW:
                 return $this->canView($user, $recordId);
+            case self::VIEW_ALL:
+                return $this->canViewAll();
+            case self::VIEW_OWN:
+                return $this->canViewOwn();
+            case self::CREATE:
+                return $this->canCreate();
             case self::EDIT:
                 return $this->canEdit($user, $recordId);
         }
@@ -78,17 +87,30 @@ class MedicalRecordVoter extends Voter
 
     private function canView(User $user, ?int $recordId) : bool
     {
-        // Doctors and nurses can view records they own or have access to
-        if ($recordId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+        if ($recordId && $this->canViewOwn()) {
             return $this->isOwner($user, $recordId);
         }
 
         return false;
     }
 
+    private function canViewAll() : bool
+    {
+        return $this->security->isGranted('ROLE_REGISTRAR');
+    }
+
+    private function canViewOwn() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
+    }
+
+    private function canCreate() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR');
+    }
+
     private function canEdit(User $user, ?int $recordId) : bool
     {
-        // Only doctors can edit records, and only their own
         if ($recordId && $this->security->isGranted('ROLE_DOCTOR')) {
             return $this->isOwner($user, $recordId);
         }
