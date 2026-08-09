@@ -24,28 +24,58 @@
 
 namespace App\Bundles\NewsBundle;
 
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class NewsVoter extends Voter
 {
+    public const VIEW = 'NEWS_VIEW';
+    public const MANAGE = 'NEWS_MANAGE';
+
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return false;
+        return in_array($attribute, [self::VIEW, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
         $user = $token->getUser();
-
         if (!$user instanceof User) {
             return false;
         }
 
+        // Administrators, Medical Managers, and HR Managers can manage news
+        if ($this->security->isGranted('ROLE_ADMIN') ||
+            $this->security->isGranted('ROLE_MEDICAL_MANAGER') ||
+            $this->security->isGranted('ROLE_HR_MANAGER')) {
+            return true;
+        }
+
         switch ($attribute) {
+            case self::VIEW:
+                return $this->canView();
+            case self::MANAGE:
+                return false;
         }
 
         return false;
+    }
+
+    private function canView() : bool
+    {
+        // All staff roles can view news
+        return $this->security->isGranted('ROLE_DOCTOR')
+            || $this->security->isGranted('ROLE_NURSE')
+            || $this->security->isGranted('ROLE_REGISTRAR')
+            || $this->security->isGranted('ROLE_HR_MANAGER');
     }
 }
