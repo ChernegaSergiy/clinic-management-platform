@@ -32,7 +32,6 @@ use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -108,7 +107,7 @@ class LabOrderController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/lab-orders/new?record_id=' . $recordId);
+            return $this->redirectToRoute('lab_orders_new_get', ['record_id' => $recordId]);
         }
 
         $data = $_POST;
@@ -138,7 +137,7 @@ class LabOrderController extends AbstractController
         }
 
         $_SESSION['success_message'] = "Лабораторне замовлення успішно створено.";
-        return new RedirectResponse('/medical-records/show?id=' . $recordId);
+        return $this->redirectToRoute('medical_records_show', ['id' => $recordId]);
     }
 
     #[Route('/lab-orders/show', name: 'lab_orders_show_get', methods: ['GET'])]
@@ -207,12 +206,12 @@ class LabOrderController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/lab-orders/edit?id=' . $id);
+            return $this->redirectToRoute('lab_orders_edit_get', ['id' => $id]);
         }
 
         $this->labOrderRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Лабораторне замовлення успішно оновлено.";
-        return new RedirectResponse('/lab-orders/show?id=' . $id);
+        return $this->redirectToRoute('lab_orders_show_get', ['id' => $id]);
     }
 
     #[Route('/lab-orders/import', name: 'lab_orders_import', methods: ['GET'])]
@@ -235,14 +234,14 @@ class LabOrderController extends AbstractController
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
 
         $file = $_FILES['hl7_dicom_file'];
 
         if (UPLOAD_ERR_OK !== $file['error']) {
             $_SESSION['errors']['file'] = 'Помилка завантаження файлу: ' . $file['error'];
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
 
         $tempDir = dirname(__DIR__, 3) . '/uploads/temp/';
@@ -254,7 +253,7 @@ class LabOrderController extends AbstractController
 
         if (!move_uploaded_file($file['tmp_name'], $tempPath)) {
             $_SESSION['errors']['file'] = 'Не вдалося зберегти завантажений файл для обробки.';
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
 
         try {
@@ -263,11 +262,11 @@ class LabOrderController extends AbstractController
             $_SESSION['hl7_dicom_temp_path'] = $tempPath;
             $_SESSION['success_message'] = 'Файл успішно завантажено та пройшов структурну валідацію. '
                                            . 'Будь ласка, перегляньте дані перед імпортом.';
-            return new RedirectResponse('/lab-orders/import/confirm');
+            return $this->redirectToRoute('lab_orders_import_confirm');
         } catch (\Exception $e) {
             unlink($tempPath);
             $_SESSION['errors']['file'] = 'Помилка структурної валідації: ' . $e->getMessage();
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
     }
 
@@ -278,7 +277,7 @@ class LabOrderController extends AbstractController
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
 
         $response = $this->render('@LabOrder/confirm_import.html.twig', [
@@ -296,7 +295,7 @@ class LabOrderController extends AbstractController
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';
-            return new RedirectResponse('/lab-orders/import');
+            return $this->redirectToRoute('lab_orders_import');
         }
 
         $parsedData = $_SESSION['hl7_dicom_parsed_data'];
@@ -311,10 +310,10 @@ class LabOrderController extends AbstractController
             unlink($tempPath);
 
             $_SESSION['success_message'] = 'Лабораторне замовлення успішно імпортовано (ID: ' . $orderId . ').';
-            return new RedirectResponse('/lab-orders/show?id=' . $orderId);
+            return $this->redirectToRoute('lab_orders_show_get', ['id' => $orderId]);
         } catch (\Exception $e) {
             $_SESSION['errors']['import'] = 'Помилка логічної валідації або імпорту: ' . $e->getMessage();
-            return new RedirectResponse('/lab-orders/import/confirm');
+            return $this->redirectToRoute('lab_orders_import_confirm');
         }
     }
 }
