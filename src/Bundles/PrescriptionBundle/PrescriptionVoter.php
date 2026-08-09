@@ -37,7 +37,6 @@ class PrescriptionVoter extends Voter
 
         switch ($attribute) {
             case 'ROLE_PRESCRIPTION_VIEW_OWN':
-
                 $prescriptionId = $context['id'] ?? null;
                 if (!$prescriptionId) {
                     return false;
@@ -45,14 +44,12 @@ class PrescriptionVoter extends Voter
 
                 return $this->isOwner($user, (int)$prescriptionId);
             case 'ROLE_PRESCRIPTION_CREATE_OWN':
-
                 $submittedDoctorId = $context['doctor_id'] ?? null;
                 if (!$submittedDoctorId) {
                     return true;
                 }
                 return $user->getId() === (int)$submittedDoctorId;
             case 'ROLE_PRESCRIPTION_EDIT_OWN':
-
                 $prescriptionId = $context['id'] ?? null;
                 if (!$prescriptionId) {
                     return false;

@@ -32,7 +32,6 @@ class LabOrderVoter extends Voter
 
         switch ($attribute) {
             case 'ROLE_LAB_ORDER_VIEW_OWN':
-
                 $labOrderId = $context['id'] ?? null;
                 if (!$labOrderId) {
                     return false;
@@ -40,7 +39,6 @@ class LabOrderVoter extends Voter
 
                 return $this->isOwner($user, (int)$labOrderId);
             case 'ROLE_LAB_ORDER_EDIT_OWN':
-
                 $labOrderId = $context['id'] ?? null;
                 if (!$labOrderId) {
                     return false;

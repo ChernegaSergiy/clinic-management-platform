@@ -24,7 +24,6 @@
 
 namespace App\Bundles\KpiBundle;
 
-use App\Core\Model\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
