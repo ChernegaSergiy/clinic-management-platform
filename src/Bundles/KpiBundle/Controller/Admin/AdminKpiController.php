@@ -28,11 +28,11 @@ use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AdminKpiController extends \App\Core\Controller\AbstractController
+class AdminKpiController extends AbstractController
 {
     private KpiRepository $kpiRepository;
     private InvoiceRepository $invoiceRepository;
@@ -54,8 +54,7 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
     #[Route('/kpi/definitions', name: 'admin_kpi_definitions_index', methods: ['GET'])]
     public function listDefinitions() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
         return $this->render('@Kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
@@ -63,8 +62,7 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
     #[Route('/kpi/definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createDefinition() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
         $response = $this->render('@Kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -76,8 +74,7 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
     #[Route('/kpi/definitions/new', name: 'admin_kpi_definitions_store', methods: ['POST'])]
     public function storeDefinition() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -90,19 +87,18 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/kpi/definitions/new');
+            return $this->redirectToRoute('admin_kpi_definitions_new');
         }
 
         $this->kpiRepository->saveKpiDefinition($_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно додано.";
-        return new RedirectResponse('/admin/kpi/definitions');
+        return $this->redirectToRoute('admin_kpi_definitions_index');
     }
 
     #[Route('/kpi/definitions/edit', name: 'admin_kpi_definitions_edit', methods: ['GET'])]
     public function editDefinition() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -123,8 +119,7 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
     #[Route('/kpi/definitions/edit', name: 'admin_kpi_definitions_update', methods: ['POST'])]
     public function updateDefinition() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $definition = $this->kpiRepository->findKpiDefinitionById($id);
@@ -144,31 +139,29 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/kpi/definitions/edit?id=' . $id);
+            return $this->redirectToRoute('admin_kpi_definitions_edit', ['id' => $id]);
         }
 
         $this->kpiRepository->updateKpiDefinition($id, $_POST);
         $_SESSION['success_message'] = "Визначення KPI успішно оновлено.";
-        return new RedirectResponse('/admin/kpi/definitions');
+        return $this->redirectToRoute('admin_kpi_definitions_index');
     }
 
     #[Route('/kpi/definitions/delete', name: 'admin_kpi_definitions_delete', methods: ['POST'])]
     public function deleteDefinition() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->kpiRepository->deleteKpiDefinition($id);
         $_SESSION['success_message'] = "Визначення KPI успішно видалено.";
-        return new RedirectResponse('/admin/kpi/definitions');
+        return $this->redirectToRoute('admin_kpi_definitions_index');
     }
 
     #[Route('/kpi/results', name: 'admin_kpi_results_index', methods: ['GET'])]
     public function listResults() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.read');
+        $this->denyAccessUnlessGranted('KPI_VIEW');
         $results = $this->kpiRepository->findAllKpiResults();
         return $this->render('@Kpi/results/index.html.twig', ['results' => $results]);
     }
@@ -200,7 +193,7 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
         }
 
         $_SESSION['success_message'] = "KPI перераховано за " . $today->format('Y-m-d');
-        return new RedirectResponse('/dashboard');
+        return $this->redirectToRoute('dashboard');
     }
 
     private function calculateKpiValue(string $type, string $from, string $to) : ?float
@@ -268,7 +261,6 @@ class AdminKpiController extends \App\Core\Controller\AbstractController
         if (PHP_SAPI === 'cli') {
             return;
         }
-        $this->checkAuth();
-        $this->gate->authorize('admin.manage');
+        $this->denyAccessUnlessGranted('KPI_MANAGE');
     }
 }

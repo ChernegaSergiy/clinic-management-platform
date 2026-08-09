@@ -25,10 +25,11 @@
 namespace App\Bundles\KpiBundle\Controller\App;
 
 use App\Bundles\KpiBundle\Repository\KpiRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AppKpiController extends \App\Core\Controller\AbstractController
+class AppKpiController extends AbstractController
 {
     private KpiRepository $kpiRepository;
 
@@ -40,8 +41,7 @@ class AppKpiController extends \App\Core\Controller\AbstractController
     #[Route('/kpi/results', name: 'app_kpi_results_index', methods: ['GET'])]
     public function listResults() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('kpi.read');
+        $this->denyAccessUnlessGranted('KPI_VIEW');
 
         $userId = $_SESSION['user']['id'];
         $results = $this->kpiRepository->findKpiResultsForUser($userId);
