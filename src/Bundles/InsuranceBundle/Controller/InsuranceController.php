@@ -29,7 +29,6 @@ namespace App\Bundles\InsuranceBundle\Controller;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -99,7 +98,7 @@ class InsuranceController extends AbstractController
         if (!$validator->validate($_POST, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/insurance/companies/new');
+            return $this->redirectToRoute('insurance_companies_new_get');
         }
 
         $this->insuranceService->addInsuranceCompany(
@@ -110,7 +109,7 @@ class InsuranceController extends AbstractController
             $_POST['notes'] ?? null
         );
 
-        return new RedirectResponse('/insurance/companies');
+        return $this->redirectToRoute('insurance_companies_index');
     }
 
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_get', methods: ['GET'])]
@@ -153,7 +152,7 @@ class InsuranceController extends AbstractController
         if (!$validator->validate($_POST, $rules)) {
             $_SESSION['errors'] = $validator->getErrors();
             // Redirect back to edit form
-            return new RedirectResponse('/insurance/companies/edit?id=' . $id);
+            return $this->redirectToRoute('insurance_companies_edit_get', ['id' => $id]);
         }
 
         $this->insuranceService->updateInsuranceCompany(
@@ -165,7 +164,7 @@ class InsuranceController extends AbstractController
             $_POST['notes'] ?? null
         );
 
-        return new RedirectResponse('/insurance/companies');
+        return $this->redirectToRoute('insurance_companies_index');
     }
 
     #[Route('/insurance/companies/delete', name: 'insurance_companies_delete', methods: ['POST'])]
@@ -176,7 +175,7 @@ class InsuranceController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->insuranceService->deleteInsuranceCompany($id);
 
-        return new RedirectResponse('/insurance/companies');
+        return $this->redirectToRoute('insurance_companies_index');
     }
 
     #[Route('/insurance/claims', name: 'insurance_claims_index', methods: ['GET'])]
@@ -220,6 +219,6 @@ class InsuranceController extends AbstractController
 
         $this->insuranceService->updateClaimStatus($id, $status, $submittedAt, $totalPaid);
 
-        return new RedirectResponse('/insurance/claims/show?id=' . $id);
+        return $this->redirectToRoute('insurance_claims_show', ['id' => $id]);
     }
 }
