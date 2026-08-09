@@ -10,9 +10,7 @@
                 <h2 class="ui header">{{ 'admin.roles.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/roles/new" class="ui primary button">
-                    <i class="plus icon"></i> {{ 'admin.roles.add'|trans }}
-                </a>
+                <!-- Role creation is disabled architecturally -->
             </div>
         </div>
 
@@ -38,12 +36,6 @@
                                 <a href="/admin/roles/edit?id={{ role.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/roles/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.roles.delete_confirm'|trans }}');">
-                                    <input type="hidden" name="id" value="{{ role.id }}">
-                                    <button type="submit" class="ui icon button red">
-                                        <i class="trash icon"></i>
-                                    </button>
-                                </form>
                             </td>
                         </tr>
                     {% else %}
