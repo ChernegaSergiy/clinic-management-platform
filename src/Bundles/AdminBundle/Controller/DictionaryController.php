@@ -27,7 +27,6 @@ namespace App\Bundles\AdminBundle\Controller;
 use App\Bundles\AdminBundle\Repository\DictionaryRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -94,12 +93,12 @@ class DictionaryController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/dictionaries/new');
+            return $this->redirectToRoute('admin_dictionaries_new');
         }
 
         $this->dictionaryRepository->save($_POST);
         $_SESSION['success_message'] = "Словник успішно створено.";
-        return new RedirectResponse('/admin/dictionaries');
+        return $this->redirectToRoute('admin_dictionaries');
     }
 
     #[Route('/dictionaries/edit', name: 'admin_dictionaries_edit', methods: ['GET'])]
@@ -144,12 +143,12 @@ class DictionaryController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/dictionaries/edit?id=' . $id);
+            return $this->redirectToRoute('admin_dictionaries_edit', ['id' => $id]);
         }
 
         $this->dictionaryRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Словник успішно оновлено.";
-        return new RedirectResponse('/admin/dictionaries');
+        return $this->redirectToRoute('admin_dictionaries');
     }
 
     #[Route('/dictionaries/delete', name: 'admin_dictionaries_delete', methods: ['POST'])]
@@ -160,7 +159,7 @@ class DictionaryController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->dictionaryRepository->delete($id);
         $_SESSION['success_message'] = "Словник успішно видалено.";
-        return new RedirectResponse('/admin/dictionaries');
+        return $this->redirectToRoute('admin_dictionaries');
     }
 
     // --- Dictionary Value Management ---
@@ -194,12 +193,12 @@ class DictionaryController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/dictionaries/values/new?dictionary_id=' . $dictionaryId);
+            return $this->redirectToRoute('admin_dictionaries_values_new', ['dictionary_id' => $dictionaryId]);
         }
 
         $this->dictionaryRepository->saveValue($_POST);
         $_SESSION['success_message'] = "Значення словника успішно створено.";
-        return new RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
+        return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
 
     #[Route('/dictionaries/values/edit', name: 'admin_dictionaries_values_edit', methods: ['GET'])]
@@ -242,12 +241,12 @@ class DictionaryController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/dictionaries/values/edit?id=' . $id);
+            return $this->redirectToRoute('admin_dictionaries_values_edit', ['id' => $id]);
         }
 
         $this->dictionaryRepository->updateValue($id, $_POST);
         $_SESSION['success_message'] = "Значення словника успішно оновлено.";
-        return new RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
+        return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
 
     #[Route('/dictionaries/values/delete', name: 'admin_dictionaries_values_delete', methods: ['POST'])]
@@ -261,6 +260,6 @@ class DictionaryController extends AbstractController
 
         $this->dictionaryRepository->deleteValue($id);
         $_SESSION['success_message'] = "Значення словника успішно видалено.";
-        return new RedirectResponse('/admin/dictionaries/show?id=' . $dictionaryId);
+        return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
 }
