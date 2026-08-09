@@ -79,11 +79,14 @@ class PatientVoter extends Voter
 
     private function canView(User $user, ?int $patientId) : bool
     {
-        // Doctors, registrars, and nurses can view ALL patients
-        if ($this->security->isGranted('ROLE_DOCTOR') ||
-            $this->security->isGranted('ROLE_REGISTRAR') ||
-            $this->security->isGranted('ROLE_NURSE')) {
+        // Registrars and administrators can view any patient
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
             return true;
+        }
+
+        // Doctors and nurses can ONLY view their own assigned patients
+        if ($patientId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+            return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
         }
 
         return false;
@@ -91,12 +94,12 @@ class PatientVoter extends Voter
 
     private function canEdit(User $user, ?int $patientId) : bool
     {
-        // Registrars can edit any patient
+        // Registrars can edit general data for any patient
         if ($this->security->isGranted('ROLE_REGISTRAR')) {
             return true;
         }
 
-        // Doctors can only edit if they are assigned to this specific patient
+        // Doctors can only edit (add records, etc.) their own assigned patients
         if ($patientId && $this->security->isGranted('ROLE_DOCTOR')) {
             return $this->appointmentRepository->isPatientAssignedToDoctor($patientId, $user->getId());
         }
