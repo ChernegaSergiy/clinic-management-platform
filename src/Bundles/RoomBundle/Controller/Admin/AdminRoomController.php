@@ -26,11 +26,11 @@ namespace App\Bundles\RoomBundle\Controller\Admin;
 
 use App\Bundles\RoomBundle\Repository\RoomRepository;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AdminRoomController extends \App\Core\Controller\AbstractController
+class AdminRoomController extends AbstractController
 {
     private RoomRepository $roomRepository;
     private Validator $validator;
@@ -44,7 +44,7 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
     #[Route('/rooms', name: 'admin_rooms_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
         $searchTerm = $_GET['search'] ?? '';
         $rooms = $this->roomRepository->findAll();
 
@@ -57,7 +57,7 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
     #[Route('/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
     public function create() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $response = $this->render('@Room/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -70,7 +70,7 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
     #[Route('/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
     public function store() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -82,20 +82,20 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/rooms/new');
+            return $this->redirectToRoute('admin_rooms_new_get');
         }
 
         $data = $_POST;
         $data['is_available'] = isset($_POST['is_available']) ? 1 : 0;
         $this->roomRepository->create($data);
         $_SESSION['success_message'] = "Кімнату успішно створено.";
-        return new RedirectResponse('/admin/rooms');
+        return $this->redirectToRoute('admin_rooms_index');
     }
 
     #[Route('/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
     public function show() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -110,7 +110,7 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
     #[Route('/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -131,7 +131,7 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
     #[Route('/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -150,19 +150,19 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/rooms/edit?id=' . $id);
+            return $this->redirectToRoute('admin_rooms_edit_get', ['id' => $id]);
         }
 
         $_POST['is_available'] = isset($_POST['is_available']) ? 1 : 0;
         $this->roomRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Дані кімнати успішно оновлено.";
-        return new RedirectResponse('/admin/rooms/show?id=' . $id);
+        return $this->redirectToRoute('admin_rooms_show_get', ['id' => $id]);
     }
 
     #[Route('/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
     public function delete() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -173,12 +173,6 @@ class AdminRoomController extends \App\Core\Controller\AbstractController
 
         $this->roomRepository->delete($id);
         $_SESSION['success_message'] = "Кімнату успішно видалено.";
-        return new RedirectResponse('/admin/rooms');
-    }
-
-    private function authorizeAdmin() : void
-    {
-        $this->checkAuth();
-        $this->gate->authorize('rooms.manage');
+        return $this->redirectToRoute('admin_rooms_index');
     }
 }
