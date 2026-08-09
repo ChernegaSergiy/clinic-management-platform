@@ -33,7 +33,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class LabOrderVoter extends Voter
 {
     public const VIEW = 'LAB_ORDER_VIEW';
+    public const CREATE = 'LAB_ORDER_CREATE';
     public const EDIT = 'LAB_ORDER_EDIT';
+    public const EDIT_ALL = 'LAB_ORDER_EDIT_ALL';
 
     private LabOrderRepositoryInterface $labOrderRepository;
     private Security $security;
@@ -48,7 +50,7 @@ class LabOrderVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT], true);
+        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT, self::EDIT_ALL], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -65,14 +67,13 @@ class LabOrderVoter extends Voter
 
         $labOrderId = $this->extractLabOrderId($subject);
 
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($user, $labOrderId);
-            case self::EDIT:
-                return $this->canEdit($user, $labOrderId);
-        }
-
-        return false;
+        return match ($attribute) {
+            self::VIEW => $this->canView($user, $labOrderId),
+            self::CREATE => $this->canCreate(),
+            self::EDIT => $this->canEdit($user, $labOrderId),
+            self::EDIT_ALL => $this->canEditAll(),
+            default => false,
+        };
     }
 
     private function canView(User $user, ?int $labOrderId) : bool
@@ -98,6 +99,18 @@ class LabOrderVoter extends Voter
         }
 
         return false;
+    }
+
+    private function canCreate() : bool
+    {
+        return $this->security->isGranted('ROLE_DOCTOR');
+    }
+
+    private function canEditAll() : bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN')
+            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
+            || $this->security->isGranted('ROLE_REGISTRAR');
     }
 
     private function isOwner(User $user, int $labOrderId) : bool
