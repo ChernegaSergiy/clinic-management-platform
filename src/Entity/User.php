@@ -234,8 +234,8 @@ class User implements UserInterface
 
     public function getRoles() : array
     {
-        $roleName = $this->role ? $this->role->getName() : 'USER';
-        return ['ROLE_' . strtoupper($roleName)];
+        $roleName = $this->role ? $this->role->getName() : 'ROLE_USER';
+        return [$roleName];
     }
 
     public function eraseCredentials() : void
