@@ -26,11 +26,11 @@ namespace App\Bundles\InventoryBundle\Controller;
 
 use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class InventoryController extends \App\Core\Controller\AbstractController
+class InventoryController extends AbstractController
 {
     private InventoryItemRepositoryInterface $inventoryItemRepository;
     private Validator $validator;
@@ -44,8 +44,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
         $searchTerm = $_GET['search'] ?? '';
         $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
@@ -62,8 +61,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
@@ -80,8 +78,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -93,19 +90,18 @@ class InventoryController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/inventory/new');
+            return $this->redirectToRoute('inventory_new_create');
         }
 
         $this->inventoryItemRepository->save($_POST);
         $_SESSION['success_message'] = "Позицію складу успішно додано.";
-        return new RedirectResponse('/inventory');
+        return $this->redirectToRoute('inventory_index');
     }
 
     #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -125,8 +121,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -152,8 +147,7 @@ class InventoryController extends \App\Core\Controller\AbstractController
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('inventory.manage');
+        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -172,11 +166,11 @@ class InventoryController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/inventory/edit?id=' . $id);
+            return $this->redirectToRoute('inventory_edit_edit', ['id' => $id]);
         }
 
         $this->inventoryItemRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Позицію складу успішно оновлено.";
-        return new RedirectResponse('/inventory/show?id=' . $id);
+        return $this->redirectToRoute('inventory_show_show', ['id' => $id]);
     }
 }
