@@ -48,7 +48,7 @@ class PatientVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT]);
+        return in_array($attribute, [self::VIEW, self::EDIT], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool

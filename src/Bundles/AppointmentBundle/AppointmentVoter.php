@@ -49,7 +49,7 @@ class AppointmentVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT, self::CANCEL]);
+        return in_array($attribute, [self::VIEW, self::EDIT, self::CANCEL], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
