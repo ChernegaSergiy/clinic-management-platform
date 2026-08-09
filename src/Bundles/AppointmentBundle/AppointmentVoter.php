@@ -25,22 +25,31 @@
 namespace App\Bundles\AppointmentBundle;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AppointmentVoter extends Voter
 {
-    private AppointmentRepositoryInterface $appointmentRepository;
+    public const VIEW = 'APPOINTMENT_VIEW';
+    public const EDIT = 'APPOINTMENT_EDIT';
+    public const CANCEL = 'APPOINTMENT_CANCEL';
 
-    public function __construct(AppointmentRepositoryInterface $appointmentRepository)
-    {
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private Security $security;
+
+    public function __construct(
+        AppointmentRepositoryInterface $appointmentRepository,
+        Security $security
+    ) {
         $this->appointmentRepository = $appointmentRepository;
+        $this->security = $security;
     }
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_APPOINTMENT_VIEW_OWN', 'ROLE_APPOINTMENT_EDIT_OWN', 'ROLE_APPOINTMENT_CANCEL_OWN']);
+        return in_array($attribute, [self::VIEW, self::EDIT, self::CANCEL]);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -51,24 +60,65 @@ class AppointmentVoter extends Voter
             return false;
         }
 
-        $context = is_array($subject) ? $subject : [];
+        // Administrators and Medical Managers have full access
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
+        }
+
+        $appointmentId = $this->extractAppointmentId($subject);
 
         switch ($attribute) {
-            case 'ROLE_APPOINTMENT_VIEW_OWN':
-                $appointmentId = $context['id'] ?? null;
-                if (!$appointmentId) {
-                    return false;
-                }
+            case self::VIEW:
+                return $this->canView($user, $appointmentId);
+            case self::EDIT:
+                return $this->canEdit($user, $appointmentId);
+            case self::CANCEL:
+                return $this->canCancel($user, $appointmentId);
+        }
 
-                return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
-            case 'ROLE_APPOINTMENT_EDIT_OWN':
-            case 'ROLE_APPOINTMENT_CANCEL_OWN':
-                $appointmentId = $context['id'] ?? null;
-                if (!$appointmentId) {
-                    return false;
-                }
+        return false;
+    }
 
-                return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
+    private function canView(User $user, ?int $appointmentId) : bool
+    {
+        // Registrars can view all appointments
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+            return true;
+        }
+
+        // Doctors and nurses can view their own assigned appointments
+        if ($appointmentId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+            return $this->isUserOwnerOfAppointment($user, $appointmentId);
+        }
+
+        return false;
+    }
+
+    private function canEdit(User $user, ?int $appointmentId) : bool
+    {
+        // Registrars can edit any appointment
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+            return true;
+        }
+
+        // Doctors can edit their own assigned appointments
+        if ($appointmentId && $this->security->isGranted('ROLE_DOCTOR')) {
+            return $this->isUserOwnerOfAppointment($user, $appointmentId);
+        }
+
+        return false;
+    }
+
+    private function canCancel(User $user, ?int $appointmentId) : bool
+    {
+        // Registrars can cancel any appointment
+        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+            return true;
+        }
+
+        // Doctors can cancel their own assigned appointments
+        if ($appointmentId && $this->security->isGranted('ROLE_DOCTOR')) {
+            return $this->isUserOwnerOfAppointment($user, $appointmentId);
         }
 
         return false;
@@ -81,5 +131,22 @@ class AppointmentVoter extends Voter
             return false;
         }
         return $this->appointmentRepository->isAppointmentOwnedByDoctor($appointmentId, $userId);
+    }
+
+    private function extractAppointmentId(mixed $subject) : ?int
+    {
+        if (is_int($subject) || is_string($subject)) {
+            return (int) $subject;
+        }
+
+        if (is_array($subject) && isset($subject['id'])) {
+            return (int) $subject['id'];
+        }
+
+        if (is_object($subject) && method_exists($subject, 'getId')) {
+            return (int) $subject->getId();
+        }
+
+        return null;
     }
 }
