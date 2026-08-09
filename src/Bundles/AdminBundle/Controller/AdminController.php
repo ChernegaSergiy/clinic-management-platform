@@ -24,7 +24,6 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,18 +31,15 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminController extends \App\Core\Controller\AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
-    private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
-        ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
         \App\Core\Validation\Validator $validator
     ) {
         $this->roleRepository = $roleRepository;
-        $this->serviceRepository = $serviceRepository;
         $this->settingsRepository = $settingsRepository;
         $this->validator = $validator;
     }
@@ -95,252 +91,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
-    }
-
-    // --- Service Management ---
-    #[Route('/services', name: 'admin_services', methods: ['GET'])]
-    public function listServices() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services'); // Specific permission for service management
-        $services = $this->serviceRepository->findAll();
-        return $this->render('@Admin/services/index.html.twig', ['services' => $services]);
-    }
-
-    #[Route('/services/new', name: 'admin_services_new', methods: ['GET'])]
-    public function createService() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services');
-        $categories = $this->serviceRepository->findCategories();
-        $categoryOptions = [];
-        foreach ($categories as $category) {
-            $categoryOptions[$category['id']] = $category['name'];
-        }
-
-        $response = $this->render('@Admin/users/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-            'categories' => $categoryOptions,
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/services/new', name: 'admin_services_new_post', methods: ['POST'])]
-    public function storeService() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services');
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:services,name'],
-            'price' => ['required', 'numeric'],
-            'duration_minutes' => ['required', 'numeric', 'min:1'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services/new');
-        }
-
-        // Normalize is_active checkbox value
-        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
-
-        $this->serviceRepository->save($_POST);
-        $_SESSION['success_message'] = "Послугу успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
-    }
-
-    #[Route('/services/edit', name: 'admin_services_edit', methods: ['GET'])]
-    public function editService() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $service = $this->serviceRepository->findById($id);
-
-        if (!$service) {
-            return new \Symfony\Component\HttpFoundation\Response("Послугу не знайдено", 404);
-        }
-
-        $categories = $this->serviceRepository->findCategories();
-        $categoryOptions = [];
-        foreach ($categories as $category) {
-            $categoryOptions[$category['id']] = $category['name'];
-        }
-
-        $response = $this->render('@Admin/users/edit.html.twig', [
-            'service' => $service,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-            'categories' => $categoryOptions,
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
-    public function updateService() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $service = $this->serviceRepository->findById($id);
-
-        if (!$service) {
-            return new \Symfony\Component\HttpFoundation\Response("Послугу не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:services,name,' . $id],
-            'price' => ['required', 'numeric'],
-            'duration_minutes' => ['required', 'numeric', 'min:1'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services/edit?id=' . $id);
-        }
-
-        // Normalize is_active checkbox value
-        $_POST['is_active'] = isset($_POST['is_active']) ? 1 : 0;
-
-        $this->serviceRepository->update($id, $_POST);
-        $_SESSION['success_message'] = "Послугу успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
-    }
-
-    #[Route('/services/delete', name: 'admin_services_delete', methods: ['POST'])]
-    public function deleteService() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_services');
-
-        $id = (int)($_POST['id'] ?? 0);
-        $this->serviceRepository->delete($id);
-        $_SESSION['success_message'] = "Послугу успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/services');
-    }
-
-    // --- Service Category Management ---
-    #[Route('/service-categories', name: 'admin_service_categories', methods: ['GET'])]
-    public function listServiceCategories() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-        $categories = $this->serviceRepository->findCategories();
-        return $this->render('@Admin/service_categories/index.html.twig', ['categories' => $categories]);
-    }
-
-    #[Route('/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
-    public function createServiceCategory() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-        $response = $this->render('@Admin/service_categories/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
-    public function storeServiceCategory() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:service_categories,name'],
-            'description' => [], // Optional
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories/new');
-        }
-
-        $this->serviceRepository->saveCategory($_POST);
-        $_SESSION['success_message'] = "Категорію успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
-    }
-
-    #[Route('/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
-    public function editServiceCategory() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $category = $this->serviceRepository->findCategoryById($id);
-
-        if (!$category) {
-            return new \Symfony\Component\HttpFoundation\Response("Категорію послуг не знайдено", 404);
-        }
-
-        $response = $this->render('@Admin/service_categories/edit.html.twig', [
-            'category' => $category,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
-    public function updateServiceCategory() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-
-        $id = (int)($_GET['id'] ?? 0);
-        $category = $this->serviceRepository->findCategoryById($id);
-
-        if (!$category) {
-            return new \Symfony\Component\HttpFoundation\Response("Категорію послуг не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:service_categories,name,' . $id],
-            'description' => [], // Optional
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories/edit?id=' . $id);
-        }
-
-        $this->serviceRepository->updateCategory($id, $_POST);
-        $_SESSION['success_message'] = "Категорію успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
-    }
-
-    #[Route('/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
-    public function deleteServiceCategory() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $this->gate->authorize('admin.manage_service_categories');
-
-        $id = (int)($_POST['id'] ?? 0);
-        if ($this->serviceRepository->categoryHasServices($id)) {
-            $_SESSION['error_message'] = "Не можна видалити категорію, до якої прив'язані послуги.";
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
-        }
-        $this->serviceRepository->deleteCategory($id);
-        $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/service-categories');
     }
 
     private function authorizeAdmin() : void
