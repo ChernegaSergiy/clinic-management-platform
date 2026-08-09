@@ -117,12 +117,12 @@ class BillingController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/services/new');
+            return $this->redirectToRoute('billing_services_new_get');
         }
 
         $this->serviceRepository->save($_POST);
         $_SESSION['success_message'] = "Послугу успішно додано.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/services');
+        return $this->redirectToRoute('billing_services_index');
     }
 
     // --- Service Bundle Management ---
@@ -163,12 +163,12 @@ class BillingController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/bundles/new');
+            return $this->redirectToRoute('billing_bundles_new_get');
         }
 
         $this->serviceBundleRepository->save($_POST);
         $_SESSION['success_message'] = "Пакет послуг успішно додано.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/bundles');
+        return $this->redirectToRoute('billing_bundles_index');
     }
 
     #[Route('/billing/new', name: 'billing_new', methods: ['GET'])]
@@ -232,7 +232,7 @@ class BillingController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/new');
+            return $this->redirectToRoute('billing_new');
         }
 
         $invoiceId = $this->invoiceRepository->save($_POST);
@@ -264,7 +264,7 @@ class BillingController extends AbstractController
         }
 
         $_SESSION['success_message'] = "Рахунок успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing');
+        return $this->redirectToRoute('billing_index');
     }
 
     #[Route('/billing/show', name: 'billing_show', methods: ['GET'])]
@@ -308,7 +308,7 @@ class BillingController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $invoiceId);
+            return $this->redirectToRoute('billing_show', ['id' => $invoiceId]);
         }
 
         $this->invoiceRepository->addPayment(
@@ -320,7 +320,7 @@ class BillingController extends AbstractController
         );
 
         $_SESSION['success_message'] = "Оплата успішно додана.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $invoiceId);
+        return $this->redirectToRoute('billing_show', ['id' => $invoiceId]);
     }
 
     #[Route('/billing/edit', name: 'billing_edit', methods: ['GET'])]
@@ -399,14 +399,14 @@ class BillingController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/edit?id=' . $id);
+            return $this->redirectToRoute('billing_edit', ['id' => $id]);
         }
 
         $data = $_POST;
         $data['patient_id'] = $invoice['patient_id']; // Patient ID cannot be changed after creation
         $this->invoiceRepository->update($id, $data);
         $_SESSION['success_message'] = "Рахунок успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/show?id=' . $id);
+        return $this->redirectToRoute('billing_show', ['id' => $id]);
     }
 
     #[Route('/billing/export-csv', name: 'billing_export_csv', methods: ['GET'])]
