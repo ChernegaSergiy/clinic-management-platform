@@ -35,6 +35,7 @@ class DepartmentVoter extends Voter
     public const CREATE = 'DEPARTMENT_CREATE';
     public const EDIT = 'DEPARTMENT_EDIT';
     public const DELETE = 'DEPARTMENT_DELETE';
+    public const MANAGE = 'DEPARTMENT_MANAGE';
 
     private Security $security;
 
@@ -45,7 +46,7 @@ class DepartmentVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT, self::DELETE], true);
+        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -66,6 +67,7 @@ class DepartmentVoter extends Voter
             case self::CREATE:
             case self::EDIT:
             case self::DELETE:
+            case self::MANAGE:
                 return false; // Only admins and medical managers can modify departments
         }
 
