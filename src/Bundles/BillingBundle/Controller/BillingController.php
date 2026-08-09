@@ -458,7 +458,7 @@ class BillingController extends AbstractController
 
         $invoices = $this->invoiceRepository->findAll();
 
-        $html = $this->view->renderToString('@Billing/export_pdf.html.twig', ['invoices' => $invoices]);
+        $html = $this->renderView('@Billing/export_pdf.html.twig', ['invoices' => $invoices]);
 
         $pdfExporter = new PdfExporter();
         $pdfExporter->loadHtml($html);
