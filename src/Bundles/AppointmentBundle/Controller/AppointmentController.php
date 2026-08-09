@@ -31,9 +31,11 @@ use App\Bundles\RoomBundle\Repository\RoomRepository;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AppointmentController extends \App\Core\Controller\AbstractController
+class AppointmentController extends AbstractController
 {
     private AppointmentRepositoryInterface $appointmentRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -65,18 +67,18 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth();
-        $user = $this->gate->getUser();
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
+        $user = $this->getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
         $waitlist = $this->appointmentRepository->getWaitlistEntries();
         $appointments = [];
 
-        if ($this->gate->allows('appointment.view.any')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
             $appointments = $this->appointmentRepository->findAll();
-        } elseif ($this->gate->allows('appointment.view.own')) {
+        } elseif ($this->isGranted('APPOINTMENT_VIEW_OWN')) {
             if ($user && $user->getId()) {
                 $appointments = $this->appointmentRepository->findByDoctorId($user->getId());
             }
@@ -85,8 +87,8 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $calendarDoctors = [];
         foreach ($doctors as $doctor) {
             if (
-                $this->gate->allows('appointment.view.any') ||
-                ($this->gate->allows('appointment.view.own') && (int)$doctor['id'] === $user->getId())
+                $this->isGranted('APPOINTMENT_VIEW_ALL') ||
+                ($this->isGranted('APPOINTMENT_VIEW_OWN') && (int)$doctor['id'] === $user->getId())
             ) {
                 $calendarDoctors[] = [
                     'id' => $doctor['id'],
@@ -103,7 +105,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/book-appointment', name: 'appointment_public_form', methods: ['GET'])]
-    public function publicForm() : \Symfony\Component\HttpFoundation\Response
+    public function publicForm() : Response
     {
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
@@ -136,7 +138,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/book-appointment', name: 'appointment_submit_public_form', methods: ['POST'])]
-    public function submitPublicForm() : \Symfony\Component\HttpFoundation\Response
+    public function submitPublicForm() : Response
     {
         $rawInput = $_POST;
 
@@ -259,30 +261,28 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $result = $this->appointmentRepository->addToWaitlist($waitlistData);
 
         $_SESSION['public_success_message'] = 'Вашу заявку успішно додано до списку очікування! Ми зв\'яжемося з вами найближчим часом для підтвердження запису.';
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/book-appointment');
+        return $this->redirectToRoute('appointment_public_form');
     }
 
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
-    public function rejectWaitlist() : \Symfony\Component\HttpFoundation\Response
+    public function rejectWaitlist() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.edit.any');
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
+            return new Response("Заявку не знайдено", 404);
         }
         $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments');
+        return $this->redirectToRoute('appointment_index');
     }
 
     #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
-    public function create() : \Symfony\Component\HttpFoundation\Response
+    public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.create');
+        $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
 
-        $user = $this->gate->getUser();
+        $user = $this->getUser();
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
@@ -330,7 +330,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         }
 
         $doctorOptions = [];
-        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL')) {
             foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
@@ -369,16 +369,15 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
-    public function store() : \Symfony\Component\HttpFoundation\Response
+    public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.create');
+        $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
 
-        $user = $this->gate->getUser();
+        $user = $this->getUser();
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
-        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any') && $user->getId() !== $submittedDoctorId) {
-            return new \Symfony\Component\HttpFoundation\Response("Доступ заборонено: Ви можете створювати записи лише для себе.", 403);
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL') && $user->getId() !== $submittedDoctorId) {
+            return new Response("Доступ заборонено: Ви можете створювати записи лише для себе.", 403);
         }
 
         $rawInput = $_POST;
@@ -512,7 +511,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $this->notificationService->createNotification($doctor['id'], $message);
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments');
+        return $this->redirectToRoute('appointment_index');
     }
 
     private function normalizeDateTime(string $value) : \DateTime
@@ -535,21 +534,21 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/api/appointments', name: 'appointment_json', methods: ['GET'])]
-    public function json() : \Symfony\Component\HttpFoundation\Response
+    public function json() : Response
     {
-        $this->checkAuth();
-        $user = $this->gate->getUser();
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
+        $user = $this->getUser();
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
         $appointments = [];
 
-        if ($this->gate->allows('appointment.view.any')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
             if ($start && $end) {
                 $appointments = $this->appointmentRepository->findByDateRange($start, $end);
             } else {
                 $appointments = $this->appointmentRepository->findAll();
             }
-        } elseif ($this->gate->allows('appointment.view.own')) {
+        } elseif ($this->isGranted('APPOINTMENT_VIEW_OWN')) {
             if ($user && $user->getId()) {
                 if ($start && $end) {
                     $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($user->getId(), $start, $end);
@@ -594,35 +593,33 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
-    public function show() : \Symfony\Component\HttpFoundation\Response
+    public function show() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('appointment.view', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
+            return new Response("Запис не знайдено", 404);
         }
 
         return $this->render('@Appointment/show.html.twig', ['appointment' => $appointment]);
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
-    public function edit() : \Symfony\Component\HttpFoundation\Response
+    public function edit() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('appointment.edit', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
+            return new Response("Запис не знайдено", 404);
         }
 
-        $user = $this->gate->getUser();
+        $user = $this->getUser();
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $rooms = $this->roomRepository->findAll();
@@ -633,7 +630,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         }
 
         $doctorOptions = [];
-        if ($user->hasPermission('appointment.edit.own') && !$user->hasPermission('appointment.edit.any')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL')) {
             foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
@@ -660,11 +657,10 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
-    public function update() : \Symfony\Component\HttpFoundation\Response
+    public function update() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
-        $this->gate->authorize('appointment.edit', ['id' => $id]);
 
         $rawInput = $_POST;
 
@@ -684,7 +680,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
+            return new Response("Запис не знайдено", 404);
         }
 
         $errors = null;
@@ -774,20 +770,19 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         }
 
         $this->appointmentRepository->update($id, $_POST);
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/show?id=' . $id);
+        return $this->redirectToRoute('appointment_show', ['id' => $id]);
     }
 
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
-    public function cancel() : \Symfony\Component\HttpFoundation\Response
+    public function cancel() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('APPOINTMENT_CANCEL');
         $id = (int)($_POST['id'] ?? 0);
-        $this->gate->authorize('appointment.cancel', ['id' => $id]);
 
         $appointment = $this->appointmentRepository->findById($id);
 
         if (!$appointment) {
-            return new \Symfony\Component\HttpFoundation\Response("Запис не знайдено", 404);
+            return new Response("Запис не знайдено", 404);
         }
 
         $this->appointmentRepository->updateStatus($id, 'cancelled');
@@ -811,14 +806,13 @@ class AppointmentController extends \App\Core\Controller\AbstractController
             $this->notificationService->createNotification($doctor['id'], $messageDoctor);
         }
 
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/show?id=' . $id);
+        return $this->redirectToRoute('appointment_show', ['id' => $id]);
     }
 
     #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
-    public function showWaitlist() : \Symfony\Component\HttpFoundation\Response
+    public function showWaitlist() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.view.any');
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ALL');
 
         $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -842,10 +836,9 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/add', name: 'appointment_add_waitlist', methods: ['POST'])]
-    public function addPatientToWaitlist() : \Symfony\Component\HttpFoundation\Response
+    public function addPatientToWaitlist() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.create');
+        $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
 
         $validator = $this->validator;
         $rules = [
@@ -877,14 +870,13 @@ class AppointmentController extends \App\Core\Controller\AbstractController
         }
 
         $this->appointmentRepository->addToWaitlist($_POST);
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/waitlist');
+        return $this->redirectToRoute('appointment_waitlist');
     }
 
     #[Route('/appointments/load-analytics', name: 'appointment_load_analytics', methods: ['GET'])]
-    public function showLoadAnalytics() : \Symfony\Component\HttpFoundation\Response
+    public function showLoadAnalytics() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.view.any');
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ALL');
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
@@ -896,7 +888,7 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/api/appointments/available-slots', name: 'appointment_available_slots_api', methods: ['GET'])]
-    public function getAvailableSlotsApi() : \Symfony\Component\HttpFoundation\Response
+    public function getAvailableSlotsApi() : Response
     {
         $selectedDoctorId = (int)($_GET['doctor_id'] ?? 0);
         $selectedDateStr = $_GET['date'] ?? null;
@@ -928,14 +920,13 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/fulfill', name: 'appointment_fulfill_waitlist', methods: ['GET'])]
-    public function fulfillWaitlist() : \Symfony\Component\HttpFoundation\Response
+    public function fulfillWaitlist() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.create');
+        $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
         $id = (int)($_GET['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
+            return new Response("Заявку не знайдено", 404);
         }
 
         $patients = $this->patientRepository->findAllActive();
@@ -982,16 +973,15 @@ class AppointmentController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/appointments/waitlist/cancel', name: 'appointment_cancel_waitlist', methods: ['POST'])]
-    public function cancelWaitlist() : \Symfony\Component\HttpFoundation\Response
+    public function cancelWaitlist() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('appointment.edit.any');
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
         $entry = $this->appointmentRepository->findWaitlistById($id);
         if (!$entry) {
-            return new \Symfony\Component\HttpFoundation\Response("Заявку не знайдено", 404);
+            return new Response("Заявку не знайдено", 404);
         }
         $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/appointments/waitlist');
+        return $this->redirectToRoute('appointment_waitlist');
     }
 }
