@@ -24,7 +24,6 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
@@ -33,20 +32,17 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminController extends \App\Core\Controller\AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
-    private BackupPolicyRepository $backupPolicyRepository;
     private ServiceRepository $serviceRepository;
     private SettingsRepository $settingsRepository;
     private \App\Core\Validation\Validator $validator;
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
-        BackupPolicyRepository $backupPolicyRepository,
         ServiceRepository $serviceRepository,
         SettingsRepository $settingsRepository,
         \App\Core\Validation\Validator $validator
     ) {
         $this->roleRepository = $roleRepository;
-        $this->backupPolicyRepository = $backupPolicyRepository;
         $this->serviceRepository = $serviceRepository;
         $this->settingsRepository = $settingsRepository;
         $this->validator = $validator;
@@ -100,115 +96,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         $_SESSION['success_message'] = 'Налаштування збережено.';
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
-
-    // --- Backup Policy Management ---
-    #[Route('/backup-policies', name: 'admin_backup_policies', methods: ['GET'])]
-    public function listBackupPolicies() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $policies = $this->backupPolicyRepository->findAll();
-        return $this->render('@Admin/backup_policies/index.html.twig', ['policies' => $policies]);
-    }
-
-    #[Route('/backup-policies/new', name: 'admin_backup_policies_new', methods: ['GET'])]
-    public function createBackupPolicy() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-        $response = $this->render('@Admin/backup_policies/new.html.twig', [
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/backup-policies/new', name: 'admin_backup_policies_new_post', methods: ['POST'])]
-    public function storeBackupPolicy() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:backup_policies,name'],
-            'frequency' => ['required'],
-            'retention_days' => ['required', 'numeric', 'min:1'],
-            'status' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies/new');
-        }
-
-        $this->backupPolicyRepository->save($_POST);
-        $_SESSION['success_message'] = "Політику резервного копіювання успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
-    }
-
-    #[Route('/backup-policies/edit', name: 'admin_backup_policies_edit', methods: ['GET'])]
-    public function editBackupPolicy() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $policy = $this->backupPolicyRepository->findById($id);
-
-        if (!$policy) {
-            return new \Symfony\Component\HttpFoundation\Response("Політику резервного копіювання не знайдено", 404);
-        }
-
-        $response = $this->render('@Admin/backup_policies/edit.html.twig', [
-            'policy' => $policy,
-            'old' => $_SESSION['old'] ?? [],
-            'errors' => $_SESSION['errors'] ?? [],
-        ]);
-        unset($_SESSION['old'], $_SESSION['errors']);
-        return $response;
-    }
-
-    #[Route('/backup-policies/edit', name: 'admin_backup_policies_edit_post', methods: ['POST'])]
-    public function updateBackupPolicy() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_GET['id'] ?? 0);
-        $policy = $this->backupPolicyRepository->findById($id);
-
-        if (!$policy) {
-            return new \Symfony\Component\HttpFoundation\Response("Політику резервного копіювання не знайдено", 404);
-        }
-
-        $validator = $this->validator;
-        $validator->validate($_POST, [
-            'name' => ['required', 'unique:backup_policies,name,' . $id],
-            'frequency' => ['required'],
-            'retention_days' => ['required', 'numeric', 'min:1'],
-            'status' => ['required'],
-        ]);
-
-        if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies/edit?id=' . $id);
-        }
-
-        $this->backupPolicyRepository->update($id, $_POST);
-        $_SESSION['success_message'] = "Політику резервного копіювання успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
-    }
-
-    #[Route('/backup-policies/delete', name: 'admin_backup_policies_delete', methods: ['POST'])]
-    public function deleteBackupPolicy() : \Symfony\Component\HttpFoundation\Response
-    {
-        $this->authorizeAdmin();
-
-        $id = (int)($_POST['id'] ?? 0);
-        $this->backupPolicyRepository->delete($id);
-        $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/backup_policies');
-    }
-
 
     // --- Service Management ---
     #[Route('/services', name: 'admin_services', methods: ['GET'])]
