@@ -28,11 +28,11 @@ use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
 use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
 use MedCore\Nk0262021Parser\Parser as Nk026Parser;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ClinicalReferenceController extends \App\Core\Controller\AbstractController
+class ClinicalReferenceController extends AbstractController
 {
     private IcdCodeRepository $icdCodeRepository;
     private InterventionCodeRepository $interventionCodeRepository;
@@ -48,8 +48,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     #[Route('/clinical/icd-import', name: 'clinical_icd_import_form', methods: ['GET'])]
     public function icdImportForm() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $count = $this->icdCodeRepository->countAll();
         $response = $this->render('@ClinicalReference/icd_import.html.twig', [
@@ -64,8 +63,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     #[Route('/clinical/icd-import', name: 'clinical_icd_import_run', methods: ['POST'])]
     public function icdImportRun() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         try {
             $parser = new Parser();
@@ -93,14 +91,13 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        return new RedirectResponse('/admin/clinical');
+        return $this->redirectToRoute('clinical_index');
     }
 
     #[Route('/clinical/intervention-import', name: 'clinical_intervention_import_form', methods: ['GET'])]
     public function interventionImportForm() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $count = $this->interventionCodeRepository->countAll();
         $response = $this->render('@ClinicalReference/intervention_import.html.twig', [
@@ -115,8 +112,7 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
     #[Route('/clinical/intervention-import', name: 'clinical_intervention_import_run', methods: ['POST'])]
     public function interventionImportRun() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         try {
             $parser = new Nk026Parser();
@@ -145,14 +141,13 @@ class ClinicalReferenceController extends \App\Core\Controller\AbstractControlle
             $_SESSION['errors']['import'] = $e->getMessage();
         }
 
-        return new RedirectResponse('/admin/clinical');
+        return $this->redirectToRoute('clinical_index');
     }
 
     #[Route('/clinical', name: 'clinical_index', methods: ['GET'])]
     public function clinicalIndex() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();
