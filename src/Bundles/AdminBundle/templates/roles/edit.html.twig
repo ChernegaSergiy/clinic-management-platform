@@ -10,7 +10,7 @@
         <div class="ui divider"></div>
 
         <form class="ui form" method="POST" action="/admin/roles/edit?id={{ role.id }}">
-            {{ forms.input('name', 'admin.roles.new.name'|trans, old.name ?? role.name, 'text', 'admin.roles.new.name_placeholder'|trans, errors.name ?? null, {'required': 'required'}) }}
+            {{ forms.input('name', 'admin.roles.new.name'|trans, old.name ?? role.name, 'text', 'admin.roles.new.name_placeholder'|trans, errors.name ?? null, {'readonly': 'readonly'}) }}
             {{ forms.textarea('description', 'admin.roles.new.description'|trans, old.description ?? role.description, 'admin.roles.new.description_placeholder'|trans, errors.description ?? null) }}
 
             {{ ui.button('admin.roles.edit.save'|trans, 'primary', 'large', 'save') }}
