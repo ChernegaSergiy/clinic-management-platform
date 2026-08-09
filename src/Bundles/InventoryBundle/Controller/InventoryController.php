@@ -44,7 +44,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory', name: 'inventory_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
         $searchTerm = $_GET['search'] ?? '';
         $items = $this->inventoryItemRepository->findAll($searchTerm);
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
@@ -61,7 +61,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory/new', name: 'inventory_new_create', methods: ['GET'])]
     public function create() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
         $old = $_SESSION['old'] ?? [];
         unset($_SESSION['old']);
         $errors = $_SESSION['errors'] ?? [];
@@ -78,7 +78,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -101,7 +101,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory/show', name: 'inventory_show_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -121,7 +121,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory/edit', name: 'inventory_edit_edit', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
@@ -147,7 +147,7 @@ class InventoryController extends AbstractController
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_INVENTORY_MANAGE');
+        $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $item = $this->inventoryItemRepository->findById($id);
