@@ -27,7 +27,6 @@ namespace App\Bundles\AdminBundle\Controller;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -85,7 +84,7 @@ class ServiceController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/services/new');
+            return $this->redirectToRoute('admin_services_new');
         }
 
         // Normalize is_active checkbox value
@@ -93,7 +92,7 @@ class ServiceController extends AbstractController
 
         $this->serviceRepository->save($_POST);
         $_SESSION['success_message'] = "Послугу успішно створено.";
-        return new RedirectResponse('/admin/services');
+        return $this->redirectToRoute('admin_services');
     }
 
     #[Route('/services/edit', name: 'admin_services_edit', methods: ['GET'])]
@@ -146,7 +145,7 @@ class ServiceController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/services/edit?id=' . $id);
+            return $this->redirectToRoute('admin_services_edit', ['id' => $id]);
         }
 
         // Normalize is_active checkbox value
@@ -154,7 +153,7 @@ class ServiceController extends AbstractController
 
         $this->serviceRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Послугу успішно оновлено.";
-        return new RedirectResponse('/admin/services');
+        return $this->redirectToRoute('admin_services');
     }
 
     #[Route('/services/delete', name: 'admin_services_delete', methods: ['POST'])]
@@ -165,7 +164,7 @@ class ServiceController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->serviceRepository->delete($id);
         $_SESSION['success_message'] = "Послугу успішно видалено.";
-        return new RedirectResponse('/admin/services');
+        return $this->redirectToRoute('admin_services');
     }
 
     // --- Service Category Management ---
@@ -203,12 +202,12 @@ class ServiceController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/service-categories/new');
+            return $this->redirectToRoute('admin_service_categories_new');
         }
 
         $this->serviceRepository->saveCategory($_POST);
         $_SESSION['success_message'] = "Категорію успішно створено.";
-        return new RedirectResponse('/admin/service-categories');
+        return $this->redirectToRoute('admin_service_categories');
     }
 
     #[Route('/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
@@ -253,12 +252,12 @@ class ServiceController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/service-categories/edit?id=' . $id);
+            return $this->redirectToRoute('admin_service_categories_edit', ['id' => $id]);
         }
 
         $this->serviceRepository->updateCategory($id, $_POST);
         $_SESSION['success_message'] = "Категорію успішно оновлено.";
-        return new RedirectResponse('/admin/service-categories');
+        return $this->redirectToRoute('admin_service_categories');
     }
 
     #[Route('/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
@@ -269,10 +268,10 @@ class ServiceController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         if ($this->serviceRepository->categoryHasServices($id)) {
             $_SESSION['error_message'] = "Не можна видалити категорію, до якої прив'язані послуги.";
-            return new RedirectResponse('/admin/service-categories');
+            return $this->redirectToRoute('admin_service_categories');
         }
         $this->serviceRepository->deleteCategory($id);
         $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
-        return new RedirectResponse('/admin/service-categories');
+        return $this->redirectToRoute('admin_service_categories');
     }
 }
