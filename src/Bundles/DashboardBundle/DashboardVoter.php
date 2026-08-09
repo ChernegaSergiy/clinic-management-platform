@@ -24,23 +24,50 @@
 
 namespace App\Bundles\DashboardBundle;
 
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class DashboardVoter extends Voter
 {
+    public const VIEW = 'DASHBOARD_VIEW';
+    public const EXPORT = 'DASHBOARD_EXPORT';
+
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return false;
+        return in_array($attribute, [self::VIEW, self::EXPORT], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
         $user = $token->getUser();
-
         if (!$user instanceof User) {
             return false;
+        }
+
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
+        }
+
+        switch ($attribute) {
+            case self::VIEW:
+                return $this->security->isGranted('ROLE_REGISTRAR')
+                    || $this->security->isGranted('ROLE_DOCTOR')
+                    || $this->security->isGranted('ROLE_NURSE')
+                    || $this->security->isGranted('ROLE_LAB_TECHNICIAN')
+                    || $this->security->isGranted('ROLE_BILLING')
+                    || $this->security->isGranted('ROLE_INVENTORY_MANAGER')
+                    || $this->security->isGranted('ROLE_HR_MANAGER');
+            case self::EXPORT:
+                return $this->security->isGranted('ROLE_BILLING');
         }
 
         return false;
