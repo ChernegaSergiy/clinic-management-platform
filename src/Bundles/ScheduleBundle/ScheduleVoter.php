@@ -41,7 +41,7 @@ class ScheduleVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_SCHEDULE_VIEW', 'ROLE_SCHEDULE_UPDATE']);
+        return in_array($attribute, ['ROLE_SCHEDULE_VIEW_OWN', 'ROLE_SCHEDULE_UPDATE_OWN']);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -55,7 +55,7 @@ class ScheduleVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_SCHEDULE_VIEW':
+            case 'ROLE_SCHEDULE_VIEW_OWN':
                 if ($user->hasPermission('schedules.manage_all')) {
                     return true;
                 }
@@ -68,7 +68,7 @@ class ScheduleVoter extends Voter
                 }
                 return false;
 
-            case 'ROLE_SCHEDULE_UPDATE':
+            case 'ROLE_SCHEDULE_UPDATE_OWN':
                 if ($user->hasPermission('schedules.manage_all')) {
                     return true;
                 }

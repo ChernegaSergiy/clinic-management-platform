@@ -40,7 +40,7 @@ class AppointmentVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_APPOINTMENT_VIEW', 'ROLE_APPOINTMENT_EDIT', 'ROLE_APPOINTMENT_CANCEL']);
+        return in_array($attribute, ['ROLE_APPOINTMENT_VIEW_OWN', 'ROLE_APPOINTMENT_EDIT_OWN', 'ROLE_APPOINTMENT_CANCEL_OWN']);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -54,34 +54,21 @@ class AppointmentVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_APPOINTMENT_VIEW':
-                if ($user->hasPermission('appointment.view.any')) {
-                    return true;
+            case 'ROLE_APPOINTMENT_VIEW_OWN':
+                $appointmentId = $context['id'] ?? null;
+                if (!$appointmentId) {
+                    return false;
                 }
-                if ($user->hasPermission('appointment.view.own')) {
-                    $appointmentId = $context['id'] ?? null;
-                    if (!$appointmentId) {
-                        return false;
-                    }
 
-                    return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
+                return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
+            case 'ROLE_APPOINTMENT_EDIT_OWN':
+            case 'ROLE_APPOINTMENT_CANCEL_OWN':
+                $appointmentId = $context['id'] ?? null;
+                if (!$appointmentId) {
+                    return false;
                 }
-                return false;
 
-            case 'ROLE_APPOINTMENT_EDIT':
-            case 'ROLE_APPOINTMENT_CANCEL':
-                if ($user->hasPermission('appointment.edit.any')) {
-                    return true;
-                }
-                if ($user->hasPermission('appointment.edit.own')) {
-                    $appointmentId = $context['id'] ?? null;
-                    if (!$appointmentId) {
-                        return false;
-                    }
-
-                    return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
-                }
-                return false;
+                return $this->isUserOwnerOfAppointment($user, (int)$appointmentId);
         }
 
         return false;

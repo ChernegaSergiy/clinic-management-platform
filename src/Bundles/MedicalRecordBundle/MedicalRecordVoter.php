@@ -40,7 +40,7 @@ class MedicalRecordVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_MEDICAL_RECORD_VIEW', 'ROLE_MEDICAL_RECORD_EDIT']);
+        return in_array($attribute, ['ROLE_MEDICAL_RECORD_VIEW_OWN', 'ROLE_MEDICAL_RECORD_EDIT_OWN']);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -54,33 +54,20 @@ class MedicalRecordVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_MEDICAL_RECORD_VIEW':
-                if ($user->hasPermission('medical_record.view.any')) {
-                    return true;
+            case 'ROLE_MEDICAL_RECORD_VIEW_OWN':
+                $recordId = $context['id'] ?? null;
+                if (!$recordId) {
+                    return false;
                 }
-                if ($user->hasPermission('medical_record.view.own')) {
-                    $recordId = $context['id'] ?? null;
-                    if (!$recordId) {
-                        return false;
-                    }
 
-                    return $this->isOwner($user, (int)$recordId);
+                return $this->isOwner($user, (int)$recordId);
+            case 'ROLE_MEDICAL_RECORD_EDIT_OWN':
+                $recordId = $context['id'] ?? null;
+                if (!$recordId) {
+                    return false;
                 }
-                return false;
 
-            case 'ROLE_MEDICAL_RECORD_EDIT':
-                if ($user->hasPermission('medical_record.edit.any')) {
-                    return true;
-                }
-                if ($user->hasPermission('medical_record.edit.own')) {
-                    $recordId = $context['id'] ?? null;
-                    if (!$recordId) {
-                        return false;
-                    }
-
-                    return $this->isOwner($user, (int)$recordId);
-                }
-                return false;
+                return $this->isOwner($user, (int)$recordId);
         }
 
         return false;

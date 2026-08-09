@@ -36,49 +36,29 @@ class PrescriptionVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_PRESCRIPTION_VIEW':
-                if ($user->hasPermission('prescription.view.any')) {
+            case 'ROLE_PRESCRIPTION_VIEW_OWN':
+
+                $prescriptionId = $context['id'] ?? null;
+                if (!$prescriptionId) {
+                    return false;
+                }
+
+                return $this->isOwner($user, (int)$prescriptionId);
+            case 'ROLE_PRESCRIPTION_CREATE_OWN':
+
+                $submittedDoctorId = $context['doctor_id'] ?? null;
+                if (!$submittedDoctorId) {
                     return true;
                 }
+                return $user->getId() === (int)$submittedDoctorId;
+            case 'ROLE_PRESCRIPTION_EDIT_OWN':
 
-                if ($user->hasPermission('prescription.view.own')) {
-                    $prescriptionId = $context['id'] ?? null;
-                    if (!$prescriptionId) {
-                        return false;
-                    }
-
-                    return $this->isOwner($user, (int)$prescriptionId);
-                }
-                return false;
-
-            case 'ROLE_PRESCRIPTION_CREATE':
-                if ($user->hasPermission('prescription.create.any')) {
-                    return true;
+                $prescriptionId = $context['id'] ?? null;
+                if (!$prescriptionId) {
+                    return false;
                 }
 
-                if ($user->hasPermission('prescription.create.own')) {
-                    $submittedDoctorId = $context['doctor_id'] ?? null;
-                    if (!$submittedDoctorId) {
-                        return true;
-                    }
-                    return $user->getId() === (int)$submittedDoctorId;
-                }
-                return false;
-
-            case 'ROLE_PRESCRIPTION_EDIT':
-                if ($user->hasPermission('prescription.edit.any')) {
-                    return true;
-                }
-
-                if ($user->hasPermission('prescription.edit.own')) {
-                    $prescriptionId = $context['id'] ?? null;
-                    if (!$prescriptionId) {
-                        return false;
-                    }
-
-                    return $this->isOwner($user, (int)$prescriptionId);
-                }
-                return false;
+                return $this->isOwner($user, (int)$prescriptionId);
         }
 
         return false;

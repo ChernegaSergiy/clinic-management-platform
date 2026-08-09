@@ -31,35 +31,22 @@ class LabOrderVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_LAB_ORDER_VIEW':
-                if ($user->hasPermission('lab_order.view.any')) {
-                    return true;
+            case 'ROLE_LAB_ORDER_VIEW_OWN':
+
+                $labOrderId = $context['id'] ?? null;
+                if (!$labOrderId) {
+                    return false;
                 }
 
-                if ($user->hasPermission('lab_order.view.own')) {
-                    $labOrderId = $context['id'] ?? null;
-                    if (!$labOrderId) {
-                        return false;
-                    }
+                return $this->isOwner($user, (int)$labOrderId);
+            case 'ROLE_LAB_ORDER_EDIT_OWN':
 
-                    return $this->isOwner($user, (int)$labOrderId);
-                }
-                return false;
-
-            case 'ROLE_LAB_ORDER_EDIT':
-                if ($user->hasPermission('lab_order.edit.any')) {
-                    return true;
+                $labOrderId = $context['id'] ?? null;
+                if (!$labOrderId) {
+                    return false;
                 }
 
-                if ($user->hasPermission('lab_order.edit.own')) {
-                    $labOrderId = $context['id'] ?? null;
-                    if (!$labOrderId) {
-                        return false;
-                    }
-
-                    return $this->isOwner($user, (int)$labOrderId);
-                }
-                return false;
+                return $this->isOwner($user, (int)$labOrderId);
         }
 
         return false;

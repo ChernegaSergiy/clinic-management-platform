@@ -46,7 +46,7 @@ class PatientVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_PATIENT_VIEW', 'ROLE_PATIENT_EDIT']);
+        return in_array($attribute, ['ROLE_PATIENT_VIEW_OWN', 'ROLE_PATIENT_EDIT_OWN']);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -60,33 +60,20 @@ class PatientVoter extends Voter
         $context = is_array($subject) ? $subject : [];
 
         switch ($attribute) {
-            case 'ROLE_PATIENT_VIEW':
-                if ($user->hasPermission('patient.view.any')) {
-                    return true;
+            case 'ROLE_PATIENT_VIEW_OWN':
+                $patientId = $context['id'] ?? null;
+                if (!$patientId) {
+                    return false;
                 }
-                if ($user->hasPermission('patient.view.own')) {
-                    $patientId = $context['id'] ?? null;
-                    if (!$patientId) {
-                        return false;
-                    }
 
-                    return $this->isUserAssignedToPatient($user, (int)$patientId);
+                return $this->isUserAssignedToPatient($user, (int)$patientId);
+            case 'ROLE_PATIENT_EDIT_OWN':
+                $patientId = $context['id'] ?? null;
+                if (!$patientId) {
+                    return false;
                 }
-                return false;
 
-            case 'ROLE_PATIENT_EDIT':
-                if ($user->hasPermission('patient.edit.any')) {
-                    return true;
-                }
-                if ($user->hasPermission('patient.edit.own')) {
-                    $patientId = $context['id'] ?? null;
-                    if (!$patientId) {
-                        return false;
-                    }
-
-                    return $this->isUserAssignedToPatient($user, (int)$patientId);
-                }
-                return false;
+                return $this->isUserAssignedToPatient($user, (int)$patientId);
         }
 
         return false;
