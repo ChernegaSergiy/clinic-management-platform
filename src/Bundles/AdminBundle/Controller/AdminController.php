@@ -109,8 +109,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
     }
 
-
-
     // --- Dictionary Management ---
     #[Route('/dictionaries', name: 'admin_dictionaries', methods: ['GET'])]
     public function listDictionaries() : \Symfony\Component\HttpFoundation\Response
