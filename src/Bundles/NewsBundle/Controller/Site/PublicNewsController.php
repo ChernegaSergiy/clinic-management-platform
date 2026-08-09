@@ -25,10 +25,11 @@
 namespace App\Bundles\NewsBundle\Controller\Site;
 
 use App\Bundles\NewsBundle\Repository\NewsRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PublicNewsController extends \App\Core\Controller\AbstractController
+class PublicNewsController extends AbstractController
 {
     private NewsRepository $newsRepository;
 
