@@ -1,7 +1,7 @@
 {
   "name": "clinical-management-platform",
   "version": "1.0.0",
-  "description": "Це навчальний курсовий проєкт, метою якого є розробка трирівневої веб-системи для автоматизації ключових процесів сучасної клініки. Система розробляється з урахуванням українських реалій та нормативних вимог.",
+  "description": "Web-based clinic management platform.",
   "main": "index.js",
   "directories": {
     "doc": "docs",
