@@ -25,9 +25,11 @@
 namespace App\Bundles\BillingBundle\Controller;
 
 use App\Bundles\BillingBundle\Repository\ContractRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ContractController extends \App\Core\Controller\AbstractController
+class ContractController extends AbstractController
 {
     private ContractRepository $contractRepository;
     private \App\Core\Validation\Validator $validator;
@@ -41,19 +43,17 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts', name: 'billing_contracts_index', methods: ['GET'])]
-    public function index() : \Symfony\Component\HttpFoundation\Response
+    public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $contracts = $this->contractRepository->findAll();
         return $this->render('@Billing/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
-    public function create() : \Symfony\Component\HttpFoundation\Response
+    public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $response = $this->render('@Billing/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -63,10 +63,9 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_store', methods: ['POST'])]
-    public function store() : \Symfony\Component\HttpFoundation\Response
+    public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -87,7 +86,7 @@ class ContractController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/new');
+            return $this->redirectToRoute('billing_contracts_new');
         }
 
         // Handle file upload for contract document
@@ -109,36 +108,34 @@ class ContractController extends \App\Core\Controller\AbstractController
 
         $this->contractRepository->save($data);
         $_SESSION['success_message'] = "Контракт успішно створено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts');
+        return $this->redirectToRoute('billing_contracts_index');
     }
 
     #[Route('/billing/contracts/show', name: 'billing_contracts_show', methods: ['GET'])]
-    public function show() : \Symfony\Component\HttpFoundation\Response
+    public function show() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract) {
-            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+            return new Response("Контракт не знайдено", 404);
         }
 
         return $this->render('@Billing/contracts/show.html.twig', ['contract' => $contract]);
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
-    public function edit() : \Symfony\Component\HttpFoundation\Response
+    public function edit() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract) {
-            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+            return new Response("Контракт не знайдено", 404);
         }
 
         $response = $this->render('@Billing/contracts/edit.html.twig', [
@@ -151,16 +148,15 @@ class ContractController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_update', methods: ['POST'])]
-    public function update() : \Symfony\Component\HttpFoundation\Response
+    public function update() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract) {
-            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+            return new Response("Контракт не знайдено", 404);
         }
 
         $validator = $this->validator;
@@ -173,7 +169,7 @@ class ContractController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/edit?id=' . $id);
+            return $this->redirectToRoute('billing_contracts_edit', ['id' => $id]);
         }
 
         // Handle file upload for contract document (if new file is uploaded)
@@ -196,20 +192,19 @@ class ContractController extends \App\Core\Controller\AbstractController
 
         $this->contractRepository->update($id, $data);
         $_SESSION['success_message'] = "Контракт успішно оновлено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts/show?id=' . $id);
+        return $this->redirectToRoute('billing_contracts_show', ['id' => $id]);
     }
 
     #[Route('/billing/contracts/delete', name: 'billing_contracts_delete', methods: ['POST'])]
-    public function delete() : \Symfony\Component\HttpFoundation\Response
+    public function delete() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract) {
-            return new \Symfony\Component\HttpFoundation\Response("Контракт не знайдено", 404);
+            return new Response("Контракт не знайдено", 404);
         }
 
         // Optionally, delete the physical file
@@ -219,14 +214,13 @@ class ContractController extends \App\Core\Controller\AbstractController
 
         $this->contractRepository->delete($id);
         $_SESSION['success_message'] = "Контракт успішно видалено.";
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/billing/contracts');
+        return $this->redirectToRoute('billing_contracts_index');
     }
 
     #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
-    public function downloadFile(int $id = 0) : \Symfony\Component\HttpFoundation\Response
+    public function downloadFile(int $id = 0) : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('BILLING_MANAGE');
 
         // Accept ID from route parameter or query string fallback
         if (0 === $id) {
@@ -236,7 +230,7 @@ class ContractController extends \App\Core\Controller\AbstractController
         $contract = $this->contractRepository->findById($id);
 
         if (!$contract || !$contract['file_path'] || !file_exists(dirname(__DIR__, 3) . '/' . $contract['file_path'])) {
-            return new \Symfony\Component\HttpFoundation\Response("Файл контракту не знайдено", 404);
+            return new Response("Файл контракту не знайдено", 404);
         }
 
         $filePath = dirname(__DIR__, 3) . '/' . $contract['file_path'];
