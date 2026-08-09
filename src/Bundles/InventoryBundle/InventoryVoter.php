@@ -24,26 +24,39 @@
 
 namespace App\Bundles\InventoryBundle;
 
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class InventoryVoter extends Voter
 {
+    public const MANAGE = 'INVENTORY_MANAGE';
+
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return false;
+        return self::MANAGE === $attribute;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
     {
         $user = $token->getUser();
-
         if (!$user instanceof User) {
             return false;
         }
 
-        switch ($attribute) {
+        // Administrators, Medical Managers, and Nurses can manage inventory
+        if ($this->security->isGranted('ROLE_ADMIN') ||
+            $this->security->isGranted('ROLE_MEDICAL_MANAGER') ||
+            $this->security->isGranted('ROLE_NURSE')) {
+            return true;
         }
 
         return false;
