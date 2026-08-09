@@ -25,10 +25,11 @@
 namespace App\Bundles\NotificationBundle\Controller;
 
 use App\Bundles\NotificationBundle\Repository\NotificationRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-class NotificationController extends \App\Core\Controller\AbstractController
+class NotificationController extends AbstractController
 {
     private NotificationRepository $notificationRepository;
 
@@ -44,8 +45,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
     #[Route('/notifications', name: 'notifications_unread', methods: ['GET'])]
     public function getUnread() : JsonResponse
     {
-        $this->checkAuth();
-        $this->gate->authorize('notifications.read');
+        $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
         $userId = (int)($_SESSION['user']['id'] ?? 0);
 
         $page = max(1, (int)($_GET['page'] ?? 1));
@@ -73,8 +73,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
     #[Route('/notifications/mark-all-read', name: 'notifications_mark_all_read', methods: ['POST'])]
     public function markAllRead() : JsonResponse
     {
-        $this->checkAuth();
-        $this->gate->authorize('notifications.read');
+        $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
         $userId = (int)($_SESSION['user']['id'] ?? 0);
 
         $success = $this->notificationRepository->markAllAsReadByUserId($userId);
@@ -88,8 +87,7 @@ class NotificationController extends \App\Core\Controller\AbstractController
     #[Route('/notifications/delete', name: 'notifications_delete', methods: ['POST'])]
     public function delete() : JsonResponse
     {
-        $this->checkAuth();
-        $this->gate->authorize('notifications.read');
+        $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
         $userId = (int)($_SESSION['user']['id'] ?? 0);
 
         $id = (int)($_POST['id'] ?? 0);
