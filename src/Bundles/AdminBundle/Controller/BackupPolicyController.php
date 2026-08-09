@@ -27,7 +27,6 @@ namespace App\Bundles\AdminBundle\Controller;
 use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -78,12 +77,12 @@ class BackupPolicyController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/backup_policies/new');
+            return $this->redirectToRoute('admin_backup_policies_new');
         }
 
         $this->backupPolicyRepository->save($_POST);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно створено.";
-        return new RedirectResponse('/admin/backup_policies');
+        return $this->redirectToRoute('admin_backup_policies');
     }
 
     #[Route('/backup-policies/edit', name: 'admin_backup_policies_edit', methods: ['GET'])]
@@ -130,12 +129,12 @@ class BackupPolicyController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/backup_policies/edit?id=' . $id);
+            return $this->redirectToRoute('admin_backup_policies_edit', ['id' => $id]);
         }
 
         $this->backupPolicyRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно оновлено.";
-        return new RedirectResponse('/admin/backup_policies');
+        return $this->redirectToRoute('admin_backup_policies');
     }
 
     #[Route('/backup-policies/delete', name: 'admin_backup_policies_delete', methods: ['POST'])]
@@ -146,6 +145,6 @@ class BackupPolicyController extends AbstractController
         $id = (int)($_POST['id'] ?? 0);
         $this->backupPolicyRepository->delete($id);
         $_SESSION['success_message'] = "Політику резервного копіювання успішно видалено.";
-        return new RedirectResponse('/admin/backup_policies');
+        return $this->redirectToRoute('admin_backup_policies');
     }
 }
