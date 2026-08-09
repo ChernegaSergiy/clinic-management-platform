@@ -56,30 +56,18 @@ class ScheduleVoter extends Voter
 
         switch ($attribute) {
             case 'ROLE_SCHEDULE_VIEW_OWN':
-                if ($user->hasPermission('schedules.manage_all')) {
+                $doctorId = $context['doctor_id'] ?? null;
+                if (!$doctorId) {
                     return true;
                 }
-                if ($user->hasPermission('schedules.manage_own')) {
-                    $doctorId = $context['doctor_id'] ?? null;
-                    if (!$doctorId) {
-                        return true;
-                    }
-                    return $user->getId() === (int)$doctorId;
-                }
-                return false;
+                return $user->getId() === (int)$doctorId;
 
             case 'ROLE_SCHEDULE_UPDATE_OWN':
-                if ($user->hasPermission('schedules.manage_all')) {
+                $doctorId = $context['doctor_id'] ?? null;
+                if (!$doctorId) {
                     return true;
                 }
-                if ($user->hasPermission('schedules.manage_own')) {
-                    $doctorId = $context['doctor_id'] ?? null;
-                    if (!$doctorId) {
-                        return true;
-                    }
-                    return $user->getId() === (int)$doctorId;
-                }
-                return false;
+                return $user->getId() === (int)$doctorId;
         }
 
         return false;
