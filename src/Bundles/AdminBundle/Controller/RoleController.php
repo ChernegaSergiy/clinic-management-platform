@@ -27,7 +27,6 @@ namespace App\Bundles\AdminBundle\Controller;
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -76,12 +75,12 @@ class RoleController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/roles/new');
+            return $this->redirectToRoute('admin_roles_new');
         }
 
         $this->roleRepository->save($_POST);
         $_SESSION['success_message'] = "Роль успішно створено.";
-        return new RedirectResponse('/admin/roles');
+        return $this->redirectToRoute('admin_roles');
     }
 
     #[Route('/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
@@ -126,12 +125,12 @@ class RoleController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/roles/edit?id=' . $id);
+            return $this->redirectToRoute('admin_roles_edit', ['id' => $id]);
         }
 
         $this->roleRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Роль успішно оновлено.";
-        return new RedirectResponse('/admin/roles');
+        return $this->redirectToRoute('admin_roles');
     }
 
     #[Route('/roles/delete', name: 'admin_roles_delete', methods: ['POST'])]
@@ -148,6 +147,6 @@ class RoleController extends AbstractController
 
         $this->roleRepository->delete($id);
         $_SESSION['success_message'] = "Роль успішно видалено.";
-        return new RedirectResponse('/admin/roles');
+        return $this->redirectToRoute('admin_roles');
     }
 }
