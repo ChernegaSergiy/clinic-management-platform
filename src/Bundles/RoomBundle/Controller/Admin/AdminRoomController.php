@@ -44,7 +44,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms', name: 'admin_rooms_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
         $searchTerm = $_GET['search'] ?? '';
         $rooms = $this->roomRepository->findAll();
 
@@ -57,7 +57,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/new', name: 'admin_rooms_new_get', methods: ['GET'])]
     public function create() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $response = $this->render('@Room/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -70,7 +70,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/new', name: 'admin_rooms_new_post', methods: ['POST'])]
     public function store() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -95,7 +95,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/show', name: 'admin_rooms_show_get', methods: ['GET'])]
     public function show() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -110,7 +110,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -131,7 +131,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/edit', name: 'admin_rooms_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
@@ -162,7 +162,7 @@ class AdminRoomController extends AbstractController
     #[Route('/rooms/delete', name: 'admin_rooms_delete_post', methods: ['POST'])]
     public function delete() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ROOM_MANAGE');
+        $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $room = $this->roomRepository->findById($id);
