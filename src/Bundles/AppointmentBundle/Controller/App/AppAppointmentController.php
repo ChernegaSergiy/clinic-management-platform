@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle\Controller;
+namespace App\Bundles\AppointmentBundle\Controller\App;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
@@ -35,7 +35,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AppointmentController extends AbstractController
+class AppAppointmentController extends AbstractController
 {
     private AppointmentRepositoryInterface $appointmentRepository;
     private PatientRepositoryInterface $patientRepository;
