@@ -54,11 +54,6 @@ class View
         echo $this->twig->render($template, $data);
     }
 
-    public function renderToString(string $template, array $data = []) : string
-    {
-        return $this->twig->render($template, $data);
-    }
-
     public function getTranslationService() : TranslationService
     {
         return $this->translationService;
