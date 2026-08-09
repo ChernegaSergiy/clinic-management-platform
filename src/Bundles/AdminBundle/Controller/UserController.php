@@ -29,7 +29,6 @@ use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -115,12 +114,12 @@ class UserController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/users/new');
+            return $this->redirectToRoute('admin_users_new');
         }
 
         $this->userRepository->save($_POST);
         $_SESSION['success_message'] = "Користувача успішно створено.";
-        return new RedirectResponse('/admin/users');
+        return $this->redirectToRoute('admin_users');
     }
 
     #[Route('/users/show', name: 'admin_users_show', methods: ['GET'])]
@@ -233,12 +232,12 @@ class UserController extends AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/admin/users/edit?id=' . $id);
+            return $this->redirectToRoute('admin_users_edit', ['id' => $id]);
         }
 
         $this->userRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Дані користувача успішно оновлено.";
-        return new RedirectResponse('/admin/users/show?id=' . $id);
+        return $this->redirectToRoute('admin_users_show', ['id' => $id]);
     }
 
     #[Route('/users/delete', name: 'admin_users_delete', methods: ['POST'])]
@@ -256,12 +255,12 @@ class UserController extends AbstractController
         // Prevent admin from deleting themselves
         if ($user['id'] === $_SESSION['user']['id']) {
             $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
-            return new RedirectResponse('/admin/users');
+            return $this->redirectToRoute('admin_users');
         }
 
         $this->userRepository->delete($id);
         $_SESSION['success_message'] = "Користувача успішно видалено.";
-        return new RedirectResponse('/admin/users');
+        return $this->redirectToRoute('admin_users');
     }
 
     #[Route('/users/disable-mfa', name: 'admin_users_disable_mfa', methods: ['POST'])]
@@ -279,6 +278,6 @@ class UserController extends AbstractController
         $this->mfaService->disableMfaForUser($id);
 
         $_SESSION['success_message'] = "2FA для користувача " . $user['email'] . " успішно вимкнено.";
-        return new RedirectResponse('/admin/users');
+        return $this->redirectToRoute('admin_users');
     }
 }
