@@ -25,10 +25,11 @@
 namespace App\Bundles\RoomBundle\Controller\App;
 
 use App\Bundles\RoomBundle\Repository\RoomRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ApiRoomController extends \App\Core\Controller\AbstractController
+class ApiRoomController extends AbstractController
 {
     private RoomRepository $roomRepository;
 
