@@ -25,22 +25,30 @@
 namespace App\Bundles\MedicalRecordBundle;
 
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Core\Model\User;
+use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class MedicalRecordVoter extends Voter
 {
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    public const VIEW = 'MEDICAL_RECORD_VIEW';
+    public const EDIT = 'MEDICAL_RECORD_EDIT';
 
-    public function __construct(MedicalRecordRepositoryInterface $medicalRecordRepository)
-    {
+    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private Security $security;
+
+    public function __construct(
+        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        Security $security
+    ) {
         $this->medicalRecordRepository = $medicalRecordRepository;
+        $this->security = $security;
     }
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, ['ROLE_MEDICAL_RECORD_VIEW_OWN', 'ROLE_MEDICAL_RECORD_EDIT_OWN']);
+        return in_array($attribute, [self::VIEW, self::EDIT]);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -51,23 +59,38 @@ class MedicalRecordVoter extends Voter
             return false;
         }
 
-        $context = is_array($subject) ? $subject : [];
+        // Administrators and Medical Managers can view everything
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+            return true;
+        }
+
+        $recordId = $this->extractRecordId($subject);
 
         switch ($attribute) {
-            case 'ROLE_MEDICAL_RECORD_VIEW_OWN':
-                $recordId = $context['id'] ?? null;
-                if (!$recordId) {
-                    return false;
-                }
+            case self::VIEW:
+                return $this->canView($user, $recordId);
+            case self::EDIT:
+                return $this->canEdit($user, $recordId);
+        }
 
-                return $this->isOwner($user, (int)$recordId);
-            case 'ROLE_MEDICAL_RECORD_EDIT_OWN':
-                $recordId = $context['id'] ?? null;
-                if (!$recordId) {
-                    return false;
-                }
+        return false;
+    }
 
-                return $this->isOwner($user, (int)$recordId);
+    private function canView(User $user, ?int $recordId) : bool
+    {
+        // Doctors and nurses can view records they own or have access to
+        if ($recordId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+            return $this->isOwner($user, $recordId);
+        }
+
+        return false;
+    }
+
+    private function canEdit(User $user, ?int $recordId) : bool
+    {
+        // Only doctors can edit records, and only their own
+        if ($recordId && $this->security->isGranted('ROLE_DOCTOR')) {
+            return $this->isOwner($user, $recordId);
         }
 
         return false;
@@ -81,5 +104,22 @@ class MedicalRecordVoter extends Voter
         }
         $medicalRecord = $this->medicalRecordRepository->findById($recordId);
         return $medicalRecord && (int)$medicalRecord['doctor_id'] === $userId;
+    }
+
+    private function extractRecordId(mixed $subject) : ?int
+    {
+        if (is_int($subject) || is_string($subject)) {
+            return (int) $subject;
+        }
+
+        if (is_array($subject) && isset($subject['id'])) {
+            return (int) $subject['id'];
+        }
+
+        if (is_object($subject) && method_exists($subject, 'getId')) {
+            return (int) $subject->getId();
+        }
+
+        return null;
     }
 }
