@@ -534,7 +534,7 @@ class AppointmentController extends AbstractController
     }
 
     #[Route('/api/appointments', name: 'appointment_json', methods: ['GET'])]
-    public function json() : Response
+    public function getAppointmentsJson() : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
         $user = $this->getUser();
