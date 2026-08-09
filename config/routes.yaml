@@ -94,5 +94,5 @@ site_routes_news:
     resource: { path: ../src/Bundles/NewsBundle/Controller/Site/, namespace: App\Bundles\NewsBundle\Controller\Site\ }
     type: attribute
 site_routes_appointment:
-    resource: { path: ../src/Bundles/AppointmentBundle/Controller/Public/, namespace: App\Bundles\AppointmentBundle\Controller\Public\ }
+    resource: { path: ../src/Bundles/AppointmentBundle/Controller/Site/, namespace: App\Bundles\AppointmentBundle\Controller\Site\ }
     type: attribute

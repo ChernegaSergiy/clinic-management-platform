@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle\Controller\Public;
+namespace App\Bundles\AppointmentBundle\Controller\Site;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
