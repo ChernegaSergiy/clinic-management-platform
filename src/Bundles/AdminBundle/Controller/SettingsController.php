@@ -26,28 +26,32 @@ namespace App\Bundles\AdminBundle\Controller;
 
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
+use App\Core\Service\TranslationService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AdminController extends \App\Core\Controller\AbstractController
+class SettingsController extends AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
     private SettingsRepository $settingsRepository;
-    private \App\Core\Validation\Validator $validator;
+    private TranslationService $translationService;
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
         SettingsRepository $settingsRepository,
-        \App\Core\Validation\Validator $validator
+        TranslationService $translationService
     ) {
         $this->roleRepository = $roleRepository;
         $this->settingsRepository = $settingsRepository;
-        $this->validator = $validator;
+        $this->translationService = $translationService;
     }
 
     #[Route('/settings', name: 'admin_settings', methods: ['GET'])]
-    public function showSettings() : \Symfony\Component\HttpFoundation\Response
+    public function showSettings() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $roles = $this->roleRepository->findAll();
 
@@ -58,7 +62,7 @@ class AdminController extends \App\Core\Controller\AbstractController
             'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
 
-        $availableLocales = $this->view->getTranslationService()->getAvailableLocales();
+        $availableLocales = $this->translationService->getAvailableLocales();
 
         return $this->render('@Admin/settings.html.twig', [
             'settings' => $settings,
@@ -68,9 +72,9 @@ class AdminController extends \App\Core\Controller\AbstractController
     }
 
     #[Route('/settings', name: 'admin_settings_post', methods: ['POST'])]
-    public function updateSettings() : \Symfony\Component\HttpFoundation\Response
+    public function updateSettings() : Response
     {
-        $this->authorizeAdmin();
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $clinicName = $_POST['clinic_name'] ?? '';
         $mfaPolicy = $_POST['mfa_policy'] ?? 'optional';
@@ -90,12 +94,6 @@ class AdminController extends \App\Core\Controller\AbstractController
         // A new View instance is built for every request, so the updated
         // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
-        return new \Symfony\Component\HttpFoundation\RedirectResponse('/admin/settings');
-    }
-
-    private function authorizeAdmin() : void
-    {
-        $this->checkAuth();
-        $this->gate->authorize('system.manage');
+        return new RedirectResponse('/admin/settings');
     }
 }
