@@ -32,13 +32,13 @@ use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Core\Validation\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-class MedicalRecordController extends \App\Core\Controller\AbstractController
+class MedicalRecordController extends AbstractController
 {
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
@@ -72,8 +72,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/new', name: 'medical_records_new_get', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('medical_record.create');
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_CREATE');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -94,17 +93,15 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records', name: 'medical_records_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->checkAuth();
-        $user = $this->gate->getUser();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
+        $user = $this->getUser();
         $searchTerm = $_GET['search'] ?? '';
         $records = [];
 
-        if ($this->gate->allows('medical_record.view.any')) {
+        if ($this->isGranted('MEDICAL_RECORD_VIEW_ALL')) {
             $records = $this->medicalRecordRepository->findAll($searchTerm);
-        } elseif ($this->gate->allows('medical_record.view.own')) {
-            if ($user && $user->getId()) {
-                $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);
-            }
+        } elseif ($user && $user->getId()) {
+            $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);
         }
 
         return $this->render('@MedicalRecord/index.html.twig', [
@@ -116,8 +113,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/new', name: 'medical_records_new_post', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('medical_record.create');
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_CREATE');
 
         $appointmentId = (int)($_GET['appointment_id'] ?? 0);
         $appointment = $this->appointmentRepository->findById($appointmentId);
@@ -143,7 +139,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/medical-records/new?appointment_id=' . $appointmentId);
+            return $this->redirectToRoute('medical_records_new_get', ['appointment_id' => $appointmentId]);
         }
 
         $data = $_POST;
@@ -167,7 +163,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $this->gate->getUser()->getId()
+                        $this->getUser()->getId()
                     );
                 }
             }
@@ -175,13 +171,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
 
         $this->appointmentRepository->updateStatus($appointmentId, 'completed');
 
-        return new RedirectResponse('/patients/show?id=' . $appointment['patient_id']);
+        return $this->redirectToRoute('patient_show', ['id' => $appointment['patient_id']]);
     }
 
     #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
         $id = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
@@ -189,15 +185,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        $this->gate->authorize('medical_record.view', ['id' => $id]);
-
         $this->auditLogger->log(
             'medical_record',
             $id,
             'view',
             null,
             null,
-            $this->gate->getUser()->getId()
+            $this->getUser()->getId()
         );
 
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
@@ -213,8 +207,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/icd-codes', name: 'medical_records_icd_codes', methods: ['GET'])]
     public function getIcdCodes() : JsonResponse
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->icdCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -225,8 +218,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/intervention-codes', name: 'medical_records_intervention_codes', methods: ['GET'])]
     public function getInterventionCodes() : JsonResponse
     {
-        $this->checkAuth();
-        $this->gate->authorize('clinical.manage');
+        $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $searchTerm = $_GET['search'] ?? '';
         $codes = $this->interventionCodeRepository->searchByCodeOrDescription($searchTerm);
@@ -237,15 +229,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/edit', name: 'medical_records_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $id = (int)($_GET['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
             return new Response("Медичний запис не знайдено", 404);
         }
-
-        $this->gate->authorize('medical_record.edit', ['id' => $id]);
 
         $response = $this->render('@MedicalRecord/edit.html.twig', [
             'record' => $record,
@@ -259,15 +249,13 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
     #[Route('/medical-records/edit', name: 'medical_records_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $id = (int)($_POST['id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
             return new Response("Медичний запис не знайдено", 404);
         }
-
-        $this->gate->authorize('medical_record.edit', ['id' => $id]);
 
         if (!empty($_POST['visit_date'])) {
             try {
@@ -291,7 +279,7 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
         if ($validator->hasErrors()) {
             $_SESSION['errors'] = $validator->getErrors();
             $_SESSION['old'] = $_POST;
-            return new RedirectResponse('/medical-records/edit?id=' . $id);
+            return $this->redirectToRoute('medical_records_edit_get', ['id' => $id]);
         }
 
         $data = $_POST;
@@ -304,21 +292,19 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
             $data
         );
 
-        return new RedirectResponse('/medical-records/show?id=' . $id);
+        return $this->redirectToRoute('medical_records_show', ['id' => $id]);
     }
 
     #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
     public function uploadAttachment() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
         if (!$record) {
             return new Response("Медичний запис не знайдено", 404);
         }
-
-        $this->gate->authorize('medical_record.edit', ['id' => $medicalRecordId]);
 
         if (isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0])) {
             foreach ($_FILES['attachments']['name'] as $key => $name) {
@@ -334,19 +320,19 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $this->gate->getUser()->getId()
+                        $this->getUser()->getId()
                     );
                 }
             }
         }
 
-        return new RedirectResponse('/medical-records/show?id=' . $medicalRecordId);
+        return $this->redirectToRoute('medical_records_show', ['id' => $medicalRecordId]);
     }
 
     #[Route('/medical-records/attachments/download', name: 'medical_records_attachments_download', methods: ['GET'])]
     public function downloadAttachment() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
         $attachmentId = (int)($_GET['attachment_id'] ?? 0);
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
@@ -360,8 +346,6 @@ class MedicalRecordController extends \App\Core\Controller\AbstractController
         if (!$record) {
             return new Response("Медичний запис, пов'язаний із вкладенням, не знайдено", 404);
         }
-
-        $this->gate->authorize('medical_record.view', ['id' => $medicalRecordId]);
 
         $uploadBase = dirname(__DIR__, 3) . '/uploads/';
         $candidates = [];
