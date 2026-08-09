@@ -31,6 +31,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class HrmVoter extends Voter
 {
+    public const VIEW = 'HRM_VIEW';
+    public const WRITE = 'HRM_WRITE';
     public const MANAGE = 'HRM_MANAGE';
 
     private Security $security;
@@ -42,7 +44,7 @@ class HrmVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return self::MANAGE === $attribute;
+        return in_array($attribute, [self::VIEW, self::WRITE, self::MANAGE], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
