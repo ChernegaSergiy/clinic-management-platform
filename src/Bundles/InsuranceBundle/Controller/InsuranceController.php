@@ -28,11 +28,12 @@ namespace App\Bundles\InsuranceBundle\Controller;
 
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Core\Validation\Validator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class InsuranceController extends \App\Core\Controller\AbstractController
+class InsuranceController extends AbstractController
 {
     private InsuranceService $insuranceService;
     private Validator $validator;
@@ -46,8 +47,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies', name: 'insurance_companies_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage'); // Reuse billing permission for now
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $companies = $this->insuranceService->getAllInsuranceCompanies();
 
@@ -59,8 +59,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/show', name: 'insurance_companies_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read'); // Reusing billing read permission
+        $this->denyAccessUnlessGranted('INSURANCE_VIEW');
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -77,8 +76,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_get', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $response = $this->render('@Insurance/companies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
@@ -91,8 +89,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/new', name: 'insurance_companies_new_post', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $validator = $this->validator;
         $rules = [
@@ -119,8 +116,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -140,8 +136,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/edit', name: 'insurance_companies_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $company = $this->insuranceService->getInsuranceCompany($id);
@@ -176,8 +171,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/companies/delete', name: 'insurance_companies_delete', methods: ['POST'])]
     public function delete() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->insuranceService->deleteInsuranceCompany($id);
@@ -188,8 +182,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/claims', name: 'insurance_claims_index', methods: ['GET'])]
     public function listClaims() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read'); // Reuse billing permission
+        $this->denyAccessUnlessGranted('INSURANCE_VIEW');
 
         $claims = $this->insuranceService->getAllClaims();
 
@@ -201,8 +194,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/claims/show', name: 'insurance_claims_show', methods: ['GET'])]
     public function showClaim() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.read');
+        $this->denyAccessUnlessGranted('INSURANCE_VIEW');
 
         $id = (int)($_GET['id'] ?? 0);
         $claim = $this->insuranceService->getClaimWithDetails($id);
@@ -219,8 +211,7 @@ class InsuranceController extends \App\Core\Controller\AbstractController
     #[Route('/insurance/claims/update-status', name: 'insurance_claims_update_status', methods: ['POST'])]
     public function updateClaimStatus() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('billing.manage');
+        $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $status = $_POST['status'] ?? 'draft';
