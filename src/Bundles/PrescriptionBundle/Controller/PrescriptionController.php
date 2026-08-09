@@ -30,11 +30,11 @@ use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Validation\Validator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PrescriptionController extends \App\Core\Controller\AbstractController
+class PrescriptionController extends AbstractController
 {
     private PrescriptionRepository $prescriptionRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -62,17 +62,15 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     #[Route('/prescriptions', name: 'prescription_index', methods: ['GET'])]
     public function index() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PRESCRIPTION_VIEW');
         $searchTerm = $_GET['search'] ?? '';
-        $user = $this->gate->getUser();
+        $user = $this->getUser();
         $prescriptions = [];
 
-        if ($this->gate->allows('prescription.view.any')) {
+        if ($this->isGranted('PRESCRIPTION_VIEW_ALL')) {
             $prescriptions = $this->prescriptionRepository->findAll($searchTerm);
-        } elseif ($this->gate->allows('prescription.view.own')) {
-            if ($user && $user->getId()) {
-                $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);
-            }
+        } elseif ($user && $user->getId()) {
+            $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);
         }
 
         return $this->render('@Prescription/index.html.twig', [
@@ -84,8 +82,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
     #[Route('/prescriptions/new', name: 'prescription_new', methods: ['GET'])]
     public function create() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('prescription.create', ['doctor_id' => $this->gate->getUser()->getId()]); // Check if current user can create prescriptions
+        $this->denyAccessUnlessGranted('PRESCRIPTION_CREATE', ['doctor_id' => $this->getUser()->getId()]);
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -106,15 +103,14 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
-            'currentDoctorId' => $this->gate->getUser()->getId(),
+            'currentDoctorId' => $this->getUser()->getId(),
         ]);
     }
 
     #[Route('/prescriptions/new', name: 'prescription_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->checkAuth();
-        $this->gate->authorize('prescription.create', ['doctor_id' => $_POST['doctor_id'] ?? null]);
+        $this->denyAccessUnlessGranted('PRESCRIPTION_CREATE', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
         $validator = $this->validator;
         $rules = [
@@ -143,7 +139,7 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                 'patient' => $patient,
                 'doctors' => $doctorOptions,
                 'medicalRecords' => $medicalRecords,
-                'currentDoctorId' => $this->gate->getUser()->getId(),
+                'currentDoctorId' => $this->getUser()->getId(),
             ]);
         }
 
@@ -160,22 +156,21 @@ class PrescriptionController extends \App\Core\Controller\AbstractController
                         $this->inventoryItemRepository->decreaseQuantity(
                             $inventoryItem['id'],
                             $quantityToDeduct,
-                            $this->gate->getUser()->getId(),
+                            $this->getUser()->getId(),
                             'Виконання рецепту #' . $prescriptionId
                         );
                     }
                 }
             }
         }
-        return new RedirectResponse('/patients/show?id=' . $_POST['patient_id']);
+        return $this->redirectToRoute('patient_show', ['id' => $_POST['patient_id']]);
     }
 
     #[Route('/prescriptions/show', name: 'prescription_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->checkAuth();
+        $this->denyAccessUnlessGranted('PRESCRIPTION_VIEW');
         $id = (int)($_GET['id'] ?? 0);
-        $this->gate->authorize('prescription.view', ['id' => $id]);
 
         $prescription = $this->prescriptionRepository->findById($id);
 
