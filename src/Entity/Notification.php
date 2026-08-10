@@ -56,51 +56,62 @@ class Notification
     {
         return $this->id;
     }
+
     public function setId(?int $id) : self
     {
         $this->id = $id;
         return $this;
     }
+
     public function getUserId() : ?int
     {
         return $this->user_id;
     }
+
     public function setUserId(?int $user_id) : self
     {
         $this->user_id = $user_id;
         return $this;
     }
+
     public function getMessage() : ?string
     {
         return $this->message;
     }
+
     public function setMessage(?string $message) : self
     {
         $this->message = $message;
         return $this;
     }
+
     public function isIsRead() : bool
     {
         return $this->is_read;
     }
+
     public function setIsRead(bool $is_read) : self
     {
         $this->is_read = $is_read;
         return $this;
     }
+
     public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
+
     public function setCreatedAt(?\DateTimeInterface $created_at) : self
     {
         $this->created_at = $created_at;
         return $this;
     }
+
     public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
+
     public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
     {
         $this->updated_at = $updated_at;

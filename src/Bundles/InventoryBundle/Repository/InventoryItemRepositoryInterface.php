@@ -27,14 +27,24 @@ namespace App\Bundles\InventoryBundle\Repository;
 interface InventoryItemRepositoryInterface
 {
     public function findAll(string $searchTerm = '') : array;
+
     public function save(array $data) : bool;
+
     public function findById(int $id) : ?array;
+
     public function update(int $id, array $data) : bool;
+
     public function findItemsBelowMinStock() : array;
+
     public function findItemsAboveMaxStock() : array;
+
     public function countItemsBelowMinStock() : int;
+
     public function getMovementHistory(int $itemId) : array;
+
     public function findByName(string $name) : ?array;
+
     public function decreaseQuantity(int $itemId, int $quantity, ?int $userId = null, string $reason = 'Виконання рецепту') : bool;
-    // public function delete(int $id): bool;
+
+    // public function delete(int $id) : bool;
 }

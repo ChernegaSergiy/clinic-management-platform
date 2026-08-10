@@ -221,6 +221,7 @@ class SchedulingService
 
         return true;
     }
+
     /**
      * Check if a time slot is available for both doctor and room
      */

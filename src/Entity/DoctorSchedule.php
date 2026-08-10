@@ -43,51 +43,62 @@ class DoctorSchedule
     {
         return $this->id;
     }
+
     public function setId(?int $id) : self
     {
         $this->id = $id;
         return $this;
     }
+
     public function getDoctorId() : ?int
     {
         return $this->doctor_id;
     }
+
     public function setDoctorId(?int $doctor_id) : self
     {
         $this->doctor_id = $doctor_id;
         return $this;
     }
+
     public function getDayOfWeek() : ?int
     {
         return $this->day_of_week;
     }
+
     public function setDayOfWeek(?int $day_of_week) : self
     {
         $this->day_of_week = $day_of_week;
         return $this;
     }
+
     public function getStartTime() : ?\DateTimeInterface
     {
         return $this->start_time;
     }
+
     public function setStartTime(?\DateTimeInterface $start_time) : self
     {
         $this->start_time = $start_time;
         return $this;
     }
+
     public function getEndTime() : ?\DateTimeInterface
     {
         return $this->end_time;
     }
+
     public function setEndTime(?\DateTimeInterface $end_time) : self
     {
         $this->end_time = $end_time;
         return $this;
     }
+
     public function isIsAvailable() : bool
     {
         return $this->is_available;
     }
+
     public function setIsAvailable(bool $is_available) : self
     {
         $this->is_available = $is_available;

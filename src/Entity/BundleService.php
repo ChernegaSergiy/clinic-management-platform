@@ -43,15 +43,18 @@ class BundleService
     {
         return $this->bundle_id;
     }
+
     public function setBundleId(?int $bundle_id) : self
     {
         $this->bundle_id = $bundle_id;
         return $this;
     }
+
     public function getServiceId() : ?int
     {
         return $this->service_id;
     }
+
     public function setServiceId(?int $service_id) : self
     {
         $this->service_id = $service_id;

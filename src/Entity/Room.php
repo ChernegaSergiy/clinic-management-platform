@@ -159,6 +159,7 @@ class Room
         $this->id = $id;
         return $this;
     }
+
     public function isIsAvailable() : bool
     {
         return $this->is_available;

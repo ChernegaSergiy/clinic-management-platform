@@ -27,10 +27,16 @@ namespace App\Bundles\MedicalRecordBundle\Repository;
 interface MedicalRecordRepositoryInterface
 {
     public function findByPatientId(int $patientId) : array;
+
     public function findByDoctorId(int $doctorId, string $searchTerm = '') : array;
+
     public function findAll(string $searchTerm = '') : array;
+
     public function save(array $data) : int|false;
+
     public function findById(int $id) : ?array;
+
     public function update(int $id, array $data) : bool;
-    // public function delete(int $id): bool;
+
+    // public function delete(int $id) : bool;
 }

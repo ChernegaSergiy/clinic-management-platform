@@ -29,6 +29,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class NotificationService
 {
     private ManagerRegistry $registry;
+
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

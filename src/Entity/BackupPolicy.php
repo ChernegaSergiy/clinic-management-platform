@@ -46,73 +46,89 @@ class BackupPolicy
     {
         return $this->id;
     }
+
     public function getName() : ?string
     {
         return $this->name;
     }
+
     public function setName(?string $name) : self
     {
         $this->name = $name;
         return $this;
     }
+
     public function getDescription() : ?string
     {
         return $this->description;
     }
+
     public function setDescription(?string $description) : self
     {
         $this->description = $description;
         return $this;
     }
+
     public function getFrequency() : ?string
     {
         return $this->frequency;
     }
+
     public function setFrequency(?string $frequency) : self
     {
         $this->frequency = $frequency;
         return $this;
     }
+
     public function getRetentionDays() : ?int
     {
         return $this->retention_days;
     }
+
     public function setRetentionDays(?int $retention_days) : self
     {
         $this->retention_days = $retention_days;
         return $this;
     }
+
     public function getStatus() : ?string
     {
         return $this->status;
     }
+
     public function setStatus(?string $status) : self
     {
         $this->status = $status;
         return $this;
     }
+
     public function getLastRunAt() : ?\DateTimeInterface
     {
         return $this->last_run_at;
     }
+
     public function setLastRunAt(?\DateTimeInterface $last_run_at) : self
     {
         $this->last_run_at = $last_run_at;
         return $this;
     }
+
     public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
+
     public function setCreatedAt(?\DateTimeInterface $created_at) : self
     {
         $this->created_at = $created_at;
         return $this;
     }
+
     public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
+
     public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
     {
         $this->updated_at = $updated_at;

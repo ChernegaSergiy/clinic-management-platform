@@ -192,10 +192,12 @@ class Appointment
         $this->id = $id;
         return $this;
     }
+
     public function getEhealthEpisodeId() : ?string
     {
         return $this->ehealth_episode_id;
     }
+
     public function setEhealthEpisodeId(?string $ehealth_episode_id) : self
     {
         $this->ehealth_episode_id = $ehealth_episode_id;

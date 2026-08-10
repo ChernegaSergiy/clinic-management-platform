@@ -27,10 +27,16 @@ namespace App\Bundles\LabOrderBundle\Repository;
 interface LabOrderRepositoryInterface
 {
     public function findByMedicalRecordId(int $medicalRecordId) : array;
+
     public function save(array $data) : int|false;
+
     public function findById(int $id) : ?array;
+
     public function update(int $id, array $data) : bool;
+
     public function updateQrCodeHash(int $id, string $qrCodeHash) : bool;
+
     public function countByStatus(array $statuses) : int;
-    // public function delete(int $id): bool;
+
+    // public function delete(int $id) : bool;
 }

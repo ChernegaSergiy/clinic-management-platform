@@ -42,37 +42,45 @@ class ServiceBundle
     {
         return $this->id;
     }
+
     public function getName() : ?string
     {
         return $this->name;
     }
+
     public function setName(?string $name) : self
     {
         $this->name = $name;
         return $this;
     }
+
     public function getDescription() : ?string
     {
         return $this->description;
     }
+
     public function setDescription(?string $description) : self
     {
         $this->description = $description;
         return $this;
     }
+
     public function getPrice() : ?float
     {
         return $this->price;
     }
+
     public function setPrice(?float $price) : self
     {
         $this->price = $price;
         return $this;
     }
+
     public function isActive() : bool
     {
         return $this->is_active;
     }
+
     public function setIsActive(bool $is_active) : self
     {
         $this->is_active = $is_active;
@@ -84,6 +92,7 @@ class ServiceBundle
         $this->id = $id;
         return $this;
     }
+
     public function isIsActive() : bool
     {
         return $this->is_active;

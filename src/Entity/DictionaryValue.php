@@ -42,46 +42,56 @@ class DictionaryValue
     {
         return $this->id;
     }
+
     public function getDictionaryId() : ?int
     {
         return $this->dictionary_id;
     }
+
     public function setDictionaryId(?int $dictionary_id) : self
     {
         $this->dictionary_id = $dictionary_id;
         return $this;
     }
+
     public function getValue() : ?string
     {
         return $this->value;
     }
+
     public function setValue(?string $value) : self
     {
         $this->value = $value;
         return $this;
     }
+
     public function getLabel() : ?string
     {
         return $this->label;
     }
+
     public function setLabel(?string $label) : self
     {
         $this->label = $label;
         return $this;
     }
+
     public function getOrderNum() : ?int
     {
         return $this->order_num;
     }
+
     public function setOrderNum(?int $order_num) : self
     {
         $this->order_num = $order_num;
         return $this;
     }
+
     public function isActive() : bool
     {
         return $this->is_active;
     }
+
     public function setIsActive(bool $is_active) : self
     {
         $this->is_active = $is_active;
@@ -93,6 +103,7 @@ class DictionaryValue
         $this->id = $id;
         return $this;
     }
+
     public function isIsActive() : bool
     {
         return $this->is_active;

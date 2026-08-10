@@ -39,19 +39,23 @@ class InterventionCode
     {
         return $this->id;
     }
+
     public function getCode() : ?string
     {
         return $this->code;
     }
+
     public function setCode(?string $code) : self
     {
         $this->code = $code;
         return $this;
     }
+
     public function getDescription() : ?string
     {
         return $this->description;
     }
+
     public function setDescription(?string $description) : self
     {
         $this->description = $description;

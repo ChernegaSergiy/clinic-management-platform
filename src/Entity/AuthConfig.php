@@ -45,64 +45,78 @@ class AuthConfig
     {
         return $this->id;
     }
+
     public function getProvider() : ?string
     {
         return $this->provider;
     }
+
     public function setProvider(?string $provider) : self
     {
         $this->provider = $provider;
         return $this;
     }
+
     public function getClientId() : ?string
     {
         return $this->client_id;
     }
+
     public function setClientId(?string $client_id) : self
     {
         $this->client_id = $client_id;
         return $this;
     }
+
     public function getClientSecret() : ?string
     {
         return $this->client_secret;
     }
+
     public function setClientSecret(?string $client_secret) : self
     {
         $this->client_secret = $client_secret;
         return $this;
     }
+
     public function isActive() : bool
     {
         return $this->is_active;
     }
+
     public function setIsActive(bool $is_active) : self
     {
         $this->is_active = $is_active;
         return $this;
     }
+
     public function getConfig() : ?string
     {
         return $this->config;
     }
+
     public function setConfig(?string $config) : self
     {
         $this->config = $config;
         return $this;
     }
+
     public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
+
     public function setCreatedAt(?\DateTimeInterface $created_at) : self
     {
         $this->created_at = $created_at;
         return $this;
     }
+
     public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
+
     public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
     {
         $this->updated_at = $updated_at;
@@ -114,6 +128,7 @@ class AuthConfig
         $this->id = $id;
         return $this;
     }
+
     public function isIsActive() : bool
     {
         return $this->is_active;

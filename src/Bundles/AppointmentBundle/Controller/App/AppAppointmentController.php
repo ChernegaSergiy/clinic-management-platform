@@ -105,7 +105,6 @@ class AppAppointmentController extends AbstractController
         ]);
     }
 
-
     #[Route('/appointments/waitlist/reject', name: 'appointment_reject_waitlist', methods: ['POST'])]
     public function rejectWaitlist() : Response
     {

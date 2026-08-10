@@ -48,100 +48,122 @@ class Waitlist
     {
         return $this->id;
     }
+
     public function getTicketNumber() : ?string
     {
         return $this->ticket_number;
     }
+
     public function setTicketNumber(?string $ticket_number) : self
     {
         $this->ticket_number = $ticket_number;
         return $this;
     }
+
     public function getPatientId() : ?int
     {
         return $this->patient_id;
     }
+
     public function setPatientId(?int $patient_id) : self
     {
         $this->patient_id = $patient_id;
         return $this;
     }
+
     public function getDesiredDoctorId() : ?int
     {
         return $this->desired_doctor_id;
     }
+
     public function setDesiredDoctorId(?int $desired_doctor_id) : self
     {
         $this->desired_doctor_id = $desired_doctor_id;
         return $this;
     }
+
     public function getDesiredStartTime() : ?\DateTimeInterface
     {
         return $this->desired_start_time;
     }
+
     public function setDesiredStartTime(?\DateTimeInterface $desired_start_time) : self
     {
         $this->desired_start_time = $desired_start_time;
         return $this;
     }
+
     public function getDesiredEndTime() : ?\DateTimeInterface
     {
         return $this->desired_end_time;
     }
+
     public function setDesiredEndTime(?\DateTimeInterface $desired_end_time) : self
     {
         $this->desired_end_time = $desired_end_time;
         return $this;
     }
+
     public function getNotes() : ?string
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes) : self
     {
         $this->notes = $notes;
         return $this;
     }
+
     public function getContactPhone() : ?string
     {
         return $this->contact_phone;
     }
+
     public function setContactPhone(?string $contact_phone) : self
     {
         $this->contact_phone = $contact_phone;
         return $this;
     }
+
     public function getContactEmail() : ?string
     {
         return $this->contact_email;
     }
+
     public function setContactEmail(?string $contact_email) : self
     {
         $this->contact_email = $contact_email;
         return $this;
     }
+
     public function getStatus() : ?string
     {
         return $this->status;
     }
+
     public function setStatus(?string $status) : self
     {
         $this->status = $status;
         return $this;
     }
+
     public function getCreatedAt() : ?\DateTimeInterface
     {
         return $this->created_at;
     }
+
     public function setCreatedAt(?\DateTimeInterface $created_at) : self
     {
         $this->created_at = $created_at;
         return $this;
     }
+
     public function getUpdatedAt() : ?\DateTimeInterface
     {
         return $this->updated_at;
     }
+
     public function setUpdatedAt(?\DateTimeInterface $updated_at) : self
     {
         $this->updated_at = $updated_at;

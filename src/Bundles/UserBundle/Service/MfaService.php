@@ -34,6 +34,7 @@ class MfaService
     private ManagerRegistry $registry;
     private QrCodeGenerator $qrCodeGenerator;
     private string $issuerName;
+
     public function __construct(ManagerRegistry $registry, QrCodeGenerator $qrCodeGenerator, string $issuerName = 'Clinic')
     {
         $this->registry = $registry;

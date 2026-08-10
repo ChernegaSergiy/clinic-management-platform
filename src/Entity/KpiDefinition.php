@@ -45,69 +45,84 @@ class KpiDefinition
     {
         return $this->id;
     }
+
     public function setId(?int $id) : self
     {
         $this->id = $id;
         return $this;
     }
+
     public function getName() : ?string
     {
         return $this->name;
     }
+
     public function setName(?string $name) : self
     {
         $this->name = $name;
         return $this;
     }
+
     public function getDescription() : ?string
     {
         return $this->description;
     }
+
     public function setDescription(?string $description) : self
     {
         $this->description = $description;
         return $this;
     }
+
     public function getKpiType() : ?string
     {
         return $this->kpi_type;
     }
+
     public function setKpiType(?string $kpi_type) : self
     {
         $this->kpi_type = $kpi_type;
         return $this;
     }
+
     public function getTargetValue() : ?float
     {
         return $this->target_value;
     }
+
     public function setTargetValue(?float $target_value) : self
     {
         $this->target_value = $target_value;
         return $this;
     }
+
     public function getUnit() : ?string
     {
         return $this->unit;
     }
+
     public function setUnit(?string $unit) : self
     {
         $this->unit = $unit;
         return $this;
     }
+
     public function isIsActive() : bool
     {
         return $this->is_active;
     }
+
     public function setIsActive(bool $is_active) : self
     {
         $this->is_active = $is_active;
         return $this;
     }
+
     public function getPeriod() : ?string
     {
         return $this->period;
     }
+
     public function setPeriod(?string $period) : self
     {
         $this->period = $period;

@@ -43,60 +43,73 @@ class KpiResult
     {
         return $this->id;
     }
+
     public function setId(?int $id) : self
     {
         $this->id = $id;
         return $this;
     }
+
     public function getKpiId() : ?int
     {
         return $this->kpi_id;
     }
+
     public function setKpiId(?int $kpi_id) : self
     {
         $this->kpi_id = $kpi_id;
         return $this;
     }
+
     public function getUserId() : ?int
     {
         return $this->user_id;
     }
+
     public function setUserId(?int $user_id) : self
     {
         $this->user_id = $user_id;
         return $this;
     }
+
     public function getPeriodStart() : ?\DateTimeInterface
     {
         return $this->period_start;
     }
+
     public function setPeriodStart(?\DateTimeInterface $period_start) : self
     {
         $this->period_start = $period_start;
         return $this;
     }
+
     public function getPeriodEnd() : ?\DateTimeInterface
     {
         return $this->period_end;
     }
+
     public function setPeriodEnd(?\DateTimeInterface $period_end) : self
     {
         $this->period_end = $period_end;
         return $this;
     }
+
     public function getCalculatedValue() : ?float
     {
         return $this->calculated_value;
     }
+
     public function setCalculatedValue(?float $calculated_value) : self
     {
         $this->calculated_value = $calculated_value;
         return $this;
     }
+
     public function getNotes() : ?string
     {
         return $this->notes;
     }
+
     public function setNotes(?string $notes) : self
     {
         $this->notes = $notes;

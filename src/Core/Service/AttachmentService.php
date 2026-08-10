@@ -30,6 +30,7 @@ class AttachmentService
 {
     private ManagerRegistry $registry;
     private string $uploadDir = __DIR__ . '/../../../uploads';
+
     public function __construct(ManagerRegistry $registry, ?string $uploadDir = null)
     {
         $this->registry = $registry;
