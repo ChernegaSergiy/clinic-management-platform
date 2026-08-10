@@ -26,25 +26,22 @@ namespace App\Bundles\AdminBundle\Controller;
 
 use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
 use App\Core\Repository\SettingsRepository;
-use App\Core\Service\TranslationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Translation\Locales;
 
 class SettingsController extends AbstractController
 {
     private RoleRepositoryInterface $roleRepository;
     private SettingsRepository $settingsRepository;
-    private TranslationService $translationService;
 
     public function __construct(
         RoleRepositoryInterface $roleRepository,
-        SettingsRepository $settingsRepository,
-        TranslationService $translationService
+        SettingsRepository $settingsRepository
     ) {
         $this->roleRepository = $roleRepository;
         $this->settingsRepository = $settingsRepository;
-        $this->translationService = $translationService;
     }
 
     #[Route('/settings', name: 'admin_settings', methods: ['GET'])]
@@ -61,7 +58,7 @@ class SettingsController extends AbstractController
             'system_locale' => $this->settingsRepository->get('system_locale', 'uk'),
         ];
 
-        $availableLocales = $this->translationService->getAvailableLocales();
+        $availableLocales = $this->getAvailableLocales();
 
         return $this->render('@Admin/settings.html.twig', [
             'settings' => $settings,
@@ -94,5 +91,39 @@ class SettingsController extends AbstractController
         // locale takes effect automatically on the next request.
         $_SESSION['success_message'] = 'Налаштування збережено.';
         return $this->redirectToRoute('admin_settings');
+    }
+
+    private function getAvailableLocales() : array
+    {
+        $locales = [];
+        $bundlesDir = __DIR__ . '/../../../../Bundles';
+
+        if (!is_dir($bundlesDir)) {
+            return ['uk' => 'Українська', 'en' => 'English'];
+        }
+
+        $bundles = scandir($bundlesDir);
+        foreach ($bundles as $bundle) {
+            $translationsDir = $bundlesDir . '/' . $bundle . '/translations';
+            if (!is_dir($translationsDir)) {
+                continue;
+            }
+
+            $files = scandir($translationsDir);
+            foreach ($files as $file) {
+                if (str_starts_with($file, 'messages.') && str_ends_with($file, '.yaml')) {
+                    $locale = substr($file, 9, -5);
+                    $locales[$locale] = true;
+                }
+            }
+        }
+
+        $result = [];
+        foreach (array_keys($locales) as $locale) {
+            $result[$locale] = Locales::getName($locale, 'uk');
+        }
+        asort($result);
+
+        return $result;
     }
 }
