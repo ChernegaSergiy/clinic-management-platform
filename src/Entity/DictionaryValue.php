@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\AdminBundle\Repository\DictionaryValueRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: DictionaryValueRepository::class)]
 #[ORM\Table(name: 'dictionary_values')]
 class DictionaryValue
 {

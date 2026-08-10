@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: KpiResultRepository::class)]
 #[ORM\Table(name: 'kpi_results')]
 class KpiResult
 {

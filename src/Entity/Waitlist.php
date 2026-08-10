@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\AppointmentBundle\Repository\WaitlistRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: WaitlistRepository::class)]
 #[ORM\Table(name: 'waitlists')]
 class Waitlist
 {

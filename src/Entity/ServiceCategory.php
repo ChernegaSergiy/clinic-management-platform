@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ServiceCategoryRepository::class)]
 #[ORM\Table(name: 'service_categories')]
 class ServiceCategory
 {

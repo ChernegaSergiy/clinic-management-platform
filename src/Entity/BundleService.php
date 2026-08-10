@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\BillingBundle\Repository\BundleServiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: BundleServiceRepository::class)]
 #[ORM\Table(name: 'bundle_services')]
 class BundleService
 {

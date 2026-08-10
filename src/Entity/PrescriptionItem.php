@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\PrescriptionBundle\Repository\PrescriptionItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PrescriptionItemRepository::class)]
 #[ORM\Table(name: 'prescription_items')]
 class PrescriptionItem
 {

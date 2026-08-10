@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Bundles\BillingBundle\Repository\PaymentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\Table(name: 'payments')]
 class Payment
 {
