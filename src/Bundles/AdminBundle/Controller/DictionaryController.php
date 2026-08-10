@@ -25,6 +25,7 @@
 namespace App\Bundles\AdminBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\DictionaryRepository;
+use App\Bundles\AdminBundle\Repository\DictionaryValueRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,11 +34,16 @@ use Symfony\Component\Routing\Attribute\Route;
 class DictionaryController extends AbstractController
 {
     private DictionaryRepository $dictionaryRepository;
+    private DictionaryValueRepository $dictionaryValueRepository;
     private Validator $validator;
 
-    public function __construct(DictionaryRepository $dictionaryRepository, Validator $validator)
-    {
+    public function __construct(
+        DictionaryRepository $dictionaryRepository,
+        DictionaryValueRepository $dictionaryValueRepository,
+        Validator $validator
+    ) {
         $this->dictionaryRepository = $dictionaryRepository;
+        $this->dictionaryValueRepository = $dictionaryValueRepository;
         $this->validator = $validator;
     }
 
@@ -60,7 +66,7 @@ class DictionaryController extends AbstractController
             return new Response("Словник не знайдено", 404);
         }
 
-        $values = $this->dictionaryRepository->findValuesByDictionaryId($id);
+        $values = $this->dictionaryValueRepository->findValuesByDictionaryId($id);
         return $this->render('@Admin/dictionaries/show.html.twig', [
             'dictionary' => $dictionary,
             'values' => $values,
@@ -196,7 +202,7 @@ class DictionaryController extends AbstractController
             return $this->redirectToRoute('admin_dictionaries_values_new', ['dictionary_id' => $dictionaryId]);
         }
 
-        $this->dictionaryRepository->saveValue($_POST);
+        $this->dictionaryValueRepository->saveValue($_POST);
         $_SESSION['success_message'] = "Значення словника успішно створено.";
         return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
@@ -207,7 +213,7 @@ class DictionaryController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
+        $value = $this->dictionaryValueRepository->findValueById($id);
 
         if (!$value) {
             return new Response("Значення словника не знайдено", 404);
@@ -228,7 +234,7 @@ class DictionaryController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
+        $value = $this->dictionaryValueRepository->findValueById($id);
         $dictionaryId = $value['dictionary_id'];
 
         $validator = $this->validator;
@@ -244,7 +250,7 @@ class DictionaryController extends AbstractController
             return $this->redirectToRoute('admin_dictionaries_values_edit', ['id' => $id]);
         }
 
-        $this->dictionaryRepository->updateValue($id, $_POST);
+        $this->dictionaryValueRepository->updateValue($id, $_POST);
         $_SESSION['success_message'] = "Значення словника успішно оновлено.";
         return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
@@ -255,10 +261,10 @@ class DictionaryController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
-        $value = $this->dictionaryRepository->findValueById($id);
+        $value = $this->dictionaryValueRepository->findValueById($id);
         $dictionaryId = $value['dictionary_id'];
 
-        $this->dictionaryRepository->deleteValue($id);
+        $this->dictionaryValueRepository->deleteValue($id);
         $_SESSION['success_message'] = "Значення словника успішно видалено.";
         return $this->redirectToRoute('admin_dictionaries_show', ['id' => $dictionaryId]);
     }
