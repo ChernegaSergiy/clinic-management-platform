@@ -25,7 +25,7 @@
 namespace App\Bundles\ScheduleBundle\Service;
 
 use App\Domain\Appointment\AppointmentRepository;
-use App\Bundles\BillingBundle\Repository\ServiceRepository;
+use App\Domain\Billing\ServiceRepository;
 use App\Bundles\RoomBundle\Repository\RoomRepository;
 use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository; // Assuming this exists or will be created
 use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;

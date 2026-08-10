@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Repository;
+namespace App\Domain\Billing;
 
-use App\Entity\ServiceBundle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

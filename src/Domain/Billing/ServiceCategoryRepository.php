@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Repository;
+namespace App\Domain\Billing;
 
-use App\Entity\ServiceCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -112,7 +111,7 @@ class ServiceCategoryRepository extends ServiceEntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('COUNT(s.id)')
-            ->from(\App\Entity\Service::class, 's')
+            ->from(\App\Domain\Billing\Service::class, 's')
             ->where('s.category_id = :category_id')
             ->setParameter('category_id', $categoryId);
 

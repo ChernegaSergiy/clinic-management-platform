@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\BillingBundle;
+namespace App\Domain\Billing;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

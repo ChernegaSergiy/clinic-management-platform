@@ -24,7 +24,7 @@
 
 namespace App\Bundles\BillingBundle\Controller;
 
-use App\Bundles\BillingBundle\Repository\ContractRepository;
+use App\Domain\Billing\ContractRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

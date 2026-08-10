@@ -24,7 +24,7 @@
 
 namespace App\Bundles\InventoryBundle\Repository;
 
-use App\Bundles\BillingBundle\Repository\InvoiceRepository;
+use App\Domain\Billing\InvoiceRepository;
 use App\Entity\InventoryItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

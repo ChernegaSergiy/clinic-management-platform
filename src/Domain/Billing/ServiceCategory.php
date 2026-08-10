@@ -22,21 +22,18 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Billing;
 
-use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ServiceBundleRepository::class)]
-#[ORM\Table(name: 'service_bundles')]
-class ServiceBundle
+#[ORM\Entity(repositoryClass: ServiceCategoryRepository::class)]
+#[ORM\Table(name: 'service_categories')]
+class ServiceCategory
 {
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
     #[ORM\Column(length: 255)] private ?string $name = null;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $description = null;
-    #[ORM\Column(type: Types::FLOAT)] private ?float $price = null;
-    #[ORM\Column(type: Types::BOOLEAN)] private bool $is_active = true;
 
     public function getId() : ?int
     {
@@ -65,36 +62,9 @@ class ServiceBundle
         return $this;
     }
 
-    public function getPrice() : ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?float $price) : self
-    {
-        $this->price = $price;
-        return $this;
-    }
-
-    public function isActive() : bool
-    {
-        return $this->is_active;
-    }
-
-    public function setIsActive(bool $is_active) : self
-    {
-        $this->is_active = $is_active;
-        return $this;
-    }
-
     public function setId(?int $id) : self
     {
         $this->id = $id;
         return $this;
-    }
-
-    public function isIsActive() : bool
-    {
-        return $this->is_active;
     }
 }

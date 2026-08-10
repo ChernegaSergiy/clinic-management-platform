@@ -24,8 +24,8 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
-use App\Bundles\BillingBundle\Repository\ServiceRepository;
+use App\Domain\Billing\ServiceCategoryRepository;
+use App\Domain\Billing\ServiceRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

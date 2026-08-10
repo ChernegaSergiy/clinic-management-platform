@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Repository;
+namespace App\Domain\Billing;
 
-use App\Entity\Invoice;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

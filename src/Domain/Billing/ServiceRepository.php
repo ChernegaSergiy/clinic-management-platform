@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Repository;
+namespace App\Domain\Billing;
 
-use App\Entity\Service;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,7 +38,7 @@ class ServiceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->select('s', 'sc.name as category_name')
-            ->leftJoin(\App\Entity\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
+            ->leftJoin(\App\Domain\Billing\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
             ->orderBy('s.name', 'ASC');
 
         $results = $qb->getQuery()->getArrayResult();
@@ -58,7 +57,7 @@ class ServiceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->select('s', 'sc.name as category_name')
-            ->leftJoin(\App\Entity\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
+            ->leftJoin(\App\Domain\Billing\ServiceCategory::class, 'sc', \Doctrine\ORM\Query\Expr\Join::WITH, 's.category_id = sc.id')
             ->where('s.id = :id')
             ->setParameter('id', $id);
 

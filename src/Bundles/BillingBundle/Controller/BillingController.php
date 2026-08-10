@@ -25,10 +25,10 @@
 namespace App\Bundles\BillingBundle\Controller;
 
 use App\Domain\Appointment\AppointmentRepository;
-use App\Bundles\BillingBundle\Repository\InvoiceRepository;
-use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
-use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
-use App\Bundles\BillingBundle\Repository\ServiceRepository;
+use App\Domain\Billing\InvoiceRepository;
+use App\Domain\Billing\ServiceBundleRepository;
+use App\Domain\Billing\ServiceCategoryRepository;
+use App\Domain\Billing\ServiceRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;

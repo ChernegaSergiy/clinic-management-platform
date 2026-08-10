@@ -22,22 +22,19 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Billing;
 
-use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ServiceRepository::class)]
-#[ORM\Table(name: 'services')]
-class Service
+#[ORM\Entity(repositoryClass: ServiceBundleRepository::class)]
+#[ORM\Table(name: 'service_bundles')]
+class ServiceBundle
 {
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
     #[ORM\Column(length: 255)] private ?string $name = null;
     #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $description = null;
     #[ORM\Column(type: Types::FLOAT)] private ?float $price = null;
-    #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $category_id = null;
-    #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $duration_minutes = null;
     #[ORM\Column(type: Types::BOOLEAN)] private bool $is_active = true;
 
     public function getId() : ?int
@@ -75,28 +72,6 @@ class Service
     public function setPrice(?float $price) : self
     {
         $this->price = $price;
-        return $this;
-    }
-
-    public function getCategoryId() : ?int
-    {
-        return $this->category_id;
-    }
-
-    public function setCategoryId(?int $category_id) : self
-    {
-        $this->category_id = $category_id;
-        return $this;
-    }
-
-    public function getDurationMinutes() : ?int
-    {
-        return $this->duration_minutes;
-    }
-
-    public function setDurationMinutes(?int $duration_minutes) : self
-    {
-        $this->duration_minutes = $duration_minutes;
         return $this;
     }
 

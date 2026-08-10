@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Repository;
+namespace App\Domain\Billing;
 
-use App\Entity\BundleService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,7 +39,7 @@ class BundleServiceRepository extends ServiceEntityRepository
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('s.id', 's.name', 's.price')
             ->from(BundleService::class, 'bs')
-            ->join(\App\Entity\Service::class, 's', \Doctrine\ORM\Query\Expr\Join::WITH, 'bs.service_id = s.id')
+            ->join(\App\Domain\Billing\Service::class, 's', \Doctrine\ORM\Query\Expr\Join::WITH, 'bs.service_id = s.id')
             ->where('bs.bundle_id = :bundle_id')
             ->setParameter('bundle_id', $bundleId)
             ->orderBy('s.name', 'ASC');
