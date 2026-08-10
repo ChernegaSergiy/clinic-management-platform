@@ -25,6 +25,7 @@
 namespace App\Bundles\AppointmentBundle\Controller\App;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\WaitlistRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Bundles\RoomBundle\Repository\RoomRepository;
@@ -39,6 +40,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AppAppointmentController extends AbstractController
 {
     private AppointmentRepositoryInterface $appointmentRepository;
+    private WaitlistRepository $waitlistRepository;
     private PatientRepositoryInterface $patientRepository;
     private UserRepositoryInterface $userRepository;
     private NotificationService $notificationService;
@@ -49,6 +51,7 @@ class AppAppointmentController extends AbstractController
 
     public function __construct(
         AppointmentRepositoryInterface $appointmentRepository,
+        WaitlistRepository $waitlistRepository,
         PatientRepositoryInterface $patientRepository,
         UserRepositoryInterface $userRepository,
         NotificationService $notificationService,
@@ -58,6 +61,7 @@ class AppAppointmentController extends AbstractController
         \App\Core\Validation\Validator $validator
     ) {
         $this->appointmentRepository = $appointmentRepository;
+        $this->waitlistRepository = $waitlistRepository;
         $this->patientRepository = $patientRepository;
         $this->userRepository = $userRepository;
         $this->notificationService = $notificationService;
@@ -74,7 +78,7 @@ class AppAppointmentController extends AbstractController
         $user = $this->getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
-        $waitlist = $this->appointmentRepository->getWaitlistEntries();
+        $waitlist = $this->waitlistRepository->getWaitlistEntries();
         $appointments = [];
 
         if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
@@ -110,11 +114,11 @@ class AppAppointmentController extends AbstractController
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
-        $entry = $this->appointmentRepository->findWaitlistById($id);
+        $entry = $this->waitlistRepository->findWaitlistById($id);
         if (!$entry) {
             return new Response("Заявку не знайдено", 404);
         }
-        $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
+        $this->waitlistRepository->updateWaitlistStatus($id, 'cancelled');
         return $this->redirectToRoute('appointment_index');
     }
 
@@ -148,7 +152,7 @@ class AppAppointmentController extends AbstractController
         $prefill = [];
         $waitlistId = (int)($_GET['waitlist_id'] ?? 0);
         if ($waitlistId) {
-            $entry = $this->appointmentRepository->findWaitlistById($waitlistId);
+            $entry = $this->waitlistRepository->findWaitlistById($waitlistId);
             if ($entry) {
                 $prefill['waitlist_id'] = $waitlistId;
                 if (!empty($entry['desired_doctor_id'])) {
@@ -335,7 +339,7 @@ class AppAppointmentController extends AbstractController
         $this->appointmentRepository->save($dataToSave);
 
         if ($waitlistId > 0) {
-            $this->appointmentRepository->updateWaitlistStatus($waitlistId, 'booked');
+            $this->waitlistRepository->updateWaitlistStatus($waitlistId, 'booked');
         }
 
         $patient = $this->patientRepository->findById((int)$rawInput['patient_id']);
@@ -653,7 +657,7 @@ class AppAppointmentController extends AbstractController
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ALL');
 
-        $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
+        $waitlistEntries = $this->waitlistRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
 
@@ -685,7 +689,7 @@ class AppAppointmentController extends AbstractController
         ];
 
         if (!$validator->validate($_POST, $rules)) {
-            $waitlistEntries = $this->appointmentRepository->getWaitlistEntries('pending');
+            $waitlistEntries = $this->waitlistRepository->getWaitlistEntries('pending');
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
 
@@ -708,7 +712,7 @@ class AppAppointmentController extends AbstractController
             ]);
         }
 
-        $this->appointmentRepository->addToWaitlist($_POST);
+        $this->waitlistRepository->addToWaitlist($_POST);
         return $this->redirectToRoute('appointment_waitlist');
     }
 
@@ -763,7 +767,7 @@ class AppAppointmentController extends AbstractController
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
         $id = (int)($_GET['id'] ?? 0);
-        $entry = $this->appointmentRepository->findWaitlistById($id);
+        $entry = $this->waitlistRepository->findWaitlistById($id);
         if (!$entry) {
             return new Response("Заявку не знайдено", 404);
         }
@@ -816,11 +820,11 @@ class AppAppointmentController extends AbstractController
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
-        $entry = $this->appointmentRepository->findWaitlistById($id);
+        $entry = $this->waitlistRepository->findWaitlistById($id);
         if (!$entry) {
             return new Response("Заявку не знайдено", 404);
         }
-        $this->appointmentRepository->updateWaitlistStatus($id, 'cancelled');
+        $this->waitlistRepository->updateWaitlistStatus($id, 'cancelled');
         return $this->redirectToRoute('appointment_waitlist');
     }
 }
