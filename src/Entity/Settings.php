@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Core\Repository\SettingsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: SettingsRepository::class)]
 #[ORM\Table(name: 'settings')]
 class Settings
 {
