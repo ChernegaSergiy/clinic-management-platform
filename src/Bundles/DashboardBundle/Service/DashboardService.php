@@ -28,6 +28,7 @@ use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
+use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use DateTime;
@@ -35,6 +36,7 @@ use DateTime;
 class DashboardService
 {
     private KpiRepository $kpiRepository;
+    private KpiResultRepository $kpiResultRepository;
     private InvoiceRepository $invoiceRepository;
     private PatientRepositoryInterface $patientRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
@@ -43,6 +45,7 @@ class DashboardService
 
     public function __construct(
         KpiRepository $kpiRepository,
+        KpiResultRepository $kpiResultRepository,
         InvoiceRepository $invoiceRepository,
         PatientRepositoryInterface $patientRepository,
         AppointmentRepositoryInterface $appointmentRepository,
@@ -50,6 +53,7 @@ class DashboardService
         InventoryItemRepositoryInterface $inventoryItemRepository
     ) {
         $this->kpiRepository = $kpiRepository;
+        $this->kpiResultRepository = $kpiResultRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->patientRepository = $patientRepository;
         $this->appointmentRepository = $appointmentRepository;
@@ -68,12 +72,12 @@ class DashboardService
         $kpiDefinitions = $this->kpiRepository->findActiveKpiDefinitions();
 
         foreach ($kpiDefinitions as $definition) {
-            $latestResult = $this->kpiRepository->findLatestKpiResult($definition['id'], $definition['period'] ?? 'day');
+            $latestResult = $this->kpiResultRepository->findLatestResult($definition['id'], $definition['period'] ?? 'day');
             if (!$latestResult) {
                 continue;
             }
 
-            $previousResult = $this->kpiRepository->findKpiResultForPreviousPeriod(
+            $previousResult = $this->kpiResultRepository->findResultForPreviousPeriod(
                 $definition['id'],
                 $latestResult['period_end'],
                 'day'
