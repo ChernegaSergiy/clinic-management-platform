@@ -275,8 +275,6 @@ class AppAppointmentController extends AbstractController
             }
         }
 
-
-
         if (!empty($errors)) {
             $patients = $this->patientRepository->findAllActive();
             $doctors = $this->userRepository->findAllDoctors();
