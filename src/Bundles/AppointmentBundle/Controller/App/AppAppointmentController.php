@@ -32,6 +32,7 @@ use App\Bundles\ScheduleBundle\Service\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use App\Core\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -428,7 +429,7 @@ class AppAppointmentController extends AbstractController
             }
         }
 
-        return new \Symfony\Component\HttpFoundation\JsonResponse($events);
+        return new JsonResponse($events);
     }
 
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
@@ -734,7 +735,7 @@ class AppAppointmentController extends AbstractController
         $selectedServiceId = (int)($_GET['service_id'] ?? 0);
 
         if (!$selectedDoctorId || !$selectedDateStr || !$selectedServiceId) {
-            return new \Symfony\Component\HttpFoundation\JsonResponse(['error' => 'Doctor, service, and date are required.']);
+            return new JsonResponse(['error' => 'Doctor, service, and date are required.']);
         }
 
         try {
@@ -752,9 +753,9 @@ class AppAppointmentController extends AbstractController
                 ];
             }
 
-            return new \Symfony\Component\HttpFoundation\JsonResponse($formattedSlots);
+            return new JsonResponse($formattedSlots);
         } catch (\Exception $e) {
-            return new \Symfony\Component\HttpFoundation\JsonResponse(['error' => 'Invalid date format.'], 400);
+            return new JsonResponse(['error' => 'Invalid date format.'], 400);
         }
     }
 
