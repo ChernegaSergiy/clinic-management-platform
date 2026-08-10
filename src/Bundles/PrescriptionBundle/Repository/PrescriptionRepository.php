@@ -34,11 +34,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class PrescriptionRepository extends ServiceEntityRepository
 {
     private EventDispatcherInterface $eventDispatcher;
+    private PrescriptionItemRepository $prescriptionItemRepository;
 
-    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EventDispatcherInterface $eventDispatcher,
+        PrescriptionItemRepository $prescriptionItemRepository
+    ) {
         parent::__construct($registry, Prescription::class);
         $this->eventDispatcher = $eventDispatcher;
+        $this->prescriptionItemRepository = $prescriptionItemRepository;
     }
 
     public function findAll(string $searchTerm = '') : array
@@ -98,7 +103,7 @@ class PrescriptionRepository extends ServiceEntityRepository
             $prescriptionId = $prescription->getId();
 
             if (!empty($data['items']) && is_array($data['items'])) {
-                $this->saveItems($prescriptionId, $data['items']);
+                $this->prescriptionItemRepository->saveItems($prescriptionId, $data['items']);
             }
 
             $em->commit();
@@ -115,22 +120,6 @@ class PrescriptionRepository extends ServiceEntityRepository
             $em->rollBack();
             return null;
         }
-    }
-
-    private function saveItems(int $prescriptionId, array $items) : void
-    {
-        $em = $this->getEntityManager();
-        foreach ($items as $item) {
-            $pi = new \App\Entity\PrescriptionItem();
-            $pi->setPrescriptionId($prescriptionId);
-            $pi->setMedicationName($item['medication_name']);
-            $pi->setDosage($item['dosage']);
-            $pi->setFrequency($item['frequency']);
-            $pi->setDuration($item['duration'] ?? null);
-            $pi->setNotes($item['notes'] ?? null);
-            $em->persist($pi);
-        }
-        $em->flush();
     }
 
     public function findById(int $id) : ?array
@@ -156,21 +145,10 @@ class PrescriptionRepository extends ServiceEntityRepository
                 $flat['expiry_date'] = $flat['expiry_date']->format('Y-m-d H:i:s');
             }
 
-            $flat['items'] = $this->findItemsByPrescriptionId($id);
+            $flat['items'] = $this->prescriptionItemRepository->findItemsByPrescriptionId($id);
             return $flat;
         }
         return null;
-    }
-
-    public function findItemsByPrescriptionId(int $prescriptionId) : array
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder()
-            ->select('pi')
-            ->from(\App\Entity\PrescriptionItem::class, 'pi')
-            ->where('pi.prescription_id = :prescription_id')
-            ->setParameter('prescription_id', $prescriptionId);
-
-        return $qb->getQuery()->getArrayResult();
     }
 
     public function findByPatientId(int $patientId) : array
