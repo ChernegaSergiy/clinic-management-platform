@@ -27,6 +27,7 @@ namespace App\Bundles\KpiBundle\Controller\Admin;
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
+use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,17 +36,20 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminKpiController extends AbstractController
 {
     private KpiRepository $kpiRepository;
+    private KpiResultRepository $kpiResultRepository;
     private InvoiceRepository $invoiceRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
     private Validator $validator;
 
     public function __construct(
         KpiRepository $kpiRepository,
+        KpiResultRepository $kpiResultRepository,
         InvoiceRepository $invoiceRepository,
         AppointmentRepositoryInterface $appointmentRepository,
         Validator $validator
     ) {
         $this->kpiRepository = $kpiRepository;
+        $this->kpiResultRepository = $kpiResultRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->appointmentRepository = $appointmentRepository;
         $this->validator = $validator;
@@ -162,7 +166,7 @@ class AdminKpiController extends AbstractController
     public function listResults() : Response
     {
         $this->denyAccessUnlessGranted('KPI_VIEW');
-        $results = $this->kpiRepository->findAllKpiResults();
+        $results = $this->kpiResultRepository->findAllResults();
         return $this->render('@Kpi/results/index.html.twig', ['results' => $results]);
     }
 
@@ -182,7 +186,7 @@ class AdminKpiController extends AbstractController
             if (null === $value) {
                 continue;
             }
-            $this->kpiRepository->saveKpiResult([
+            $this->kpiResultRepository->save([
                 'kpi_id' => $definition['id'],
                 'user_id' => $userId,
                 'period_start' => $periodStart,
