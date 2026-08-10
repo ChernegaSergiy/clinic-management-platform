@@ -24,6 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
+use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,11 +34,16 @@ use Symfony\Component\Routing\Attribute\Route;
 class ServiceController extends AbstractController
 {
     private ServiceRepository $serviceRepository;
+    private ServiceCategoryRepository $serviceCategoryRepository;
     private Validator $validator;
 
-    public function __construct(ServiceRepository $serviceRepository, Validator $validator)
-    {
+    public function __construct(
+        ServiceRepository $serviceRepository,
+        ServiceCategoryRepository $serviceCategoryRepository,
+        Validator $validator
+    ) {
         $this->serviceRepository = $serviceRepository;
+        $this->serviceCategoryRepository = $serviceCategoryRepository;
         $this->validator = $validator;
     }
 
@@ -54,7 +60,7 @@ class ServiceController extends AbstractController
     public function createService() : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
-        $categories = $this->serviceRepository->findCategories();
+        $categories = $this->serviceCategoryRepository->findAllCategories();
         $categoryOptions = [];
         foreach ($categories as $category) {
             $categoryOptions[$category['id']] = $category['name'];
@@ -107,7 +113,7 @@ class ServiceController extends AbstractController
             return new Response("Послугу не знайдено", 404);
         }
 
-        $categories = $this->serviceRepository->findCategories();
+        $categories = $this->serviceCategoryRepository->findAllCategories();
         $categoryOptions = [];
         foreach ($categories as $category) {
             $categoryOptions[$category['id']] = $category['name'];
@@ -172,7 +178,7 @@ class ServiceController extends AbstractController
     public function listServiceCategories() : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
-        $categories = $this->serviceRepository->findCategories();
+        $categories = $this->serviceCategoryRepository->findAllCategories();
         return $this->render('@Admin/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
@@ -205,7 +211,7 @@ class ServiceController extends AbstractController
             return $this->redirectToRoute('admin_service_categories_new');
         }
 
-        $this->serviceRepository->saveCategory($_POST);
+        $this->serviceCategoryRepository->save($_POST);
         $_SESSION['success_message'] = "Категорію успішно створено.";
         return $this->redirectToRoute('admin_service_categories');
     }
@@ -216,7 +222,7 @@ class ServiceController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
 
         $id = (int)($_GET['id'] ?? 0);
-        $category = $this->serviceRepository->findCategoryById($id);
+        $category = $this->serviceCategoryRepository->findById($id);
 
         if (!$category) {
             return new Response("Категорію послуг не знайдено", 404);
@@ -237,7 +243,7 @@ class ServiceController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
 
         $id = (int)($_GET['id'] ?? 0);
-        $category = $this->serviceRepository->findCategoryById($id);
+        $category = $this->serviceCategoryRepository->findById($id);
 
         if (!$category) {
             return new Response("Категорію послуг не знайдено", 404);
@@ -255,7 +261,7 @@ class ServiceController extends AbstractController
             return $this->redirectToRoute('admin_service_categories_edit', ['id' => $id]);
         }
 
-        $this->serviceRepository->updateCategory($id, $_POST);
+        $this->serviceCategoryRepository->update($id, $_POST);
         $_SESSION['success_message'] = "Категорію успішно оновлено.";
         return $this->redirectToRoute('admin_service_categories');
     }
@@ -266,11 +272,11 @@ class ServiceController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
 
         $id = (int)($_POST['id'] ?? 0);
-        if ($this->serviceRepository->categoryHasServices($id)) {
+        if ($this->serviceCategoryRepository->hasServices($id)) {
             $_SESSION['error_message'] = "Не можна видалити категорію, до якої прив'язані послуги.";
             return $this->redirectToRoute('admin_service_categories');
         }
-        $this->serviceRepository->deleteCategory($id);
+        $this->serviceCategoryRepository->delete($id);
         $_SESSION['success_message'] = "Категорію послуг успішно видалено.";
         return $this->redirectToRoute('admin_service_categories');
     }
