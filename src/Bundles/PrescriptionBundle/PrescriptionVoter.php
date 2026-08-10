@@ -24,7 +24,7 @@
 
 namespace App\Bundles\PrescriptionBundle;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

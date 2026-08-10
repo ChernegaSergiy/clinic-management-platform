@@ -24,8 +24,8 @@
 
 namespace App\Bundles\AppointmentBundle\Controller\Site;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
-use App\Bundles\AppointmentBundle\Repository\WaitlistRepository;
+use App\Domain\Appointment\AppointmentRepository;
+use App\Domain\Appointment\WaitlistRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;

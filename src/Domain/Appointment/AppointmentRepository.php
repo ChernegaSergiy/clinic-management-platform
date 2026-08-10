@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle\Repository;
+namespace App\Domain\Appointment;
 
-use App\Entity\Appointment;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -500,7 +499,7 @@ class AppointmentRepository extends ServiceEntityRepository
             ->select('u.id as doctor_id, u.first_name, u.last_name, a.start_time, a.end_time')
             ->from(\App\Entity\User::class, 'u')
             ->join('u.role', 'r')
-            ->leftJoin(\App\Entity\Appointment::class, 'a', 'WITH', 'u.id = IDENTITY(a.doctor) AND SUBSTRING(a.start_time, 1, 10) = :date AND a.status = :status')
+            ->leftJoin(\App\Domain\Appointment\Appointment::class, 'a', 'WITH', 'u.id = IDENTITY(a.doctor) AND SUBSTRING(a.start_time, 1, 10) = :date AND a.status = :status')
             ->where('r.name = :role_name')
             ->setParameter('date', substr($date, 0, 10))
             ->setParameter('status', 'scheduled')

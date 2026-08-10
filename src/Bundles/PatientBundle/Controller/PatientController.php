@@ -24,7 +24,7 @@
 
 namespace App\Bundles\PatientBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;

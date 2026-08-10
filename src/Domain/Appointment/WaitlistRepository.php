@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle\Repository;
+namespace App\Domain\Appointment;
 
-use App\Entity\Waitlist;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

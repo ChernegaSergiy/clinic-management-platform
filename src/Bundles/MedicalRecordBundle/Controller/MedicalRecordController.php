@@ -24,7 +24,7 @@
 
 namespace App\Bundles\MedicalRecordBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
 use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;

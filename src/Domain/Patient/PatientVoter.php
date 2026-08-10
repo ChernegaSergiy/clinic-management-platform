@@ -24,7 +24,7 @@
 
 namespace App\Domain\Patient;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

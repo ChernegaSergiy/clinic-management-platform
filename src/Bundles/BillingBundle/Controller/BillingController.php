@@ -24,7 +24,7 @@
 
 namespace App\Bundles\BillingBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
 use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;

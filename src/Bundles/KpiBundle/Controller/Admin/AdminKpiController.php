@@ -24,7 +24,7 @@
 
 namespace App\Bundles\KpiBundle\Controller\Admin;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;

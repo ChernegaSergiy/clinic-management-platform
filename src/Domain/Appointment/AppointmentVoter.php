@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle;
+namespace App\Domain\Appointment;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
