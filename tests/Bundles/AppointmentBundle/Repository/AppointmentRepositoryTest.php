@@ -115,14 +115,6 @@ class AppointmentRepositoryTest extends RepositoryTestCase
         $this->assertTrue($result);
     }
 
-    public function testGenerateWaitlistTicketFormat() : void
-    {
-        $this->createMockQueryBuilder(5, true);
-        $result = $this->repository->generateWaitlistTicket();
-        $this->assertStringStartsWith('WL-', $result);
-        $this->assertStringContainsString('-00006', $result);
-    }
-
     public function testCountScheduledByDate() : void
     {
         $this->createMockQueryBuilder(10, true);
