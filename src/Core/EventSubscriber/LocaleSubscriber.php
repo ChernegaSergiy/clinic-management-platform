@@ -26,18 +26,15 @@ namespace App\Core\EventSubscriber;
 
 use App\Core\Repository\SettingsRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class LocaleSubscriber implements EventSubscriberInterface
 {
-    private SettingsRepository $settingsRepository;
-
-    public function __construct(SettingsRepository $settingsRepository)
-    {
-        $this->settingsRepository = $settingsRepository;
-    }
+    public function __construct(
+        private SettingsRepository $settingsRepository,
+        private array $supportedLocales = ['uk', 'en'],
+    ) {}
 
     public function onKernelRequest(RequestEvent $event) : void
     {
@@ -50,72 +47,18 @@ class LocaleSubscriber implements EventSubscriberInterface
             // DB not available, fallback to browser
         }
 
-        $preferredLocale = $systemLocale ?? $this->detectBrowserLanguage($request) ?? 'uk';
-
-        $availableLocales = $this->getAvailableLocales();
-        $finalLocale = 'uk';
-
-        if (in_array($preferredLocale, $availableLocales, true)) {
-            $finalLocale = $preferredLocale;
+        if ($systemLocale && in_array($systemLocale, $this->supportedLocales, true)) {
+            $finalLocale = $systemLocale;
+        } else {
+            $finalLocale = $request->getPreferredLanguage($this->supportedLocales) ?: 'uk';
         }
 
         $request->setLocale($finalLocale);
     }
 
-    private function detectBrowserLanguage(Request $request) : ?string
-    {
-        $acceptLang = $request->headers->get('Accept-Language', '');
-        if (empty($acceptLang)) {
-            return null;
-        }
-
-        $supportedLocales = $this->getAvailableLocales();
-
-        $languages = explode(',', $acceptLang);
-        foreach ($languages as $lang) {
-            $lang = trim(explode(';', $lang)[0]);
-            $lang = explode('-', $lang)[0];
-
-            if (in_array($lang, $supportedLocales, true)) {
-                return $lang;
-            }
-        }
-
-        return null;
-    }
-
-    private function getAvailableLocales() : array
-    {
-        $locales = [];
-        $bundlesDir = __DIR__ . '/../../../Bundles';
-
-        if (!is_dir($bundlesDir)) {
-            return ['uk', 'en'];
-        }
-
-        $bundles = scandir($bundlesDir);
-        foreach ($bundles as $bundle) {
-            $translationsDir = $bundlesDir . '/' . $bundle . '/translations';
-            if (!is_dir($translationsDir)) {
-                continue;
-            }
-
-            $files = scandir($translationsDir);
-            foreach ($files as $file) {
-                if (str_starts_with($file, 'messages.') && str_ends_with($file, '.yaml')) {
-                    $locale = substr($file, 9, -5);
-                    $locales[$locale] = true;
-                }
-            }
-        }
-
-        return array_keys($locales);
-    }
-
     public static function getSubscribedEvents() : array
     {
         return [
-            // Priority 20 to ensure locale is set early
             KernelEvents::REQUEST => [['onKernelRequest', 20]],
         ];
     }
