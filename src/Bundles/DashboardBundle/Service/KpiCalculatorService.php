@@ -27,6 +27,7 @@ namespace App\Bundles\DashboardBundle\Service;
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
+use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
 use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
 use DateTimeImmutable;
@@ -34,6 +35,7 @@ use DateTimeImmutable;
 class KpiCalculatorService
 {
     private KpiRepository $kpiRepository;
+    private KpiResultRepository $kpiResultRepository;
     private AppointmentRepositoryInterface $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
     /** @phpstan-ignore property.onlyWritten */
@@ -43,12 +45,14 @@ class KpiCalculatorService
 
     public function __construct(
         KpiRepository $kpiRepository,
+        KpiResultRepository $kpiResultRepository,
         AppointmentRepositoryInterface $appointmentRepository,
         InvoiceRepository $invoiceRepository,
         UserRepositoryInterface $userRepository,
         MedicalRecordRepositoryInterface $medicalRecordRepository
     ) {
         $this->kpiRepository = $kpiRepository;
+        $this->kpiResultRepository = $kpiResultRepository;
         $this->appointmentRepository = $appointmentRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->userRepository = $userRepository;
@@ -67,7 +71,7 @@ class KpiCalculatorService
             if (null === $value) {
                 continue;
             }
-            $this->kpiRepository->saveKpiResult([
+            $this->kpiResultRepository->save([
                 'kpi_id' => $definition['id'],
                 'user_id' => $userId,
                 'period_start' => $periodStart,
