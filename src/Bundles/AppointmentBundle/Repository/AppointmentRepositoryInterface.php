@@ -40,12 +40,6 @@ interface AppointmentRepositoryInterface
 
     // public function delete(int $id) : bool;
 
-    public function findWaitlistById(int $id) : ?array;
-
-    public function updateWaitlistStatus(int $id, string $status) : bool;
-
-    public function generateWaitlistTicket() : string;
-
     public function isPatientAssignedToDoctor(int $patientId, int $doctorId) : bool;
 
     public function isAppointmentOwnedByDoctor(int $appointmentId, int $doctorId) : bool;
@@ -69,10 +63,6 @@ interface AppointmentRepositoryInterface
     public function findByDateRange(string $start, string $end) : array;
 
     public function findByDoctorIdAndDateRange(int $doctorId, string $start, string $end) : array;
-
-    public function addToWaitlist(array $data) : bool;
-
-    public function getWaitlistEntries(?string $status = 'pending') : array;
 
     public function getDoctorDailyLoad(string $date) : array;
 }
