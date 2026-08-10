@@ -76,7 +76,7 @@ class UserController extends AbstractController
 
         $mfaPolicy = $this->settingsRepository->getMfaPolicy();
 
-        return $this->render('@User/profile.html.twig', [
+        return $this->render('user/profile.html.twig', [
             'user' => $user,
             'employee' => $employee,
             'successMessage' => $successMessage,

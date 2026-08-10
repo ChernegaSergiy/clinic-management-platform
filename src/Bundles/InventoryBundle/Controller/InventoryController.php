@@ -50,7 +50,7 @@ class InventoryController extends AbstractController
         $lowStockItems = $this->inventoryItemRepository->findItemsBelowMinStock();
         $overStockedItems = $this->inventoryItemRepository->findItemsAboveMaxStock();
 
-        return $this->render('@Inventory/index.html.twig', [
+        return $this->render('inventory/index.html.twig', [
             'items' => $items,
             'lowStockItems' => $lowStockItems,
             'overStockedItems' => $overStockedItems,
@@ -67,7 +67,7 @@ class InventoryController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Inventory/new.html.twig', [
+        return $this->render('inventory/new.html.twig', [
             'old' => $old,
             'errors' => $errors,
             'min_stock_level' => $old['min_stock_level'] ?? 0,
@@ -112,7 +112,7 @@ class InventoryController extends AbstractController
 
         $movementHistory = $this->inventoryItemRepository->getMovementHistory($id);
 
-        return $this->render('@Inventory/show.html.twig', [
+        return $this->render('inventory/show.html.twig', [
             'item' => $item,
             'movementHistory' => $movementHistory,
         ]);
@@ -135,7 +135,7 @@ class InventoryController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Inventory/edit.html.twig', [
+        return $this->render('inventory/edit.html.twig', [
             'item' => $item,
             'old' => $old,
             'errors' => $errors,

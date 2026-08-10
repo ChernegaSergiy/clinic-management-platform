@@ -46,6 +46,6 @@ class AppKpiController extends AbstractController
         $userId = $_SESSION['user']['id'];
         $results = $this->kpiResultRepository->findResultsForUser($userId);
 
-        return $this->render('@Kpi/results/index.html.twig', ['results' => $results]);
+        return $this->render('kpi/results/index.html.twig', ['results' => $results]);
     }
 }

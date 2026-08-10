@@ -80,7 +80,7 @@ class LabOrderController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@LabOrder/new.html.twig', [
+        return $this->render('lab_order/new.html.twig', [
             'medical_record' => $medicalRecord,
             'old' => $old,
             'errors' => $errors,
@@ -155,7 +155,7 @@ class LabOrderController extends AbstractController
         $qrCodeData = $_ENV['APP_BASE_URL'] . '/lab-orders/show?id=' . $id;
         $qrCodeImage = $this->qrCodeGenerator->generateQrCodeAsBase64($qrCodeData);
 
-        return $this->render('@LabOrder/show.html.twig', [
+        return $this->render('lab_order/show.html.twig', [
             'order' => $order,
             'qrCodeImage' => $qrCodeImage,
         ]);
@@ -178,7 +178,7 @@ class LabOrderController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@LabOrder/edit.html.twig', [
+        return $this->render('lab_order/edit.html.twig', [
             'order' => $order,
             'old' => $old,
             'errors' => $errors,
@@ -219,7 +219,7 @@ class LabOrderController extends AbstractController
     {
         $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
 
-        $response = $this->render('@LabOrder/import.html.twig', [
+        $response = $this->render('lab_order/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
         ]);
@@ -280,7 +280,7 @@ class LabOrderController extends AbstractController
             return $this->redirectToRoute('lab_orders_import');
         }
 
-        $response = $this->render('@LabOrder/confirm_import.html.twig', [
+        $response = $this->render('lab_order/confirm_import.html.twig', [
             'parsedData' => $_SESSION['hl7_dicom_parsed_data'],
             'errors' => $_SESSION['errors'] ?? [],
         ]);

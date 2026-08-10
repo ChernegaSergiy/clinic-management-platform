@@ -102,7 +102,7 @@ class AppAppointmentController extends AbstractController
             }
         }
 
-        return $this->render('@Appointment/index.html.twig', [
+        return $this->render('appointment/index.html.twig', [
             'doctors' => $calendarDoctors,
             'waitlist' => $waitlist,
             'appointments' => $appointments,
@@ -201,7 +201,7 @@ class AppAppointmentController extends AbstractController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        return $this->render('@Appointment/new.html.twig', [
+        return $this->render('appointment/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,
@@ -320,7 +320,7 @@ class AppAppointmentController extends AbstractController
                 $serviceOptions[$service['id']] = $service['name'] . ' (' . $service['duration_minutes'] . ' хв)';
             }
 
-            return $this->render('@Appointment/new.html.twig', [
+            return $this->render('appointment/new.html.twig', [
                 'errors' => $errors,
                 'old' => $rawInput,
                 'patients' => $patientOptions,
@@ -447,7 +447,7 @@ class AppAppointmentController extends AbstractController
             return new Response("Запис не знайдено", 404);
         }
 
-        return $this->render('@Appointment/show.html.twig', ['appointment' => $appointment]);
+        return $this->render('appointment/show.html.twig', ['appointment' => $appointment]);
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
@@ -491,7 +491,7 @@ class AppAppointmentController extends AbstractController
             $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
         }
 
-        return $this->render('@Appointment/edit.html.twig', [
+        return $this->render('appointment/edit.html.twig', [
             'appointment' => $appointment,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -599,7 +599,7 @@ class AppAppointmentController extends AbstractController
                 $roomOptions[$room['id']] = $room['name'] . ' (' . $room['type'] . ')';
             }
 
-            return $this->render('@Appointment/edit.html.twig', [
+            return $this->render('appointment/edit.html.twig', [
                 'errors' => $errors,
                 'appointment' => $appointment,
                 'old' => array_merge($rawInput, [
@@ -671,7 +671,7 @@ class AppAppointmentController extends AbstractController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        return $this->render('@Appointment/waitlist.html.twig', [
+        return $this->render('appointment/waitlist.html.twig', [
             'waitlistEntries' => $waitlistEntries,
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
@@ -703,7 +703,7 @@ class AppAppointmentController extends AbstractController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            return $this->render('@Appointment/waitlist.html.twig', [
+            return $this->render('appointment/waitlist.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'waitlistEntries' => $waitlistEntries,
@@ -724,7 +724,7 @@ class AppAppointmentController extends AbstractController
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);
 
-        return $this->render('@Appointment/load_analytics.html.twig', [
+        return $this->render('appointment/load_analytics.html.twig', [
             'date' => $date,
             'doctorLoad' => $doctorLoad,
         ]);
@@ -803,7 +803,7 @@ class AppAppointmentController extends AbstractController
             'waitlist_id' => $id,
         ];
 
-        return $this->render('@Appointment/new.html.twig', [
+        return $this->render('appointment/new.html.twig', [
             'patients' => $patientOptions,
             'doctors' => $doctorOptions,
             'services' => $serviceOptions,

@@ -50,7 +50,7 @@ class InsuranceController extends AbstractController
 
         $companies = $this->insuranceService->getAllInsuranceCompanies();
 
-        return $this->render('@Insurance/companies/index.html.twig', [
+        return $this->render('insurance/companies/index.html.twig', [
             'companies' => $companies,
         ]);
     }
@@ -67,7 +67,7 @@ class InsuranceController extends AbstractController
             return new Response('404 Not Found: Insurance company not found.', 404);
         }
 
-        return $this->render('@Insurance/companies/show.html.twig', [
+        return $this->render('insurance/companies/show.html.twig', [
             'company' => $company,
         ]);
     }
@@ -77,7 +77,7 @@ class InsuranceController extends AbstractController
     {
         $this->denyAccessUnlessGranted('INSURANCE_MANAGE');
 
-        $response = $this->render('@Insurance/companies/new.html.twig', [
+        $response = $this->render('insurance/companies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -124,7 +124,7 @@ class InsuranceController extends AbstractController
             return new Response("Компанію не знайдено", 404);
         }
 
-        $response = $this->render('@Insurance/companies/edit.html.twig', [
+        $response = $this->render('insurance/companies/edit.html.twig', [
             'company' => $company,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -185,7 +185,7 @@ class InsuranceController extends AbstractController
 
         $claims = $this->insuranceService->getAllClaims();
 
-        return $this->render('@Insurance/claims/index.html.twig', [
+        return $this->render('insurance/claims/index.html.twig', [
             'claims' => $claims,
         ]);
     }
@@ -202,7 +202,7 @@ class InsuranceController extends AbstractController
             return new Response("Кейс не знайдено", 404);
         }
 
-        return $this->render('@Insurance/claims/show.html.twig', [
+        return $this->render('insurance/claims/show.html.twig', [
             'claim' => $claim,
         ]);
     }

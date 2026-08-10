@@ -68,7 +68,7 @@ class UserController extends AbstractController
         }
         unset($user); // Break the reference with the last element
 
-        return $this->render('@Admin/users/index.html.twig', [
+        return $this->render('admin/users/index.html.twig', [
             'users' => $users,
             'searchTerm' => $searchTerm,
         ]);
@@ -86,7 +86,7 @@ class UserController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Admin/users/new.html.twig', [
+        return $this->render('admin/users/new.html.twig', [
             'roles' => $roleOptions,
             'old' => $old,
             'errors' => $errors,
@@ -137,7 +137,7 @@ class UserController extends AbstractController
         $role = $this->roleRepository->findById($user['role_id']);
         $user['role_name'] = $role['name'] ?? 'Невідома';
 
-        return $this->render('@Admin/users/show.html.twig', ['user' => $user]);
+        return $this->render('admin/users/show.html.twig', ['user' => $user]);
     }
 
     #[Route('/users/edit', name: 'admin_users_edit', methods: ['GET'])]
@@ -159,7 +159,7 @@ class UserController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Admin/users/edit.html.twig', [
+        return $this->render('admin/users/edit.html.twig', [
             'user' => $user,
             'roles' => $roleOptions,
             'old' => $old,

@@ -47,14 +47,14 @@ class ContractController extends AbstractController
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $contracts = $this->contractRepository->findAll();
-        return $this->render('@Billing/contracts/index.html.twig', ['contracts' => $contracts]);
+        return $this->render('billing/contracts/index.html.twig', ['contracts' => $contracts]);
     }
 
     #[Route('/billing/contracts/new', name: 'billing_contracts_new', methods: ['GET'])]
     public function create() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
-        $response = $this->render('@Billing/contracts/new.html.twig', [
+        $response = $this->render('billing/contracts/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -123,7 +123,7 @@ class ContractController extends AbstractController
             return new Response("Контракт не знайдено", 404);
         }
 
-        return $this->render('@Billing/contracts/show.html.twig', ['contract' => $contract]);
+        return $this->render('billing/contracts/show.html.twig', ['contract' => $contract]);
     }
 
     #[Route('/billing/contracts/edit', name: 'billing_contracts_edit', methods: ['GET'])]
@@ -138,7 +138,7 @@ class ContractController extends AbstractController
             return new Response("Контракт не знайдено", 404);
         }
 
-        $response = $this->render('@Billing/contracts/edit.html.twig', [
+        $response = $this->render('billing/contracts/edit.html.twig', [
             'contract' => $contract,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

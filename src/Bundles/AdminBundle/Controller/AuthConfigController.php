@@ -47,7 +47,7 @@ class AuthConfigController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $configs = $this->authConfigRepository->findAll();
-        return $this->render('@Admin/auth_configs/index.html.twig', ['configs' => $configs]);
+        return $this->render('admin/auth_configs/index.html.twig', ['configs' => $configs]);
     }
 
     #[Route('/auth-configs/new', name: 'admin_auth_configs_new', methods: ['GET'])]
@@ -56,7 +56,7 @@ class AuthConfigController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $supportedProviders = OAuthController::getSupportedProviders();
 
-        $response = $this->render('@Admin/auth_configs/new.html.twig', [
+        $response = $this->render('admin/auth_configs/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'supportedProviders' => $supportedProviders,
@@ -102,7 +102,7 @@ class AuthConfigController extends AbstractController
         }
         $supportedProviders = OAuthController::getSupportedProviders();
 
-        $response = $this->render('@Admin/auth_configs/edit.html.twig', [
+        $response = $this->render('admin/auth_configs/edit.html.twig', [
             'config' => $config,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -168,7 +168,7 @@ class AuthConfigController extends AbstractController
 
         $redirectUri = $_ENV['APP_BASE_URL'] . '/oauth/callback/' . $config['provider'];
 
-        return $this->render('@Admin/auth_configs/show.html.twig', [
+        return $this->render('admin/auth_configs/show.html.twig', [
             'config' => $config,
             'redirectUri' => $redirectUri,
         ]);

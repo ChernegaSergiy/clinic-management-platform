@@ -42,7 +42,7 @@ class PublicNewsController extends AbstractController
     public function index() : Response
     {
         $newsArticles = $this->newsRepository->findAll();
-        return $this->render('@News/public/index.html.twig', [
+        return $this->render('news/public/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
@@ -60,7 +60,7 @@ class PublicNewsController extends AbstractController
             ]);
         }
 
-        return $this->render('@News/public/show.html.twig', [
+        return $this->render('news/public/show.html.twig', [
             'newsArticle' => $newsArticle,
         ]);
     }

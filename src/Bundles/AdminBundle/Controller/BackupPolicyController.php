@@ -46,14 +46,14 @@ class BackupPolicyController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $policies = $this->backupPolicyRepository->findAll();
-        return $this->render('@Admin/backup_policies/index.html.twig', ['policies' => $policies]);
+        return $this->render('admin/backup_policies/index.html.twig', ['policies' => $policies]);
     }
 
     #[Route('/backup-policies/new', name: 'admin_backup_policies_new', methods: ['GET'])]
     public function createBackupPolicy() : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
-        $response = $this->render('@Admin/backup_policies/new.html.twig', [
+        $response = $this->render('admin/backup_policies/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -97,7 +97,7 @@ class BackupPolicyController extends AbstractController
             return new Response("Політику резервного копіювання не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/backup_policies/edit.html.twig', [
+        $response = $this->render('admin/backup_policies/edit.html.twig', [
             'policy' => $policy,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

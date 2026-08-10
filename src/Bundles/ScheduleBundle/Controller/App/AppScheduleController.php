@@ -59,7 +59,7 @@ class AppScheduleController extends AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        return $this->render('@Schedule/personal.html.twig', [
+        return $this->render('schedule/personal.html.twig', [
             'scheduleByDay' => $scheduleByDay,
             'exceptions' => $exceptions,
         ]);

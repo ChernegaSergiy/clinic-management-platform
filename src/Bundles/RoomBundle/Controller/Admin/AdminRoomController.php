@@ -48,7 +48,7 @@ class AdminRoomController extends AbstractController
         $searchTerm = $_GET['search'] ?? '';
         $rooms = $this->roomRepository->findAll();
 
-        return $this->render('@Room/index.html.twig', [
+        return $this->render('room/index.html.twig', [
             'rooms' => $rooms,
             'searchTerm' => $searchTerm,
         ]);
@@ -59,7 +59,7 @@ class AdminRoomController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROOM_MANAGE');
 
-        $response = $this->render('@Room/new.html.twig', [
+        $response = $this->render('room/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -104,7 +104,7 @@ class AdminRoomController extends AbstractController
             return new Response("Кімнату не знайдено", 404);
         }
 
-        return $this->render('@Room/show.html.twig', ['room' => $room]);
+        return $this->render('room/show.html.twig', ['room' => $room]);
     }
 
     #[Route('/rooms/edit', name: 'admin_rooms_edit_get', methods: ['GET'])]
@@ -119,7 +119,7 @@ class AdminRoomController extends AbstractController
             return new Response("Кімнату не знайдено", 404);
         }
 
-        $response = $this->render('@Room/edit.html.twig', [
+        $response = $this->render('room/edit.html.twig', [
             'room' => $room,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

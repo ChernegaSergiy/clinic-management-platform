@@ -50,7 +50,7 @@ class AdminScheduleController extends AbstractController
         $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
         $allDoctors = $this->userRepository->findAllDoctors();
 
-        return $this->render('@Schedule/admin.html.twig', [
+        return $this->render('schedule/admin.html.twig', [
             'allDoctors' => $allDoctors,
         ]);
     }
@@ -73,7 +73,7 @@ class AdminScheduleController extends AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        return $this->render('@Schedule/show.html.twig', [
+        return $this->render('schedule/show.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);
@@ -181,7 +181,7 @@ class AdminScheduleController extends AbstractController
             $scheduleByDay[$entry['day_of_week']] = $entry;
         }
 
-        return $this->render('@Schedule/edit.html.twig', [
+        return $this->render('schedule/edit.html.twig', [
             'doctor' => $doctor,
             'scheduleByDay' => $scheduleByDay
         ]);

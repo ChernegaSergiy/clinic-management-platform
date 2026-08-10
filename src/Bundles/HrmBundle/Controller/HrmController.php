@@ -58,7 +58,7 @@ class HrmController extends AbstractController
 
         $employees = $this->hrmRepository->findAll();
 
-        return $this->render('@Hrm/index.html.twig', [
+        return $this->render('hrm/index.html.twig', [
             'employees' => $employees,
         ]);
     }
@@ -71,7 +71,7 @@ class HrmController extends AbstractController
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        return $this->render('@Hrm/new.html.twig', [
+        return $this->render('hrm/new.html.twig', [
             'users' => $users,
             'departments' => $departments,
         ]);
@@ -93,7 +93,7 @@ class HrmController extends AbstractController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            return $this->render('@Hrm/new.html.twig', [
+            return $this->render('hrm/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'users' => $users,
@@ -121,7 +121,7 @@ class HrmController extends AbstractController
             return new Response("Співробітника не знайдено", 404);
         }
 
-        return $this->render('@Hrm/show.html.twig', [
+        return $this->render('hrm/show.html.twig', [
             'employee' => $employee,
         ]);
     }
@@ -141,7 +141,7 @@ class HrmController extends AbstractController
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
 
-        return $this->render('@Hrm/edit.html.twig', [
+        return $this->render('hrm/edit.html.twig', [
             'employee' => $employee,
             'users' => $users,
             'departments' => $departments,
@@ -171,7 +171,7 @@ class HrmController extends AbstractController
         if (!$validator->validate($_POST, $rules)) {
             // Re-fetch users for the form
             $users = $this->userRepository->findAll();
-            return $this->render('@Hrm/edit.html.twig', [
+            return $this->render('hrm/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'employee' => array_merge($employee, $_POST),
                 'users' => $users,

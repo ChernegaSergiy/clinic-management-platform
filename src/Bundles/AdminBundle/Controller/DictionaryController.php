@@ -52,7 +52,7 @@ class DictionaryController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $dictionaries = $this->dictionaryRepository->findAll();
-        return $this->render('@Admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
+        return $this->render('admin/dictionaries/index.html.twig', ['dictionaries' => $dictionaries]);
     }
 
     #[Route('/dictionaries/show', name: 'admin_dictionaries_show', methods: ['GET'])]
@@ -67,7 +67,7 @@ class DictionaryController extends AbstractController
         }
 
         $values = $this->dictionaryValueRepository->findValuesByDictionaryId($id);
-        return $this->render('@Admin/dictionaries/show.html.twig', [
+        return $this->render('admin/dictionaries/show.html.twig', [
             'dictionary' => $dictionary,
             'values' => $values,
         ]);
@@ -77,7 +77,7 @@ class DictionaryController extends AbstractController
     public function createDictionary() : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
-        $response = $this->render('@Admin/dictionaries/new.html.twig', [
+        $response = $this->render('admin/dictionaries/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -119,7 +119,7 @@ class DictionaryController extends AbstractController
             return new Response("Словник не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/dictionaries/edit.html.twig', [
+        $response = $this->render('admin/dictionaries/edit.html.twig', [
             'dictionary' => $dictionary,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -174,7 +174,7 @@ class DictionaryController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $dictionaryId = (int)($_GET['dictionary_id'] ?? 0);
-        $response = $this->render('@Admin/dictionaries/values/new.html.twig', [
+        $response = $this->render('admin/dictionaries/values/new.html.twig', [
             'dictionary_id' => $dictionaryId,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -219,7 +219,7 @@ class DictionaryController extends AbstractController
             return new Response("Значення словника не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/dictionaries/values/edit.html.twig', [
+        $response = $this->render('admin/dictionaries/values/edit.html.twig', [
             'value' => $value,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

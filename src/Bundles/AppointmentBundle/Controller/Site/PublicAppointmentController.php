@@ -83,7 +83,7 @@ class PublicAppointmentController extends AbstractController
             }
         }
 
-        $response = $this->render('@Appointment/public/book.html.twig', [
+        $response = $this->render('appointment/public/book.html.twig', [
             'doctors' => $doctors,
             'services' => $services,
             'availableSlots' => $availableSlots,
@@ -155,7 +155,7 @@ class PublicAppointmentController extends AbstractController
                 }
             }
 
-            return $this->render('@Appointment/public/book.html.twig', [
+            return $this->render('appointment/public/book.html.twig', [
                 'doctors' => $doctors,
                 'services' => $services,
                 'availableSlots' => $availableSlots,
@@ -193,7 +193,7 @@ class PublicAppointmentController extends AbstractController
                     } catch (\Exception $e) {
                     }
                 }
-                return $this->render('@Appointment/public/book.html.twig', [
+                return $this->render('appointment/public/book.html.twig', [
                     'doctors' => $doctors,
                     'services' => $services,
                     'availableSlots' => $availableSlots,

@@ -76,7 +76,7 @@ class AuthController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@User/login.html.twig', [
+        return $this->render('user/login.html.twig', [
             'old' => $old,
             'errors' => [
                 'login' => $errors['login'] ?? null,

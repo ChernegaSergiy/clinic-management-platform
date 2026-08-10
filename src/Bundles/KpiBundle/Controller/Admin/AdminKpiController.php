@@ -60,14 +60,14 @@ class AdminKpiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('KPI_MANAGE');
         $definitions = $this->kpiRepository->findAllKpiDefinitions();
-        return $this->render('@Kpi/definitions/index.html.twig', ['definitions' => $definitions]);
+        return $this->render('kpi/definitions/index.html.twig', ['definitions' => $definitions]);
     }
 
     #[Route('/kpi/definitions/new', name: 'admin_kpi_definitions_new', methods: ['GET'])]
     public function createDefinition() : Response
     {
         $this->denyAccessUnlessGranted('KPI_MANAGE');
-        $response = $this->render('@Kpi/definitions/new.html.twig', [
+        $response = $this->render('kpi/definitions/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -111,7 +111,7 @@ class AdminKpiController extends AbstractController
             return new Response("Визначення KPI не знайдено", 404);
         }
 
-        $response = $this->render('@Kpi/definitions/edit.html.twig', [
+        $response = $this->render('kpi/definitions/edit.html.twig', [
             'definition' => $definition,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -167,7 +167,7 @@ class AdminKpiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('KPI_VIEW');
         $results = $this->kpiResultRepository->findAllResults();
-        return $this->render('@Kpi/results/index.html.twig', ['results' => $results]);
+        return $this->render('kpi/results/index.html.twig', ['results' => $results]);
     }
 
     #[Route('/kpi/calculate', name: 'admin_kpi_calculate', methods: ['POST'])]

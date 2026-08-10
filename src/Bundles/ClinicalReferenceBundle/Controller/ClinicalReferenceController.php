@@ -51,7 +51,7 @@ class ClinicalReferenceController extends AbstractController
         $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $count = $this->icdCodeRepository->countAll();
-        $response = $this->render('@ClinicalReference/icd_import.html.twig', [
+        $response = $this->render('clinical_reference/icd_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
@@ -100,7 +100,7 @@ class ClinicalReferenceController extends AbstractController
         $this->denyAccessUnlessGranted('CLINICAL_REFERENCE_MANAGE');
 
         $count = $this->interventionCodeRepository->countAll();
-        $response = $this->render('@ClinicalReference/intervention_import.html.twig', [
+        $response = $this->render('clinical_reference/intervention_import.html.twig', [
             'count' => $count,
             'errors' => $_SESSION['errors'] ?? [],
             'success_message' => $_SESSION['success_message'] ?? null,
@@ -152,7 +152,7 @@ class ClinicalReferenceController extends AbstractController
         $icdCount = $this->icdCodeRepository->countAll();
         $interventionCount = $this->interventionCodeRepository->countAll();
 
-        return $this->render('@ClinicalReference/index.html.twig', [
+        return $this->render('clinical_reference/index.html.twig', [
             'icdCount' => $icdCount,
             'interventionCount' => $interventionCount,
         ]);

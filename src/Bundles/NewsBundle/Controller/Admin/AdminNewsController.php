@@ -50,7 +50,7 @@ class AdminNewsController extends AbstractController
         $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
         $newsArticles = $this->newsRepository->findAll();
-        return $this->render('@News/index.html.twig', [
+        return $this->render('news/index.html.twig', [
             'newsArticles' => $newsArticles,
         ]);
     }
@@ -66,7 +66,7 @@ class AdminNewsController extends AbstractController
             return $acc;
         }, []);
 
-        $response = $this->render('@News/new.html.twig', [
+        $response = $this->render('news/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'authors' => $authors,
@@ -121,7 +121,7 @@ class AdminNewsController extends AbstractController
             return $acc;
         }, []);
 
-        $response = $this->render('@News/edit.html.twig', [
+        $response = $this->render('news/edit.html.twig', [
             'newsArticle' => $newsArticle,
             'old' => $_SESSION['old'] ?? $newsArticle,
             'errors' => $_SESSION['errors'] ?? [],

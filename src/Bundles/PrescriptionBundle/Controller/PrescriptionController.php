@@ -73,7 +73,7 @@ class PrescriptionController extends AbstractController
             $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);
         }
 
-        return $this->render('@Prescription/index.html.twig', [
+        return $this->render('prescription/index.html.twig', [
             'prescriptions' => $prescriptions,
             'searchTerm' => $searchTerm,
         ]);
@@ -99,7 +99,7 @@ class PrescriptionController extends AbstractController
             $doctorOptions[$doctor['id']] = $doctor['full_name'];
         }
 
-        return $this->render('@Prescription/new.html.twig', [
+        return $this->render('prescription/new.html.twig', [
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
@@ -133,7 +133,7 @@ class PrescriptionController extends AbstractController
                 $doctorOptions[$doctor['id']] = $doctor['full_name'];
             }
 
-            return $this->render('@Prescription/new.html.twig', [
+            return $this->render('prescription/new.html.twig', [
                 'errors' => $validator->getErrors(),
                 'old' => $_POST,
                 'patient' => $patient,
@@ -178,7 +178,7 @@ class PrescriptionController extends AbstractController
             return new Response("Рецепт не знайдено", 404);
         }
 
-        return $this->render('@Prescription/show.html.twig', [
+        return $this->render('prescription/show.html.twig', [
             'prescription' => $prescription,
         ]);
     }

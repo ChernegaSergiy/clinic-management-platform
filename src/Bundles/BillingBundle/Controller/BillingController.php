@@ -78,7 +78,7 @@ class BillingController extends AbstractController
         $this->denyAccessUnlessGranted('BILLING_VIEW');
         $searchTerm = $_GET['search'] ?? '';
         $invoices = $this->invoiceRepository->findAll($searchTerm);
-        return $this->render('@Billing/index.html.twig', [
+        return $this->render('billing/index.html.twig', [
             'invoices' => $invoices,
             'searchTerm' => $searchTerm,
         ]);
@@ -90,7 +90,7 @@ class BillingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $services = $this->serviceRepository->findAll();
-        return $this->render('@Billing/services/index.html.twig', ['services' => $services]);
+        return $this->render('billing/services/index.html.twig', ['services' => $services]);
     }
 
     #[Route('/billing/services/new', name: 'billing_services_new_get', methods: ['GET'])]
@@ -98,7 +98,7 @@ class BillingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $categories = $this->serviceCategoryRepository->findAllCategories();
-        $response = $this->render('@Billing/services/new.html.twig', [
+        $response = $this->render('billing/services/new.html.twig', [
             'categories' => $categories,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -135,7 +135,7 @@ class BillingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $bundles = $this->serviceBundleRepository->findAll();
-        return $this->render('@Billing/bundles/index.html.twig', ['bundles' => $bundles]);
+        return $this->render('billing/bundles/index.html.twig', ['bundles' => $bundles]);
     }
 
     #[Route('/billing/bundles/new', name: 'billing_bundles_new_get', methods: ['GET'])]
@@ -143,7 +143,7 @@ class BillingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
         $services = $this->serviceRepository->findAll();
-        $response = $this->render('@Billing/bundles/new.html.twig', [
+        $response = $this->render('billing/bundles/new.html.twig', [
             'services' => $services,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -212,7 +212,7 @@ class BillingController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Billing/new.html.twig', [
+        return $this->render('billing/new.html.twig', [
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
             'medical_records' => $medicalRecordOptions,
@@ -283,7 +283,7 @@ class BillingController extends AbstractController
             return new Response("Рахунок не знайдено", 404);
         }
 
-        $response = $this->render('@Billing/show.html.twig', [
+        $response = $this->render('billing/show.html.twig', [
             'invoice' => $invoice,
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -371,7 +371,7 @@ class BillingController extends AbstractController
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
-        return $this->render('@Billing/edit.html.twig', [
+        return $this->render('billing/edit.html.twig', [
             'invoice' => $invoice,
             'patients' => $patientOptions,
             'appointments' => $appointmentOptions,
@@ -462,7 +462,7 @@ class BillingController extends AbstractController
 
         $invoices = $this->invoiceRepository->findAll();
 
-        $html = $this->renderView('@Billing/export_pdf.html.twig', ['invoices' => $invoices]);
+        $html = $this->renderView('billing/export_pdf.html.twig', ['invoices' => $invoices]);
 
         $pdfExporter = new PdfExporter();
         $pdfExporter->loadHtml($html);

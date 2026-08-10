@@ -53,7 +53,7 @@ class ServiceController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
         $services = $this->serviceRepository->findAll();
-        return $this->render('@Admin/services/index.html.twig', ['services' => $services]);
+        return $this->render('admin/services/index.html.twig', ['services' => $services]);
     }
 
     #[Route('/services/new', name: 'admin_services_new', methods: ['GET'])]
@@ -66,7 +66,7 @@ class ServiceController extends AbstractController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        $response = $this->render('@Admin/services/new.html.twig', [
+        $response = $this->render('admin/services/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
             'categories' => $categoryOptions,
@@ -119,7 +119,7 @@ class ServiceController extends AbstractController
             $categoryOptions[$category['id']] = $category['name'];
         }
 
-        $response = $this->render('@Admin/services/edit.html.twig', [
+        $response = $this->render('admin/services/edit.html.twig', [
             'service' => $service,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -179,14 +179,14 @@ class ServiceController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
         $categories = $this->serviceCategoryRepository->findAllCategories();
-        return $this->render('@Admin/service_categories/index.html.twig', ['categories' => $categories]);
+        return $this->render('admin/service_categories/index.html.twig', ['categories' => $categories]);
     }
 
     #[Route('/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
     public function createServiceCategory() : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
-        $response = $this->render('@Admin/service_categories/new.html.twig', [
+        $response = $this->render('admin/service_categories/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
         ]);
@@ -228,7 +228,7 @@ class ServiceController extends AbstractController
             return new Response("Категорію послуг не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/service_categories/edit.html.twig', [
+        $response = $this->render('admin/service_categories/edit.html.twig', [
             'category' => $category,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

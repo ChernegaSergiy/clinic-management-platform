@@ -59,7 +59,7 @@ class SettingsController extends AbstractController
         }
         asort($availableLocales);
 
-        return $this->render('@Admin/settings.html.twig', [
+        return $this->render('admin/settings.html.twig', [
             'settings' => $settings,
             'roles' => $roles,
             'availableLocales' => $availableLocales,

@@ -128,7 +128,7 @@ class MfaController extends AbstractController
             $qrCode = '';
             $this->prepareHotpSetup($userId, $secret, $backupCodes, $counter, $qrCode);
 
-            return $this->render('@User/hotp_setup.html.twig', [
+            return $this->render('user/hotp_setup.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -143,7 +143,7 @@ class MfaController extends AbstractController
             $this->prepareTotpSetup($userId, $secret, $backupCodes, $qrCode);
             $_SESSION['mfa_setup_is_reset'] = $isReset;
 
-            return $this->render('@User/mfa_setup.html.twig', [
+            return $this->render('user/mfa_setup.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -169,7 +169,7 @@ class MfaController extends AbstractController
             return $this->redirectToRoute('login_form');
         }
 
-        return $this->render('@User/mfa_required_choice.html.twig', [
+        return $this->render('user/mfa_required_choice.html.twig', [
             'user' => $user,
         ]);
     }
@@ -208,7 +208,7 @@ class MfaController extends AbstractController
                 $qrCode = $this->mfaService->generateHotpQRCode($secret, $user['email'], $counter);
             }
 
-            return $this->render('@User/hotp_required.html.twig', [
+            return $this->render('user/hotp_required.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -227,7 +227,7 @@ class MfaController extends AbstractController
                 $qrCode = $this->mfaService->generateQRCode($secret, $user['email']);
             }
 
-            return $this->render('@User/totp_required.html.twig', [
+            return $this->render('user/totp_required.html.twig', [
                 'user' => $user,
                 'secret' => $secret,
                 'qrCode' => $qrCode,
@@ -528,7 +528,7 @@ class MfaController extends AbstractController
 
         $mfaType = $_SESSION['mfa_type'] ?? $this->mfaService->getUserMfaStatus($userId)['type'] ?? 'totp';
 
-        return $this->render('@User/mfa_verify.html.twig', [
+        return $this->render('user/mfa_verify.html.twig', [
             'user' => $user,
             'errorMessage' => $errorMessage,
             'mfaType' => $mfaType,

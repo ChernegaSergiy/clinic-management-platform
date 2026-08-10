@@ -81,7 +81,7 @@ class MedicalRecordController extends AbstractController
             return new Response("Запис не знайдено", 404);
         }
 
-        $response = $this->render('@MedicalRecord/create.html.twig', [
+        $response = $this->render('medical_record/create.html.twig', [
             'appointment' => $appointment,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -104,7 +104,7 @@ class MedicalRecordController extends AbstractController
             $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);
         }
 
-        return $this->render('@MedicalRecord/index.html.twig', [
+        return $this->render('medical_record/index.html.twig', [
             'records' => $records,
             'searchTerm' => $searchTerm,
         ]);
@@ -197,7 +197,7 @@ class MedicalRecordController extends AbstractController
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
         $attachments = $this->attachmentService->getAttachmentsForEntity('medical_record', $id);
 
-        return $this->render('@MedicalRecord/show.html.twig', [
+        return $this->render('medical_record/show.html.twig', [
             'record' => $record,
             'lab_orders' => $labOrders,
             'attachments' => $attachments,
@@ -237,7 +237,7 @@ class MedicalRecordController extends AbstractController
             return new Response("Медичний запис не знайдено", 404);
         }
 
-        $response = $this->render('@MedicalRecord/edit.html.twig', [
+        $response = $this->render('medical_record/edit.html.twig', [
             'record' => $record,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

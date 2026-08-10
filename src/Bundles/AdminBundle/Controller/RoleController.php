@@ -46,7 +46,7 @@ class RoleController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $roles = $this->roleRepository->findAll();
-        return $this->render('@Admin/roles/index.html.twig', ['roles' => $roles]);
+        return $this->render('admin/roles/index.html.twig', ['roles' => $roles]);
     }
 
     #[Route('/roles/edit', name: 'admin_roles_edit', methods: ['GET'])]
@@ -61,7 +61,7 @@ class RoleController extends AbstractController
             return new Response("Роль не знайдено", 404);
         }
 
-        $response = $this->render('@Admin/roles/edit.html.twig', [
+        $response = $this->render('admin/roles/edit.html.twig', [
             'role' => $role,
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],

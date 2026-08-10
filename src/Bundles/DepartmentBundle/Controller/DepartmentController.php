@@ -54,7 +54,7 @@ class DepartmentController extends AbstractController
 
         $departments = $this->departmentRepository->findAll();
 
-        return $this->render('@Department/index.html.twig', [
+        return $this->render('department/index.html.twig', [
             'departments' => $departments,
         ]);
     }
@@ -67,7 +67,7 @@ class DepartmentController extends AbstractController
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
 
-        return $this->render('@Department/new.html.twig', [
+        return $this->render('department/new.html.twig', [
             'parentOptions' => $parentOptions,
         ]);
     }
@@ -90,7 +90,7 @@ class DepartmentController extends AbstractController
             $departments = $this->departmentRepository->findAll();
             $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
 
-            $response = $this->render('@Department/create.html.twig', [
+            $response = $this->render('department/create.html.twig', [
                 'old' => $_SESSION['old'] ?? [],
                 'errors' => $_SESSION['errors'] ?? [],
                 'parentOptions' => $parentOptions,
@@ -123,7 +123,7 @@ class DepartmentController extends AbstractController
         // Отримуємо співробітників цього відділу
         $employees = $this->hrmRepository->findByDepartment($id);
 
-        return $this->render('@Department/show.html.twig', [
+        return $this->render('department/show.html.twig', [
             'department' => $department,
             'employees' => $employees,
         ]);
@@ -144,7 +144,7 @@ class DepartmentController extends AbstractController
         $departments = $this->departmentRepository->findAll();
         $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
 
-        return $this->render('@Department/edit.html.twig', [
+        return $this->render('department/edit.html.twig', [
             'department' => $department,
             'parentOptions' => $parentOptions,
         ]);
@@ -175,7 +175,7 @@ class DepartmentController extends AbstractController
             $departments = $this->departmentRepository->findAll();
             $parentOptions = array_filter($departments, fn ($dept) => null === $dept['parent_id']);
 
-            return $this->render('@Department/edit.html.twig', [
+            return $this->render('department/edit.html.twig', [
                 'errors' => $validator->getErrors(),
                 'department' => array_merge($department, $_POST),
                 'parentOptions' => $parentOptions,

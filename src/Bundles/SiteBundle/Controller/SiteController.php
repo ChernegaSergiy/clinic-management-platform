@@ -33,48 +33,48 @@ class SiteController extends AbstractController
     #[Route('/', name: 'site_home')]
     public function home() : Response
     {
-        return $this->render('@Site/home.html.twig');
+        return $this->render('site/home.html.twig');
     }
 
     #[Route('/about', name: 'site_about')]
     public function about() : Response
     {
-        return $this->render('@Site/about.html.twig');
+        return $this->render('site/about.html.twig');
     }
 
     #[Route('/contact', name: 'site_contact')]
     public function contact() : Response
     {
-        return $this->render('@Site/contact.html.twig');
+        return $this->render('site/contact.html.twig');
     }
 
     #[Route('/sitemap', name: 'site_sitemap')]
     public function sitemap() : Response
     {
-        return $this->render('@Site/sitemap.html.twig');
+        return $this->render('site/sitemap.html.twig');
     }
 
     #[Route('/privacy', name: 'site_privacy')]
     public function privacy() : Response
     {
-        return $this->render('@Site/privacy.html.twig');
+        return $this->render('site/privacy.html.twig');
     }
 
     #[Route('/departments', name: 'site_departments')]
     public function departments() : Response
     {
-        return $this->render('@Site/departments.html.twig');
+        return $this->render('site/departments.html.twig');
     }
 
     #[Route('/doctors', name: 'site_doctors')]
     public function doctors() : Response
     {
-        return $this->render('@Site/doctors.html.twig');
+        return $this->render('site/doctors.html.twig');
     }
 
     #[Route('/our-team', name: 'site_our_team')]
     public function ourTeam() : Response
     {
-        return $this->render('@Site/our-team.html.twig');
+        return $this->render('site/our-team.html.twig');
     }
 }
