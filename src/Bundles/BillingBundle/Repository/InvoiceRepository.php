@@ -34,10 +34,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class InvoiceRepository extends ServiceEntityRepository implements InvoiceRepositoryInterface
 {
     private EventDispatcherInterface $eventDispatcher;
+    private PaymentRepository $paymentRepository;
 
-    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher)
+    public function __construct(ManagerRegistry $registry, EventDispatcherInterface $eventDispatcher, PaymentRepository $paymentRepository)
     {
         parent::__construct($registry, Invoice::class);
+        $this->paymentRepository = $paymentRepository;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -142,7 +144,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
                 $flat['updated_at'] = $flat['updated_at']->format('Y-m-d H:i:s');
             }
 
-            $flat['payments'] = $this->getPaymentsForInvoice($id);
+            $flat['payments'] = $this->paymentRepository->findByInvoiceId($id);
             $flat['total_paid'] = array_sum(array_column($flat['payments'], 'amount'));
             $flat['remaining_amount'] = $flat['amount'] - $flat['total_paid'];
             return $flat;
@@ -214,15 +216,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         $em->beginTransaction();
 
         try {
-            $payment = new \App\Entity\Payment();
-            $payment->setInvoiceId($invoiceId);
-            $payment->setAmount($amount);
-            $payment->setPaymentMethod($paymentMethod);
-            $payment->setTransactionId($transactionId);
-            $payment->setNotes($notes);
-
-            $em->persist($payment);
-            $em->flush();
+            $this->paymentRepository->create($invoiceId, $amount, $paymentMethod, $transactionId, $notes);
 
             $invoiceData = $this->findById($invoiceId);
             if (
@@ -245,25 +239,6 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         }
     }
 
-    public function getPaymentsForInvoice(int $invoiceId) : array
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder()
-            ->select('p')
-            ->from(\App\Entity\Payment::class, 'p')
-            ->where('p.invoice_id = :invoice_id')
-            ->setParameter('invoice_id', $invoiceId)
-            ->orderBy('p.payment_date', 'DESC');
-
-        $results = $qb->getQuery()->getArrayResult();
-
-        return array_map(function ($row) {
-            if ($row['payment_date'] instanceof \DateTimeInterface) {
-                $row['payment_date'] = $row['payment_date']->format('Y-m-d H:i:s');
-            }
-            return $row;
-        }, $results);
-    }
-
     public function logFinancialTransaction(
         int $patientId,
         float $amount,
@@ -279,15 +254,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         $startDate = new \DateTime($date . ' 00:00:00');
         $endDate = new \DateTime($date . ' 23:59:59');
 
-        $paymentsQb = $this->getEntityManager()->createQueryBuilder()
-            ->select('COALESCE(SUM(p.amount), 0)')
-            ->from(\App\Entity\Payment::class, 'p')
-            ->where('p.payment_date >= :startDate')
-            ->andWhere('p.payment_date <= :endDate')
-            ->setParameter('startDate', $startDate)
-            ->setParameter('endDate', $endDate);
-
-        $paymentsSum = (float) $paymentsQb->getQuery()->getSingleScalarResult();
+        $paymentsSum = $this->paymentRepository->sumAmountByDateRange($startDate, $endDate);
 
         $invoicesQb = $this->createQueryBuilder('i')
             ->select('i.amount')
@@ -310,10 +277,7 @@ class InvoiceRepository extends ServiceEntityRepository implements InvoiceReposi
         $invoicesQb->setParameter('startDate', $startDate);
         $invoicesQb->setParameter('endDate', $endDate);
 
-        $sub = $this->getEntityManager()->createQueryBuilder()
-            ->select('1')
-            ->from(\App\Entity\Payment::class, 'p2')
-            ->where('p2.invoice_id = i.id');
+        $sub = $this->paymentRepository->existsSubqueryForInvoice();
 
         $invoicesQb->andWhere($invoicesQb->expr()->not($invoicesQb->expr()->exists($sub->getDQL())));
 
