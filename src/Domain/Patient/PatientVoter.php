@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\PatientBundle;
+namespace App\Domain\Patient;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Entity\User;

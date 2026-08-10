@@ -26,7 +26,7 @@ namespace App\Bundles\PrescriptionBundle\Controller;
 
 use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
-use App\Bundles\PatientBundle\Repository\PatientRepository;
+use App\Domain\Patient\PatientRepository;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;

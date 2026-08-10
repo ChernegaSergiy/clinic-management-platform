@@ -2,9 +2,9 @@
 
 namespace App\Tests\Bundles\PatientBundle\Repository;
 
-use App\Bundles\PatientBundle\Repository\PatientRepository;
+use App\Domain\Patient\PatientRepository;
 use App\Core\Service\AuditLogger;
-use App\Entity\Patient;
+use App\Domain\Patient\Patient;
 use App\Tests\RepositoryTestCase;
 use Doctrine\ORM\Persisters\Entity\EntityPersister;
 use Doctrine\ORM\UnitOfWork;

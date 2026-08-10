@@ -50,7 +50,7 @@ class PrescriptionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p.id', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first', 'p.issue_date', 'p.expiry_date')
-            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Domain\Patient\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
             ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id');
 
         if (!empty($searchTerm)) {
@@ -126,7 +126,7 @@ class PrescriptionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first')
-            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Domain\Patient\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
             ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id')
             ->where('p.id = :id')
             ->setParameter('id', $id);
@@ -178,7 +178,7 @@ class PrescriptionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p.id', 'p.issue_date', 'p.expiry_date', 'pat.last_name as pat_last', 'pat.first_name as pat_first', 'doc.last_name as doc_last', 'doc.first_name as doc_first')
-            ->join(\App\Entity\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
+            ->join(\App\Domain\Patient\Patient::class, 'pat', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.patient_id = pat.id')
             ->join(\App\Entity\User::class, 'doc', \Doctrine\ORM\Query\Expr\Join::WITH, 'p.doctor_id = doc.id')
             ->where('p.doctor_id = :doctor_id')
             ->setParameter('doctor_id', $doctorId);

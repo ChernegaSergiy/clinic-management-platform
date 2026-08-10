@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Patient;
 
-use App\Bundles\PatientBundle\Repository\PatientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

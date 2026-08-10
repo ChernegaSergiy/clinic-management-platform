@@ -47,7 +47,7 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('i')
             ->select('i.id', 'p.last_name', 'p.first_name', 'i.amount', 'i.status', 'i.issued_date')
-            ->join(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id');
+            ->join(\App\Domain\Patient\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id');
 
         if (!empty($searchTerm)) {
             $orX = $qb->expr()->orX(
@@ -121,7 +121,7 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('i')
             ->select('i', 'p.last_name', 'p.first_name')
-            ->join(\App\Entity\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id')
+            ->join(\App\Domain\Patient\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'i.patient_id = p.id')
             ->where('i.id = :id')
             ->setParameter('id', $id);
 

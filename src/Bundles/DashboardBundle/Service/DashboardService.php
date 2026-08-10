@@ -30,7 +30,7 @@ use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
-use App\Bundles\PatientBundle\Repository\PatientRepository;
+use App\Domain\Patient\PatientRepository;
 use DateTime;
 
 class DashboardService

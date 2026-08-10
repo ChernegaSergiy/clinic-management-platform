@@ -22,10 +22,9 @@
  *
  */
 
-namespace App\Bundles\PatientBundle\Repository;
+namespace App\Domain\Patient;
 
 use App\Core\Service\AuditLogger as CoreAuditLogger;
-use App\Entity\Patient;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;

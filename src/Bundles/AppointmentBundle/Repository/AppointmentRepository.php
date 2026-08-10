@@ -71,7 +71,7 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         $appointment = new Appointment();
 
-        $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+        $patient = $this->getEntityManager()->getReference(\App\Domain\Patient\Patient::class, $data['patient_id']);
         $appointment->setPatient($patient);
 
         $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
@@ -171,7 +171,7 @@ class AppointmentRepository extends ServiceEntityRepository
         }
 
         if (isset($data['patient_id'])) {
-            $patient = $this->getEntityManager()->getReference(\App\Entity\Patient::class, $data['patient_id']);
+            $patient = $this->getEntityManager()->getReference(\App\Domain\Patient\Patient::class, $data['patient_id']);
             $appointment->setPatient($patient);
         }
         if (isset($data['doctor_id'])) {

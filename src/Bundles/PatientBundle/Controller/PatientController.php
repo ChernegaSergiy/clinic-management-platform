@@ -28,7 +28,7 @@ use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
-use App\Bundles\PatientBundle\Repository\PatientRepository;
+use App\Domain\Patient\PatientRepository;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;

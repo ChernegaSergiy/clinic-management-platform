@@ -31,7 +31,7 @@ use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
-use App\Bundles\PatientBundle\Repository\PatientRepository;
+use App\Domain\Patient\PatientRepository;
 use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
