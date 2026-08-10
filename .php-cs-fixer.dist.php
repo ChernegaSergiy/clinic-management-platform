@@ -18,6 +18,11 @@ return (new Config())
             'keep_multiple_spaces_after_comma' => false,
         ],
         'single_line_empty_body' => true,
+        'class_attributes_separation' => [
+            'elements' => [
+                'method' => 'one',
+            ],
+        ],
         'array_indentation' => true,
         'trim_array_spaces' => true,
         'no_whitespace_in_blank_line' => true,
