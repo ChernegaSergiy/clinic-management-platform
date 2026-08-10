@@ -24,7 +24,7 @@
 
 namespace App\Bundles\PrescriptionBundle;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -40,12 +40,12 @@ class PrescriptionVoter extends Voter
     public const EDIT = 'PRESCRIPTION_EDIT';
 
     private PrescriptionRepository $prescriptionRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private AppointmentRepository $appointmentRepository;
     private Security $security;
 
     public function __construct(
         PrescriptionRepository $prescriptionRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
+        AppointmentRepository $appointmentRepository,
         Security $security
     ) {
         $this->prescriptionRepository = $prescriptionRepository;

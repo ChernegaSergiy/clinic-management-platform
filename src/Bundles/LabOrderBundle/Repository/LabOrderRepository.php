@@ -31,7 +31,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LabOrderRepository extends ServiceEntityRepository implements LabOrderRepositoryInterface
+class LabOrderRepository extends ServiceEntityRepository
 {
     private EventDispatcherInterface $eventDispatcher;
 

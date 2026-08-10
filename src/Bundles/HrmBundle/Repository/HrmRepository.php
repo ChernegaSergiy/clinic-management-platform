@@ -28,7 +28,7 @@ use App\Entity\Employee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class HrmRepository extends ServiceEntityRepository implements HrmRepositoryInterface
+class HrmRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

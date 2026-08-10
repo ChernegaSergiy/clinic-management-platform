@@ -25,7 +25,7 @@
 namespace App\Bundles\DepartmentBundle\Controller;
 
 use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
-use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
+use App\Bundles\HrmBundle\Repository\HrmRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,12 +34,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class DepartmentController extends AbstractController
 {
     private DepartmentRepository $departmentRepository;
-    private HrmRepositoryInterface $hrmRepository;
+    private HrmRepository $hrmRepository;
     private Validator $validator;
 
     public function __construct(
         DepartmentRepository $departmentRepository,
-        HrmRepositoryInterface $hrmRepository,
+        HrmRepository $hrmRepository,
         Validator $validator
     ) {
         $this->departmentRepository = $departmentRepository;

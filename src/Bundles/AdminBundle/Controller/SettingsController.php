@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
+use App\Bundles\UserBundle\Repository\RoleRepository;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +34,7 @@ use Symfony\Component\Translation\Locales;
 class SettingsController extends AbstractController
 {
     public function __construct(
-        private RoleRepositoryInterface $roleRepository,
+        private RoleRepository $roleRepository,
         private SettingsRepository $settingsRepository,
         private array $supportedLocales = ['uk', 'en'],
     ) {}

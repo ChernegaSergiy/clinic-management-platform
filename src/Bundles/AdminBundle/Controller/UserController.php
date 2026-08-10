@@ -24,8 +24,8 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\RoleRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,14 +34,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    private UserRepositoryInterface $userRepository;
-    private RoleRepositoryInterface $roleRepository;
+    private UserRepository $userRepository;
+    private RoleRepository $roleRepository;
     private MfaService $mfaService;
     private Validator $validator;
 
     public function __construct(
-        UserRepositoryInterface $userRepository,
-        RoleRepositoryInterface $roleRepository,
+        UserRepository $userRepository,
+        RoleRepository $roleRepository,
         MfaService $mfaService,
         Validator $validator
     ) {

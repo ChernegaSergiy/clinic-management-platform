@@ -25,7 +25,7 @@
 namespace App\Bundles\NewsBundle\Controller\Admin;
 
 use App\Bundles\NewsBundle\Repository\NewsRepository;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,10 +34,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminNewsController extends AbstractController
 {
     private NewsRepository $newsRepository;
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
     private Validator $validator;
 
-    public function __construct(NewsRepository $newsRepository, UserRepositoryInterface $userRepository, Validator $validator)
+    public function __construct(NewsRepository $newsRepository, UserRepository $userRepository, Validator $validator)
     {
         $this->newsRepository = $newsRepository;
         $this->userRepository = $userRepository;

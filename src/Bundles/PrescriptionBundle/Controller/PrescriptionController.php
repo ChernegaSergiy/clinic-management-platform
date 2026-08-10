@@ -24,11 +24,11 @@
 
 namespace App\Bundles\PrescriptionBundle\Controller;
 
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,18 +37,18 @@ use Symfony\Component\Routing\Attribute\Route;
 class PrescriptionController extends AbstractController
 {
     private PrescriptionRepository $prescriptionRepository;
-    private PatientRepositoryInterface $patientRepository;
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
-    private UserRepositoryInterface $userRepository;
-    private InventoryItemRepositoryInterface $inventoryItemRepository;
+    private PatientRepository $patientRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
+    private UserRepository $userRepository;
+    private InventoryItemRepository $inventoryItemRepository;
     private Validator $validator;
 
     public function __construct(
         PrescriptionRepository $prescriptionRepository,
-        PatientRepositoryInterface $patientRepository,
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
-        UserRepositoryInterface $userRepository,
-        InventoryItemRepositoryInterface $inventoryItemRepository,
+        PatientRepository $patientRepository,
+        MedicalRecordRepository $medicalRecordRepository,
+        UserRepository $userRepository,
+        InventoryItemRepository $inventoryItemRepository,
         Validator $validator
     ) {
         $this->prescriptionRepository = $prescriptionRepository;

@@ -24,7 +24,7 @@
 
 namespace App\Bundles\KpiBundle\Controller\Admin;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;
@@ -38,14 +38,14 @@ class AdminKpiController extends AbstractController
     private KpiRepository $kpiRepository;
     private KpiResultRepository $kpiResultRepository;
     private InvoiceRepository $invoiceRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private AppointmentRepository $appointmentRepository;
     private Validator $validator;
 
     public function __construct(
         KpiRepository $kpiRepository,
         KpiResultRepository $kpiResultRepository,
         InvoiceRepository $invoiceRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
+        AppointmentRepository $appointmentRepository,
         Validator $validator
     ) {
         $this->kpiRepository = $kpiRepository;

@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
+use App\Bundles\UserBundle\Repository\RoleRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,10 +32,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class RoleController extends AbstractController
 {
-    private RoleRepositoryInterface $roleRepository;
+    private RoleRepository $roleRepository;
     private Validator $validator;
 
-    public function __construct(RoleRepositoryInterface $roleRepository, Validator $validator)
+    public function __construct(RoleRepository $roleRepository, Validator $validator)
     {
         $this->roleRepository = $roleRepository;
         $this->validator = $validator;

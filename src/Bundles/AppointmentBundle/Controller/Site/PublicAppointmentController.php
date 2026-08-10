@@ -24,12 +24,12 @@
 
 namespace App\Bundles\AppointmentBundle\Controller\Site;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\AppointmentBundle\Repository\WaitlistRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,19 +37,19 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PublicAppointmentController extends AbstractController
 {
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private AppointmentRepository $appointmentRepository;
     private WaitlistRepository $waitlistRepository;
-    private PatientRepositoryInterface $patientRepository;
-    private UserRepositoryInterface $userRepository;
+    private PatientRepository $patientRepository;
+    private UserRepository $userRepository;
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
     private Validator $validator;
 
     public function __construct(
-        AppointmentRepositoryInterface $appointmentRepository,
+        AppointmentRepository $appointmentRepository,
         WaitlistRepository $waitlistRepository,
-        PatientRepositoryInterface $patientRepository,
-        UserRepositoryInterface $userRepository,
+        PatientRepository $patientRepository,
+        UserRepository $userRepository,
         SchedulingService $schedulingService,
         ServiceRepository $serviceRepository,
         Validator $validator

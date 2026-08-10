@@ -24,7 +24,7 @@
 
 namespace App\Bundles\InventoryBundle\Controller;
 
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,10 +32,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class InventoryController extends AbstractController
 {
-    private InventoryItemRepositoryInterface $inventoryItemRepository;
+    private InventoryItemRepository $inventoryItemRepository;
     private Validator $validator;
 
-    public function __construct(InventoryItemRepositoryInterface $inventoryItemRepository, Validator $validator)
+    public function __construct(InventoryItemRepository $inventoryItemRepository, Validator $validator)
     {
         $this->inventoryItemRepository = $inventoryItemRepository;
         $this->validator = $validator;

@@ -25,8 +25,8 @@
 namespace App\Bundles\UserBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
-use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\RoleRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Validation\Validator;
 use App\Event\UserLoggedInEvent;
@@ -39,9 +39,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends AbstractController
 {
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
     private AuthConfigRepository $authConfigRepository;
-    private RoleRepositoryInterface $roleRepository;
+    private RoleRepository $roleRepository;
     private MfaService $mfaService;
     private OAuthController $oauthController;
     private \App\Core\Repository\SettingsRepository $settingsRepository;
@@ -49,9 +49,9 @@ class AuthController extends AbstractController
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        UserRepositoryInterface $userRepository,
+        UserRepository $userRepository,
         AuthConfigRepository $authConfigRepository,
-        RoleRepositoryInterface $roleRepository,
+        RoleRepository $roleRepository,
         MfaService $mfaService,
         \App\Core\Repository\SettingsRepository $settingsRepository,
         OAuthController $oauthController,

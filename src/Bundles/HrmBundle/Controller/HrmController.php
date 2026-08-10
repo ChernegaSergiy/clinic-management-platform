@@ -25,8 +25,8 @@
 namespace App\Bundles\HrmBundle\Controller;
 
 use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
-use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\HrmBundle\Repository\HrmRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,14 +34,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HrmController extends AbstractController
 {
-    private HrmRepositoryInterface $hrmRepository;
-    private UserRepositoryInterface $userRepository;
+    private HrmRepository $hrmRepository;
+    private UserRepository $userRepository;
     private DepartmentRepository $departmentRepository;
     private Validator $validator;
 
     public function __construct(
-        HrmRepositoryInterface $hrmRepository,
-        UserRepositoryInterface $userRepository,
+        HrmRepository $hrmRepository,
+        UserRepository $userRepository,
         DepartmentRepository $departmentRepository,
         Validator $validator
     ) {

@@ -24,13 +24,13 @@
 
 namespace App\Bundles\DashboardBundle\Service;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepositoryInterface;
+use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use DateTime;
 
 class DashboardService
@@ -38,19 +38,19 @@ class DashboardService
     private KpiRepository $kpiRepository;
     private KpiResultRepository $kpiResultRepository;
     private InvoiceRepository $invoiceRepository;
-    private PatientRepositoryInterface $patientRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
-    private LabOrderRepositoryInterface $labOrderRepository;
-    private InventoryItemRepositoryInterface $inventoryItemRepository;
+    private PatientRepository $patientRepository;
+    private AppointmentRepository $appointmentRepository;
+    private LabOrderRepository $labOrderRepository;
+    private InventoryItemRepository $inventoryItemRepository;
 
     public function __construct(
         KpiRepository $kpiRepository,
         KpiResultRepository $kpiResultRepository,
         InvoiceRepository $invoiceRepository,
-        PatientRepositoryInterface $patientRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
-        LabOrderRepositoryInterface $labOrderRepository,
-        InventoryItemRepositoryInterface $inventoryItemRepository
+        PatientRepository $patientRepository,
+        AppointmentRepository $appointmentRepository,
+        LabOrderRepository $labOrderRepository,
+        InventoryItemRepository $inventoryItemRepository
     ) {
         $this->kpiRepository = $kpiRepository;
         $this->kpiResultRepository = $kpiResultRepository;

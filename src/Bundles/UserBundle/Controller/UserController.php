@@ -25,9 +25,9 @@
 namespace App\Bundles\UserBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
-use App\Bundles\HrmBundle\Repository\HrmRepositoryInterface;
+use App\Bundles\HrmBundle\Repository\HrmRepository;
 use App\Bundles\UserBundle\Repository\UserOAuthIdentityRepository;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,17 +35,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
     private AuthConfigRepository $authConfigRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
-    private HrmRepositoryInterface $hrmRepository;
+    private HrmRepository $hrmRepository;
     private SettingsRepository $settingsRepository;
 
     public function __construct(
-        UserRepositoryInterface $userRepository,
+        UserRepository $userRepository,
         AuthConfigRepository $authConfigRepository,
         UserOAuthIdentityRepository $userOAuthIdentityRepository,
-        HrmRepositoryInterface $hrmRepository,
+        HrmRepository $hrmRepository,
         SettingsRepository $settingsRepository
     ) {
         $this->userRepository = $userRepository;

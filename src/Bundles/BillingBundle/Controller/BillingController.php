@@ -24,14 +24,14 @@
 
 namespace App\Bundles\BillingBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
 use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use App\Core\Export\ExcelExporter;
 use App\Core\Export\PdfExporter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,9 +41,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class BillingController extends AbstractController
 {
     private InvoiceRepository $invoiceRepository;
-    private PatientRepositoryInterface $patientRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private PatientRepository $patientRepository;
+    private AppointmentRepository $appointmentRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
     private ServiceRepository $serviceRepository;
     private ServiceCategoryRepository $serviceCategoryRepository;
     private ServiceBundleRepository $serviceBundleRepository;
@@ -52,9 +52,9 @@ class BillingController extends AbstractController
 
     public function __construct(
         InvoiceRepository $invoiceRepository,
-        PatientRepositoryInterface $patientRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        PatientRepository $patientRepository,
+        AppointmentRepository $appointmentRepository,
+        MedicalRecordRepository $medicalRecordRepository,
         ServiceRepository $serviceRepository,
         ServiceCategoryRepository $serviceCategoryRepository,
         ServiceBundleRepository $serviceBundleRepository,

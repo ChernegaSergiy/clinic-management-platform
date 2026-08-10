@@ -24,8 +24,8 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\RoleRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Bundles\UserBundle\Service\MfaService;
 use App\Core\Auth\MfaGuard;
 use App\Core\Repository\SettingsRepository;
@@ -37,17 +37,17 @@ use Symfony\Component\Routing\Attribute\Route;
 class MfaController extends AbstractController
 {
     private MfaService $mfaService;
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
     private SettingsRepository $settingsRepository;
-    private RoleRepositoryInterface $roleRepository;
+    private RoleRepository $roleRepository;
     private \Doctrine\Persistence\ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
 
     public function __construct(
         MfaService $mfaService,
-        UserRepositoryInterface $userRepository,
+        UserRepository $userRepository,
         SettingsRepository $settingsRepository,
-        RoleRepositoryInterface $roleRepository,
+        RoleRepository $roleRepository,
         \Doctrine\Persistence\ManagerRegistry $registry,
         MfaGuard $mfaGuard
     ) {

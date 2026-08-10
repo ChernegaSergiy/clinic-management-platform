@@ -31,7 +31,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
+class AppointmentRepository extends ServiceEntityRepository
 {
     private EventDispatcherInterface $eventDispatcher;
 

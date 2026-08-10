@@ -24,10 +24,10 @@
 
 namespace App\Bundles\LabOrderBundle\Controller;
 
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use App\Bundles\LabOrderBundle\Service\LabImportService;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;
 use App\Core\Validation\Validator;
@@ -37,18 +37,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class LabOrderController extends AbstractController
 {
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
-    private LabOrderRepositoryInterface $labOrderRepository;
-    private UserRepositoryInterface $userRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
+    private LabOrderRepository $labOrderRepository;
+    private UserRepository $userRepository;
     private NotificationService $notificationService;
     private QrCodeGenerator $qrCodeGenerator;
     private LabImportService $labImportService;
     private Validator $validator;
 
     public function __construct(
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
-        LabOrderRepositoryInterface $labOrderRepository,
-        UserRepositoryInterface $userRepository,
+        MedicalRecordRepository $medicalRecordRepository,
+        LabOrderRepository $labOrderRepository,
+        UserRepository $userRepository,
         NotificationService $notificationService,
         QrCodeGenerator $qrCodeGenerator,
         LabImportService $labImportService,

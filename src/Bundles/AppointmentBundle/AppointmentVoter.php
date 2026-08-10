@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AppointmentBundle;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -40,11 +40,11 @@ final class AppointmentVoter extends Voter
     public const EDIT_ALL = 'APPOINTMENT_EDIT_ALL';
     public const CANCEL = 'APPOINTMENT_CANCEL';
 
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private AppointmentRepository $appointmentRepository;
     private Security $security;
 
     public function __construct(
-        AppointmentRepositoryInterface $appointmentRepository,
+        AppointmentRepository $appointmentRepository,
         Security $security
     ) {
         $this->appointmentRepository = $appointmentRepository;

@@ -24,32 +24,32 @@
 
 namespace App\Bundles\DashboardBundle\Service;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use DateTimeImmutable;
 
 class KpiCalculatorService
 {
     private KpiRepository $kpiRepository;
     private KpiResultRepository $kpiResultRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private AppointmentRepository $appointmentRepository;
     private InvoiceRepository $invoiceRepository;
     /** @phpstan-ignore property.onlyWritten */
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
     /** @phpstan-ignore property.onlyWritten */
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
 
     public function __construct(
         KpiRepository $kpiRepository,
         KpiResultRepository $kpiResultRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
+        AppointmentRepository $appointmentRepository,
         InvoiceRepository $invoiceRepository,
-        UserRepositoryInterface $userRepository,
-        MedicalRecordRepositoryInterface $medicalRecordRepository
+        UserRepository $userRepository,
+        MedicalRecordRepository $medicalRecordRepository
     ) {
         $this->kpiRepository = $kpiRepository;
         $this->kpiResultRepository = $kpiResultRepository;

@@ -24,7 +24,7 @@
 
 namespace App\Bundles\MedicalRecordBundle;
 
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -38,11 +38,11 @@ class MedicalRecordVoter extends Voter
     public const CREATE = 'MEDICAL_RECORD_CREATE';
     public const EDIT = 'MEDICAL_RECORD_EDIT';
 
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
     private Security $security;
 
     public function __construct(
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
+        MedicalRecordRepository $medicalRecordRepository,
         Security $security
     ) {
         $this->medicalRecordRepository = $medicalRecordRepository;

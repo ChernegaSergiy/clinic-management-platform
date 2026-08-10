@@ -24,7 +24,7 @@
 
 namespace App\Bundles\LabOrderBundle;
 
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -37,11 +37,11 @@ class LabOrderVoter extends Voter
     public const EDIT = 'LAB_ORDER_EDIT';
     public const EDIT_ALL = 'LAB_ORDER_EDIT_ALL';
 
-    private LabOrderRepositoryInterface $labOrderRepository;
+    private LabOrderRepository $labOrderRepository;
     private Security $security;
 
     public function __construct(
-        LabOrderRepositoryInterface $labOrderRepository,
+        LabOrderRepository $labOrderRepository,
         Security $security
     ) {
         $this->labOrderRepository = $labOrderRepository;

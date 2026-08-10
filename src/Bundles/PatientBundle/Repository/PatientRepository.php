@@ -32,7 +32,7 @@ use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PatientRepository extends ServiceEntityRepository implements PatientRepositoryInterface
+class PatientRepository extends ServiceEntityRepository
 {
     private CoreAuditLogger $auditLogger;
     private ?string $lastError = null;

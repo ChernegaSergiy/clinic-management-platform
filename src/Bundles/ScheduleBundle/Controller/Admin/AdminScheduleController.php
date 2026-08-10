@@ -26,7 +26,7 @@ namespace App\Bundles\ScheduleBundle\Controller\Admin;
 
 use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
 use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
-use App\Bundles\UserBundle\Repository\UserRepositoryInterface;
+use App\Bundles\UserBundle\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,9 +35,9 @@ class AdminScheduleController extends AbstractController
 {
     private DoctorScheduleRepository $doctorScheduleRepository;
     private ScheduleExceptionRepository $scheduleExceptionRepository;
-    private UserRepositoryInterface $userRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(DoctorScheduleRepository $doctorScheduleRepository, ScheduleExceptionRepository $scheduleExceptionRepository, UserRepositoryInterface $userRepository)
+    public function __construct(DoctorScheduleRepository $doctorScheduleRepository, ScheduleExceptionRepository $scheduleExceptionRepository, UserRepository $userRepository)
     {
         $this->doctorScheduleRepository = $doctorScheduleRepository;
         $this->scheduleExceptionRepository = $scheduleExceptionRepository;

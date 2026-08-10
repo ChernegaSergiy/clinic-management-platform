@@ -24,11 +24,11 @@
 
 namespace App\Bundles\PatientBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
-use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Bundles\PatientBundle\Repository\PatientRepository;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;
 use App\Core\Validation\Validator;
@@ -38,17 +38,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PatientController extends AbstractController
 {
-    private PatientRepositoryInterface $patientRepository;
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
+    private PatientRepository $patientRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
+    private AppointmentRepository $appointmentRepository;
     private InsuranceService $insuranceService;
     private PatientInsurancePolicyRepository $patientInsurancePolicyRepository;
     private Validator $validator;
 
     public function __construct(
-        PatientRepositoryInterface $patientRepository,
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
+        PatientRepository $patientRepository,
+        MedicalRecordRepository $medicalRecordRepository,
+        AppointmentRepository $appointmentRepository,
         InsuranceService $insuranceService,
         PatientInsurancePolicyRepository $patientInsurancePolicyRepository,
         Validator $validator

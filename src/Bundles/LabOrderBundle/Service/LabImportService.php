@@ -24,14 +24,14 @@
 
 namespace App\Bundles\LabOrderBundle\Service;
 
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use Exception;
 
 class LabImportService
 {
-    private LabOrderRepositoryInterface $labOrderRepository;
+    private LabOrderRepository $labOrderRepository;
 
-    public function __construct(LabOrderRepositoryInterface $labOrderRepository)
+    public function __construct(LabOrderRepository $labOrderRepository)
     {
         $this->labOrderRepository = $labOrderRepository;
     }

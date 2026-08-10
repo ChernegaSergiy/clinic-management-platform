@@ -32,7 +32,7 @@ use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MedicalRecordRepository extends ServiceEntityRepository implements MedicalRecordRepositoryInterface
+class MedicalRecordRepository extends ServiceEntityRepository
 {
     private EventDispatcherInterface $eventDispatcher;
 

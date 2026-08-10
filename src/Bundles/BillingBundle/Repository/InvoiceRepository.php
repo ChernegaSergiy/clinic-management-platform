@@ -31,7 +31,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class InvoiceRepository extends ServiceEntityRepository implements InvoiceRepositoryInterface
+class InvoiceRepository extends ServiceEntityRepository
 {
     private EventDispatcherInterface $eventDispatcher;
     private PaymentRepository $paymentRepository;

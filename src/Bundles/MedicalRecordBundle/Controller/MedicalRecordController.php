@@ -24,11 +24,11 @@
 
 namespace App\Bundles\MedicalRecordBundle\Controller;
 
-use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\AppointmentRepository;
 use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
 use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepositoryInterface;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
+use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
+use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Core\Validation\Validator;
@@ -40,9 +40,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MedicalRecordController extends AbstractController
 {
-    private MedicalRecordRepositoryInterface $medicalRecordRepository;
-    private AppointmentRepositoryInterface $appointmentRepository;
-    private LabOrderRepositoryInterface $labOrderRepository;
+    private MedicalRecordRepository $medicalRecordRepository;
+    private AppointmentRepository $appointmentRepository;
+    private LabOrderRepository $labOrderRepository;
     private IcdCodeRepository $icdCodeRepository;
     private InterventionCodeRepository $interventionCodeRepository;
     private AttachmentService $attachmentService;
@@ -50,9 +50,9 @@ class MedicalRecordController extends AbstractController
     private Validator $validator;
 
     public function __construct(
-        MedicalRecordRepositoryInterface $medicalRecordRepository,
-        AppointmentRepositoryInterface $appointmentRepository,
-        LabOrderRepositoryInterface $labOrderRepository,
+        MedicalRecordRepository $medicalRecordRepository,
+        AppointmentRepository $appointmentRepository,
+        LabOrderRepository $labOrderRepository,
         IcdCodeRepository $icdCodeRepository,
         InterventionCodeRepository $interventionCodeRepository,
         AttachmentService $attachmentService,

@@ -29,7 +29,7 @@ use App\Entity\InventoryItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class InventoryItemRepository extends ServiceEntityRepository implements InventoryItemRepositoryInterface
+class InventoryItemRepository extends ServiceEntityRepository
 {
     private InvoiceRepository $invoiceRepository;
 
