@@ -21,7 +21,6 @@ return function (ContainerBuilder $container) {
         ->setPublic(true);
     $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)->setPublic(true);
     $container->setAlias(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class, \Symfony\Component\EventDispatcher\EventDispatcher::class);
-    $container->register(\App\Core\Service\TranslationService::class)->setPublic(true);
     $container->register(\App\Core\Service\AuditLogger::class)
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
