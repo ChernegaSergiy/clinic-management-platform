@@ -30,9 +30,12 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ServiceBundleRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private BundleServiceRepository $bundleServiceRepository;
+
+    public function __construct(ManagerRegistry $registry, BundleServiceRepository $bundleServiceRepository)
     {
         parent::__construct($registry, ServiceBundle::class);
+        $this->bundleServiceRepository = $bundleServiceRepository;
     }
 
     public function findAll() : array
@@ -52,7 +55,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
         $bundle = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
         if ($bundle) {
-            $bundle['services'] = $this->getServicesInBundle($id);
+            $bundle['services'] = $this->bundleServiceRepository->getServicesInBundle($id);
         }
         return $bundle ?: null;
     }
@@ -75,7 +78,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
             $bundleId = $bundle->getId();
 
             if (!empty($data['services']) && is_array($data['services'])) {
-                $this->syncServices($bundleId, $data['services']);
+                $this->bundleServiceRepository->syncServices($bundleId, $data['services']);
             }
 
             $em->commit();
@@ -115,7 +118,7 @@ class ServiceBundleRepository extends ServiceEntityRepository
             $em->flush();
 
             if (isset($data['services']) && is_array($data['services'])) {
-                $this->syncServices($id, $data['services']);
+                $this->bundleServiceRepository->syncServices($id, $data['services']);
             }
 
             $em->commit();
@@ -124,42 +127,5 @@ class ServiceBundleRepository extends ServiceEntityRepository
             $em->rollBack();
             return false;
         }
-    }
-
-    public function getServicesInBundle(int $bundleId) : array
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder()
-            ->select('s.id', 's.name', 's.price')
-            ->from(\App\Entity\BundleService::class, 'bs')
-            ->join(\App\Entity\Service::class, 's', \Doctrine\ORM\Query\Expr\Join::WITH, 'bs.service_id = s.id')
-            ->where('bs.bundle_id = :bundle_id')
-            ->setParameter('bundle_id', $bundleId)
-            ->orderBy('s.name', 'ASC');
-
-        return $qb->getQuery()->getArrayResult();
-    }
-
-    private function syncServices(int $bundleId, array $serviceIds) : void
-    {
-        $em = $this->getEntityManager();
-
-        $deleteQb = $em->createQueryBuilder()
-            ->delete(\App\Entity\BundleService::class, 'bs')
-            ->where('bs.bundle_id = :bundle_id')
-            ->setParameter('bundle_id', $bundleId);
-
-        $deleteQb->getQuery()->execute();
-
-        if (empty($serviceIds)) {
-            return;
-        }
-
-        foreach ($serviceIds as $serviceId) {
-            $bs = new \App\Entity\BundleService();
-            $bs->setBundleId($bundleId);
-            $bs->setServiceId($serviceId);
-            $em->persist($bs);
-        }
-        $em->flush();
     }
 }
