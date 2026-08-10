@@ -78,7 +78,7 @@ class DashboardController extends AbstractController
         $exporter = new \App\Core\Export\CsvExporter($headers, $data);
         $csvContent = $exporter->generate();
 
-        $response = new \Symfony\Component\HttpFoundation\Response($csvContent);
+        $response = new Response($csvContent);
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.csv"');
         $response->headers->set('Pragma', 'no-cache');
@@ -103,7 +103,7 @@ class DashboardController extends AbstractController
         $exporter->render();
         $pdfContent = $exporter->output();
 
-        $response = new \Symfony\Component\HttpFoundation\Response($pdfContent);
+        $response = new Response($pdfContent);
         $response->headers->set('Content-Type', 'application/pdf');
         $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.pdf"');
 
@@ -131,7 +131,7 @@ class DashboardController extends AbstractController
         $exporter = new \App\Core\Export\ExcelExporter();
         $excelContent = $exporter->generate($headers, $data);
 
-        $response = new \Symfony\Component\HttpFoundation\Response($excelContent);
+        $response = new Response($excelContent);
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment; filename="dashboard_report.xlsx"');
         $response->headers->set('Cache-Control', 'max-age=0');
