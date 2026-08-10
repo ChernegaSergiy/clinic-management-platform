@@ -24,8 +24,8 @@
 
 namespace App\Bundles\ClinicalReferenceBundle\Controller;
 
-use App\Bundles\ClinicalReferenceBundle\Repository\IcdCodeRepository;
-use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
+use App\Domain\ClinicalReference\IcdCodeRepository;
+use App\Domain\ClinicalReference\InterventionCodeRepository;
 use MedCore\Nk0252021Parser\Parser;
 use MedCore\Nk0262021Parser\Parser as Nk026Parser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

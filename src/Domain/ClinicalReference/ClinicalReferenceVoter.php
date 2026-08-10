@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\ClinicalReferenceBundle;
+namespace App\Domain\ClinicalReference;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

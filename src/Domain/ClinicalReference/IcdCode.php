@@ -22,14 +22,13 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\ClinicalReference;
 
-use App\Bundles\ClinicalReferenceBundle\Repository\InterventionCodeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: InterventionCodeRepository::class)]
-#[ORM\Table(name: 'intervention_codes')]
-class InterventionCode
+#[ORM\Entity(repositoryClass: IcdCodeRepository::class)]
+#[ORM\Table(name: 'icd_codes')]
+class IcdCode
 {
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
     #[ORM\Column(length: 50)] private ?string $code = null;

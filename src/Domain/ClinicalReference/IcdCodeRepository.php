@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\ClinicalReferenceBundle\Repository;
+namespace App\Domain\ClinicalReference;
 
-use App\Entity\IcdCode;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -57,7 +56,7 @@ class IcdCodeRepository extends ServiceEntityRepository
         $em = $this->getEntityManager();
         $em->beginTransaction();
         try {
-            $em->createQuery('DELETE FROM App\Entity\IcdCode')->execute();
+            $em->createQuery('DELETE FROM App\Domain\ClinicalReference\IcdCode')->execute();
 
             $count = 0;
             $seen = [];
