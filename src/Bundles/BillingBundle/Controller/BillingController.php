@@ -27,6 +27,7 @@ namespace App\Bundles\BillingBundle\Controller;
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
 use App\Bundles\BillingBundle\Repository\InvoiceRepository;
 use App\Bundles\BillingBundle\Repository\ServiceBundleRepository;
+use App\Bundles\BillingBundle\Repository\ServiceCategoryRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\InsuranceBundle\Service\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepositoryInterface;
@@ -44,6 +45,7 @@ class BillingController extends AbstractController
     private AppointmentRepositoryInterface $appointmentRepository;
     private MedicalRecordRepositoryInterface $medicalRecordRepository;
     private ServiceRepository $serviceRepository;
+    private ServiceCategoryRepository $serviceCategoryRepository;
     private ServiceBundleRepository $serviceBundleRepository;
     private InsuranceService $insuranceService;
     private \App\Core\Validation\Validator $validator;
@@ -54,6 +56,7 @@ class BillingController extends AbstractController
         AppointmentRepositoryInterface $appointmentRepository,
         MedicalRecordRepositoryInterface $medicalRecordRepository,
         ServiceRepository $serviceRepository,
+        ServiceCategoryRepository $serviceCategoryRepository,
         ServiceBundleRepository $serviceBundleRepository,
         InsuranceService $insuranceService,
         \App\Core\Validation\Validator $validator
@@ -63,6 +66,7 @@ class BillingController extends AbstractController
         $this->appointmentRepository = $appointmentRepository;
         $this->medicalRecordRepository = $medicalRecordRepository;
         $this->serviceRepository = $serviceRepository;
+        $this->serviceCategoryRepository = $serviceCategoryRepository;
         $this->serviceBundleRepository = $serviceBundleRepository;
         $this->insuranceService = $insuranceService;
         $this->validator = $validator;
@@ -93,7 +97,7 @@ class BillingController extends AbstractController
     public function createService() : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
-        $categories = $this->serviceRepository->findCategories();
+        $categories = $this->serviceCategoryRepository->findAllCategories();
         $response = $this->render('@Billing/services/new.html.twig', [
             'categories' => $categories,
             'old' => $_SESSION['old'] ?? [],
