@@ -25,20 +25,19 @@
 namespace App\Core\Repository;
 
 use App\Entity\Settings;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class SettingsRepository
+class SettingsRepository extends ServiceEntityRepository
 {
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->em = $em;
+        parent::__construct($registry, Settings::class);
     }
 
     public function getAll() : array
     {
-        $settings = $this->em->getRepository(Settings::class)->findAll();
+        $settings = $this->findAll();
         $result = [];
         foreach ($settings as $setting) {
             $val = $setting->getValue();
@@ -51,7 +50,7 @@ class SettingsRepository
 
     public function get(string $key, mixed $default = null) : mixed
     {
-        $setting = $this->em->find(Settings::class, $key);
+        $setting = $this->find($key);
 
         if (null === $setting) {
             return $default;
@@ -68,33 +67,33 @@ class SettingsRepository
 
     public function set(string $key, mixed $value) : bool
     {
-        $setting = $this->em->find(Settings::class, $key);
+        $setting = $this->find($key);
 
         if (null === $setting) {
             $setting = new Settings();
             $setting->setKey($key);
             $setting->setCreatedAt(new \DateTimeImmutable());
-            $this->em->persist($setting);
+            $this->getEntityManager()->persist($setting);
         }
 
         $val = is_array($value) || is_object($value) ? json_encode($value) : $value;
         $setting->setValue($val);
         $setting->setUpdatedAt(new \DateTimeImmutable());
 
-        $this->em->flush();
+        $this->getEntityManager()->flush();
         return true;
     }
 
     public function delete(string $key) : bool
     {
-        $setting = $this->em->find(Settings::class, $key);
+        $setting = $this->find($key);
 
         if (null === $setting) {
             return false;
         }
 
-        $this->em->remove($setting);
-        $this->em->flush();
+        $this->getEntityManager()->remove($setting);
+        $this->getEntityManager()->flush();
         return true;
     }
 
