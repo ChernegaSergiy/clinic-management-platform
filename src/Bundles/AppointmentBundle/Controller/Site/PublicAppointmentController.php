@@ -25,6 +25,7 @@
 namespace App\Bundles\AppointmentBundle\Controller\Site;
 
 use App\Bundles\AppointmentBundle\Repository\AppointmentRepositoryInterface;
+use App\Bundles\AppointmentBundle\Repository\WaitlistRepository;
 use App\Bundles\BillingBundle\Repository\ServiceRepository;
 use App\Bundles\PatientBundle\Repository\PatientRepositoryInterface;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;
@@ -37,6 +38,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PublicAppointmentController extends AbstractController
 {
     private AppointmentRepositoryInterface $appointmentRepository;
+    private WaitlistRepository $waitlistRepository;
     private PatientRepositoryInterface $patientRepository;
     private UserRepositoryInterface $userRepository;
     private SchedulingService $schedulingService;
@@ -45,6 +47,7 @@ class PublicAppointmentController extends AbstractController
 
     public function __construct(
         AppointmentRepositoryInterface $appointmentRepository,
+        WaitlistRepository $waitlistRepository,
         PatientRepositoryInterface $patientRepository,
         UserRepositoryInterface $userRepository,
         SchedulingService $schedulingService,
@@ -52,6 +55,7 @@ class PublicAppointmentController extends AbstractController
         Validator $validator
     ) {
         $this->appointmentRepository = $appointmentRepository;
+        $this->waitlistRepository = $waitlistRepository;
         $this->patientRepository = $patientRepository;
         $this->userRepository = $userRepository;
         $this->schedulingService = $schedulingService;
@@ -213,7 +217,7 @@ class PublicAppointmentController extends AbstractController
             'notes' => $rawInput['notes'] ?? null,
         ];
 
-        $result = $this->appointmentRepository->addToWaitlist($waitlistData);
+        $result = $this->waitlistRepository->addToWaitlist($waitlistData);
 
         $_SESSION['public_success_message'] = 'Вашу заявку успішно додано до списку очікування! Ми зв\'яжемося з вами найближчим часом для підтвердження запису.';
         return $this->redirectToRoute('appointment_public_form');
