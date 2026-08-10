@@ -24,10 +24,11 @@
 
 namespace App\Entity;
 
+use App\Core\Repository\AttachmentAclRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: AttachmentAclRepository::class)]
 #[ORM\Table(name: 'attachment_acl')]
 #[ORM\UniqueConstraint(name: 'unique_acl', columns: ['attachment_id', 'user_id', 'role_id'])]
 class AttachmentAcl
