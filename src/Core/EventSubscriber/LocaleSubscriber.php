@@ -25,7 +25,6 @@
 namespace App\Core\EventSubscriber;
 
 use App\Core\Repository\SettingsRepository;
-use App\Core\Service\TranslationService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -34,12 +33,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class LocaleSubscriber implements EventSubscriberInterface
 {
     private SettingsRepository $settingsRepository;
-    private TranslationService $translationService;
 
-    public function __construct(SettingsRepository $settingsRepository, TranslationService $translationService)
+    public function __construct(SettingsRepository $settingsRepository)
     {
         $this->settingsRepository = $settingsRepository;
-        $this->translationService = $translationService;
     }
 
     public function onKernelRequest(RequestEvent $event) : void
@@ -55,15 +52,14 @@ class LocaleSubscriber implements EventSubscriberInterface
 
         $preferredLocale = $systemLocale ?? $this->detectBrowserLanguage($request) ?? 'uk';
 
-        $rawAvailableLocales = array_keys($this->translationService->getAvailableLocales());
+        $availableLocales = $this->getAvailableLocales();
         $finalLocale = 'uk';
 
-        if (in_array($preferredLocale, $rawAvailableLocales, true)) {
+        if (in_array($preferredLocale, $availableLocales, true)) {
             $finalLocale = $preferredLocale;
         }
 
         $request->setLocale($finalLocale);
-        $this->translationService->setLocale($finalLocale);
     }
 
     private function detectBrowserLanguage(Request $request) : ?string
@@ -73,7 +69,7 @@ class LocaleSubscriber implements EventSubscriberInterface
             return null;
         }
 
-        $supportedLocales = array_keys($this->translationService->getAvailableLocales());
+        $supportedLocales = $this->getAvailableLocales();
 
         $languages = explode(',', $acceptLang);
         foreach ($languages as $lang) {
@@ -86,6 +82,34 @@ class LocaleSubscriber implements EventSubscriberInterface
         }
 
         return null;
+    }
+
+    private function getAvailableLocales() : array
+    {
+        $locales = [];
+        $bundlesDir = __DIR__ . '/../../../Bundles';
+
+        if (!is_dir($bundlesDir)) {
+            return ['uk', 'en'];
+        }
+
+        $bundles = scandir($bundlesDir);
+        foreach ($bundles as $bundle) {
+            $translationsDir = $bundlesDir . '/' . $bundle . '/translations';
+            if (!is_dir($translationsDir)) {
+                continue;
+            }
+
+            $files = scandir($translationsDir);
+            foreach ($files as $file) {
+                if (str_starts_with($file, 'messages.') && str_ends_with($file, '.yaml')) {
+                    $locale = substr($file, 9, -5);
+                    $locales[$locale] = true;
+                }
+            }
+        }
+
+        return array_keys($locales);
     }
 
     public static function getSubscribedEvents() : array
