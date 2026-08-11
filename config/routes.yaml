@@ -40,7 +40,7 @@ app_routes_medical_record:
     type: attribute
     prefix: /app
 app_routes_prescription:
-    resource: { path: ../src/Bundles/PrescriptionBundle/Controller/, namespace: App\Bundles\PrescriptionBundle\Controller\ }
+    resource: { path: ../src/Http/Prescription/, namespace: App\Http\Prescription\ }
     type: attribute
     prefix: /app
 app_routes_lab_order:

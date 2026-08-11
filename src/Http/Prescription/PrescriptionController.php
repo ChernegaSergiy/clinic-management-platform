@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\PrescriptionBundle\Controller;
+namespace App\Http\Prescription;
 
 use App\Domain\Inventory\InventoryItemRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
