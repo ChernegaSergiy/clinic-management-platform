@@ -24,7 +24,7 @@
 
 namespace App\Core\Auth;
 
-use App\Bundles\UserBundle\Service\MfaService;
+use App\Domain\User\MfaService;
 use App\Core\Exception\RedirectException;
 
 class MfaGuard

@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\UserBundle\Repository;
+namespace App\Domain\User;
 
-use App\Entity\Role;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;

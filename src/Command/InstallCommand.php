@@ -24,8 +24,8 @@
 
 namespace App\Command;
 
-use App\Entity\Role;
-use App\Entity\User;
+use App\Domain\User\Role;
+use App\Domain\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Console\Attribute\AsCommand;

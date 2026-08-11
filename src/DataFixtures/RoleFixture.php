@@ -24,7 +24,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Role;
+use App\Domain\User\Role;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 

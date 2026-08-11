@@ -28,7 +28,7 @@ use App\Domain\Inventory\InventoryItemRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Prescription\PrescriptionRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

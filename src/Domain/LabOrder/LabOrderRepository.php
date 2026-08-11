@@ -101,7 +101,7 @@ class LabOrderRepository extends ServiceEntityRepository
             'CONCAT(u.last_name, CONCAT(\' \', u.first_name)) AS doctor_name'
         )
            ->join(\App\Domain\Patient\Patient::class, 'p', 'WITH', 'lo.patient_id = p.id')
-           ->join(\App\Entity\User::class, 'u', 'WITH', 'lo.doctor_id = u.id')
+           ->join(\App\Domain\User\User::class, 'u', 'WITH', 'lo.doctor_id = u.id')
            ->where('lo.id = :id')
            ->setParameter('id', $id);
 

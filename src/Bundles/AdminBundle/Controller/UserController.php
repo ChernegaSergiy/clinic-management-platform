@@ -24,9 +24,9 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
-use App\Bundles\UserBundle\Service\MfaService;
+use App\Domain\User\RoleRepository;
+use App\Domain\User\UserRepository;
+use App\Domain\User\MfaService;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

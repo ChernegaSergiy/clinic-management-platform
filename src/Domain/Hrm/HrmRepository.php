@@ -140,7 +140,7 @@ class HrmRepository extends ServiceEntityRepository
             ->select('e, d.name as department_name, dp.name as parent_name, u.email as user_email')
             ->leftJoin('App\Domain\Department\Department', 'd', 'WITH', 'e.department_id = d.id')
             ->leftJoin('App\Domain\Department\Department', 'dp', 'WITH', 'd.parent_id = dp.id')
-            ->leftJoin('App\Entity\User', 'u', 'WITH', 'e.user_id = u.id')
+            ->leftJoin('App\Domain\User\User', 'u', 'WITH', 'e.user_id = u.id')
             ->where('e.department_id = :department_id')
             ->setParameter('department_id', $departmentId)
             ->orderBy('e.last_name', 'ASC')

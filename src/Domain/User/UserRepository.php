@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\UserBundle\Repository;
+namespace App\Domain\User;
 
-use App\Entity\User;
 use App\Event\EntityChangedEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -157,7 +156,7 @@ class UserRepository extends ServiceEntityRepository
         }
 
         if (!empty($data['role_id'])) {
-            $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, $data['role_id']);
+            $role = $this->getEntityManager()->getReference(\App\Domain\User\Role::class, $data['role_id']);
             $user->setRole($role);
         }
 
@@ -196,7 +195,7 @@ class UserRepository extends ServiceEntityRepository
             $user->setEmail($data['email']);
         }
         if (isset($data['role_id'])) {
-            $role = $this->getEntityManager()->getReference(\App\Entity\Role::class, $data['role_id']);
+            $role = $this->getEntityManager()->getReference(\App\Domain\User\Role::class, $data['role_id']);
             $user->setRole($role);
         }
         if (!empty($data['password'])) {
@@ -262,7 +261,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('r.id')
-           ->from(\App\Entity\Role::class, 'r')
+           ->from(\App\Domain\User\Role::class, 'r')
            ->where('r.name = :role_name')
            ->setParameter('role_name', $roleName)
            ->setMaxResults(1);

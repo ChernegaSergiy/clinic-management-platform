@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\UserBundle\Service;
+namespace App\Domain\User;
 
 use App\Core\Service\QrCodeGenerator;
 use Doctrine\Persistence\ManagerRegistry;

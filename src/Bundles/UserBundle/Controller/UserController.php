@@ -26,8 +26,8 @@ namespace App\Bundles\UserBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use App\Domain\Hrm\HrmRepository;
-use App\Bundles\UserBundle\Repository\UserOAuthIdentityRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserOAuthIdentityRepository;
+use App\Domain\User\UserRepository;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

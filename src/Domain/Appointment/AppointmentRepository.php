@@ -73,7 +73,7 @@ class AppointmentRepository extends ServiceEntityRepository
         $patient = $this->getEntityManager()->getReference(\App\Domain\Patient\Patient::class, $data['patient_id']);
         $appointment->setPatient($patient);
 
-        $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+        $doctor = $this->getEntityManager()->getReference(\App\Domain\User\User::class, $data['doctor_id']);
         $appointment->setDoctor($doctor);
 
         try {
@@ -174,7 +174,7 @@ class AppointmentRepository extends ServiceEntityRepository
             $appointment->setPatient($patient);
         }
         if (isset($data['doctor_id'])) {
-            $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+            $doctor = $this->getEntityManager()->getReference(\App\Domain\User\User::class, $data['doctor_id']);
             $appointment->setDoctor($doctor);
         }
 
@@ -497,7 +497,7 @@ class AppointmentRepository extends ServiceEntityRepository
         // Using PHP to process time diff, so fetch the entities using QueryBuilder
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('u.id as doctor_id, u.first_name, u.last_name, a.start_time, a.end_time')
-            ->from(\App\Entity\User::class, 'u')
+            ->from(\App\Domain\User\User::class, 'u')
             ->join('u.role', 'r')
             ->leftJoin(\App\Domain\Appointment\Appointment::class, 'a', 'WITH', 'u.id = IDENTITY(a.doctor) AND SUBSTRING(a.start_time, 1, 10) = :date AND a.status = :status')
             ->where('r.name = :role_name')

@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepository;
+use App\Domain\User\RoleRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

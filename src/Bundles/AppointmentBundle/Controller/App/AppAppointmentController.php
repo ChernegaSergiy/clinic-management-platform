@@ -30,7 +30,7 @@ use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Room\RoomRepository;
 use App\Domain\Schedule\SchedulingService;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use App\Core\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

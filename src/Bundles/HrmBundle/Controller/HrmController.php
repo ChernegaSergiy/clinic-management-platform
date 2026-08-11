@@ -26,7 +26,7 @@ namespace App\Bundles\HrmBundle\Controller;
 
 use App\Domain\Department\DepartmentRepository;
 use App\Domain\Hrm\HrmRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

@@ -24,9 +24,9 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
-use App\Bundles\UserBundle\Repository\RoleRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
-use App\Bundles\UserBundle\Service\MfaService;
+use App\Domain\User\RoleRepository;
+use App\Domain\User\UserRepository;
+use App\Domain\User\MfaService;
 use App\Core\Auth\MfaGuard;
 use App\Core\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

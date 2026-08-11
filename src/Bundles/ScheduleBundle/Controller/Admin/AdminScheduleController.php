@@ -26,7 +26,7 @@ namespace App\Bundles\ScheduleBundle\Controller\Admin;
 
 use App\Domain\Schedule\DoctorScheduleRepository;
 use App\Domain\Schedule\ScheduleExceptionRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

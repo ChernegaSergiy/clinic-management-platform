@@ -25,7 +25,7 @@
 namespace App\Bundles\NewsBundle\Controller\Admin;
 
 use App\Domain\News\NewsRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

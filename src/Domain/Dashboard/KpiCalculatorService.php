@@ -29,7 +29,7 @@ use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Kpi\KpiRepository;
 use App\Domain\Kpi\KpiResultRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
-use App\Bundles\UserBundle\Repository\UserRepository;
+use App\Domain\User\UserRepository;
 use DateTimeImmutable;
 
 class KpiCalculatorService

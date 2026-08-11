@@ -114,7 +114,7 @@ class KpiResultRepository extends ServiceEntityRepository
             'CONCAT(u.last_name, CONCAT(\' \', u.first_name)) AS user_name'
         )
         ->join(\App\Domain\Kpi\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
-        ->join(\App\Entity\User::class, 'u', 'WITH', 'kr.user_id = u.id')
+        ->join(\App\Domain\User\User::class, 'u', 'WITH', 'kr.user_id = u.id')
         ->orderBy('kr.period_start', 'DESC');
 
         return $qb->getQuery()->getArrayResult();

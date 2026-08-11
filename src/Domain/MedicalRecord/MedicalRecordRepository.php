@@ -139,7 +139,7 @@ class MedicalRecordRepository extends ServiceEntityRepository
         $patient = $this->getEntityManager()->getReference(\App\Domain\Patient\Patient::class, $data['patient_id']);
         $mr->setPatient($patient);
 
-        $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+        $doctor = $this->getEntityManager()->getReference(\App\Domain\User\User::class, $data['doctor_id']);
         $mr->setDoctor($doctor);
 
         if (!empty($data['appointment_id'])) {
@@ -213,7 +213,7 @@ class MedicalRecordRepository extends ServiceEntityRepository
         }
 
         if (isset($data['doctor_id'])) {
-            $doctor = $this->getEntityManager()->getReference(\App\Entity\User::class, $data['doctor_id']);
+            $doctor = $this->getEntityManager()->getReference(\App\Domain\User\User::class, $data['doctor_id']);
             $mr->setDoctor($doctor);
         }
 

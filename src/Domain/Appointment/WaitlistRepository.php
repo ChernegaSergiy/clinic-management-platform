@@ -54,7 +54,7 @@ class WaitlistRepository extends ServiceEntityRepository
             ->addSelect("COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name")
             ->from(Waitlist::class, 'wl')
             ->leftJoin(\App\Domain\Patient\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.patient_id = p.id')
-            ->leftJoin(\App\Entity\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
+            ->leftJoin(\App\Domain\User\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
             ->where('wl.id = :id')
             ->setParameter('id', $id);
 
@@ -129,7 +129,7 @@ class WaitlistRepository extends ServiceEntityRepository
             ->addSelect("COALESCE(CONCAT(u.last_name, ' ', u.first_name), 'Будь-який') as doctor_name")
             ->from(Waitlist::class, 'wl')
             ->leftJoin(\App\Domain\Patient\Patient::class, 'p', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.patient_id = p.id')
-            ->leftJoin(\App\Entity\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
+            ->leftJoin(\App\Domain\User\User::class, 'u', \Doctrine\ORM\Query\Expr\Join::WITH, 'wl.desired_doctor_id = u.id')
             ->orderBy('wl.created_at', 'ASC');
 
         if (null !== $status) {

@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\UserBundle\Repository;
+namespace App\Domain\User;
 
-use App\Entity\UserOAuthIdentity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -64,7 +63,7 @@ class UserOAuthIdentityRepository extends ServiceEntityRepository
     {
         $identity = new UserOAuthIdentity();
 
-        $user = $this->getEntityManager()->getReference(\App\Entity\User::class, $userId);
+        $user = $this->getEntityManager()->getReference(\App\Domain\User\User::class, $userId);
         $identity->setUser($user);
 
         $identity->setProvider($provider);
