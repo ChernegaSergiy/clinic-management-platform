@@ -26,7 +26,7 @@ namespace App\Domain\Dashboard;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
+use App\Domain\Inventory\InventoryItemRepository;
 use App\Bundles\KpiBundle\Repository\KpiRepository;
 use App\Bundles\KpiBundle\Repository\KpiResultRepository;
 use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;

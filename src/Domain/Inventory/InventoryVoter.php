@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\InventoryBundle;
+namespace App\Domain\Inventory;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

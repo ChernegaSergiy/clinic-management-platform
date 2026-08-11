@@ -24,7 +24,7 @@
 
 namespace App\Bundles\PrescriptionBundle\Controller;
 
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
+use App\Domain\Inventory\InventoryItemRepository;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;

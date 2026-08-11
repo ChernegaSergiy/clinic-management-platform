@@ -22,10 +22,9 @@
  *
  */
 
-namespace App\Bundles\InventoryBundle\Repository;
+namespace App\Domain\Inventory;
 
 use App\Domain\Billing\InvoiceRepository;
-use App\Entity\InventoryItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

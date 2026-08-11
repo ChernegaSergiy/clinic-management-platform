@@ -24,7 +24,7 @@
 
 namespace App\Bundles\InventoryBundle\Controller;
 
-use App\Bundles\InventoryBundle\Repository\InventoryItemRepository;
+use App\Domain\Inventory\InventoryItemRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
