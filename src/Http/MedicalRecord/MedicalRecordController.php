@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\MedicalRecordBundle\Controller;
+namespace App\Http\MedicalRecord;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\ClinicalReference\IcdCodeRepository;

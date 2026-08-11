@@ -36,7 +36,7 @@ app_routes_patient:
     type: attribute
     prefix: /app
 app_routes_medical_record:
-    resource: { path: ../src/Bundles/MedicalRecordBundle/Controller/, namespace: App\Bundles\MedicalRecordBundle\Controller\ }
+    resource: { path: ../src/Http/MedicalRecord/, namespace: App\Http\MedicalRecord\ }
     type: attribute
     prefix: /app
 app_routes_prescription:
