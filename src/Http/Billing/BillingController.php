@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\BillingBundle\Controller;
+namespace App\Http\Billing;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;

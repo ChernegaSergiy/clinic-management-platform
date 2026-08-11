@@ -68,7 +68,7 @@ app_routes_notification:
     type: attribute
     prefix: /app
 app_routes_billing:
-    resource: { path: ../src/Bundles/BillingBundle/Controller/, namespace: App\Bundles\BillingBundle\Controller\ }
+    resource: { path: ../src/Http/Billing/, namespace: App\Http\Billing\ }
     type: attribute
     prefix: /app
 app_routes_appointment:
