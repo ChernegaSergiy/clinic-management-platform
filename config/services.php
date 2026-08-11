@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 return function (ContainerBuilder $container) {
     // Doctrine EntityManager
@@ -11,16 +10,10 @@ return function (ContainerBuilder $container) {
 
     $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)->setPublic(true);
     $container->setAlias(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class, \Symfony\Component\EventDispatcher\EventDispatcher::class);
-    $container->register(\App\Shared\Service\AuditLogger::class)
-        ->setArguments([new Reference('pdo')])
-        ->setPublic(true);
+    $container->register(\App\Shared\Service\AuditLogger::class)->setPublic(true);
 
-    $container->register(\App\Shared\Service\AttachmentService::class)
-        ->setArguments([new Reference('pdo')])
-        ->setPublic(true);
-    $container->register(\App\Shared\Service\NotificationService::class)
-        ->setArguments([new Reference('pdo')])
-        ->setPublic(true);
+    $container->register(\App\Shared\Service\AttachmentService::class)->setPublic(true);
+    $container->register(\App\Shared\Service\NotificationService::class)->setPublic(true);
     $container->register(\App\Shared\Service\QrCodeGenerator::class)->setPublic(true);
 
     $container->register(\App\Shared\Repository\SettingsRepository::class)->setPublic(true);
