@@ -29,7 +29,7 @@ use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Inventory\InventoryItemRepository;
 use App\Domain\Kpi\KpiRepository;
 use App\Domain\Kpi\KpiResultRepository;
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
+use App\Domain\LabOrder\LabOrderRepository;
 use App\Domain\Patient\PatientRepository;
 use DateTime;
 

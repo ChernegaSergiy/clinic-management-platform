@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\LabOrderBundle;
+namespace App\Domain\LabOrder;
 
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

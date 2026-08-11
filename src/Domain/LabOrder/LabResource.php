@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\LabOrder;
 
-use App\Bundles\LabOrderBundle\Repository\LabResourceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

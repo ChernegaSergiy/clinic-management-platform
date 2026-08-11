@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\LabOrderBundle\Service;
+namespace App\Domain\LabOrder;
 
-use App\Bundles\LabOrderBundle\Repository\LabOrderRepository;
 use Exception;
 
 class LabImportService

@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\LabOrderBundle\Repository;
+namespace App\Domain\LabOrder;
 
-use App\Entity\LabResource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

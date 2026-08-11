@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\LabOrderBundle\Repository;
+namespace App\Domain\LabOrder;
 
-use App\Entity\LabOrder;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
