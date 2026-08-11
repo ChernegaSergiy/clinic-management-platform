@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\PrescriptionBundle\Repository;
+namespace App\Domain\Prescription;
 
-use App\Entity\PrescriptionItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

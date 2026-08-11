@@ -22,10 +22,9 @@
  *
  */
 
-namespace App\Bundles\PrescriptionBundle;
+namespace App\Domain\Prescription;
 
 use App\Domain\Appointment\AppointmentRepository;
-use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

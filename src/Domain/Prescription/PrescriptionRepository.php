@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\PrescriptionBundle\Repository;
+namespace App\Domain\Prescription;
 
-use App\Entity\Prescription;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

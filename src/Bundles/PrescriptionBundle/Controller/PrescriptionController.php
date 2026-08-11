@@ -27,7 +27,7 @@ namespace App\Bundles\PrescriptionBundle\Controller;
 use App\Domain\Inventory\InventoryItemRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
-use App\Bundles\PrescriptionBundle\Repository\PrescriptionRepository;
+use App\Domain\Prescription\PrescriptionRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
