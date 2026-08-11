@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Department;
 
-use App\Bundles\DepartmentBundle\Repository\DepartmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

@@ -39,7 +39,7 @@ class HrmRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, d.name as department_name')
-            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->leftJoin('App\Domain\Department\Department', 'd', 'WITH', 'e.department_id = d.id')
             ->orderBy('e.last_name', 'ASC')
             ->addOrderBy('e.first_name', 'ASC');
 
@@ -75,7 +75,7 @@ class HrmRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, d.name as department_name')
-            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->leftJoin('App\Domain\Department\Department', 'd', 'WITH', 'e.department_id = d.id')
             ->where('e.id = :id')
             ->setParameter('id', $id);
 
@@ -139,8 +139,8 @@ class HrmRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, d.name as department_name, dp.name as parent_name, u.email as user_email')
-            ->leftJoin('App\Entity\Department', 'd', 'WITH', 'e.department_id = d.id')
-            ->leftJoin('App\Entity\Department', 'dp', 'WITH', 'd.parent_id = dp.id')
+            ->leftJoin('App\Domain\Department\Department', 'd', 'WITH', 'e.department_id = d.id')
+            ->leftJoin('App\Domain\Department\Department', 'dp', 'WITH', 'd.parent_id = dp.id')
             ->leftJoin('App\Entity\User', 'u', 'WITH', 'e.user_id = u.id')
             ->where('e.department_id = :department_id')
             ->setParameter('department_id', $departmentId)

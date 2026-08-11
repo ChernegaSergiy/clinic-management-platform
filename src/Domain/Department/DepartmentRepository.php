@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\DepartmentBundle\Repository;
+namespace App\Domain\Department;
 
-use App\Entity\Department;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;

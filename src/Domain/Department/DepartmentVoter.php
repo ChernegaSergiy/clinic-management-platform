@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\DepartmentBundle;
+namespace App\Domain\Department;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
