@@ -27,7 +27,7 @@ namespace App\Bundles\PatientBundle\Controller;
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Insurance\PatientInsurancePolicyRepository;
 use App\Domain\Insurance\InsuranceService;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Core\Export\CsvExporter;
 use App\Core\Export\JsonExporter;

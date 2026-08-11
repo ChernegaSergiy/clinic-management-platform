@@ -28,7 +28,7 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Kpi\KpiRepository;
 use App\Domain\Kpi\KpiResultRepository;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use DateTimeImmutable;
 

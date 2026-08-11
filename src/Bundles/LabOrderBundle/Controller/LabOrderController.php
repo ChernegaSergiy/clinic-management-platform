@@ -26,7 +26,7 @@ namespace App\Bundles\LabOrderBundle\Controller;
 
 use App\Domain\LabOrder\LabOrderRepository;
 use App\Domain\LabOrder\LabImportService;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Service\NotificationService;
 use App\Core\Service\QrCodeGenerator;

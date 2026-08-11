@@ -608,7 +608,7 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('a')
             ->select('a.id as appointment_id', 'a.start_time', 'a.status', 'IDENTITY(mr.id) as medical_record_id')
-            ->leftJoin(\App\Entity\MedicalRecord::class, 'mr', 'WITH', 'a.id = IDENTITY(mr.appointment)')
+            ->leftJoin(\App\Domain\MedicalRecord\MedicalRecord::class, 'mr', 'WITH', 'a.id = IDENTITY(mr.appointment)')
             ->where('IDENTITY(a.patient) = :patient_id')
             ->andWhere('a.start_time > :after_date')
             ->andWhere('a.start_time <= DATE_ADD(:after_date, :timeframe_days, \'DAY\')')

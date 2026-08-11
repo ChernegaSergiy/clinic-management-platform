@@ -28,7 +28,7 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\ClinicalReference\IcdCodeRepository;
 use App\Domain\ClinicalReference\InterventionCodeRepository;
 use App\Domain\LabOrder\LabOrderRepository;
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
+use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Core\Service\AttachmentService;
 use App\Core\Service\AuditLogger;
 use App\Core\Validation\Validator;

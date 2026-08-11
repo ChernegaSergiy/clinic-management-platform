@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\MedicalRecordBundle;
+namespace App\Domain\MedicalRecord;
 
-use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

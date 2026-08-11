@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\MedicalRecordBundle\Repository;
+namespace App\Domain\MedicalRecord;
 
-use App\Entity\MedicalRecord;
 use App\Event\EntityChangedEvent;
 use App\Event\PatientNotificationEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
