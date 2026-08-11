@@ -24,9 +24,8 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\InsuranceBundle\Repository;
+namespace App\Domain\Insurance;
 
-use App\Entity\InsuranceCompany;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

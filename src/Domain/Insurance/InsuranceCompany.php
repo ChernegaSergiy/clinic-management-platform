@@ -22,22 +22,21 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Insurance;
 
-use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ClaimRepository::class)]
-#[ORM\Table(name: 'claims')]
-class Claim
+#[ORM\Entity(repositoryClass: InsuranceCompanyRepository::class)]
+#[ORM\Table(name: 'insurance_companies')]
+class InsuranceCompany
 {
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
-    #[ORM\Column(type: Types::INTEGER)] private ?int $invoice_id = null;
-    #[ORM\Column(type: Types::INTEGER, nullable: true)] private ?int $patient_policy_id = null;
-    #[ORM\Column(length: 50)] private ?string $status = null;
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $submitted_at = null;
-    #[ORM\Column(type: Types::FLOAT, nullable: true)] private ?float $total_claimed = null;
+    #[ORM\Column(length: 255)] private ?string $name = null;
+    #[ORM\Column(length: 255, nullable: true)] private ?string $contact_person = null;
+    #[ORM\Column(length: 255, nullable: true)] private ?string $phone = null;
+    #[ORM\Column(length: 255, nullable: true)] private ?string $email = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $notes = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 
@@ -52,58 +51,58 @@ class Claim
         return $this;
     }
 
-    public function getInvoiceId() : ?int
+    public function getName() : ?string
     {
-        return $this->invoice_id;
+        return $this->name;
     }
 
-    public function setInvoiceId(?int $invoice_id) : self
+    public function setName(?string $name) : self
     {
-        $this->invoice_id = $invoice_id;
+        $this->name = $name;
         return $this;
     }
 
-    public function getPatientPolicyId() : ?int
+    public function getContactPerson() : ?string
     {
-        return $this->patient_policy_id;
+        return $this->contact_person;
     }
 
-    public function setPatientPolicyId(?int $patient_policy_id) : self
+    public function setContactPerson(?string $contact_person) : self
     {
-        $this->patient_policy_id = $patient_policy_id;
+        $this->contact_person = $contact_person;
         return $this;
     }
 
-    public function getStatus() : ?string
+    public function getPhone() : ?string
     {
-        return $this->status;
+        return $this->phone;
     }
 
-    public function setStatus(?string $status) : self
+    public function setPhone(?string $phone) : self
     {
-        $this->status = $status;
+        $this->phone = $phone;
         return $this;
     }
 
-    public function getSubmittedAt() : ?\DateTimeInterface
+    public function getEmail() : ?string
     {
-        return $this->submitted_at;
+        return $this->email;
     }
 
-    public function setSubmittedAt(?\DateTimeInterface $submitted_at) : self
+    public function setEmail(?string $email) : self
     {
-        $this->submitted_at = $submitted_at;
+        $this->email = $email;
         return $this;
     }
 
-    public function getTotalClaimed() : ?float
+    public function getNotes() : ?string
     {
-        return $this->total_claimed;
+        return $this->notes;
     }
 
-    public function setTotalClaimed(?float $total_claimed) : self
+    public function setNotes(?string $notes) : self
     {
-        $this->total_claimed = $total_claimed;
+        $this->notes = $notes;
         return $this;
     }
 

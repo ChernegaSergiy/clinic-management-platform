@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Insurance;
 
-use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

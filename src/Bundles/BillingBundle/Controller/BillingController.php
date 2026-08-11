@@ -29,7 +29,7 @@ use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Billing\ServiceBundleRepository;
 use App\Domain\Billing\ServiceCategoryRepository;
 use App\Domain\Billing\ServiceRepository;
-use App\Bundles\InsuranceBundle\Service\InsuranceService;
+use App\Domain\Insurance\InsuranceService;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Core\Export\ExcelExporter;

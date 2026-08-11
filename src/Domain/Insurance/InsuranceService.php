@@ -24,12 +24,9 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\InsuranceBundle\Service;
+namespace App\Domain\Insurance;
 
 use App\Domain\Billing\InvoiceRepository;
-use App\Bundles\InsuranceBundle\Repository\ClaimRepository;
-use App\Bundles\InsuranceBundle\Repository\InsuranceCompanyRepository;
-use App\Bundles\InsuranceBundle\Repository\PatientInsurancePolicyRepository;
 
 class InsuranceService
 {

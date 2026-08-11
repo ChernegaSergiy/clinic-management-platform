@@ -24,7 +24,7 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\InsuranceBundle\Repository;
+namespace App\Domain\Insurance;
 
 use App\Domain\Patient\PatientInsurancePolicy;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

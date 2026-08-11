@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\InsuranceBundle;
+namespace App\Domain\Insurance;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

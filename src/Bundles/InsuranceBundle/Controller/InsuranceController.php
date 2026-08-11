@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 namespace App\Bundles\InsuranceBundle\Controller;
 
-use App\Bundles\InsuranceBundle\Service\InsuranceService;
+use App\Domain\Insurance\InsuranceService;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
