@@ -7,7 +7,7 @@ admin_routes_clinical:
     type: attribute
     prefix: /admin
 admin_routes_department:
-    resource: { path: ../src/Bundles/DepartmentBundle/Controller/, namespace: App\Bundles\DepartmentBundle\Controller\ }
+    resource: { path: ../src/Http/Department/, namespace: App\Http\Department\ }
     type: attribute
     prefix: /admin
 admin_routes_kpi:
