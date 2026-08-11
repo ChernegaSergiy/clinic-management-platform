@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\HrmBundle\Controller;
+namespace App\Http\Hrm;
 
 use App\Domain\Department\DepartmentRepository;
 use App\Domain\Hrm\HrmRepository;

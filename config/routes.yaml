@@ -52,7 +52,7 @@ app_routes_kpi:
     type: attribute
     prefix: /app
 app_routes_hrm:
-    resource: { path: ../src/Bundles/HrmBundle/Controller/, namespace: App\Bundles\HrmBundle\Controller\ }
+    resource: { path: ../src/Http/Hrm/, namespace: App\Http\Hrm\ }
     type: attribute
     prefix: /app
 app_routes_insurance:
