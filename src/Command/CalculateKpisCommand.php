@@ -24,7 +24,7 @@
 
 namespace App\Command;
 
-use App\Bundles\DashboardBundle\Service\KpiCalculatorService;
+use App\Domain\Dashboard\KpiCalculatorService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

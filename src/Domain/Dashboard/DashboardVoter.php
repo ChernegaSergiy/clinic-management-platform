@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\DashboardBundle;
+namespace App\Domain\Dashboard;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

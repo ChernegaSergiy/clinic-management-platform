@@ -24,7 +24,7 @@
 
 namespace App\Bundles\DashboardBundle\Controller;
 
-use App\Bundles\DashboardBundle\Service\DashboardService;
+use App\Domain\Dashboard\DashboardService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
