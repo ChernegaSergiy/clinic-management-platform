@@ -56,6 +56,18 @@ class AttachmentVersionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function getMaxVersionNumber(int $attachmentId) : int
+    {
+        $result = $this->createQueryBuilder('v')
+            ->select('MAX(v.version_number)')
+            ->where('v.attachment = :attachment_id')
+            ->setParameter('attachment_id', $attachmentId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return null !== $result ? (int)$result : 0;
+    }
+
     public function save(AttachmentVersion $version) : void
     {
         $this->getEntityManager()->persist($version);
