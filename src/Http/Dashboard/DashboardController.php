@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\DashboardBundle\Controller;
+namespace App\Http\Dashboard;
 
 use App\Domain\Dashboard\DashboardService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

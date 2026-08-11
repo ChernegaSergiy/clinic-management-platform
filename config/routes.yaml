@@ -28,7 +28,7 @@ admin_routes_schedule:
     prefix: /admin
 
 app_routes_dashboard:
-    resource: { path: ../src/Bundles/DashboardBundle/Controller/, namespace: App\Bundles\DashboardBundle\Controller\ }
+    resource: { path: ../src/Http/Dashboard/, namespace: App\Http\Dashboard\ }
     type: attribute
     prefix: /app
 app_routes_patient:
