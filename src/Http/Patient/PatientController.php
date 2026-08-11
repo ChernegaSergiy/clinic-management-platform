@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\PatientBundle\Controller;
+namespace App\Http\Patient;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Insurance\PatientInsurancePolicyRepository;
