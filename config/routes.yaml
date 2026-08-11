@@ -23,7 +23,7 @@ admin_routes_news:
     type: attribute
     prefix: /admin
 admin_routes_schedule:
-    resource: { path: ../src/Bundles/ScheduleBundle/Controller/Admin/, namespace: App\Bundles\ScheduleBundle\Controller\Admin\ }
+    resource: { path: ../src/Http/Schedule/Admin/, namespace: App\Http\Schedule\Admin\ }
     type: attribute
     prefix: /admin
 
@@ -80,7 +80,7 @@ app_routes_room:
     type: attribute
     prefix: /app
 app_routes_schedule:
-    resource: { path: ../src/Bundles/ScheduleBundle/Controller/App/, namespace: App\Bundles\ScheduleBundle\Controller\App\ }
+    resource: { path: ../src/Http/Schedule/App/, namespace: App\Http\Schedule\App\ }
     type: attribute
     prefix: /app
 

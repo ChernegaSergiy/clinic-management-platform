@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\ScheduleBundle\Controller\App;
+namespace App\Http\Schedule\App;
 
 use App\Domain\Schedule\DoctorScheduleRepository;
 use App\Domain\Schedule\ScheduleExceptionRepository;
