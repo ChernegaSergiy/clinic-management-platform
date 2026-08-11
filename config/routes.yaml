@@ -85,7 +85,7 @@ app_routes_schedule:
     prefix: /app
 
 site_routes_site:
-    resource: { path: ../src/Bundles/SiteBundle/Controller/, namespace: App\Bundles\SiteBundle\Controller\ }
+    resource: { path: ../src/Http/Site/, namespace: App\Http\Site\ }
     type: attribute
 site_routes_user:
     resource: { path: ../src/Bundles/UserBundle/Controller/, namespace: App\Bundles\UserBundle\Controller\ }

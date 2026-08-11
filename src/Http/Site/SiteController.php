@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\SiteBundle\Controller;
+namespace App\Http\Site;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
