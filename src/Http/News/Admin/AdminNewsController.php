@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\NewsBundle\Controller\Admin;
+namespace App\Http\News\Admin;
 
 use App\Domain\News\NewsRepository;
 use App\Domain\User\UserRepository;

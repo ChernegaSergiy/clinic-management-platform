@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\NewsBundle\Controller\Site;
+namespace App\Http\News\Site;
 
 use App\Domain\News\NewsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
