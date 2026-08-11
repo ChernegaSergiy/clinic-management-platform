@@ -31,7 +31,7 @@ use App\Domain\Patient\PatientRepository;
 use App\Domain\Room\RoomRepository;
 use App\Domain\Schedule\SchedulingService;
 use App\Domain\User\UserRepository;
-use App\Core\Service\NotificationService;
+use App\Shared\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +47,7 @@ class AppAppointmentController extends AbstractController
     private SchedulingService $schedulingService;
     private ServiceRepository $serviceRepository;
     private RoomRepository $roomRepository;
-    private \App\Core\Validation\Validator $validator;
+    private \App\Shared\Validation\Validator $validator;
 
     public function __construct(
         AppointmentRepository $appointmentRepository,
@@ -58,7 +58,7 @@ class AppAppointmentController extends AbstractController
         SchedulingService $schedulingService,
         ServiceRepository $serviceRepository,
         RoomRepository $roomRepository,
-        \App\Core\Validation\Validator $validator
+        \App\Shared\Validation\Validator $validator
     ) {
         $this->appointmentRepository = $appointmentRepository;
         $this->waitlistRepository = $waitlistRepository;

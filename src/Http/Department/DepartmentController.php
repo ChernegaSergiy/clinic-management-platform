@@ -26,7 +26,7 @@ namespace App\Http\Department;
 
 use App\Domain\Department\DepartmentRepository;
 use App\Domain\Hrm\HrmRepository;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

@@ -28,7 +28,7 @@ use App\Domain\Admin\AuthConfigRepository;
 use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;
 use App\Domain\User\MfaService;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,7 +44,7 @@ class AuthController extends AbstractController
     private RoleRepository $roleRepository;
     private MfaService $mfaService;
     private OAuthController $oauthController;
-    private \App\Core\Repository\SettingsRepository $settingsRepository;
+    private \App\Shared\Repository\SettingsRepository $settingsRepository;
     private Validator $validator;
     private EventDispatcherInterface $eventDispatcher;
 
@@ -53,7 +53,7 @@ class AuthController extends AbstractController
         AuthConfigRepository $authConfigRepository,
         RoleRepository $roleRepository,
         MfaService $mfaService,
-        \App\Core\Repository\SettingsRepository $settingsRepository,
+        \App\Shared\Repository\SettingsRepository $settingsRepository,
         OAuthController $oauthController,
         Validator $validator,
         EventDispatcherInterface $eventDispatcher

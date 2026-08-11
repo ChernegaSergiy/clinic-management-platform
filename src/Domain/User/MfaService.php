@@ -24,7 +24,7 @@
 
 namespace App\Domain\User;
 
-use App\Core\Service\QrCodeGenerator;
+use App\Shared\Service\QrCodeGenerator;
 use Doctrine\Persistence\ManagerRegistry;
 use OTPHP\HOTP;
 use OTPHP\TOTP;

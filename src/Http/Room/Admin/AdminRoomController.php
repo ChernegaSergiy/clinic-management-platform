@@ -25,7 +25,7 @@
 namespace App\Http\Room\Admin;
 
 use App\Domain\Room\RoomRepository;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

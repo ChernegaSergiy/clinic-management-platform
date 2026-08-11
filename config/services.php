@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Reference;
 return function (ContainerBuilder $container) {
     // Doctrine EntityManager
     $container->register(\Doctrine\ORM\EntityManagerInterface::class)
-        ->setFactory([\App\Core\Database\DoctrineFactory::class, 'createEntityManager'])
+        ->setFactory([\App\Infrastructure\Database\DoctrineFactory::class, 'createEntityManager'])
         ->setPublic(true);
 
     // PDO service via existing Database singleton.
@@ -16,17 +16,17 @@ return function (ContainerBuilder $container) {
 
     $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)->setPublic(true);
     $container->setAlias(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class, \Symfony\Component\EventDispatcher\EventDispatcher::class);
-    $container->register(\App\Core\Service\AuditLogger::class)
+    $container->register(\App\Shared\Service\AuditLogger::class)
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
 
-    $container->register(\App\Core\Service\AttachmentService::class)
+    $container->register(\App\Shared\Service\AttachmentService::class)
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
-    $container->register(\App\Core\Service\NotificationService::class)
+    $container->register(\App\Shared\Service\NotificationService::class)
         ->setArguments([new Reference('pdo')])
         ->setPublic(true);
-    $container->register(\App\Core\Service\QrCodeGenerator::class)->setPublic(true);
+    $container->register(\App\Shared\Service\QrCodeGenerator::class)->setPublic(true);
 
-    $container->register(\App\Core\Repository\SettingsRepository::class)->setPublic(true);
+    $container->register(\App\Shared\Repository\SettingsRepository::class)->setPublic(true);
 };

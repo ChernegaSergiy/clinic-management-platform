@@ -32,8 +32,8 @@ use App\Domain\Billing\ServiceRepository;
 use App\Domain\Insurance\InsuranceService;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
-use App\Core\Export\ExcelExporter;
-use App\Core\Export\PdfExporter;
+use App\Infrastructure\Export\ExcelExporter;
+use App\Infrastructure\Export\PdfExporter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -48,7 +48,7 @@ class BillingController extends AbstractController
     private ServiceCategoryRepository $serviceCategoryRepository;
     private ServiceBundleRepository $serviceBundleRepository;
     private InsuranceService $insuranceService;
-    private \App\Core\Validation\Validator $validator;
+    private \App\Shared\Validation\Validator $validator;
 
     public function __construct(
         InvoiceRepository $invoiceRepository,
@@ -59,7 +59,7 @@ class BillingController extends AbstractController
         ServiceCategoryRepository $serviceCategoryRepository,
         ServiceBundleRepository $serviceBundleRepository,
         InsuranceService $insuranceService,
-        \App\Core\Validation\Validator $validator
+        \App\Shared\Validation\Validator $validator
     ) {
         $this->invoiceRepository = $invoiceRepository;
         $this->patientRepository = $patientRepository;
@@ -443,7 +443,7 @@ class BillingController extends AbstractController
             $exportData[] = ['N/A', '', '', '', '', '', '', ''];
         }
 
-        $exporter = new \App\Core\Export\CsvExporter($headers, $exportData);
+        $exporter = new \App\Infrastructure\Export\CsvExporter($headers, $exportData);
         $csvContent = $exporter->generate();
 
         $response = new Response($csvContent);

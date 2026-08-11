@@ -75,7 +75,7 @@ class DashboardController extends AbstractController
             ];
         }
 
-        $exporter = new \App\Core\Export\CsvExporter($headers, $data);
+        $exporter = new \App\Infrastructure\Export\CsvExporter($headers, $data);
         $csvContent = $exporter->generate();
 
         $response = new Response($csvContent);
@@ -98,7 +98,7 @@ class DashboardController extends AbstractController
             'dashboardData' => $dashboardData,
         ]);
 
-        $exporter = new \App\Core\Export\PdfExporter();
+        $exporter = new \App\Infrastructure\Export\PdfExporter();
         $exporter->loadHtml($html);
         $exporter->render();
         $pdfContent = $exporter->output();
@@ -128,7 +128,7 @@ class DashboardController extends AbstractController
             ];
         }
 
-        $exporter = new \App\Core\Export\ExcelExporter();
+        $exporter = new \App\Infrastructure\Export\ExcelExporter();
         $excelContent = $exporter->generate($headers, $data);
 
         $response = new Response($excelContent);

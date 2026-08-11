@@ -28,7 +28,7 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Kpi\KpiRepository;
 use App\Domain\Kpi\KpiResultRepository;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

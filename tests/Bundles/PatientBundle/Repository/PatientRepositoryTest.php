@@ -3,7 +3,7 @@
 namespace App\Tests\Bundles\PatientBundle\Repository;
 
 use App\Domain\Patient\PatientRepository;
-use App\Core\Service\AuditLogger;
+use App\Shared\Service\AuditLogger;
 use App\Domain\Patient\Patient;
 use App\Tests\RepositoryTestCase;
 use Doctrine\ORM\Persisters\Entity\EntityPersister;

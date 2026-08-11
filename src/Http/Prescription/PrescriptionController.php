@@ -29,7 +29,7 @@ use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Prescription\PrescriptionRepository;
 use App\Domain\User\UserRepository;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

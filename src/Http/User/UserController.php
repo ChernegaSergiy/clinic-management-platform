@@ -28,7 +28,7 @@ use App\Domain\Admin\AuthConfigRepository;
 use App\Domain\Hrm\HrmRepository;
 use App\Domain\User\UserOAuthIdentityRepository;
 use App\Domain\User\UserRepository;
-use App\Core\Repository\SettingsRepository;
+use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

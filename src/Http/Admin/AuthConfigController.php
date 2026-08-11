@@ -26,7 +26,7 @@ namespace App\Http\Admin;
 
 use App\Domain\Admin\AuthConfigRepository;
 use App\Http\User\OAuthController;
-use App\Core\Validation\Validator;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

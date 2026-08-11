@@ -32,11 +32,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ContractController extends AbstractController
 {
     private ContractRepository $contractRepository;
-    private \App\Core\Validation\Validator $validator;
+    private \App\Shared\Validation\Validator $validator;
 
     public function __construct(
         ContractRepository $contractRepository,
-        \App\Core\Validation\Validator $validator
+        \App\Shared\Validation\Validator $validator
     ) {
         $this->contractRepository = $contractRepository;
         $this->validator = $validator;

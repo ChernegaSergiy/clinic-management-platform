@@ -25,7 +25,7 @@
 namespace App\Auth;
 
 use App\Domain\User\MfaService;
-use App\Core\Exception\RedirectException;
+use App\Shared\Exception\RedirectException;
 
 class MfaGuard
 {

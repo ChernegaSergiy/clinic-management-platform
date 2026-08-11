@@ -24,7 +24,7 @@
 
 namespace App\Entity;
 
-use App\Core\Repository\AttachmentRepository;
+use App\Shared\Repository\AttachmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

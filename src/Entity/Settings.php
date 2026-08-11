@@ -24,7 +24,7 @@
 
 namespace App\Entity;
 
-use App\Core\Repository\SettingsRepository;
+use App\Shared\Repository\SettingsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
