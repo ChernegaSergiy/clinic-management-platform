@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\NewsBundle;
+namespace App\Domain\News;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

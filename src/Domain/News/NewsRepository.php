@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\NewsBundle\Repository;
+namespace App\Domain\News;
 
-use App\Entity\NewsArticle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
