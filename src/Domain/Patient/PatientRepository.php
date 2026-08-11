@@ -24,8 +24,8 @@
 
 namespace App\Domain\Patient;
 
-use App\Shared\Service\AuditLogger as CoreAuditLogger;
 use App\Event\EntityChangedEvent;
+use App\Shared\Service\AuditLogger as CoreAuditLogger;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;

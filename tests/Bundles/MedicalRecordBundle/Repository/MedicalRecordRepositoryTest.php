@@ -2,8 +2,8 @@
 
 namespace App\Tests\Bundles\MedicalRecordBundle\Repository;
 
-use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\MedicalRecord\MedicalRecord;
+use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Tests\RepositoryTestCase;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\MockObject\MockObject;

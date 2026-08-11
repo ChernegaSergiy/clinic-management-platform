@@ -25,8 +25,8 @@
 namespace App\Http\Patient;
 
 use App\Domain\Appointment\AppointmentRepository;
-use App\Domain\Insurance\PatientInsurancePolicyRepository;
 use App\Domain\Insurance\InsuranceService;
+use App\Domain\Insurance\PatientInsurancePolicyRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Infrastructure\Export\CsvExporter;

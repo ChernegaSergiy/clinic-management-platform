@@ -2,8 +2,8 @@
 
 namespace App\Tests\Bundles\AppointmentBundle\Repository;
 
-use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Appointment\Appointment;
+use App\Domain\Appointment\AppointmentRepository;
 use App\Tests\RepositoryTestCase;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\MockObject\MockObject;

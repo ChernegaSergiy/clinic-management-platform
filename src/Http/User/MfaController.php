@@ -24,10 +24,10 @@
 
 namespace App\Http\User;
 
+use App\Auth\MfaGuard;
+use App\Domain\User\MfaService;
 use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;
-use App\Domain\User\MfaService;
-use App\Auth\MfaGuard;
 use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;

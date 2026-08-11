@@ -25,12 +25,12 @@
 namespace App\Http\User;
 
 use App\Domain\Admin\AuthConfigRepository;
+use App\Domain\User\MfaService;
 use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;
-use App\Domain\User\MfaService;
-use App\Shared\Validation\Validator;
 use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
+use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;

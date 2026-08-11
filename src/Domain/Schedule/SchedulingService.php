@@ -27,7 +27,7 @@ namespace App\Domain\Schedule;
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Room\RoomRepository;
-use App\Domain\Schedule\DoctorScheduleRepository; // Assuming this exists or will be created
+// Assuming this exists or will be created
 use DateInterval;
 use DateTime;
 

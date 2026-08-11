@@ -24,8 +24,8 @@
 
 namespace App\Http\LabOrder;
 
-use App\Domain\LabOrder\LabOrderRepository;
 use App\Domain\LabOrder\LabImportService;
+use App\Domain\LabOrder\LabOrderRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\User\UserRepository;
 use App\Shared\Service\NotificationService;

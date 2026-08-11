@@ -2,8 +2,8 @@
 
 namespace App\Tests\Bundles\AppointmentBundle\Repository;
 
-use App\Domain\Appointment\WaitlistRepository;
 use App\Domain\Appointment\Waitlist;
+use App\Domain\Appointment\WaitlistRepository;
 use App\Tests\RepositoryTestCase;
 
 class WaitlistRepositoryTest extends RepositoryTestCase
