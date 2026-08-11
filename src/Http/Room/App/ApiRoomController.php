@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\RoomBundle\Controller\App;
+namespace App\Http\Room\App;
 
 use App\Domain\Room\RoomRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\RoomBundle\Controller\Admin;
+namespace App\Http\Room\Admin;
 
 use App\Domain\Room\RoomRepository;
 use App\Core\Validation\Validator;
