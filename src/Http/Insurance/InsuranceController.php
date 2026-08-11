@@ -24,7 +24,7 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\InsuranceBundle\Controller;
+namespace App\Http\Insurance;
 
 use App\Domain\Insurance\InsuranceService;
 use App\Core\Validation\Validator;

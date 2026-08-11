@@ -56,7 +56,7 @@ app_routes_hrm:
     type: attribute
     prefix: /app
 app_routes_insurance:
-    resource: { path: ../src/Bundles/InsuranceBundle/Controller/, namespace: App\Bundles\InsuranceBundle\Controller\ }
+    resource: { path: ../src/Http/Insurance/, namespace: App\Http\Insurance\ }
     type: attribute
     prefix: /app
 app_routes_inventory:
