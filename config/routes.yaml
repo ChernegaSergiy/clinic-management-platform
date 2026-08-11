@@ -72,7 +72,7 @@ app_routes_billing:
     type: attribute
     prefix: /app
 app_routes_appointment:
-    resource: { path: ../src/Bundles/AppointmentBundle/Controller/App/, namespace: App\Bundles\AppointmentBundle\Controller\App\ }
+    resource: { path: ../src/Http/Appointment/App/, namespace: App\Http\Appointment\App\ }
     type: attribute
     prefix: /app
 app_routes_room:
@@ -94,5 +94,5 @@ site_routes_news:
     resource: { path: ../src/Bundles/NewsBundle/Controller/Site/, namespace: App\Bundles\NewsBundle\Controller\Site\ }
     type: attribute
 site_routes_appointment:
-    resource: { path: ../src/Bundles/AppointmentBundle/Controller/Site/, namespace: App\Bundles\AppointmentBundle\Controller\Site\ }
+    resource: { path: ../src/Http/Appointment/Site/, namespace: App\Http\Appointment\Site\ }
     type: attribute

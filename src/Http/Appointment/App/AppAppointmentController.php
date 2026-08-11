@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\AppointmentBundle\Controller\App;
+namespace App\Http\Appointment\App;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Appointment\WaitlistRepository;
