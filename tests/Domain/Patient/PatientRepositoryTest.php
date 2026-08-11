@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Bundles\PatientBundle\Repository;
+namespace App\Tests\Domain\Patient;
 
 use App\Domain\Patient\Patient;
 use App\Domain\Patient\PatientRepository;

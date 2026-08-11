@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Bundles\AppointmentBundle\Repository;
+namespace App\Tests\Domain\Appointment;
 
 use App\Domain\Appointment\Appointment;
 use App\Domain\Appointment\AppointmentRepository;

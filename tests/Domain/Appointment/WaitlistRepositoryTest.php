@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Bundles\AppointmentBundle\Repository;
+namespace App\Tests\Domain\Appointment;
 
 use App\Domain\Appointment\Waitlist;
 use App\Domain\Appointment\WaitlistRepository;
