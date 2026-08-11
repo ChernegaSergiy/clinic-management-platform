@@ -44,7 +44,7 @@ app_routes_prescription:
     type: attribute
     prefix: /app
 app_routes_lab_order:
-    resource: { path: ../src/Bundles/LabOrderBundle/Controller/, namespace: App\Bundles\LabOrderBundle\Controller\ }
+    resource: { path: ../src/Http/LabOrder/, namespace: App\Http\LabOrder\ }
     type: attribute
     prefix: /app
 app_routes_kpi:
