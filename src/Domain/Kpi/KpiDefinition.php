@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Kpi;
 
-use App\Bundles\KpiBundle\Repository\KpiRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

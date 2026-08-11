@@ -26,8 +26,8 @@ namespace App\Domain\Dashboard;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;
-use App\Bundles\KpiBundle\Repository\KpiRepository;
-use App\Bundles\KpiBundle\Repository\KpiResultRepository;
+use App\Domain\Kpi\KpiRepository;
+use App\Domain\Kpi\KpiResultRepository;
 use App\Bundles\MedicalRecordBundle\Repository\MedicalRecordRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use DateTimeImmutable;

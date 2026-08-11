@@ -24,7 +24,7 @@
 
 namespace App\Bundles\KpiBundle\Controller\App;
 
-use App\Bundles\KpiBundle\Repository\KpiResultRepository;
+use App\Domain\Kpi\KpiResultRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

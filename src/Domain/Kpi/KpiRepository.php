@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\KpiBundle\Repository;
+namespace App\Domain\Kpi;
 
-use App\Entity\KpiDefinition;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

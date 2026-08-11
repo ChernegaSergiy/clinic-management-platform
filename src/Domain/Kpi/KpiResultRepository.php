@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\KpiBundle\Repository;
+namespace App\Domain\Kpi;
 
-use App\Entity\KpiResult;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -82,7 +81,7 @@ class KpiResultRepository extends ServiceEntityRepository
             'kd.name as kpi_name',
             'kd.unit'
         )
-           ->join(\App\Entity\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
+           ->join(\App\Domain\Kpi\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
            ->where('kr.user_id = :user_id')
            ->setParameter('user_id', $userId);
 
@@ -114,7 +113,7 @@ class KpiResultRepository extends ServiceEntityRepository
             'kd.unit',
             'CONCAT(u.last_name, CONCAT(\' \', u.first_name)) AS user_name'
         )
-        ->join(\App\Entity\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
+        ->join(\App\Domain\Kpi\KpiDefinition::class, 'kd', 'WITH', 'kr.kpi_id = kd.id')
         ->join(\App\Entity\User::class, 'u', 'WITH', 'kr.user_id = u.id')
         ->orderBy('kr.period_start', 'DESC');
 

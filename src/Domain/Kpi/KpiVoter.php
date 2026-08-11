@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\KpiBundle;
+namespace App\Domain\Kpi;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
