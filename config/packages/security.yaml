@@ -3,6 +3,126 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
+    # Consolidated from each former bundle's DependencyInjection Extension::prepend().
+    # Grants ROLE_ADMIN and functional roles their per-domain sub-permissions.
+    role_hierarchy:
+        ROLE_ADMIN:
+            - ROLE_ADMIN_MANAGE
+            - ROLE_APPOINTMENT_VIEW_ANY
+            - ROLE_APPOINTMENT_EDIT_ANY
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_BILLING_READ
+            - ROLE_BILLING_MANAGE
+            - ROLE_CLINICAL_MANAGE
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_DASHBOARD_EXPORT
+            - ROLE_DEPARTMENT_READ
+            - ROLE_DEPARTMENT_WRITE
+            - ROLE_DEPARTMENT_DELETE
+            - ROLE_DEPARTMENT_MANAGE
+            - ROLE_HRM_READ
+            - ROLE_HRM_WRITE
+            - ROLE_HRM_MANAGE
+            - ROLE_INSURANCE_MANAGE
+            - ROLE_INVENTORY_MANAGE
+            - ROLE_KPI_READ
+            - ROLE_KPI_MANAGE
+            - ROLE_LAB_ORDER_VIEW_ANY
+            - ROLE_LAB_ORDER_EDIT_ANY
+            - ROLE_LAB_ORDER_CREATE
+            - ROLE_MEDICAL_RECORD_VIEW_ANY
+            - ROLE_MEDICAL_RECORD_EDIT_ANY
+            - ROLE_MEDICAL_RECORD_CREATE
+            - ROLE_NEWS_READ
+            - ROLE_NEWS_MANAGE
+            - ROLE_NOTIFICATIONS_READ
+            - ROLE_PATIENT_VIEW_ANY
+            - ROLE_PATIENT_EDIT_ANY
+            - ROLE_PATIENT_CREATE
+            - ROLE_PRESCRIPTION_VIEW_ANY
+            - ROLE_PRESCRIPTION_EDIT_ANY
+            - ROLE_PRESCRIPTION_CREATE_ANY
+            - ROLE_ROOMS_MANAGE
+            - ROLE_SCHEDULES_MANAGE_ALL
+        ROLE_MEDICAL_MANAGER:
+            - ROLE_APPOINTMENT_VIEW_ANY
+            - ROLE_APPOINTMENT_EDIT_ANY
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_CLINICAL_MANAGE
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_DASHBOARD_EXPORT
+            - ROLE_DEPARTMENT_READ
+            - ROLE_DEPARTMENT_WRITE
+            - ROLE_HRM_READ
+            - ROLE_KPI_READ
+            - ROLE_LAB_ORDER_VIEW_ANY
+            - ROLE_MEDICAL_RECORD_VIEW_ANY
+            - ROLE_MEDICAL_RECORD_EDIT_ANY
+            - ROLE_NOTIFICATIONS_READ
+            - ROLE_PATIENT_VIEW_ANY
+            - ROLE_PRESCRIPTION_VIEW_ANY
+            - ROLE_PRESCRIPTION_EDIT_ANY
+            - ROLE_PRESCRIPTION_CREATE_ANY
+            - ROLE_SCHEDULES_MANAGE_ALL
+        ROLE_REGISTRAR:
+            - ROLE_APPOINTMENT_VIEW_ANY
+            - ROLE_APPOINTMENT_EDIT_ANY
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_NOTIFICATIONS_READ
+            - ROLE_PATIENT_VIEW_ANY
+            - ROLE_PATIENT_EDIT_ANY
+            - ROLE_PATIENT_CREATE
+        ROLE_DOCTOR:
+            - ROLE_APPOINTMENT_VIEW_OWN
+            - ROLE_APPOINTMENT_EDIT_OWN
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_LAB_ORDER_VIEW_OWN
+            - ROLE_LAB_ORDER_EDIT_OWN
+            - ROLE_LAB_ORDER_CREATE
+            - ROLE_MEDICAL_RECORD_VIEW_OWN
+            - ROLE_MEDICAL_RECORD_EDIT_OWN
+            - ROLE_MEDICAL_RECORD_CREATE
+            - ROLE_NOTIFICATIONS_READ
+            - ROLE_PATIENT_VIEW_OWN
+            - ROLE_PATIENT_EDIT_OWN
+            - ROLE_PRESCRIPTION_VIEW_OWN
+            - ROLE_PRESCRIPTION_EDIT_OWN
+            - ROLE_PRESCRIPTION_CREATE_OWN
+            - ROLE_SCHEDULES_MANAGE_OWN
+        ROLE_NURSE:
+            - ROLE_APPOINTMENT_VIEW_OWN
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_LAB_ORDER_VIEW_OWN
+            - ROLE_MEDICAL_RECORD_VIEW_OWN
+            - ROLE_NOTIFICATIONS_READ
+            - ROLE_PATIENT_VIEW_OWN
+            - ROLE_PRESCRIPTION_VIEW_OWN
+        ROLE_BILLING:
+            - ROLE_APPOINTMENT_VIEW_ANY
+            - ROLE_BILLING_READ
+            - ROLE_BILLING_MANAGE
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_DASHBOARD_EXPORT
+            - ROLE_NOTIFICATIONS_READ
+        ROLE_LAB_TECHNICIAN:
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_LAB_ORDER_VIEW_ANY
+            - ROLE_LAB_ORDER_EDIT_ANY
+            - ROLE_LAB_ORDER_CREATE
+            - ROLE_NOTIFICATIONS_READ
+        ROLE_INVENTORY_MANAGER:
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_INVENTORY_MANAGE
+            - ROLE_NOTIFICATIONS_READ
+        ROLE_HR_MANAGER:
+            - ROLE_DASHBOARD_VIEW
+            - ROLE_HRM_READ
+            - ROLE_HRM_WRITE
+            - ROLE_HRM_MANAGE
+            - ROLE_NOTIFICATIONS_READ
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         app_user_provider:
