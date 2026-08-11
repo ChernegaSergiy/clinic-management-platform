@@ -88,7 +88,7 @@ site_routes_site:
     resource: { path: ../src/Http/Site/, namespace: App\Http\Site\ }
     type: attribute
 site_routes_user:
-    resource: { path: ../src/Bundles/UserBundle/Controller/, namespace: App\Bundles\UserBundle\Controller\ }
+    resource: { path: ../src/Http/User/, namespace: App\Http\User\ }
     type: attribute
 site_routes_news:
     resource: { path: ../src/Http/News/Site/, namespace: App\Http\News\Site\ }

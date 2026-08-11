@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\UserBundle\Controller;
+namespace App\Http\User;
 
 use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;

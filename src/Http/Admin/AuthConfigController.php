@@ -25,7 +25,7 @@
 namespace App\Http\Admin;
 
 use App\Domain\Admin\AuthConfigRepository;
-use App\Bundles\UserBundle\Controller\OAuthController;
+use App\Http\User\OAuthController;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
