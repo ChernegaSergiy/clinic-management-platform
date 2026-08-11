@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\ClinicalReferenceBundle\Controller;
+namespace App\Http\ClinicalReference;
 
 use App\Domain\ClinicalReference\IcdCodeRepository;
 use App\Domain\ClinicalReference\InterventionCodeRepository;

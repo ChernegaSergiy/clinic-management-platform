@@ -3,7 +3,7 @@ admin_routes_admin:
     type: attribute
     prefix: /admin
 admin_routes_clinical:
-    resource: { path: ../src/Bundles/ClinicalReferenceBundle/Controller/, namespace: App\Bundles\ClinicalReferenceBundle\Controller\ }
+    resource: { path: ../src/Http/ClinicalReference/, namespace: App\Http\ClinicalReference\ }
     type: attribute
     prefix: /admin
 admin_routes_department:
