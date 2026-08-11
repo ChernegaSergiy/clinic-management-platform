@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\NotificationBundle;
+namespace App\Domain\Notification;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\NotificationBundle\Repository;
+namespace App\Domain\Notification;
 
-use App\Entity\Notification;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

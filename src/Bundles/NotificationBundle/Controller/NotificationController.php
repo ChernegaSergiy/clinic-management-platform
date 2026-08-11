@@ -24,7 +24,7 @@
 
 namespace App\Bundles\NotificationBundle\Controller;
 
-use App\Bundles\NotificationBundle\Repository\NotificationRepository;
+use App\Domain\Notification\NotificationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
