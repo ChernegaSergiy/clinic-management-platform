@@ -25,7 +25,7 @@
 namespace App\Bundles\UserBundle\Controller;
 
 use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
-use App\Bundles\HrmBundle\Repository\HrmRepository;
+use App\Domain\Hrm\HrmRepository;
 use App\Bundles\UserBundle\Repository\UserOAuthIdentityRepository;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Repository\SettingsRepository;

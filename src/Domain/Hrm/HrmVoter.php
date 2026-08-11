@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\HrmBundle;
+namespace App\Domain\Hrm;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

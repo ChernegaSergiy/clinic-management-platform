@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\HrmBundle\Repository;
+namespace App\Domain\Hrm;
 
-use App\Entity\Employee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
