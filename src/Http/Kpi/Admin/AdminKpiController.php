@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\KpiBundle\Controller\Admin;
+namespace App\Http\Kpi\Admin;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;

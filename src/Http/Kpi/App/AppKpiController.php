@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\KpiBundle\Controller\App;
+namespace App\Http\Kpi\App;
 
 use App\Domain\Kpi\KpiResultRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
