@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\NotificationBundle\Controller;
+namespace App\Http\Notification;
 
 use App\Domain\Notification\NotificationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

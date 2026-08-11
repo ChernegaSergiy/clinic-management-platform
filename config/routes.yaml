@@ -64,7 +64,7 @@ app_routes_inventory:
     type: attribute
     prefix: /app
 app_routes_notification:
-    resource: { path: ../src/Bundles/NotificationBundle/Controller/, namespace: App\Bundles\NotificationBundle\Controller\ }
+    resource: { path: ../src/Http/Notification/, namespace: App\Http\Notification\ }
     type: attribute
     prefix: /app
 app_routes_billing:
