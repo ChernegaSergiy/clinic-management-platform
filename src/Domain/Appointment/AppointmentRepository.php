@@ -49,7 +49,7 @@ class AppointmentRepository extends ServiceEntityRepository
             ->addSelect("r.name as room_name")
             ->join('a.patient', 'p')
             ->join('a.doctor', 'u')
-            ->leftJoin(\App\Entity\Room::class, 'r', 'WITH', 'a.room_id = r.id')
+            ->leftJoin(\App\Domain\Room\Room::class, 'r', 'WITH', 'a.room_id = r.id')
             ->orderBy('a.start_time', 'DESC');
 
         $results = $qb->getQuery()->getArrayResult();
@@ -139,7 +139,7 @@ class AppointmentRepository extends ServiceEntityRepository
             ->addSelect("r.name as room_name")
             ->join('a.patient', 'p')
             ->join('a.doctor', 'u')
-            ->leftJoin(\App\Entity\Room::class, 'r', 'WITH', 'a.room_id = r.id')
+            ->leftJoin(\App\Domain\Room\Room::class, 'r', 'WITH', 'a.room_id = r.id')
             ->where('a.id = :id')
             ->setParameter('id', $id);
 
@@ -281,7 +281,7 @@ class AppointmentRepository extends ServiceEntityRepository
             ->addSelect("r.name as room_name")
             ->join('a.patient', 'p')
             ->join('a.doctor', 'u')
-            ->leftJoin(\App\Entity\Room::class, 'r', 'WITH', 'a.room_id = r.id')
+            ->leftJoin(\App\Domain\Room\Room::class, 'r', 'WITH', 'a.room_id = r.id')
             ->where('a.start_time >= :start_time AND a.end_time <= :end_time')
             ->setParameter('start_time', $start)
             ->setParameter('end_time', $end)

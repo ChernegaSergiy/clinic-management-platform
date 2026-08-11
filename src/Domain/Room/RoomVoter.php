@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\RoomBundle;
+namespace App\Domain\Room;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

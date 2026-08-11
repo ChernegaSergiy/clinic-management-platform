@@ -24,7 +24,7 @@
 
 namespace App\Bundles\RoomBundle\Controller\App;
 
-use App\Bundles\RoomBundle\Repository\RoomRepository;
+use App\Domain\Room\RoomRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;

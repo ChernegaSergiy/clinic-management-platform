@@ -28,7 +28,7 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Appointment\WaitlistRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
-use App\Bundles\RoomBundle\Repository\RoomRepository;
+use App\Domain\Room\RoomRepository;
 use App\Bundles\ScheduleBundle\Service\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Service\NotificationService;
