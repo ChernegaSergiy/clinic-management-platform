@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\AdminBundle\Repository;
+namespace App\Domain\Admin;
 
-use App\Entity\AuthConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

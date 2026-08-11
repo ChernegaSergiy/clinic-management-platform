@@ -24,7 +24,7 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
+use App\Domain\Admin\AuthConfigRepository;
 use App\Domain\User\UserOAuthIdentityRepository;
 use App\Domain\User\UserRepository;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;

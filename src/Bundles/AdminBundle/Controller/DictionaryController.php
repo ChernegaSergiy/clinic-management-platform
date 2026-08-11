@@ -24,8 +24,8 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\DictionaryRepository;
-use App\Bundles\AdminBundle\Repository\DictionaryValueRepository;
+use App\Domain\Admin\DictionaryRepository;
+use App\Domain\Admin\DictionaryValueRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

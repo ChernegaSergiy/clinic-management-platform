@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
+use App\Domain\Admin\AuthConfigRepository;
 use App\Bundles\UserBundle\Controller\OAuthController;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

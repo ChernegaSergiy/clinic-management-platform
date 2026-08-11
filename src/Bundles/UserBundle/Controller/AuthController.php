@@ -24,7 +24,7 @@
 
 namespace App\Bundles\UserBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
+use App\Domain\Admin\AuthConfigRepository;
 use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;
 use App\Domain\User\MfaService;

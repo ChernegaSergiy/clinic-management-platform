@@ -24,7 +24,7 @@
 
 namespace App\Bundles\AdminBundle\Controller;
 
-use App\Bundles\AdminBundle\Repository\BackupPolicyRepository;
+use App\Domain\Admin\BackupPolicyRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

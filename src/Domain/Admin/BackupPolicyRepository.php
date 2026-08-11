@@ -22,32 +22,30 @@
  *
  */
 
-namespace App\Bundles\AdminBundle\Repository;
+namespace App\Domain\Admin;
 
-use App\Entity\Dictionary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class DictionaryRepository extends ServiceEntityRepository
+class BackupPolicyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Dictionary::class);
+        parent::__construct($registry, BackupPolicy::class);
     }
 
-    // --- Dictionary Definitions ---
     public function findAll() : array
     {
-        $qb = $this->createQueryBuilder('d')
-            ->orderBy('d.name', 'ASC');
+        $qb = $this->createQueryBuilder('b')
+            ->orderBy('b.name', 'ASC');
 
         return $qb->getQuery()->getArrayResult();
     }
 
     public function findById(int $id) : ?array
     {
-        $qb = $this->createQueryBuilder('d')
-            ->where('d.id = :id')
+        $qb = $this->createQueryBuilder('b')
+            ->where('b.id = :id')
             ->setParameter('id', $id);
 
         return $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
@@ -55,15 +53,17 @@ class DictionaryRepository extends ServiceEntityRepository
 
     public function save(array $data) : ?int
     {
-        $dictionary = new Dictionary();
-        $dictionary->setName($data['name']);
-        $dictionary->setDescription($data['description'] ?? null);
-        $dictionary->setType($data['type'] ?? null);
+        $policy = new BackupPolicy();
+        $policy->setName($data['name']);
+        $policy->setDescription($data['description'] ?? null);
+        $policy->setFrequency($data['frequency'] ?? 'daily');
+        $policy->setRetentionDays((int)($data['retention_days'] ?? 30));
+        $policy->setStatus($data['status'] ?? 'inactive');
 
         try {
-            $this->getEntityManager()->persist($dictionary);
+            $this->getEntityManager()->persist($policy);
             $this->getEntityManager()->flush();
-            return $dictionary->getId();
+            return $policy->getId();
         } catch (\Exception $e) {
             return null;
         }
@@ -71,20 +71,33 @@ class DictionaryRepository extends ServiceEntityRepository
 
     public function update(int $id, array $data) : bool
     {
-        /** @var Dictionary|null $dictionary */
-        $dictionary = $this->find($id);
-        if (!$dictionary) {
+        /** @var BackupPolicy|null $policy */
+        $policy = $this->find($id);
+        if (!$policy) {
             return false;
         }
 
         if (isset($data['name'])) {
-            $dictionary->setName($data['name']);
+            $policy->setName($data['name']);
         }
         if (array_key_exists('description', $data)) {
-            $dictionary->setDescription($data['description']);
+            $policy->setDescription($data['description']);
         }
-        if (array_key_exists('type', $data)) {
-            $dictionary->setType($data['type']);
+        if (isset($data['frequency'])) {
+            $policy->setFrequency($data['frequency']);
+        }
+        if (isset($data['retention_days'])) {
+            $policy->setRetentionDays((int)$data['retention_days']);
+        }
+        if (isset($data['status'])) {
+            $policy->setStatus($data['status']);
+        }
+        if (isset($data['last_run_at'])) {
+            try {
+                $policy->setLastRunAt(new \DateTime($data['last_run_at']));
+            } catch (\Exception $e) {
+                // ignore invalid dates
+            }
         }
 
         try {
@@ -97,14 +110,14 @@ class DictionaryRepository extends ServiceEntityRepository
 
     public function delete(int $id) : bool
     {
-        /** @var Dictionary|null $dictionary */
-        $dictionary = $this->find($id);
-        if (!$dictionary) {
+        /** @var BackupPolicy|null $policy */
+        $policy = $this->find($id);
+        if (!$policy) {
             return false;
         }
 
         try {
-            $this->getEntityManager()->remove($dictionary);
+            $this->getEntityManager()->remove($policy);
             $this->getEntityManager()->flush();
             return true;
         } catch (\Exception $e) {

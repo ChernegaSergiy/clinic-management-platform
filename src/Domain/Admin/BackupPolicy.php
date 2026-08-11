@@ -22,22 +22,22 @@
  *
  */
 
-namespace App\Entity;
+namespace App\Domain\Admin;
 
-use App\Bundles\AdminBundle\Repository\AuthConfigRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: AuthConfigRepository::class)]
-#[ORM\Table(name: 'auth_configs')]
-class AuthConfig
+#[ORM\Entity(repositoryClass: BackupPolicyRepository::class)]
+#[ORM\Table(name: 'backup_policies')]
+class BackupPolicy
 {
     #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column] private ?int $id = null;
-    #[ORM\Column(length: 255)] private ?string $provider = null;
-    #[ORM\Column(length: 255, nullable: true)] private ?string $client_id = null;
-    #[ORM\Column(length: 255, nullable: true)] private ?string $client_secret = null;
-    #[ORM\Column(type: Types::BOOLEAN)] private bool $is_active = true;
-    #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $config = null;
+    #[ORM\Column(length: 255)] private ?string $name = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)] private ?string $description = null;
+    #[ORM\Column(length: 50)] private ?string $frequency = null;
+    #[ORM\Column(type: Types::INTEGER)] private ?int $retention_days = null;
+    #[ORM\Column(length: 50)] private ?string $status = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $last_run_at = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $created_at = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)] private ?\DateTimeInterface $updated_at = null;
 
@@ -46,58 +46,69 @@ class AuthConfig
         return $this->id;
     }
 
-    public function getProvider() : ?string
+    public function getName() : ?string
     {
-        return $this->provider;
+        return $this->name;
     }
 
-    public function setProvider(?string $provider) : self
+    public function setName(?string $name) : self
     {
-        $this->provider = $provider;
+        $this->name = $name;
         return $this;
     }
 
-    public function getClientId() : ?string
+    public function getDescription() : ?string
     {
-        return $this->client_id;
+        return $this->description;
     }
 
-    public function setClientId(?string $client_id) : self
+    public function setDescription(?string $description) : self
     {
-        $this->client_id = $client_id;
+        $this->description = $description;
         return $this;
     }
 
-    public function getClientSecret() : ?string
+    public function getFrequency() : ?string
     {
-        return $this->client_secret;
+        return $this->frequency;
     }
 
-    public function setClientSecret(?string $client_secret) : self
+    public function setFrequency(?string $frequency) : self
     {
-        $this->client_secret = $client_secret;
+        $this->frequency = $frequency;
         return $this;
     }
 
-    public function isActive() : bool
+    public function getRetentionDays() : ?int
     {
-        return $this->is_active;
+        return $this->retention_days;
     }
 
-    public function setIsActive(bool $is_active) : self
+    public function setRetentionDays(?int $retention_days) : self
     {
-        $this->is_active = $is_active;
+        $this->retention_days = $retention_days;
         return $this;
     }
 
-    public function getConfig() : ?string
+    public function getStatus() : ?string
     {
-        return $this->config;
+        return $this->status;
     }
 
-    public function setConfig(?string $config) : self
+    public function setStatus(?string $status) : self
     {
-        $this->config = $config;
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getLastRunAt() : ?\DateTimeInterface
+    {
+        return $this->last_run_at;
+    }
+
+    public function setLastRunAt(?\DateTimeInterface $last_run_at) : self
+    {
+        $this->last_run_at = $last_run_at;
         return $this;
     }
 
@@ -127,10 +138,5 @@ class AuthConfig
     {
         $this->id = $id;
         return $this;
-    }
-
-    public function isIsActive() : bool
-    {
-        return $this->is_active;
     }
 }
