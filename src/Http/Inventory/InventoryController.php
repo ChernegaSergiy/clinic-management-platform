@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\InventoryBundle\Controller;
+namespace App\Http\Inventory;
 
 use App\Domain\Inventory\InventoryItemRepository;
 use App\Core\Validation\Validator;

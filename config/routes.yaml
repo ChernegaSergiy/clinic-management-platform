@@ -60,7 +60,7 @@ app_routes_insurance:
     type: attribute
     prefix: /app
 app_routes_inventory:
-    resource: { path: ../src/Bundles/InventoryBundle/Controller/, namespace: App\Bundles\InventoryBundle\Controller\ }
+    resource: { path: ../src/Http/Inventory/, namespace: App\Http\Inventory\ }
     type: attribute
     prefix: /app
 app_routes_notification:
