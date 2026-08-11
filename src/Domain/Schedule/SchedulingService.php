@@ -22,13 +22,12 @@
  *
  */
 
-namespace App\Bundles\ScheduleBundle\Service;
+namespace App\Domain\Schedule;
 
 use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Room\RoomRepository;
-use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository; // Assuming this exists or will be created
-use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
+use App\Domain\Schedule\DoctorScheduleRepository; // Assuming this exists or will be created
 use DateInterval;
 use DateTime;
 

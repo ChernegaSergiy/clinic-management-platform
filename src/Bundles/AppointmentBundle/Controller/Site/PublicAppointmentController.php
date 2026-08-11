@@ -28,7 +28,7 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Appointment\WaitlistRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
-use App\Bundles\ScheduleBundle\Service\SchedulingService;
+use App\Domain\Schedule\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

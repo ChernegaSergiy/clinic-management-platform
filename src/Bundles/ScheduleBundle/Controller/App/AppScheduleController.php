@@ -24,8 +24,8 @@
 
 namespace App\Bundles\ScheduleBundle\Controller\App;
 
-use App\Bundles\ScheduleBundle\Repository\DoctorScheduleRepository;
-use App\Bundles\ScheduleBundle\Repository\ScheduleExceptionRepository;
+use App\Domain\Schedule\DoctorScheduleRepository;
+use App\Domain\Schedule\ScheduleExceptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

@@ -22,9 +22,8 @@
  *
  */
 
-namespace App\Bundles\ScheduleBundle\Repository;
+namespace App\Domain\Schedule;
 
-use App\Entity\ScheduleException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

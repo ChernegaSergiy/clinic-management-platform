@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\ScheduleBundle;
+namespace App\Domain\Schedule;
 
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;

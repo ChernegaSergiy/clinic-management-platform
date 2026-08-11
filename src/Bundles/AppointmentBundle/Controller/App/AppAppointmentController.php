@@ -29,7 +29,7 @@ use App\Domain\Appointment\WaitlistRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Room\RoomRepository;
-use App\Bundles\ScheduleBundle\Service\SchedulingService;
+use App\Domain\Schedule\SchedulingService;
 use App\Bundles\UserBundle\Repository\UserRepository;
 use App\Core\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
