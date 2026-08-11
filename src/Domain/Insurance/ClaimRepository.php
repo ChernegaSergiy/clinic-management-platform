@@ -49,7 +49,7 @@ class ClaimRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->select('c, pip.patient_id, p.first_name, p.last_name, CONCAT(p.first_name, \' \', p.last_name) as patient_name, ic.name as insurance_company_name')
-            ->join('App\Domain\Patient\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
+            ->join('App\Domain\Insurance\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
             ->join('App\Domain\Patient\Patient', 'p', 'WITH', 'pip.patient_id = p.id')
             ->join('App\Domain\Insurance\InsuranceCompany', 'ic', 'WITH', 'pip.insurance_company_id = ic.id')
             ->where('c.id = :id')
@@ -91,7 +91,7 @@ class ClaimRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->select('c, pip.patient_id, p.first_name, p.last_name, CONCAT(p.first_name, \' \', p.last_name) as patient_name, ic.name as insurance_company_name')
-            ->join('App\Domain\Patient\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
+            ->join('App\Domain\Insurance\PatientInsurancePolicy', 'pip', 'WITH', 'c.patient_policy_id = pip.id')
             ->join('App\Domain\Patient\Patient', 'p', 'WITH', 'pip.patient_id = p.id')
             ->join('App\Domain\Insurance\InsuranceCompany', 'ic', 'WITH', 'pip.insurance_company_id = ic.id')
             ->orderBy('c.created_at', 'DESC');

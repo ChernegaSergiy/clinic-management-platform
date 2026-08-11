@@ -24,6 +24,9 @@
 
 namespace App\Domain\MedicalRecord;
 
+use App\Domain\Appointment\Appointment;
+use App\Domain\Patient\Patient;
+use App\Domain\User\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
