@@ -24,16 +24,32 @@
 
 namespace App\Shared\Service;
 
+use App\Entity\Attachment;
+use App\Entity\AttachmentVersion;
+use App\Shared\Repository\AttachmentAclRepository;
+use App\Shared\Repository\AttachmentRepository;
+use App\Shared\Repository\AttachmentVersionRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 class AttachmentService
 {
     private ManagerRegistry $registry;
+    private AttachmentRepository $attachmentRepository;
+    private AttachmentAclRepository $aclRepository;
+    private AttachmentVersionRepository $versionRepository;
     private string $uploadDir = __DIR__ . '/../../../uploads';
 
-    public function __construct(ManagerRegistry $registry, ?string $uploadDir = null)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AttachmentRepository $attachmentRepository,
+        AttachmentAclRepository $aclRepository,
+        AttachmentVersionRepository $versionRepository,
+        ?string $uploadDir = null
+    ) {
         $this->registry = $registry;
+        $this->attachmentRepository = $attachmentRepository;
+        $this->aclRepository = $aclRepository;
+        $this->versionRepository = $versionRepository;
         if (null !== $uploadDir) {
             $this->uploadDir = $uploadDir;
         }
@@ -66,34 +82,35 @@ class AttachmentService
             return false;
         }
 
-        $conn = $this->registry->getConnection();
-        $conn->beginTransaction();
         try {
-            $sql = "INSERT INTO attachments (entity_type, entity_id, filename, filepath, mime_type, size, created_by) VALUES (:entity_type, :entity_id, :filename, :filepath, :mime_type, :size, :created_by)";
-            $conn->executeStatement($sql, [
-                'entity_type' => $entityType,
-                'entity_id' => $entityId,
-                'filename' => $filename,
-                'filepath' => $relativePath,
-                'mime_type' => $mimeType,
-                'size' => $size,
-                'created_by' => $userId,
-            ]);
-            $attachmentId = $conn->lastInsertId();
+            $now = new \DateTime();
 
-            $sql = "INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, 1, :filepath, :filename, :size, :created_by)";
-            $conn->executeStatement($sql, [
-                'attachment_id' => $attachmentId,
-                'filepath' => $relativePath,
-                'filename' => $filename,
-                'size' => $size,
-                'created_by' => $userId,
-            ]);
+            $attachment = (new Attachment())
+                ->setEntityType($entityType)
+                ->setEntityId($entityId)
+                ->setFilename($filename)
+                ->setFilepath($relativePath)
+                ->setMimeType($mimeType)
+                ->setSize($size)
+                ->setCreatedBy($userId)
+                ->setCreatedAt($now);
 
-            $conn->commit();
-            return (int)$attachmentId;
+            $version = (new AttachmentVersion())
+                ->setAttachment($attachment)
+                ->setVersionNumber(1)
+                ->setFilepath($relativePath)
+                ->setFilename($filename)
+                ->setSize($size)
+                ->setCreatedBy($userId)
+                ->setCreatedAt($now);
+
+            $em = $this->registry->getManager();
+            $em->persist($attachment);
+            $em->persist($version);
+            $em->flush();
+
+            return $attachment->getId();
         } catch (\Exception $e) {
-            $conn->rollBack();
             unlink($targetPath);
             return false;
         }
@@ -101,8 +118,8 @@ class AttachmentService
 
     public function createNewVersion(int $attachmentId, array $fileData, ?int $userId = null)
     {
-        $currentAttachment = $this->getAttachmentById($attachmentId);
-        if (!$currentAttachment) {
+        $attachment = $this->attachmentRepository->findById($attachmentId);
+        if (!$attachment) {
             return false;
         }
 
@@ -111,7 +128,7 @@ class AttachmentService
         $size = $fileData['size'];
         $tempPath = $fileData['tmp_name'];
 
-        $targetDir = $this->uploadDir . '/' . $currentAttachment['entity_type'] . '/' . $currentAttachment['entity_id'];
+        $targetDir = $this->uploadDir . '/' . $attachment->getEntityType() . '/' . $attachment->getEntityId();
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0775, true);
         }
@@ -124,35 +141,31 @@ class AttachmentService
             return false;
         }
 
-        $conn = $this->registry->getConnection();
-        $conn->beginTransaction();
         try {
-            $sql = "SELECT MAX(version_number) FROM attachment_versions WHERE attachment_id = :attachment_id";
-            $nextVersionNumber = $conn->fetchOne($sql, ['attachment_id' => $attachmentId]) + 1;
+            $nextVersionNumber = $this->versionRepository->getMaxVersionNumber($attachmentId) + 1;
 
-            $sql = "INSERT INTO attachment_versions (attachment_id, version_number, filepath, filename, size, created_by) VALUES (:attachment_id, :version_number, :filepath, :filename, :size, :created_by)";
-            $conn->executeStatement($sql, [
-                'attachment_id' => $attachmentId,
-                'version_number' => $nextVersionNumber,
-                'filepath' => $relativePath,
-                'filename' => $filename,
-                'size' => $size,
-                'created_by' => $userId,
-            ]);
+            $version = (new AttachmentVersion())
+                ->setAttachment($attachment)
+                ->setVersionNumber($nextVersionNumber)
+                ->setFilepath($relativePath)
+                ->setFilename($filename)
+                ->setSize($size)
+                ->setCreatedBy($userId)
+                ->setCreatedAt(new \DateTime());
 
-            $sql = "UPDATE attachments SET filepath = :filepath, filename = :filename, mime_type = :mime_type, size = :size, updated_at = NOW() WHERE id = :attachment_id";
-            $conn->executeStatement($sql, [
-                'filepath' => $relativePath,
-                'filename' => $filename,
-                'mime_type' => $mimeType,
-                'size' => $size,
-                'attachment_id' => $attachmentId,
-            ]);
+            $attachment
+                ->setFilepath($relativePath)
+                ->setFilename($filename)
+                ->setMimeType($mimeType)
+                ->setSize($size)
+                ->setUpdatedAt(new \DateTime());
 
-            $conn->commit();
-            return (int)$nextVersionNumber;
+            $em = $this->registry->getManager();
+            $em->persist($version);
+            $em->flush();
+
+            return $nextVersionNumber;
         } catch (\Exception $e) {
-            $conn->rollBack();
             unlink($targetPath);
             return false;
         }
@@ -160,82 +173,65 @@ class AttachmentService
 
     public function getAttachmentById(int $attachmentId) : ?array
     {
-        $conn = $this->registry->getConnection();
-        $sql = "SELECT * FROM attachments WHERE id = :id";
-        $result = $conn->fetchAssociative($sql, ['id' => $attachmentId]);
-        return $result ?: null;
+        $attachment = $this->attachmentRepository->findById($attachmentId);
+        return $attachment ? $this->attachmentToArray($attachment) : null;
     }
 
     public function getAttachmentsForEntity(string $entityType, int $entityId) : array
     {
-        $conn = $this->registry->getConnection();
-        $sql = "SELECT * FROM attachments WHERE entity_type = :entity_type AND entity_id = :entity_id ORDER BY created_at DESC";
-        return $conn->fetchAllAssociative($sql, [
-            'entity_type' => $entityType,
-            'entity_id' => $entityId,
-        ]);
+        $attachments = $this->attachmentRepository->getAttachmentsForEntity($entityType, $entityId);
+        return array_map([$this, 'attachmentToArray'], $attachments);
     }
 
     public function getAttachmentVersions(int $attachmentId) : array
     {
-        $conn = $this->registry->getConnection();
-        $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id ORDER BY version_number DESC";
-        return $conn->fetchAllAssociative($sql, ['attachment_id' => $attachmentId]);
+        $versions = $this->versionRepository->getVersionsForAttachment($attachmentId);
+        return array_map([$this, 'versionToArray'], $versions);
     }
 
     public function getAttachmentVersion(int $attachmentId, int $versionNumber) : ?array
     {
-        $conn = $this->registry->getConnection();
-        $sql = "SELECT * FROM attachment_versions WHERE attachment_id = :attachment_id AND version_number = :version_number";
-        $result = $conn->fetchAssociative($sql, [
-            'attachment_id' => $attachmentId,
-            'version_number' => $versionNumber,
-        ]);
-        return $result ?: null;
+        $version = $this->versionRepository->getVersion($attachmentId, $versionNumber);
+        return $version ? $this->versionToArray($version) : null;
     }
 
     public function checkViewAccess(int $attachmentId, int $userId, int $userRoleId) : bool
     {
-        $conn = $this->registry->getConnection();
-
-        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND user_id = :user_id AND can_view = TRUE";
-        if ($conn->fetchOne($sql, ['attachment_id' => $attachmentId, 'user_id' => $userId]) > 0) {
-            return true;
-        }
-
-        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id AND role_id = :role_id AND can_view = TRUE";
-        if ($conn->fetchOne($sql, ['attachment_id' => $attachmentId, 'role_id' => $userRoleId]) > 0) {
-            return true;
-        }
-
-        $sql = "SELECT COUNT(*) FROM attachment_acl WHERE attachment_id = :attachment_id";
-        $hasAclEntries = $conn->fetchOne($sql, ['attachment_id' => $attachmentId]) > 0;
-
-        if (!$hasAclEntries) {
-            return false;
-        }
-
-        return false;
+        return $this->aclRepository->checkViewAccess($attachmentId, $userId, $userRoleId);
     }
 
     public function updateAccess(int $attachmentId, ?int $userId = null, ?int $roleId = null, bool $canView = false, bool $canEdit = false) : bool
     {
-        if (null === $userId && null === $roleId) {
-            return false;
-        }
+        return $this->aclRepository->updateAccess($attachmentId, $userId, $roleId, $canView, $canEdit);
+    }
 
-        $conn = $this->registry->getConnection();
-        $sql = "
-            INSERT INTO attachment_acl (attachment_id, user_id, role_id, can_view, can_edit)
-            VALUES (:attachment_id, :user_id, :role_id, :can_view, :can_edit)
-            ON DUPLICATE KEY UPDATE can_view = :can_view, can_edit = :can_edit
-        ";
-        return $conn->executeStatement($sql, [
-            'attachment_id' => $attachmentId,
-            'user_id' => $userId,
-            'role_id' => $roleId,
-            'can_view' => $canView ? 1 : 0,
-            'can_edit' => $canEdit ? 1 : 0,
-        ]) > 0;
+    private function attachmentToArray(Attachment $attachment) : array
+    {
+        return [
+            'id' => $attachment->getId(),
+            'entity_type' => $attachment->getEntityType(),
+            'entity_id' => $attachment->getEntityId(),
+            'filename' => $attachment->getFilename(),
+            'filepath' => $attachment->getFilepath(),
+            'mime_type' => $attachment->getMimeType(),
+            'size' => $attachment->getSize(),
+            'created_by' => $attachment->getCreatedBy(),
+            'created_at' => $attachment->getCreatedAt(),
+            'updated_at' => $attachment->getUpdatedAt(),
+        ];
+    }
+
+    private function versionToArray(AttachmentVersion $version) : array
+    {
+        return [
+            'id' => $version->getId(),
+            'attachment_id' => $version->getAttachment()?->getId(),
+            'version_number' => $version->getVersionNumber(),
+            'filepath' => $version->getFilepath(),
+            'filename' => $version->getFilename(),
+            'size' => $version->getSize(),
+            'created_by' => $version->getCreatedBy(),
+            'created_at' => $version->getCreatedAt(),
+        ];
     }
 }
