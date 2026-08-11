@@ -9,11 +9,6 @@ return function (ContainerBuilder $container) {
         ->setFactory([\App\Infrastructure\Database\DoctrineFactory::class, 'createEntityManager'])
         ->setPublic(true);
 
-    // PDO service via existing Database singleton.
-    $container->register('pdo', PDO::class)
-        ->setFactory([\App\Database\Database::class, 'getInstance'])
-        ->setPublic(true);
-
     $container->register(\Symfony\Component\EventDispatcher\EventDispatcher::class)->setPublic(true);
     $container->setAlias(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class, \Symfony\Component\EventDispatcher\EventDispatcher::class);
     $container->register(\App\Shared\Service\AuditLogger::class)
