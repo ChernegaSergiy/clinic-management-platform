@@ -1,6 +1,18 @@
 parameters:
     app.supported_locales: '%kernel.enabled_locales%'
 
+    # Consolidated from each former bundle's DependencyInjection Extension::load()
+    # (previously driven by per-bundle Configuration trees; values below are the
+    # defaults that were in effect, since no environment ever overrode them).
+    appointment.features.waitlist: true
+    appointment.features.api: true
+    dashboard.features.export: true
+    patient.features.insurance: true
+    patient.features.policies: true
+    patient.features.export: true
+    user.features.oauth: true
+    user.features.profile_photo: true
+
 services:
     # default configuration for services in *this* file
     _defaults:
