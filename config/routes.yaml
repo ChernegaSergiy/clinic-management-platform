@@ -1,5 +1,5 @@
 admin_routes_admin:
-    resource: { path: ../src/Bundles/AdminBundle/Controller/, namespace: App\Bundles\AdminBundle\Controller\ }
+    resource: { path: ../src/Http/Admin/, namespace: App\Http\Admin\ }
     type: attribute
     prefix: /admin
 admin_routes_clinical:

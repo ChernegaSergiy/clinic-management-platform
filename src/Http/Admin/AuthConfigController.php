@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Bundles\AdminBundle\Controller;
+namespace App\Http\Admin;
 
 use App\Domain\Admin\AuthConfigRepository;
 use App\Bundles\UserBundle\Controller\OAuthController;
