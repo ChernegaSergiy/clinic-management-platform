@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Core\Auth;
+namespace App\Auth;
 
 enum AuthStep : string
 {

@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Core\Auth;
+namespace App\Auth;
 
 use App\Domain\User\UserRepository;
 use Symfony\Component\HttpFoundation\Request;

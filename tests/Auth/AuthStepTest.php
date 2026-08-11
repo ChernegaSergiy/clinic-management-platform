@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tests\Core\Auth;
+namespace App\Tests\Auth;
 
-use App\Core\Auth\AuthStep;
+use App\Auth\AuthStep;
 use PHPUnit\Framework\TestCase;
 
 class AuthStepTest extends TestCase

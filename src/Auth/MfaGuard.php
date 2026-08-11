@@ -22,7 +22,7 @@
  *
  */
 
-namespace App\Core\Auth;
+namespace App\Auth;
 
 use App\Domain\User\MfaService;
 use App\Core\Exception\RedirectException;
