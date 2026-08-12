@@ -34,7 +34,8 @@ class LocaleSubscriber implements EventSubscriberInterface
     public function __construct(
         private SettingsRepository $settingsRepository,
         private array $supportedLocales = ['uk', 'en'],
-    ) {}
+    ) {
+    }
 
     public function onKernelRequest(RequestEvent $event) : void
     {

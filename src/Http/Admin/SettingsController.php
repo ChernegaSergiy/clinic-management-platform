@@ -37,7 +37,8 @@ class SettingsController extends AbstractController
         private RoleRepository $roleRepository,
         private SettingsRepository $settingsRepository,
         private array $supportedLocales = ['uk', 'en'],
-    ) {}
+    ) {
+    }
 
     #[Route('/settings', name: 'admin_settings', methods: ['GET'])]
     public function showSettings() : Response

@@ -74,7 +74,9 @@ class SymfonyValidator
 
         // Create a simple data object for validation
         $dataObject = new class ($data) {
-            public function __construct(private array $data) {}
+            public function __construct(private array $data)
+            {
+            }
 
             public function __get(string $name)
             {

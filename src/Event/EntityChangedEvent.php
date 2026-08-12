@@ -34,5 +34,6 @@ class EntityChangedEvent extends Event
         public readonly string $action, // 'create', 'update', 'delete'
         public readonly mixed $oldData = null,
         public readonly mixed $newData = null
-    ) {}
+    ) {
+    }
 }
