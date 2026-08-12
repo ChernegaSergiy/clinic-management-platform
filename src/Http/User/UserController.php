@@ -26,12 +26,14 @@ namespace App\Http\User;
 
 use App\Domain\Admin\AuthConfigRepository;
 use App\Domain\Hrm\HrmRepository;
+use App\Domain\User\User;
 use App\Domain\User\UserOAuthIdentityRepository;
 use App\Domain\User\UserRepository;
 use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class UserController extends AbstractController
 {
@@ -56,11 +58,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/profile', name: 'user_profile', methods: ['GET'])]
-    public function profile() : Response
+    public function profile(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $this->userRepository->findById($this->getUser()->getId());
+        $user = $this->userRepository->findById($user->getId());
 
         if (!$user) {
             session_destroy();
@@ -87,11 +89,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/profile/unlink-provider/{provider}', name: 'user_profile_unlink', methods: ['POST'])]
-    public function unlinkProvider(string $provider) : Response
+    public function unlinkProvider(#[CurrentUser] User $user, string $provider) : Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
         $this->userOAuthIdentityRepository->deleteByUserIdAndProvider($userId, $provider);
 
         $_SESSION['success_message'] = sprintf('Ваш акаунт %s було успішно відв\'язано.', ucfirst($provider));
@@ -99,11 +101,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/profile/upload-photo', name: 'user_profile_photo', methods: ['POST'])]
-    public function uploadPhoto() : Response
+    public function uploadPhoto(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
         $uploadDir = __DIR__ . '/../../../public/uploads/avatars/';
 
         // Create directory if it doesn't exist
