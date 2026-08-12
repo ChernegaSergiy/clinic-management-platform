@@ -103,13 +103,12 @@ class MfaController extends AbstractController
     }
 
     #[Route('/user/mfa/setup/{type}', name: 'mfa_setup', methods: ['GET'], defaults: ['type' => 'totp'])]
-    public function showMfaSetup(string $type = 'totp') : Response
+    public function showMfaSetup(string $type = 'totp', #[CurrentUser] ?User $currentUser = null) : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
             $type = 'totp';
         }
 
-        $currentUser = $this->getUser();
         if ($currentUser) {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -256,13 +255,12 @@ class MfaController extends AbstractController
     }
 
     #[Route('/user/mfa/setup/{type}', name: 'mfa_setup_verify', methods: ['POST'], defaults: ['type' => 'totp'])]
-    public function verifyMfaSetup(string $type = 'totp') : Response
+    public function verifyMfaSetup(string $type = 'totp', #[CurrentUser] ?User $currentUser = null) : Response
     {
         if (!in_array($type, ['totp', 'hotp'], true)) {
             $type = 'totp';
         }
 
-        $currentUser = $this->getUser();
         if ($currentUser) {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
