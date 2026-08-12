@@ -28,8 +28,8 @@ use App\Domain\User\RoleRepository;
 use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Intl\Locales;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SettingsController extends AbstractController
 {
