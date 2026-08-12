@@ -24,6 +24,8 @@
 
 namespace App\Auth;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 enum AuthStep : string
 {
     case CREDENTIALS = 'credentials';
@@ -31,9 +33,9 @@ enum AuthStep : string
     case MFA_VERIFY = 'mfa_verify';
     case AUTHENTICATED = 'authenticated';
 
-    public static function current() : self
+    public static function current(?TokenStorageInterface $tokenStorage = null) : self
     {
-        if (isset($_SESSION['user'])) {
+        if ($tokenStorage && $tokenStorage->getToken()?->getUser()) {
             return self::AUTHENTICATED;
         }
 

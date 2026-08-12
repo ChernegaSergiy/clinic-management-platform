@@ -26,19 +26,22 @@ namespace App\Auth;
 
 use App\Domain\User\MfaService;
 use App\Shared\Exception\RedirectException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MfaGuard
 {
     private MfaService $mfaService;
+    private TokenStorageInterface $tokenStorage;
 
-    public function __construct(MfaService $mfaService)
+    public function __construct(MfaService $mfaService, TokenStorageInterface $tokenStorage)
     {
         $this->mfaService = $mfaService;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function check() : void
     {
-        $step = AuthStep::current();
+        $step = AuthStep::current($this->tokenStorage);
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
         if ($step->requiresMfaVerify()) {
