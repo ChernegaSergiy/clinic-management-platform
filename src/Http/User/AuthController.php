@@ -128,14 +128,6 @@ class AuthController extends AbstractController
                     $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
                     $this->tokenStorage->setToken($token);
                 }
-                $_SESSION['user'] = [
-                    'id' => $user['id'],
-                    'first_name' => $user['first_name'],
-                    'last_name' => $user['last_name'],
-                    'email' => $user['email'],
-                    'role_id' => $user['role_id'],
-                    'role_name' => $role['name'] ?? null,
-                ];
                 $_SESSION['user_id'] = $user['id'];
                 $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
                 $redirect = $_SESSION['intended_url'] ?? null;
@@ -170,14 +162,6 @@ class AuthController extends AbstractController
                 $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
                 $this->tokenStorage->setToken($token);
             }
-            $_SESSION['user'] = [
-                'id' => $user['id'],
-                'first_name' => $user['first_name'],
-                'last_name' => $user['last_name'],
-                'email' => $user['email'],
-                'role_id' => $user['role_id'],
-                'role_name' => $role['name'] ?? null,
-            ];
             $_SESSION['user_id'] = $user['id'];
             $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
             $redirect = $_SESSION['intended_url'] ?? null;
@@ -209,10 +193,12 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
     public function logout() : Response
     {
-        $userId = $_SESSION['user']['id'] ?? null;
-        $userEmail = $_SESSION['user']['email'] ?? null;
-        if ($userId && $userEmail) {
-            $this->eventDispatcher->dispatch(new UserLoggedOutEvent($userId, $userEmail));
+        $token = $this->tokenStorage->getToken();
+        if ($token) {
+            $user = $token->getUser();
+            if ($user instanceof \App\Domain\User\User) {
+                $this->eventDispatcher->dispatch(new UserLoggedOutEvent($user->getId(), $user->getEmail()));
+            }
         }
         $this->tokenStorage->setToken(null);
         session_destroy();
