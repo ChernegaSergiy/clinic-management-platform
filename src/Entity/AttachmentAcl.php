@@ -55,7 +55,7 @@ class AttachmentAcl
     private bool $can_view = false;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    private ?bool $can_edit = false;
+    private bool $can_edit = false;
 
     public function getId() : ?int
     {
@@ -106,7 +106,7 @@ class AttachmentAcl
         return $this;
     }
 
-    public function isCanEdit() : ?bool
+    public function isCanEdit() : bool
     {
         return $this->can_edit;
     }
