@@ -26,11 +26,13 @@ namespace App\Http\Admin;
 
 use App\Domain\User\MfaService;
 use App\Domain\User\RoleRepository;
+use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class UserController extends AbstractController
 {
@@ -241,7 +243,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/delete', name: 'admin_users_delete', methods: ['POST'])]
-    public function deleteUser() : Response
+    public function deleteUser(#[CurrentUser] User $currentUser) : Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
@@ -253,7 +255,7 @@ class UserController extends AbstractController
         }
 
         // Prevent admin from deleting themselves
-        if ($user['id'] === $this->getUser()->getId()) {
+        if ($user['id'] === $currentUser->getId()) {
             $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
             return $this->redirectToRoute('admin_users');
         }
