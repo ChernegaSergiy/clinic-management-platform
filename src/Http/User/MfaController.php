@@ -33,6 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Security;
 
 class MfaController extends AbstractController
 {
@@ -42,6 +43,7 @@ class MfaController extends AbstractController
     private RoleRepository $roleRepository;
     private \Doctrine\Persistence\ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
+    private Security $security;
 
     public function __construct(
         MfaService $mfaService,
@@ -49,7 +51,8 @@ class MfaController extends AbstractController
         SettingsRepository $settingsRepository,
         RoleRepository $roleRepository,
         \Doctrine\Persistence\ManagerRegistry $registry,
-        MfaGuard $mfaGuard
+        MfaGuard $mfaGuard,
+        Security $security
     ) {
         $this->mfaService = $mfaService;
         $this->userRepository = $userRepository;
@@ -57,6 +60,7 @@ class MfaController extends AbstractController
         $this->roleRepository = $roleRepository;
         $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
+        $this->security = $security;
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode) : void
@@ -297,6 +301,12 @@ class MfaController extends AbstractController
                     $user = $this->userRepository->findById($userId);
                     $role = $this->roleRepository->findById((int)$user['role_id']);
 
+                    /** @var \App\Domain\User\User|null $userEntity */
+                    $userEntity = $this->userRepository->find($userId);
+                    if ($userEntity) {
+                        $this->security->login($userEntity);
+                    }
+
                     $_SESSION['user'] = [
                         'id' => $user['id'],
                         'first_name' => $user['first_name'],
@@ -305,6 +315,7 @@ class MfaController extends AbstractController
                         'role_id' => $user['role_id'],
                         'role_name' => $role['name'] ?? null,
                     ];
+                    $_SESSION['user_id'] = $user['id'];
 
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
@@ -349,6 +360,12 @@ class MfaController extends AbstractController
                     $user = $this->userRepository->findById($userId);
                     $role = $this->roleRepository->findById((int)$user['role_id']);
 
+                    /** @var \App\Domain\User\User|null $userEntity */
+                    $userEntity = $this->userRepository->find($userId);
+                    if ($userEntity) {
+                        $this->security->login($userEntity);
+                    }
+
                     $_SESSION['user'] = [
                         'id' => $user['id'],
                         'first_name' => $user['first_name'],
@@ -357,6 +374,7 @@ class MfaController extends AbstractController
                         'role_id' => $user['role_id'],
                         'role_name' => $role['name'] ?? null,
                     ];
+                    $_SESSION['user_id'] = $user['id'];
 
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
@@ -417,6 +435,12 @@ class MfaController extends AbstractController
                 $user = $this->userRepository->findById($userId);
                 $role = $this->roleRepository->findById((int)$user['role_id']);
 
+                /** @var \App\Domain\User\User|null $userEntity */
+                $userEntity = $this->userRepository->find($userId);
+                if ($userEntity) {
+                    $this->security->login($userEntity);
+                }
+
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'first_name' => $user['first_name'],
@@ -425,6 +449,7 @@ class MfaController extends AbstractController
                     'role_id' => $user['role_id'],
                     'role_name' => $role['name'] ?? null,
                 ];
+                $_SESSION['user_id'] = $user['id'];
 
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
@@ -462,6 +487,12 @@ class MfaController extends AbstractController
                 $user = $this->userRepository->findById($userId);
                 $role = $this->roleRepository->findById((int)$user['role_id']);
 
+                /** @var \App\Domain\User\User|null $userEntity */
+                $userEntity = $this->userRepository->find($userId);
+                if ($userEntity) {
+                    $this->security->login($userEntity);
+                }
+
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'first_name' => $user['first_name'],
@@ -470,6 +501,7 @@ class MfaController extends AbstractController
                     'role_id' => $user['role_id'],
                     'role_name' => $role['name'] ?? null,
                 ];
+                $_SESSION['user_id'] = $user['id'];
 
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
@@ -558,6 +590,12 @@ class MfaController extends AbstractController
             $user = $this->userRepository->findById($userId);
             $role = $this->roleRepository->findById((int)$user['role_id']);
 
+            /** @var \App\Domain\User\User|null $userEntity */
+            $userEntity = $this->userRepository->find($userId);
+            if ($userEntity) {
+                $this->security->login($userEntity);
+            }
+
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'first_name' => $user['first_name'],
@@ -566,6 +604,7 @@ class MfaController extends AbstractController
                 'role_id' => $user['role_id'],
                 'role_name' => $role['name'] ?? null,
             ];
+            $_SESSION['user_id'] = $user['id'];
 
             $redirect = $_SESSION['intended_url'] ?? null;
             unset($_SESSION['intended_url']);
