@@ -25,9 +25,11 @@
 namespace App\Http\Kpi\App;
 
 use App\Domain\Kpi\KpiResultRepository;
+use App\Domain\User\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AppKpiController extends AbstractController
 {
@@ -39,11 +41,11 @@ class AppKpiController extends AbstractController
     }
 
     #[Route('/kpi/results', name: 'app_kpi_results_index', methods: ['GET'])]
-    public function listResults() : Response
+    public function listResults(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('KPI_VIEW');
 
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
         $results = $this->kpiResultRepository->findResultsForUser($userId);
 
         return $this->render('kpi/results/index.html.twig', ['results' => $results]);
