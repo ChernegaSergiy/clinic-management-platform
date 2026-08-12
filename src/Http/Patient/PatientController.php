@@ -29,12 +29,14 @@ use App\Domain\Insurance\InsuranceService;
 use App\Domain\Insurance\PatientInsurancePolicyRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
+use App\Domain\User\User;
 use App\Infrastructure\Export\CsvExporter;
 use App\Infrastructure\Export\JsonExporter;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class PatientController extends AbstractController
 {
@@ -62,11 +64,10 @@ class PatientController extends AbstractController
     }
 
     #[Route('/patients', name: 'patient_index', methods: ['GET'])]
-    public function index() : Response
+    public function index(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('PATIENT_VIEW');
         $searchTerm = $_GET['search'] ?? '';
-        $user = $this->getUser();
         $patients = [];
 
         if ($this->isGranted('PATIENT_VIEW_ALL')) {
