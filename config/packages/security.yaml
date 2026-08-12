@@ -140,7 +140,6 @@ security:
             provider: app_user_provider
             custom_authenticators:
                 - App\Auth\SessionAuthenticator
-            stateless: true
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
