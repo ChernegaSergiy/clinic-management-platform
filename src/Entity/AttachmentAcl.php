@@ -36,6 +36,9 @@ class AttachmentAcl
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    // Doctrine assigns this via reflection when persisting a new entity, which
+    // PHPStan cannot see, so it otherwise flags the int part of the type as unused.
+    /** @phpstan-ignore-next-line property.unusedType */
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Attachment::class)]
