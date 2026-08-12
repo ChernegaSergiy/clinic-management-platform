@@ -52,7 +52,7 @@ class OAuthController extends AbstractController
         $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
     }
 
-    public function redirect(string $provider) : Response
+    public function redirectToProvider(string $provider) : Response
     {
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 

@@ -185,7 +185,7 @@ class AuthController extends AbstractController
     #[Route('/oauth/redirect/{provider}', name: 'oauth_login', methods: ['GET'])]
     public function redirectToProvider(string $provider) : Response
     {
-        return $this->oauthController->redirect($provider);
+        return $this->oauthController->redirectToProvider($provider);
     }
 
     #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
