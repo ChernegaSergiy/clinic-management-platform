@@ -26,7 +26,6 @@ namespace App\Http\User;
 
 use App\Auth\MfaGuard;
 use App\Domain\User\MfaService;
-use App\Domain\User\RoleRepository;
 use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Shared\Repository\SettingsRepository;
@@ -43,7 +42,6 @@ class MfaController extends AbstractController
     private MfaService $mfaService;
     private UserRepository $userRepository;
     private SettingsRepository $settingsRepository;
-    private RoleRepository $roleRepository;
     private \Doctrine\Persistence\ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
     private TokenStorageInterface $tokenStorage;
@@ -52,7 +50,6 @@ class MfaController extends AbstractController
         MfaService $mfaService,
         UserRepository $userRepository,
         SettingsRepository $settingsRepository,
-        RoleRepository $roleRepository,
         \Doctrine\Persistence\ManagerRegistry $registry,
         MfaGuard $mfaGuard,
         TokenStorageInterface $tokenStorage
@@ -60,7 +57,6 @@ class MfaController extends AbstractController
         $this->mfaService = $mfaService;
         $this->userRepository = $userRepository;
         $this->settingsRepository = $settingsRepository;
-        $this->roleRepository = $roleRepository;
         $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
         $this->tokenStorage = $tokenStorage;
