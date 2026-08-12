@@ -52,7 +52,7 @@ class AttachmentAcl
     private ?int $role_id = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    private ?bool $can_view = false;
+    private bool $can_view = false;
 
     #[ORM\Column(type: Types::BOOLEAN)]
     private ?bool $can_edit = false;
@@ -95,7 +95,7 @@ class AttachmentAcl
         return $this;
     }
 
-    public function isCanView() : ?bool
+    public function isCanView() : bool
     {
         return $this->can_view;
     }
