@@ -30,10 +30,10 @@ use App\Domain\User\RoleRepository;
 use App\Domain\User\UserRepository;
 use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Security;
 
 class MfaController extends AbstractController
 {
