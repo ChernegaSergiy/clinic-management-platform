@@ -33,6 +33,7 @@ use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -57,8 +58,9 @@ class OAuthController extends AbstractController
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function redirectToProvider(string $provider) : Response
+    public function redirectToProvider(string $provider, Request $request = null) : Response
     {
+        $request ??= \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
         if (!$providerConfig || !$providerConfig['is_active']) {
@@ -69,14 +71,15 @@ class OAuthController extends AbstractController
         $providerObj = $this->getProvider($provider, $providerConfig);
 
         $authUrl = $providerObj->getAuthorizationUrl();
-        $_SESSION['oauth2state'] = $providerObj->getState();
+        $request->getSession()->set('oauth2state', $providerObj->getState());
 
         return new RedirectResponse($authUrl);
     }
 
     #[Route('/oauth/callback/{provider}', name: 'oauth_callback', methods: ['GET'])]
-    public function callback(string $provider) : Response
+    public function callback(string $provider, Request $request) : Response
     {
+        $session = $request->getSession();
         $providerConfig = $this->authConfigRepository->findByProvider($provider);
 
         if (!$providerConfig || !$providerConfig['is_active']) {
@@ -84,8 +87,8 @@ class OAuthController extends AbstractController
         }
 
         $providerObj = $this->getProvider($provider, $providerConfig);
-        if (empty($_GET['state']) || !isset($_SESSION['oauth2state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-            unset($_SESSION['oauth2state']);
+        if (empty($_GET['state']) || !$session->has('oauth2state') || ($_GET['state'] !== $session->get('oauth2state'))) {
+            $session->remove('oauth2state');
             die('Некоректний стан запиту.');
         }
 
@@ -109,18 +112,18 @@ class OAuthController extends AbstractController
                     $existingIdentity = $this->userOAuthIdentityRepository->findByUserIdAndProvider($userId, $provider);
 
                     if ($existingIdentity) {
-                        $_SESSION['info_message'] = sprintf('Ваш акаунт %s вже прив\'язано.', ucfirst($provider));
+                        $session->set('info_message', sprintf('Ваш акаунт %s вже прив\'язано.', ucfirst($provider)));
                     } else {
                         // Check if this provider ID is already linked to ANOTHER user
                         $anotherUserIdentity = $this->userOAuthIdentityRepository->findByProviderAndProviderId($provider, $providerId);
                         if ($anotherUserIdentity && $anotherUserIdentity['user_id'] != $userId) {
-                            $_SESSION['errors'] = ['oauth' => sprintf('Цей акаунт %s вже прив\'язано до іншого користувача.', ucfirst($provider))];
+                            $session->set('errors', ['oauth' => sprintf('Цей акаунт %s вже прив\'язано до іншого користувача.', ucfirst($provider))]);
                             return $this->redirectToRoute('user_profile');
                         }
 
                         // Link the account
                         $this->userOAuthIdentityRepository->create($userId, $provider, $providerId);
-                        $_SESSION['success_message'] = sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider));
+                        $session->set('success_message', sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider)));
                     }
 
                     return $this->redirectToRoute('user_profile');
@@ -142,9 +145,9 @@ class OAuthController extends AbstractController
                         $this->tokenStorage->setToken($token);
                     }
 
-                    $_SESSION['user_id'] = $user['id'];
-                    $redirect = $_SESSION['intended_url'] ?? null;
-                    unset($_SESSION['intended_url']);
+                    $session->set('user_id', $user['id']);
+                    $redirect = $session->get('intended_url');
+                    $session->remove('intended_url');
                     if ($redirect) {
                         return new RedirectResponse($redirect);
                     }
@@ -165,9 +168,9 @@ class OAuthController extends AbstractController
                     $this->tokenStorage->setToken($token);
                 }
 
-                $_SESSION['user_id'] = $userByEmail['id'];
-                $redirect = $_SESSION['intended_url'] ?? null;
-                unset($_SESSION['intended_url']);
+                $session->set('user_id', $userByEmail['id']);
+                $redirect = $session->get('intended_url');
+                $session->remove('intended_url');
                 if ($redirect) {
                     return new RedirectResponse($redirect);
                 }
@@ -176,10 +179,10 @@ class OAuthController extends AbstractController
             }
 
             // No user found or linked, redirect to login with an error or to a registration page
-            $_SESSION['errors'] = ['login' => sprintf('Жодного користувача, пов\'язаного з цим акаунтом %s, не знайдено. Спершу зареєструйтеся або увійдіть в існуючий акаунт і прив\'яжіть його.', ucfirst($provider))];
+            $session->set('errors', ['login' => sprintf('Жодного користувача, пов\'язаного з цим акаунтом %s, не знайдено. Спершу зареєструйтеся або увійдіть в існуючий акаунт і прив\'яжіть його.', ucfirst($provider))]);
             return $this->redirectToRoute('login_form');
         } catch (IdentityProviderException $e) {
-            $_SESSION['errors'] = ['oauth' => 'Помилка автентифікації: ' . $e->getMessage()];
+            $session->set('errors', ['oauth' => 'Помилка автентифікації: ' . $e->getMessage()]);
             return $this->redirectToRoute('login_form');
         }
     }

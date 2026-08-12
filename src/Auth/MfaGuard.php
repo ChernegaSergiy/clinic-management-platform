@@ -26,26 +26,35 @@ namespace App\Auth;
 
 use App\Domain\User\MfaService;
 use App\Shared\Exception\RedirectException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MfaGuard
 {
     private MfaService $mfaService;
     private TokenStorageInterface $tokenStorage;
+    private RequestStack $requestStack;
 
-    public function __construct(MfaService $mfaService, TokenStorageInterface $tokenStorage)
+    public function __construct(MfaService $mfaService, TokenStorageInterface $tokenStorage, RequestStack $requestStack)
     {
         $this->mfaService = $mfaService;
         $this->tokenStorage = $tokenStorage;
+        $this->requestStack = $requestStack;
+    }
+
+    private function session() : SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 
     public function check() : void
     {
-        $step = AuthStep::current($this->tokenStorage);
+        $step = AuthStep::current($this->tokenStorage, $this->session());
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
         if ($step->requiresMfaVerify()) {
-            $userId = $_SESSION['mfa_pending_user_id'] ?? null;
+            $userId = $this->session()->get('mfa_pending_user_id');
 
             if ($this->mfaService->isMfaEnabled($userId)) {
                 throw new RedirectException('/user/mfa/verify');
@@ -61,32 +70,32 @@ class MfaGuard
 
     public function isPending() : bool
     {
-        return isset($_SESSION['mfa_pending_user_id']);
+        return $this->session()->has('mfa_pending_user_id');
     }
 
     public function getPendingUserId() : ?int
     {
-        return $_SESSION['mfa_pending_user_id'] ?? null;
+        return $this->session()->get('mfa_pending_user_id');
     }
 
     public function clearPending() : void
     {
-        unset($_SESSION['mfa_pending_user_id']);
+        $this->session()->remove('mfa_pending_user_id');
     }
 
     public function isRequired() : bool
     {
-        return isset($_SESSION['mfa_required']) && true === $_SESSION['mfa_required'];
+        return true === $this->session()->get('mfa_required');
     }
 
     public function setRequired() : void
     {
-        $_SESSION['mfa_required'] = true;
+        $this->session()->set('mfa_required', true);
     }
 
     public function clearRequired() : void
     {
-        unset($_SESSION['mfa_required']);
+        $this->session()->remove('mfa_required');
     }
 
     public function getUserMfaType(int $userId) : ?string

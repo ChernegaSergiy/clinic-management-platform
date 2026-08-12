@@ -24,6 +24,7 @@
 
 namespace App\Auth;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 enum AuthStep : string
@@ -33,17 +34,17 @@ enum AuthStep : string
     case MFA_VERIFY = 'mfa_verify';
     case AUTHENTICATED = 'authenticated';
 
-    public static function current(?TokenStorageInterface $tokenStorage = null) : self
+    public static function current(?TokenStorageInterface $tokenStorage = null, ?SessionInterface $session = null) : self
     {
         if ($tokenStorage && $tokenStorage->getToken()?->getUser()) {
             return self::AUTHENTICATED;
         }
 
-        if (isset($_SESSION['mfa_required']) && true === $_SESSION['mfa_required']) {
+        if (true === $session?->get('mfa_required')) {
             return self::MFA_SETUP;
         }
 
-        if (isset($_SESSION['mfa_pending_user_id'])) {
+        if ($session?->has('mfa_pending_user_id')) {
             return self::MFA_VERIFY;
         }
 

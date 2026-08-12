@@ -34,6 +34,7 @@ use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -74,12 +75,13 @@ class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
-    public function showLoginForm() : Response
+    public function showLoginForm(Request $request) : Response
     {
-        $old = $_SESSION['old'] ?? [];
-        unset($_SESSION['old']);
-        $errors = $_SESSION['errors'] ?? [];
-        unset($_SESSION['errors']);
+        $session = $request->getSession();
+        $old = $session->get('old', []);
+        $session->remove('old');
+        $errors = $session->get('errors', []);
+        $session->remove('errors');
 
         return $this->render('user/login.html.twig', [
             'old' => $old,
@@ -93,10 +95,11 @@ class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'login_post', methods: ['POST'])]
-    public function login() : Response
+    public function login(Request $request) : Response
     {
         // Admin creation should be done via CLI commands or fixtures in Symfony
 
+        $session = $request->getSession();
         $validator = $this->validator;
         $validator->validate($_POST, [
             'email' => ['required', 'email'],
@@ -104,8 +107,8 @@ class AuthController extends AbstractController
         ]);
 
         if ($validator->hasErrors()) {
-            $_SESSION['errors'] = $validator->getErrors();
-            $_SESSION['old'] = $_POST;
+            $session->set('errors', $validator->getErrors());
+            $session->set('old', $_POST);
             return $this->redirectToRoute('login_form');
         }
 
@@ -128,10 +131,10 @@ class AuthController extends AbstractController
                     $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
                     $this->tokenStorage->setToken($token);
                 }
-                $_SESSION['user_id'] = $user['id'];
+                $session->set('user_id', $user['id']);
                 $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
-                $redirect = $_SESSION['intended_url'] ?? null;
-                unset($_SESSION['intended_url']);
+                $redirect = $session->get('intended_url');
+                $session->remove('intended_url');
                 if ($redirect) {
                     return new RedirectResponse($redirect);
                 }
@@ -142,19 +145,25 @@ class AuthController extends AbstractController
             $roleRequiresMfa = in_array((int)$user['role_id'], $mfaForceRoles, true);
 
             if ($roleRequiresMfa && !$mfaService->isMfaEnabled($user['id'])) {
-                $_SESSION['mfa_required'] = true;
-                $_SESSION['mfa_required_type'] = 'totp';
-                $_SESSION['mfa_pending_user_id'] = $user['id'];
-                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? null;
-                unset($_SESSION['intended_url']);
+                $session->set('mfa_required', true);
+                $session->set('mfa_required_type', 'totp');
+                $session->set('mfa_pending_user_id', $user['id']);
+                $intendedUrl = $session->get('intended_url');
+                $session->remove('intended_url');
+                if ($intendedUrl) {
+                    $session->set('intended_url', $intendedUrl);
+                }
                 return $this->redirectToRoute('mfa_required_choice');
             }
 
             if ($mfaService->isMfaEnabled($user['id'])) {
-                $_SESSION['mfa_pending_user_id'] = $user['id'];
-                $_SESSION['mfa_type'] = $mfaService->getUserMfaStatus($user['id'])['type'];
-                $_SESSION['intended_url'] = $_SESSION['intended_url'] ?? null;
-                unset($_SESSION['intended_url']);
+                $session->set('mfa_pending_user_id', $user['id']);
+                $session->set('mfa_type', $mfaService->getUserMfaStatus($user['id'])['type']);
+                $intendedUrl = $session->get('intended_url');
+                $session->remove('intended_url');
+                if ($intendedUrl) {
+                    $session->set('intended_url', $intendedUrl);
+                }
                 return $this->redirectToRoute('mfa_verify');
             }
 
@@ -162,18 +171,18 @@ class AuthController extends AbstractController
                 $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
                 $this->tokenStorage->setToken($token);
             }
-            $_SESSION['user_id'] = $user['id'];
+            $session->set('user_id', $user['id']);
             $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
-            $redirect = $_SESSION['intended_url'] ?? null;
-            unset($_SESSION['intended_url']);
+            $redirect = $session->get('intended_url');
+            $session->remove('intended_url');
             if ($redirect) {
                 return new RedirectResponse($redirect);
             }
 
             return $this->redirectToRoute('dashboard');
         } else {
-            $_SESSION['errors'] = ['login' => 'Невірний email або пароль.'];
-            $_SESSION['old'] = $_POST;
+            $session->set('errors', ['login' => 'Невірний email або пароль.']);
+            $session->set('old', $_POST);
             return $this->redirectToRoute('login_form');
         }
     }
@@ -191,7 +200,7 @@ class AuthController extends AbstractController
     }
 
     #[Route('/logout', name: 'logout', methods: ['GET', 'POST'])]
-    public function logout() : Response
+    public function logout(Request $request) : Response
     {
         $token = $this->tokenStorage->getToken();
         if ($token) {
@@ -201,7 +210,7 @@ class AuthController extends AbstractController
             }
         }
         $this->tokenStorage->setToken(null);
-        session_destroy();
+        $request->getSession()->invalidate();
         return $this->redirectToRoute('dashboard_redirect');
     }
 
