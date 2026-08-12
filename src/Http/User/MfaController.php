@@ -27,13 +27,16 @@ namespace App\Http\User;
 use App\Auth\MfaGuard;
 use App\Domain\User\MfaService;
 use App\Domain\User\RoleRepository;
+use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class MfaController extends AbstractController
 {
@@ -43,7 +46,7 @@ class MfaController extends AbstractController
     private RoleRepository $roleRepository;
     private \Doctrine\Persistence\ManagerRegistry $registry;
     private MfaGuard $mfaGuard;
-    private Security $security;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         MfaService $mfaService,
@@ -52,7 +55,7 @@ class MfaController extends AbstractController
         RoleRepository $roleRepository,
         \Doctrine\Persistence\ManagerRegistry $registry,
         MfaGuard $mfaGuard,
-        Security $security
+        TokenStorageInterface $tokenStorage
     ) {
         $this->mfaService = $mfaService;
         $this->userRepository = $userRepository;
@@ -60,7 +63,18 @@ class MfaController extends AbstractController
         $this->roleRepository = $roleRepository;
         $this->registry = $registry;
         $this->mfaGuard = $mfaGuard;
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
+    }
+
+    private function authenticateUser(int $userId) : void
+    {
+        /** @var \App\Domain\User\User|null $userEntity */
+        $userEntity = $this->userRepository->find($userId);
+        if ($userEntity) {
+            $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
+            $this->tokenStorage->setToken($token);
+        }
+        $_SESSION['user_id'] = $userId;
     }
 
     private function prepareHotpSetup(int $userId, array &$secret, array &$backupCodes, int &$counter, string &$qrCode) : void
@@ -95,7 +109,8 @@ class MfaController extends AbstractController
             $type = 'totp';
         }
 
-        if (isset($_SESSION['user'])) {
+        $currentUser = $this->getUser();
+        if ($currentUser) {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
@@ -106,7 +121,7 @@ class MfaController extends AbstractController
             }
         }
 
-        $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
+        $userId = $_SESSION['mfa_pending_user_id'] ?? ($currentUser?->getId());
 
         if (!$userId) {
             return $this->redirectToRoute('login_form');
@@ -247,7 +262,8 @@ class MfaController extends AbstractController
             $type = 'totp';
         }
 
-        if (isset($_SESSION['user'])) {
+        $currentUser = $this->getUser();
+        if ($currentUser) {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
@@ -258,7 +274,7 @@ class MfaController extends AbstractController
             }
         }
 
-        $userId = $_SESSION['mfa_pending_user_id'] ?? $_SESSION['user']['id'] ?? null;
+        $userId = $_SESSION['mfa_pending_user_id'] ?? ($currentUser?->getId());
 
         if (!$userId) {
             return $this->redirectToRoute('login_form');
@@ -293,29 +309,12 @@ class MfaController extends AbstractController
 
                 unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter'], $_SESSION['hotp_setup_last_counter']);
 
-                if (isset($_SESSION['user'])) {
+                if ($this->getUser()) {
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію HOTP успішно увімкнено!';
                     return $this->redirectToRoute('user_profile');
                 } else {
                     $this->mfaGuard->clearRequired();
-                    $user = $this->userRepository->findById($userId);
-                    $role = $this->roleRepository->findById((int)$user['role_id']);
-
-                    /** @var \App\Domain\User\User|null $userEntity */
-                    $userEntity = $this->userRepository->find($userId);
-                    if ($userEntity) {
-                        $this->security->login($userEntity);
-                    }
-
-                    $_SESSION['user'] = [
-                        'id' => $user['id'],
-                        'first_name' => $user['first_name'],
-                        'last_name' => $user['last_name'],
-                        'email' => $user['email'],
-                        'role_id' => $user['role_id'],
-                        'role_name' => $role['name'] ?? null,
-                    ];
-                    $_SESSION['user_id'] = $user['id'];
+                    $this->authenticateUser($userId);
 
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
@@ -352,29 +351,12 @@ class MfaController extends AbstractController
 
                 unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
 
-                if (isset($_SESSION['user'])) {
+                if ($this->getUser()) {
                     $_SESSION['success_message'] = 'Двофакторну автентифікацію успішно увімкнено!';
                     return $this->redirectToRoute('user_profile');
                 } else {
                     $this->mfaGuard->clearRequired();
-                    $user = $this->userRepository->findById($userId);
-                    $role = $this->roleRepository->findById((int)$user['role_id']);
-
-                    /** @var \App\Domain\User\User|null $userEntity */
-                    $userEntity = $this->userRepository->find($userId);
-                    if ($userEntity) {
-                        $this->security->login($userEntity);
-                    }
-
-                    $_SESSION['user'] = [
-                        'id' => $user['id'],
-                        'first_name' => $user['first_name'],
-                        'last_name' => $user['last_name'],
-                        'email' => $user['email'],
-                        'role_id' => $user['role_id'],
-                        'role_name' => $role['name'] ?? null,
-                    ];
-                    $_SESSION['user_id'] = $user['id'];
+                    $this->authenticateUser($userId);
 
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
@@ -432,24 +414,7 @@ class MfaController extends AbstractController
                 unset($_SESSION['hotp_setup_secret'], $_SESSION['hotp_setup_backup_codes'], $_SESSION['hotp_setup_counter'], $_SESSION['hotp_setup_last_counter']);
                 $this->mfaGuard->clearRequired();
 
-                $user = $this->userRepository->findById($userId);
-                $role = $this->roleRepository->findById((int)$user['role_id']);
-
-                /** @var \App\Domain\User\User|null $userEntity */
-                $userEntity = $this->userRepository->find($userId);
-                if ($userEntity) {
-                    $this->security->login($userEntity);
-                }
-
-                $_SESSION['user'] = [
-                    'id' => $user['id'],
-                    'first_name' => $user['first_name'],
-                    'last_name' => $user['last_name'],
-                    'email' => $user['email'],
-                    'role_id' => $user['role_id'],
-                    'role_name' => $role['name'] ?? null,
-                ];
-                $_SESSION['user_id'] = $user['id'];
+                $this->authenticateUser($userId);
 
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
@@ -484,24 +449,7 @@ class MfaController extends AbstractController
                 unset($_SESSION['mfa_setup_secret'], $_SESSION['mfa_setup_backup_codes']);
                 $this->mfaGuard->clearRequired();
 
-                $user = $this->userRepository->findById($userId);
-                $role = $this->roleRepository->findById((int)$user['role_id']);
-
-                /** @var \App\Domain\User\User|null $userEntity */
-                $userEntity = $this->userRepository->find($userId);
-                if ($userEntity) {
-                    $this->security->login($userEntity);
-                }
-
-                $_SESSION['user'] = [
-                    'id' => $user['id'],
-                    'first_name' => $user['first_name'],
-                    'last_name' => $user['last_name'],
-                    'email' => $user['email'],
-                    'role_id' => $user['role_id'],
-                    'role_name' => $role['name'] ?? null,
-                ];
-                $_SESSION['user_id'] = $user['id'];
+                $this->authenticateUser($userId);
 
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
@@ -518,11 +466,11 @@ class MfaController extends AbstractController
     }
 
     #[Route('/user/mfa/disable', name: 'mfa_disable', methods: ['POST'])]
-    public function disableMfa() : Response
+    public function disableMfa(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $user->getId();
         $password = $_POST['password'] ?? '';
 
         $user = $this->userRepository->findById($userId);
@@ -587,24 +535,7 @@ class MfaController extends AbstractController
             unset($_SESSION['mfa_pending_user_id']);
             $this->mfaGuard->clearRequired();
 
-            $user = $this->userRepository->findById($userId);
-            $role = $this->roleRepository->findById((int)$user['role_id']);
-
-            /** @var \App\Domain\User\User|null $userEntity */
-            $userEntity = $this->userRepository->find($userId);
-            if ($userEntity) {
-                $this->security->login($userEntity);
-            }
-
-            $_SESSION['user'] = [
-                'id' => $user['id'],
-                'first_name' => $user['first_name'],
-                'last_name' => $user['last_name'],
-                'email' => $user['email'],
-                'role_id' => $user['role_id'],
-                'role_name' => $role['name'] ?? null,
-            ];
-            $_SESSION['user_id'] = $user['id'];
+            $this->authenticateUser($userId);
 
             $redirect = $_SESSION['intended_url'] ?? null;
             unset($_SESSION['intended_url']);
@@ -620,11 +551,11 @@ class MfaController extends AbstractController
     }
 
     #[Route('/user/mfa/regenerate-backup-codes', name: 'mfa_regenerate_backup_codes', methods: ['POST'])]
-    public function regenerateBackupCodes() : Response
+    public function regenerateBackupCodes(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $user->getId();
         $password = $_POST['password'] ?? '';
 
         $user = $this->userRepository->findById($userId);
