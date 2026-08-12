@@ -25,10 +25,12 @@
 namespace App\Http\Inventory;
 
 use App\Domain\Inventory\InventoryItemRepository;
+use App\Domain\User\User;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class InventoryController extends AbstractController
 {
@@ -76,7 +78,7 @@ class InventoryController extends AbstractController
     }
 
     #[Route('/inventory/new', name: 'inventory_new_store', methods: ['POST'])]
-    public function store() : Response
+    public function store(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
@@ -93,7 +95,7 @@ class InventoryController extends AbstractController
             return $this->redirectToRoute('inventory_new_create');
         }
 
-        $this->inventoryItemRepository->save($_POST);
+        $this->inventoryItemRepository->save($_POST, $user->getId());
         $_SESSION['success_message'] = "Позицію складу успішно додано.";
         return $this->redirectToRoute('inventory_index');
     }
@@ -145,7 +147,7 @@ class InventoryController extends AbstractController
     }
 
     #[Route('/inventory/edit', name: 'inventory_edit_update', methods: ['POST'])]
-    public function update() : Response
+    public function update(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('INVENTORY_MANAGE');
 
@@ -169,7 +171,7 @@ class InventoryController extends AbstractController
             return $this->redirectToRoute('inventory_edit_edit', ['id' => $id]);
         }
 
-        $this->inventoryItemRepository->update($id, $_POST);
+        $this->inventoryItemRepository->update($id, $_POST, $user->getId());
         $_SESSION['success_message'] = "Позицію складу успішно оновлено.";
         return $this->redirectToRoute('inventory_show_show', ['id' => $id]);
     }

@@ -79,7 +79,7 @@ class InventoryItemRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
-    public function save(array $data) : bool
+    public function save(array $data, ?int $userId = null) : bool
     {
         $em = $this->getEntityManager();
         $em->beginTransaction();
@@ -116,7 +116,7 @@ class InventoryItemRepository extends ServiceEntityRepository
             if (($data['quantity'] ?? 0) > 0) {
                 $this->logMovement(
                     $itemId,
-                    $_SESSION['user']['id'] ?? null,
+                    $userId,
                     'in',
                     $data['quantity'],
                     $data['quantity'],
@@ -142,7 +142,7 @@ class InventoryItemRepository extends ServiceEntityRepository
         return $result ? $result[0] : null;
     }
 
-    public function update(int $id, array $data) : bool
+    public function update(int $id, array $data, ?int $userId = null) : bool
     {
         $em = $this->getEntityManager();
         $em->beginTransaction();
@@ -193,7 +193,7 @@ class InventoryItemRepository extends ServiceEntityRepository
                 $reason = $data['movement_reason'] ?? 'Оновлення позиції';
                 $this->logMovement(
                     $id,
-                    $_SESSION['user']['id'] ?? null,
+                    $userId,
                     $movementType,
                     $quantityChange,
                     $newQuantity,
