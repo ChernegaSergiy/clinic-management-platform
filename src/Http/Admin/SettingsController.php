@@ -29,7 +29,7 @@ use App\Shared\Repository\SettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Translation\Locales;
+use Symfony\Component\Intl\Locales;
 
 class SettingsController extends AbstractController
 {
