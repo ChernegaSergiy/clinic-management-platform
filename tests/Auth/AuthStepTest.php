@@ -4,24 +4,33 @@ namespace App\Tests\Auth;
 
 use App\Auth\AuthStep;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthStepTest extends TestCase
 {
     protected function setUp() : void
     {
-        unset($_SESSION['user'], $_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
+        unset($_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
     }
 
     protected function tearDown() : void
     {
-        unset($_SESSION['user'], $_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
+        unset($_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
     }
 
     public function testCurrentReturnsAuthenticatedWhenUserIsSet() : void
     {
-        $_SESSION['user'] = ['id' => 1];
+        $user = $this->createMock(UserInterface::class);
 
-        $this->assertSame(AuthStep::AUTHENTICATED, AuthStep::current());
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getUser')->willReturn($user);
+
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->method('getToken')->willReturn($token);
+
+        $this->assertSame(AuthStep::AUTHENTICATED, AuthStep::current($tokenStorage));
     }
 
     public function testCurrentReturnsMfaSetupWhenMfaRequiredIsTrue() : void
