@@ -17,7 +17,7 @@ return (new Config())
             'on_multiline' => 'ensure_fully_multiline',
             'keep_multiple_spaces_after_comma' => false,
         ],
-        'single_line_empty_body' => true,
+        'single_line_empty_body' => false,
         'class_attributes_separation' => [
             'elements' => [
                 'method' => 'one',
