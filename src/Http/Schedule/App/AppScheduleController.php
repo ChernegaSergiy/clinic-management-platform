@@ -26,9 +26,11 @@ namespace App\Http\Schedule\App;
 
 use App\Domain\Schedule\DoctorScheduleRepository;
 use App\Domain\Schedule\ScheduleExceptionRepository;
+use App\Domain\User\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AppScheduleController extends AbstractController
 {
@@ -42,11 +44,11 @@ class AppScheduleController extends AbstractController
     }
 
     #[Route('/doctor/schedule', name: 'doctor_schedule_index', methods: ['GET'])]
-    public function index() : Response
+    public function index(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_OWN');
 
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
         $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
         $exceptions = $this->scheduleExceptionRepository->findByDoctorAndDateRange(
             $userId,
@@ -66,9 +68,9 @@ class AppScheduleController extends AbstractController
     }
 
     #[Route('/doctor/schedule/update', name: 'doctor_schedule_update', methods: ['POST'])]
-    public function update() : Response
+    public function update(#[CurrentUser] User $user) : Response
     {
-        $sessionUserId = $this->getUser()->getId();
+        $sessionUserId = $user->getId();
         $targetDoctorId = $sessionUserId; // Default
 
         if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
@@ -105,9 +107,9 @@ class AppScheduleController extends AbstractController
     }
 
     #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
-    public function addException() : Response
+    public function addException(#[CurrentUser] User $user) : Response
     {
-        $sessionUserId = $this->getUser()->getId();
+        $sessionUserId = $user->getId();
         $targetDoctorId = $sessionUserId; // Default
 
         if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
@@ -135,9 +137,9 @@ class AppScheduleController extends AbstractController
     }
 
     #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
-    public function deleteException() : Response
+    public function deleteException(#[CurrentUser] User $user) : Response
     {
-        $sessionUserId = $this->getUser()->getId();
+        $sessionUserId = $user->getId();
         $exceptionId = (int)$_POST['exception_id'];
 
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
