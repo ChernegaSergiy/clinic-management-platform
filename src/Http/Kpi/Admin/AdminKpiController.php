@@ -28,10 +28,12 @@ use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Billing\InvoiceRepository;
 use App\Domain\Kpi\KpiRepository;
 use App\Domain\Kpi\KpiResultRepository;
+use App\Domain\User\User;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AdminKpiController extends AbstractController
 {
@@ -171,12 +173,12 @@ class AdminKpiController extends AbstractController
     }
 
     #[Route('/kpi/calculate', name: 'admin_kpi_calculate', methods: ['POST'])]
-    public function calculateResults() : Response
+    public function calculateResults(#[CurrentUser] User $user) : Response
     {
         $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
         $today = new \DateTimeImmutable('today');
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
 
         foreach ($definitions as $definition) {
             $period = $definition['period'] ?? 'day';
