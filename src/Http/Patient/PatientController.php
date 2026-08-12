@@ -217,6 +217,19 @@ class PatientController extends AbstractController
         $this->denyAccessUnlessGranted('PATIENT_VIEW_ALL');
 
         $patients = $this->patientRepository->findAll();
+        $patients = array_map(static function ($patient) : array {
+            return [
+                'id' => $patient->getId(),
+                'first_name' => $patient->getFirstName(),
+                'last_name' => $patient->getLastName(),
+                'birth_date' => $patient->getBirthDate()?->format('Y-m-d'),
+                'gender' => $patient->getGender(),
+                'phone' => $patient->getPhone(),
+                'email' => $patient->getEmail(),
+                'address' => $patient->getAddress(),
+                'tax_id' => $patient->getTaxId(),
+            ];
+        }, $patients);
 
         $headers = !empty($patients) ? array_keys($patients[0]) : ['id', 'first_name', 'last_name', 'birth_date', 'gender', 'phone', 'email', 'address', 'tax_id'];
         if (empty($patients)) {
