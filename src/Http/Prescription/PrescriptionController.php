@@ -28,11 +28,13 @@ use App\Domain\Inventory\InventoryItemRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Prescription\PrescriptionRepository;
+use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class PrescriptionController extends AbstractController
 {
@@ -60,11 +62,10 @@ class PrescriptionController extends AbstractController
     }
 
     #[Route('/prescriptions', name: 'prescription_index', methods: ['GET'])]
-    public function index() : Response
+    public function index(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('PRESCRIPTION_VIEW');
         $searchTerm = $_GET['search'] ?? '';
-        $user = $this->getUser();
         $prescriptions = [];
 
         if ($this->isGranted('PRESCRIPTION_VIEW_ALL')) {
@@ -80,9 +81,9 @@ class PrescriptionController extends AbstractController
     }
 
     #[Route('/prescriptions/new', name: 'prescription_new', methods: ['GET'])]
-    public function create() : Response
+    public function create(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('PRESCRIPTION_CREATE', ['doctor_id' => $this->getUser()->getId()]);
+        $this->denyAccessUnlessGranted('PRESCRIPTION_CREATE', ['doctor_id' => $user->getId()]);
 
         $patientId = (int)($_GET['patient_id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -103,12 +104,12 @@ class PrescriptionController extends AbstractController
             'patient' => $patient,
             'doctors' => $doctorOptions,
             'medicalRecords' => $medicalRecords,
-            'currentDoctorId' => $this->getUser()->getId(),
+            'currentDoctorId' => $user->getId(),
         ]);
     }
 
     #[Route('/prescriptions/new', name: 'prescription_store', methods: ['POST'])]
-    public function store() : Response
+    public function store(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('PRESCRIPTION_CREATE', ['doctor_id' => $_POST['doctor_id'] ?? null]);
 
@@ -139,7 +140,7 @@ class PrescriptionController extends AbstractController
                 'patient' => $patient,
                 'doctors' => $doctorOptions,
                 'medicalRecords' => $medicalRecords,
-                'currentDoctorId' => $this->getUser()->getId(),
+                'currentDoctorId' => $user->getId(),
             ]);
         }
 
@@ -156,7 +157,7 @@ class PrescriptionController extends AbstractController
                         $this->inventoryItemRepository->decreaseQuantity(
                             $inventoryItem['id'],
                             $quantityToDeduct,
-                            $this->getUser()->getId(),
+                            $user->getId(),
                             'Виконання рецепту #' . $prescriptionId
                         );
                     }
