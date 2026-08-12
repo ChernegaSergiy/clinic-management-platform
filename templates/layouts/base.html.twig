@@ -5,8 +5,8 @@
 {% block brand %}Clinic Admin{% endblock %}
 
 {% block top_menu %}
-    {% if session.user is defined %}
-        {% set role = session.user.role_name|default('') %}
+    {% if app.user is not null %}
+        {% set role = app.user.role.name|default('') %}
         {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
@@ -36,7 +36,7 @@
                 <div class="item">Завантаження...</div>
             </div>
         </div>
-        <div class="item">Вітаю,&nbsp;<a href="/user/profile">{{ session.user.first_name }}</a></div>
+        <div class="item">Вітаю,&nbsp;<a href="/user/profile">{{ app.user.firstName }}</a></div>
         <a class="item" href="/logout">Вихід</a>
     {% else %}
         <a class="item" href="/login">Вхід</a>
@@ -44,8 +44,8 @@
 {% endblock %}
 
 {% block mobile_menu %}
-    {% if session.user is defined %}
-        {% set role = session.user.role_name|default('') %}
+    {% if app.user is not null %}
+        {% set role = app.user.role.name|default('') %}
         {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
@@ -93,8 +93,8 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% if session.user is defined %}
-        {% set role = session.user.role_name|default('') %}
+    {% if app.user is not null %}
+        {% set role = app.user.role.name|default('') %}
         {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
         {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
