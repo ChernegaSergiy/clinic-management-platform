@@ -85,7 +85,7 @@ class AppAppointmentController extends AbstractController
         if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
             $appointments = $this->appointmentRepository->findAll();
         } elseif ($this->isGranted('APPOINTMENT_VIEW_OWN')) {
-            if ($user && $user->getId()) {
+            if ($user->getId()) {
                 $appointments = $this->appointmentRepository->findByDoctorId($user->getId());
             }
         }
@@ -389,7 +389,7 @@ class AppAppointmentController extends AbstractController
                 $appointments = $this->appointmentRepository->findAll();
             }
         } elseif ($this->isGranted('APPOINTMENT_VIEW_OWN')) {
-            if ($user && $user->getId()) {
+            if ($user->getId()) {
                 if ($start && $end) {
                     $appointments = $this->appointmentRepository->findByDoctorIdAndDateRange($user->getId(), $start, $end);
                 } else {
