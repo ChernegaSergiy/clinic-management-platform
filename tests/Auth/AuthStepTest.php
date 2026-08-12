@@ -4,20 +4,34 @@ namespace App\Tests\Auth;
 
 use App\Auth\AuthStep;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthStepTest extends TestCase
 {
-    protected function setUp() : void
+    private function createSession(array $values = [], array $hasKeys = []) : SessionInterface
     {
-        unset($_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
-    }
+        $session = $this->createMock(SessionInterface::class);
 
-    protected function tearDown() : void
-    {
-        unset($_SESSION['mfa_required'], $_SESSION['mfa_pending_user_id']);
+        foreach ($values as $key => $value) {
+            $session->method('get')->with($key)->willReturn($value);
+        }
+
+        foreach ($hasKeys as $key) {
+            $session->method('has')->with($key)->willReturn(true);
+        }
+
+        $session->method('get')->willReturnCallback(function ($key, $default = null) use ($values) {
+            return $values[$key] ?? $default;
+        });
+
+        $session->method('has')->willReturnCallback(function ($key) use ($hasKeys) {
+            return in_array($key, $hasKeys, true);
+        });
+
+        return $session;
     }
 
     public function testCurrentReturnsAuthenticatedWhenUserIsSet() : void
@@ -35,21 +49,23 @@ class AuthStepTest extends TestCase
 
     public function testCurrentReturnsMfaSetupWhenMfaRequiredIsTrue() : void
     {
-        $_SESSION['mfa_required'] = true;
+        $session = $this->createSession(['mfa_required' => true]);
 
-        $this->assertSame(AuthStep::MFA_SETUP, AuthStep::current());
+        $this->assertSame(AuthStep::MFA_SETUP, AuthStep::current(null, $session));
     }
 
     public function testCurrentReturnsMfaVerifyWhenMfaPendingUserIdIsSet() : void
     {
-        $_SESSION['mfa_pending_user_id'] = 5;
+        $session = $this->createSession([], ['mfa_pending_user_id']);
 
-        $this->assertSame(AuthStep::MFA_VERIFY, AuthStep::current());
+        $this->assertSame(AuthStep::MFA_VERIFY, AuthStep::current(null, $session));
     }
 
     public function testCurrentReturnsCredentialsByDefault() : void
     {
-        $this->assertSame(AuthStep::CREDENTIALS, AuthStep::current());
+        $session = $this->createSession();
+
+        $this->assertSame(AuthStep::CREDENTIALS, AuthStep::current(null, $session));
     }
 
     public function testIsAuthorizedOnlyTrueForAuthenticated() : void
