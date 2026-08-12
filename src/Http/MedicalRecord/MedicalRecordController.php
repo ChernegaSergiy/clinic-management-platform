@@ -29,6 +29,7 @@ use App\Domain\ClinicalReference\IcdCodeRepository;
 use App\Domain\ClinicalReference\InterventionCodeRepository;
 use App\Domain\LabOrder\LabOrderRepository;
 use App\Domain\MedicalRecord\MedicalRecordRepository;
+use App\Domain\User\User;
 use App\Shared\Service\AttachmentService;
 use App\Shared\Service\AuditLogger;
 use App\Shared\Validation\Validator;
@@ -37,6 +38,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class MedicalRecordController extends AbstractController
 {
@@ -91,10 +93,9 @@ class MedicalRecordController extends AbstractController
     }
 
     #[Route('/medical-records', name: 'medical_records_index', methods: ['GET'])]
-    public function index() : Response
+    public function index(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
-        $user = $this->getUser();
         $searchTerm = $_GET['search'] ?? '';
         $records = [];
 
@@ -111,7 +112,7 @@ class MedicalRecordController extends AbstractController
     }
 
     #[Route('/medical-records/new', name: 'medical_records_new_post', methods: ['POST'])]
-    public function store() : Response
+    public function store(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('MEDICAL_RECORD_CREATE');
 
@@ -163,7 +164,7 @@ class MedicalRecordController extends AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $this->getUser()->getId()
+                        $user->getId()
                     );
                 }
             }
@@ -175,7 +176,7 @@ class MedicalRecordController extends AbstractController
     }
 
     #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
-    public function show() : Response
+    public function show(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
         $id = (int)($_GET['id'] ?? 0);
@@ -191,7 +192,7 @@ class MedicalRecordController extends AbstractController
             'view',
             null,
             null,
-            $this->getUser()->getId()
+            $user->getId()
         );
 
         $labOrders = $this->labOrderRepository->findByMedicalRecordId($id);
@@ -296,7 +297,7 @@ class MedicalRecordController extends AbstractController
     }
 
     #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
-    public function uploadAttachment() : Response
+    public function uploadAttachment(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
@@ -320,7 +321,7 @@ class MedicalRecordController extends AbstractController
                         $fileData,
                         'medical_record',
                         $medicalRecordId,
-                        $this->getUser()->getId()
+                        $user->getId()
                     );
                 }
             }
