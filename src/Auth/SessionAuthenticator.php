@@ -49,7 +49,7 @@ class SessionAuthenticator extends AbstractAuthenticator
     {
         $session = $request->getSession();
 
-        return $session && $session->has('user_id');
+        return $session->has('user_id');
     }
 
     public function authenticate(Request $request) : Passport
