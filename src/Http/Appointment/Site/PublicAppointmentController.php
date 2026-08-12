@@ -24,7 +24,6 @@
 
 namespace App\Http\Appointment\Site;
 
-use App\Domain\Appointment\AppointmentRepository;
 use App\Domain\Appointment\WaitlistRepository;
 use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
@@ -37,7 +36,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PublicAppointmentController extends AbstractController
 {
-    private AppointmentRepository $appointmentRepository;
     private WaitlistRepository $waitlistRepository;
     private PatientRepository $patientRepository;
     private UserRepository $userRepository;
@@ -46,7 +44,6 @@ class PublicAppointmentController extends AbstractController
     private Validator $validator;
 
     public function __construct(
-        AppointmentRepository $appointmentRepository,
         WaitlistRepository $waitlistRepository,
         PatientRepository $patientRepository,
         UserRepository $userRepository,
@@ -54,7 +51,6 @@ class PublicAppointmentController extends AbstractController
         ServiceRepository $serviceRepository,
         Validator $validator
     ) {
-        $this->appointmentRepository = $appointmentRepository;
         $this->waitlistRepository = $waitlistRepository;
         $this->patientRepository = $patientRepository;
         $this->userRepository = $userRepository;
