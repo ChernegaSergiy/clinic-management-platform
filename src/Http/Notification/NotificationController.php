@@ -25,9 +25,11 @@
 namespace App\Http\Notification;
 
 use App\Domain\Notification\NotificationRepository;
+use App\Domain\User\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class NotificationController extends AbstractController
 {
@@ -43,10 +45,10 @@ class NotificationController extends AbstractController
      * Query params: page (1-based), limit.
      */
     #[Route('/notifications', name: 'notifications_unread', methods: ['GET'])]
-    public function getUnread() : JsonResponse
+    public function getUnread(#[CurrentUser] User $user) : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -71,10 +73,10 @@ class NotificationController extends AbstractController
      * API endpoint to mark all notifications for the logged-in user as read.
      */
     #[Route('/notifications/mark-all-read', name: 'notifications_mark_all_read', methods: ['POST'])]
-    public function markAllRead() : JsonResponse
+    public function markAllRead(#[CurrentUser] User $user) : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
 
         $success = $this->notificationRepository->markAllAsReadByUserId($userId);
 
@@ -85,10 +87,10 @@ class NotificationController extends AbstractController
      * API endpoint to delete a notification for the logged-in user.
      */
     #[Route('/notifications/delete', name: 'notifications_delete', methods: ['POST'])]
-    public function delete() : JsonResponse
+    public function delete(#[CurrentUser] User $user) : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = $this->getUser()->getId();
+        $userId = $user->getId();
 
         $id = (int)($_POST['id'] ?? 0);
         $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);
