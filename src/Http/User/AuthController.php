@@ -36,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Security;
 
 class AuthController extends AbstractController
 {
@@ -47,6 +48,7 @@ class AuthController extends AbstractController
     private \App\Shared\Repository\SettingsRepository $settingsRepository;
     private Validator $validator;
     private EventDispatcherInterface $eventDispatcher;
+    private Security $security;
 
     public function __construct(
         UserRepository $userRepository,
@@ -56,7 +58,8 @@ class AuthController extends AbstractController
         \App\Shared\Repository\SettingsRepository $settingsRepository,
         OAuthController $oauthController,
         Validator $validator,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Security $security
     ) {
         $this->userRepository = $userRepository;
         $this->authConfigRepository = $authConfigRepository;
@@ -66,6 +69,7 @@ class AuthController extends AbstractController
         $this->oauthController = $oauthController;
         $this->validator = $validator;
         $this->eventDispatcher = $eventDispatcher;
+        $this->security = $security;
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
@@ -111,11 +115,17 @@ class AuthController extends AbstractController
         $role = $user ? $this->roleRepository->findById((int)$user['role_id']) : null;
 
         if ($user && password_verify($password, $user['password_hash'])) {
+            /** @var \App\Domain\User\User|null $userEntity */
+            $userEntity = $this->userRepository->find((int) $user['id']);
+
             $mfaService = $this->mfaService;
             $mfaPolicy = $this->settingsRepository->getMfaPolicy();
             $mfaForceRoles = $this->settingsRepository->getMfaForceRoles();
 
             if ('disabled' === $mfaPolicy) {
+                if ($userEntity) {
+                    $this->security->login($userEntity);
+                }
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'first_name' => $user['first_name'],
@@ -124,6 +134,7 @@ class AuthController extends AbstractController
                     'role_id' => $user['role_id'],
                     'role_name' => $role['name'] ?? null,
                 ];
+                $_SESSION['user_id'] = $user['id'];
                 $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
@@ -153,6 +164,9 @@ class AuthController extends AbstractController
                 return $this->redirectToRoute('mfa_verify');
             }
 
+            if ($userEntity) {
+                $this->security->login($userEntity);
+            }
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'first_name' => $user['first_name'],
@@ -161,6 +175,7 @@ class AuthController extends AbstractController
                 'role_id' => $user['role_id'],
                 'role_name' => $role['name'] ?? null,
             ];
+            $_SESSION['user_id'] = $user['id'];
             $this->eventDispatcher->dispatch(new UserLoggedInEvent($user['id'], $user['email']));
             $redirect = $_SESSION['intended_url'] ?? null;
             unset($_SESSION['intended_url']);
@@ -196,6 +211,7 @@ class AuthController extends AbstractController
         if ($userId && $userEmail) {
             $this->eventDispatcher->dispatch(new UserLoggedOutEvent($userId, $userEmail));
         }
+        $this->security->getTokenStorage()->setToken(null);
         session_destroy();
         return $this->redirectToRoute('dashboard_redirect');
     }
