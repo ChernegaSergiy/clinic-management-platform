@@ -32,28 +32,29 @@ use League\OAuth2\Client\Provider\Facebook;
 use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class OAuthController extends AbstractController
 {
     private AuthConfigRepository $authConfigRepository;
     private UserRepository $userRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
-    private Security $security;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         AuthConfigRepository $authConfigRepository,
         UserRepository $userRepository,
         UserOAuthIdentityRepository $userOAuthIdentityRepository,
-        Security $security
+        TokenStorageInterface $tokenStorage
     ) {
         $this->authConfigRepository = $authConfigRepository;
         $this->userRepository = $userRepository;
         $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function redirectToProvider(string $provider) : Response
@@ -98,28 +99,32 @@ class OAuthController extends AbstractController
             $email = $ownerDetails->getEmail();
 
             // 1. Check if user is already logged in (linking an existing account)
-            if (isset($_SESSION['user']['id'])) {
-                $userId = $_SESSION['user']['id'];
+            $currentToken = $this->tokenStorage->getToken();
+            if ($currentToken) {
+                $currentUser = $currentToken->getUser();
+                if ($currentUser instanceof \App\Domain\User\User) {
+                    $userId = $currentUser->getId();
 
-                // Check if this provider is already linked to the current user
-                $existingIdentity = $this->userOAuthIdentityRepository->findByUserIdAndProvider($userId, $provider);
+                    // Check if this provider is already linked to the current user
+                    $existingIdentity = $this->userOAuthIdentityRepository->findByUserIdAndProvider($userId, $provider);
 
-                if ($existingIdentity) {
-                    $_SESSION['info_message'] = sprintf('Ваш акаунт %s вже прив\'язано.', ucfirst($provider));
-                } else {
-                    // Check if this provider ID is already linked to ANOTHER user
-                    $anotherUserIdentity = $this->userOAuthIdentityRepository->findByProviderAndProviderId($provider, $providerId);
-                    if ($anotherUserIdentity && $anotherUserIdentity['user_id'] != $userId) {
-                        $_SESSION['errors'] = ['oauth' => sprintf('Цей акаунт %s вже прив\'язано до іншого користувача.', ucfirst($provider))];
-                        return $this->redirectToRoute('user_profile');
+                    if ($existingIdentity) {
+                        $_SESSION['info_message'] = sprintf('Ваш акаунт %s вже прив\'язано.', ucfirst($provider));
+                    } else {
+                        // Check if this provider ID is already linked to ANOTHER user
+                        $anotherUserIdentity = $this->userOAuthIdentityRepository->findByProviderAndProviderId($provider, $providerId);
+                        if ($anotherUserIdentity && $anotherUserIdentity['user_id'] != $userId) {
+                            $_SESSION['errors'] = ['oauth' => sprintf('Цей акаунт %s вже прив\'язано до іншого користувача.', ucfirst($provider))];
+                            return $this->redirectToRoute('user_profile');
+                        }
+
+                        // Link the account
+                        $this->userOAuthIdentityRepository->create($userId, $provider, $providerId);
+                        $_SESSION['success_message'] = sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider));
                     }
 
-                    // Link the account
-                    $this->userOAuthIdentityRepository->create($userId, $provider, $providerId);
-                    $_SESSION['success_message'] = sprintf('Ваш акаунт %s успішно прив\'язано.', ucfirst($provider));
+                    return $this->redirectToRoute('user_profile');
                 }
-
-                return $this->redirectToRoute('user_profile');
             }
 
             // 2. User is not logged in - try to find or create user based on OAuth identity
@@ -133,16 +138,10 @@ class OAuthController extends AbstractController
                     /** @var \App\Domain\User\User|null $userEntity */
                     $userEntity = $this->userRepository->find($user['id']);
                     if ($userEntity) {
-                        $this->security->login($userEntity);
+                        $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
+                        $this->tokenStorage->setToken($token);
                     }
 
-                    $_SESSION['user'] = [
-                        'id' => $user['id'],
-                        'first_name' => $user['first_name'],
-                        'last_name' => $user['last_name'],
-                        'email' => $user['email'],
-                        'role_id' => $user['role_id'],
-                    ];
                     $_SESSION['user_id'] = $user['id'];
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
@@ -162,16 +161,10 @@ class OAuthController extends AbstractController
                 /** @var \App\Domain\User\User|null $userEntity */
                 $userEntity = $this->userRepository->find($userByEmail['id']);
                 if ($userEntity) {
-                    $this->security->login($userEntity);
+                    $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
+                    $this->tokenStorage->setToken($token);
                 }
 
-                $_SESSION['user'] = [
-                    'id' => $userByEmail['id'],
-                    'first_name' => $userByEmail['first_name'],
-                    'last_name' => $userByEmail['last_name'],
-                    'email' => $userByEmail['email'],
-                    'role_id' => $userByEmail['role_id'],
-                ];
                 $_SESSION['user_id'] = $userByEmail['id'];
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
