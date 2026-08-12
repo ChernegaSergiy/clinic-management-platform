@@ -35,21 +35,25 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Security;
 
 class OAuthController extends AbstractController
 {
     private AuthConfigRepository $authConfigRepository;
     private UserRepository $userRepository;
     private UserOAuthIdentityRepository $userOAuthIdentityRepository;
+    private Security $security;
 
     public function __construct(
         AuthConfigRepository $authConfigRepository,
         UserRepository $userRepository,
-        UserOAuthIdentityRepository $userOAuthIdentityRepository
+        UserOAuthIdentityRepository $userOAuthIdentityRepository,
+        Security $security
     ) {
         $this->authConfigRepository = $authConfigRepository;
         $this->userRepository = $userRepository;
         $this->userOAuthIdentityRepository = $userOAuthIdentityRepository;
+        $this->security = $security;
     }
 
     public function redirectToProvider(string $provider) : Response
@@ -126,7 +130,12 @@ class OAuthController extends AbstractController
             if ($oauthIdentity) {
                 $user = $this->userRepository->findById($oauthIdentity['user_id']);
                 if ($user) {
-                    // Log in the user
+                    /** @var \App\Domain\User\User|null $userEntity */
+                    $userEntity = $this->userRepository->find($user['id']);
+                    if ($userEntity) {
+                        $this->security->login($userEntity);
+                    }
+
                     $_SESSION['user'] = [
                         'id' => $user['id'],
                         'first_name' => $user['first_name'],
@@ -134,6 +143,7 @@ class OAuthController extends AbstractController
                         'email' => $user['email'],
                         'role_id' => $user['role_id'],
                     ];
+                    $_SESSION['user_id'] = $user['id'];
                     $redirect = $_SESSION['intended_url'] ?? null;
                     unset($_SESSION['intended_url']);
                     if ($redirect) {
@@ -147,9 +157,14 @@ class OAuthController extends AbstractController
             // If no user found by OAuth identity, try to find by email
             $userByEmail = $this->userRepository->findByEmail($email);
             if ($userByEmail) {
-                // User exists with this email, link the OAuth identity
                 $this->userOAuthIdentityRepository->create($userByEmail['id'], $provider, $providerId);
-                // Log in the user
+
+                /** @var \App\Domain\User\User|null $userEntity */
+                $userEntity = $this->userRepository->find($userByEmail['id']);
+                if ($userEntity) {
+                    $this->security->login($userEntity);
+                }
+
                 $_SESSION['user'] = [
                     'id' => $userByEmail['id'],
                     'first_name' => $userByEmail['first_name'],
@@ -157,6 +172,7 @@ class OAuthController extends AbstractController
                     'email' => $userByEmail['email'],
                     'role_id' => $userByEmail['role_id'],
                 ];
+                $_SESSION['user_id'] = $userByEmail['id'];
                 $redirect = $_SESSION['intended_url'] ?? null;
                 unset($_SESSION['intended_url']);
                 if ($redirect) {
