@@ -211,7 +211,7 @@ class AuthController extends AbstractController
         }
         $this->tokenStorage->setToken(null);
         $request->getSession()->invalidate();
-        return $this->redirectToRoute('dashboard_redirect');
+        return $this->redirectToRoute('login_form');
     }
 
     #[Route('/dashboard-redirect', name: 'dashboard_redirect', methods: ['GET'])]
