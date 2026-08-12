@@ -30,12 +30,14 @@ use App\Domain\Billing\ServiceRepository;
 use App\Domain\Patient\PatientRepository;
 use App\Domain\Room\RoomRepository;
 use App\Domain\Schedule\SchedulingService;
+use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Shared\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AppAppointmentController extends AbstractController
 {
@@ -72,10 +74,9 @@ class AppAppointmentController extends AbstractController
     }
 
     #[Route('/appointments', name: 'appointment_index', methods: ['GET'])]
-    public function index() : Response
+    public function index(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
-        $user = $this->getUser();
         $doctors = $this->userRepository->findAllDoctors();
         $services = $this->serviceRepository->findAll();
         $waitlist = $this->waitlistRepository->getWaitlistEntries();
@@ -123,11 +124,9 @@ class AppAppointmentController extends AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_create', methods: ['GET'])]
-    public function create() : Response
+    public function create(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
-
-        $user = $this->getUser();
 
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
@@ -214,11 +213,10 @@ class AppAppointmentController extends AbstractController
     }
 
     #[Route('/appointments/new', name: 'appointment_store', methods: ['POST'])]
-    public function store() : Response
+    public function store(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_CREATE');
 
-        $user = $this->getUser();
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
         if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL') && $user->getId() !== $submittedDoctorId) {
@@ -377,10 +375,9 @@ class AppAppointmentController extends AbstractController
     }
 
     #[Route('/api/appointments', name: 'appointment_json', methods: ['GET'])]
-    public function getAppointmentsJson() : Response
+    public function getAppointmentsJson(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
-        $user = $this->getUser();
         $start = $_GET['start'] ?? null;
         $end = $_GET['end'] ?? null;
         $appointments = [];
@@ -451,7 +448,7 @@ class AppAppointmentController extends AbstractController
     }
 
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
-    public function edit() : Response
+    public function edit(#[CurrentUser] User $user) : Response
     {
         $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
@@ -462,7 +459,6 @@ class AppAppointmentController extends AbstractController
             return new Response("Запис не знайдено", 404);
         }
 
-        $user = $this->getUser();
         $patients = $this->patientRepository->findAllActive();
         $doctors = $this->userRepository->findAllDoctors();
         $rooms = $this->roomRepository->findAll();
