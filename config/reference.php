@@ -125,30 +125,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     ...<string, DefinitionType|AliasType|PrototypeType|StackType|ArgumentsType|null>
  * }
  * @psalm-type ExtensionType = array<string, mixed>
- * @psalm-type AppointmentConfig = array{
- *     features?: array{
- *         waitlist?: bool|Param, // Default: true
- *         api?: bool|Param, // Default: true
- *     },
- * }
- * @psalm-type DashboardConfig = array{
- *     features?: array{
- *         export?: bool|Param, // Default: true
- *     },
- * }
- * @psalm-type PatientConfig = array{
- *     features?: array{
- *         insurance?: bool|Param, // Default: true
- *         policies?: bool|Param, // Default: true
- *         export?: bool|Param, // Default: true
- *     },
- * }
- * @psalm-type UserConfig = array{
- *     features?: array{
- *         oauth?: bool|Param, // Default: true
- *         profile_photo?: bool|Param, // Default: true
- *     },
- * }
  * @psalm-type DoctrineConfig = array{
  *     dbal?: array{
  *         default_connection?: scalar|Param|null,
@@ -1315,10 +1291,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
  *     services?: ServicesConfig,
- *     appointment?: AppointmentConfig,
- *     dashboard?: DashboardConfig,
- *     patient?: PatientConfig,
- *     user?: UserConfig,
  *     doctrine?: DoctrineConfig,
  *     doctrine_migrations?: DoctrineMigrationsConfig,
  *     framework?: FrameworkConfig,
@@ -1328,10 +1300,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
- *         appointment?: AppointmentConfig,
- *         dashboard?: DashboardConfig,
- *         patient?: PatientConfig,
- *         user?: UserConfig,
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         framework?: FrameworkConfig,
@@ -1342,10 +1310,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
- *         appointment?: AppointmentConfig,
- *         dashboard?: DashboardConfig,
- *         patient?: PatientConfig,
- *         user?: UserConfig,
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         framework?: FrameworkConfig,
@@ -1356,10 +1320,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
- *         appointment?: AppointmentConfig,
- *         dashboard?: DashboardConfig,
- *         patient?: PatientConfig,
- *         user?: UserConfig,
  *         doctrine?: DoctrineConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         framework?: FrameworkConfig,
