@@ -30,7 +30,7 @@
         {% endif %}
 
         <div style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">
-            <form method="POST" action="/book-appointment" style="display: grid; gap: 1rem;">
+            <form method="POST" action="{{ path('appointment_submit_public_form') }}" style="display: grid; gap: 1rem;">
                 <input type="hidden" name="start_time" id="start_time_hidden">
                 <input type="hidden" name="end_time" id="end_time_hidden">
 
@@ -96,7 +96,7 @@
                 
                 <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
                     <button type="submit" id="save-button" class="btn btn--primary" disabled>Підтвердити запис</button>
-                    <a href="/" class="btn btn--ghost">На головну</a>
+                    <a href="{{ path('site_home') }}" class="btn btn--ghost">На головну</a>
                 </div>
             </form>
         </div>

@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.users.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/users/new" class="ui primary button">
+                <a href="{{ path('admin_users_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.users.add'|trans }}
                 </a>
             </div>
@@ -18,7 +18,7 @@
 
         <div class="ui divider"></div>
 
-        <form class="ui form" method="get" action="/admin/users">
+        <form class="ui form" method="get" action="{{ path('admin_users') }}">
             <div class="field">
                 <div class="ui icon input">
                     <input type="text" name="search" value="{{ searchTerm|default('') }}" placeholder="{{ 'admin.users.search_placeholder'|trans }}">
@@ -55,21 +55,21 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/admin/users/show?id={{ user.id }}" class="ui icon button">
+                            <a href="{{ path('admin_users_show', {'id': user.id}) }}" class="ui icon button">
                                 <i class="eye icon"></i>
                             </a>
-                            <a href="/admin/users/edit?id={{ user.id }}" class="ui icon button">
+                            <a href="{{ path('admin_users_edit_post', {'id': user.id}) }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
                             {% if user.mfa_enabled %}
-                                <form action="/admin/users/disable-mfa" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.mfa.disable_confirm'|trans }}');">
+                                <form action="{{ path('admin_users_disable_mfa') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.mfa.disable_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ user.id }}">
                                     <button type="submit" class="ui icon button orange" title="{{ 'admin.users.mfa.disable_title'|trans }}">
                                         <i class="shield icon"></i>
                                     </button>
                                 </form>
                             {% endif %}
-                            <form action="/admin/users/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.delete_confirm'|trans }}');">
+                            <form action="{{ path('admin_users_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.users.delete_confirm'|trans }}');">
                                 <input type="hidden" name="id" value="{{ user.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>

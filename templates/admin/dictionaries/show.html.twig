@@ -9,10 +9,10 @@
         <p>{{ dictionary.description|default('—') }}</p>
         <p><strong>{{ 'admin.dictionaries.show.type'|trans }}:</strong> {{ dictionary.type }}</p>
         <div class="ui divider"></div>
-        <a href="/admin/dictionaries" class="ui button">
+        <a href="{{ path('admin_dictionaries') }}" class="ui button">
             <i class="arrow left icon"></i> {{ 'admin.dictionaries.show.back'|trans }}
         </a>
-        <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui primary button">
+        <a href="{{ path('admin_dictionaries_edit_post', {'id': dictionary.id}) }}" class="ui primary button">
             <i class="edit icon"></i> {{ 'admin.dictionaries.edit'|trans }}
         </a>
     </div>
@@ -23,7 +23,7 @@
                 <h3 class="ui header">{{ 'admin.dictionaries.show.values_header'|trans }}</h3>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/dictionaries/values/new?dictionary_id={{ dictionary.id }}" class="ui green button">
+                <a href="{{ path('admin_dictionaries_values_new_post', {'dictionary_id': dictionary.id}) }}" class="ui green button">
                     <i class="plus icon"></i> {{ 'admin.dictionaries.show.add_value'|trans }}
                 </a>
             </div>
@@ -58,10 +58,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/admin/dictionaries/values/edit?id={{ value.id }}" class="ui icon button">
+                                <a href="{{ path('admin_dictionaries_values_edit_post', {'id': value.id}) }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/dictionaries/values/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.dictionaries.show.delete_confirm'|trans }}');">
+                                <form action="{{ path('admin_dictionaries_values_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.dictionaries.show.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ value.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

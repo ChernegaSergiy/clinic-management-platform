@@ -26,7 +26,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('news.admin.edit.update'|trans, 'primary', '', 'save') }}
-            <a href="/admin/news" class="ui button"><i class="arrow left icon"></i> {{ 'news.admin.edit.cancel'|trans }}</a>
+            <a href="{{ path('admin_news_index') }}" class="ui button"><i class="arrow left icon"></i> {{ 'news.admin.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

@@ -8,7 +8,7 @@
         <h2 class="ui header">{{ 'admin.settings.title'|trans }}</h2>
         <div class="ui divider"></div>
 
-        <form action="/admin/settings" method="POST" class="ui form">
+        <form action="{{ path('admin_settings_post') }}" method="POST" class="ui form">
             <h3 class="ui header">{{ 'admin.settings.general_info'|trans }}</h3>
             <div class="field">
                 <label for="clinic_name">{{ 'admin.settings.clinic_name'|trans }}</label>

@@ -12,13 +12,13 @@
                 <h3 class="ui header">{{ 'clinical_reference.icd_title'|trans }}</h3>
                 <p>{{ 'clinical_reference.icd_description'|trans }}</p>
                 <p>{{ 'clinical_reference.icd_records_count'|trans }}: <strong>{{ icdCount }}</strong></p>
-                <a href="/admin/clinical/icd-import" class="ui primary button">{{ 'clinical_reference.icd_manage_import'|trans }}</a>
+                <a href="{{ path('clinical_icd_import_run') }}" class="ui primary button">{{ 'clinical_reference.icd_manage_import'|trans }}</a>
             </div>
             <div class="column">
                 <h3 class="ui header">{{ 'clinical_reference.intervention_title'|trans }}</h3>
                 <p>{{ 'clinical_reference.intervention_description'|trans }}</p>
                 <p>{{ 'clinical_reference.icd_records_count'|trans }}: <strong>{{ interventionCount }}</strong></p>
-                <a href="/admin/clinical/intervention-import" class="ui primary button">{{ 'clinical_reference.intervention_manage_import'|trans }}</a>
+                <a href="{{ path('clinical_intervention_import_run') }}" class="ui primary button">{{ 'clinical_reference.intervention_manage_import'|trans }}</a>
             </div>
         </div>
 

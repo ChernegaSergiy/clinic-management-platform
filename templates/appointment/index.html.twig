@@ -10,10 +10,10 @@
                 <h2 class="ui header">{{ 'appointment.calendar.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/appointments/waitlist" class="ui orange button" style="margin-right: 0.5rem;">
+                <a href="{{ path('appointment_waitlist') }}" class="ui orange button" style="margin-right: 0.5rem;">
                     <i class="list icon"></i> {{ 'appointment.calendar.waitlist'|trans }} ({{ waitlist|length }})
                 </a>
-                <a href="/appointments/new" class="ui primary button">
+                <a href="{{ path('appointment_create') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'appointment.calendar.create'|trans }}
                 </a>
             </div>

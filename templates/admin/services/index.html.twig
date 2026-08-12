@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.services.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/services/new" class="ui primary button">
+                <a href="{{ path('admin_services_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.services.add'|trans }}
                 </a>
             </div>
@@ -46,10 +46,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/admin/services/edit?id={{ service.id }}" class="ui icon button">
+                            <a href="{{ path('admin_services_edit_post', {'id': service.id}) }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
-                            <form action="/admin/services/delete" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю послугу?');">
+                            <form action="{{ path('admin_services_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю послугу?');">
                                 <input type="hidden" name="id" value="{{ service.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>

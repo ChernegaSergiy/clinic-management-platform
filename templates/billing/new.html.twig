@@ -26,7 +26,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('billing.new.save_button'|trans, 'primary', '', 'save') }}
-            <a href="/billing" class="ui button"><i class="arrow left icon"></i> {{ 'billing.new.cancel_button'|trans }}</a>
+            <a href="{{ path('billing_index') }}" class="ui button"><i class="arrow left icon"></i> {{ 'billing.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

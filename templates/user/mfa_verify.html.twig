@@ -22,7 +22,7 @@
                     </div>
                 {% endif %}
 
-                <form method="POST" action="/user/mfa/verify" style="display: grid; gap: 1rem;" autocomplete="off">
+                <form method="POST" action="{{ path('mfa_verify_post') }}" style="display: grid; gap: 1rem;" autocomplete="off">
                     <div>
                         <label class="booking-label">{{ 'user.mfa.mfa_verify.code_label'|trans }}</label>
                         <input class="booking-input" type="text" name="code" placeholder="{{ 'user.mfa.mfa_verify.code_placeholder'|trans }}" required autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 700;" autofocus>
@@ -36,7 +36,7 @@
                     <span style="background: var(--color-bg-alt); padding: 0 0.5rem; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);">{{ 'user.mfa.mfa_verify.or_separator'|trans }}</span>
                 </div>
 
-                <form method="GET" action="/logout" style="display: grid; gap: 0.8rem;">
+                <form method="GET" action="{{ path('logout') }}" style="display: grid; gap: 0.8rem;">
                     <button type="submit" class="btn btn--ghost" style="width: 100%;">{{ 'user.mfa.mfa_verify.logout_button'|trans }}</button>
                 </form>
 
@@ -46,7 +46,7 @@
 
                 <div id="backup-code-field" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: var(--border-thin);">
                     <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">{{ 'user.mfa.mfa_verify.backup_code_instructions'|trans }}</p>
-                    <form method="POST" action="/user/mfa/verify" style="display: grid; gap: 0.8rem;">
+                    <form method="POST" action="{{ path('mfa_verify_post') }}" style="display: grid; gap: 0.8rem;">
                         <div>
                             <input class="booking-input" type="text" name="code" placeholder="{{ 'user.mfa.mfa_verify.backup_code_placeholder'|trans }}" required autocomplete="off">
                         </div>

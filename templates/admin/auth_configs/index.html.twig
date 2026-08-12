@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.auth_configs.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/auth_configs/new" class="ui primary button">
+                <a href="{{ path('admin_auth_configs_new') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.auth_configs.list.add'|trans }}
                 </a>
             </div>
@@ -49,7 +49,7 @@
                                 <a href="/admin/auth_configs/edit?id={{ config.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/auth_configs/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.auth_configs.list.delete_confirm'|trans }}');">
+                                <form action="{{ path('admin_auth_configs_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.auth_configs.list.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ config.id }}">
                             <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

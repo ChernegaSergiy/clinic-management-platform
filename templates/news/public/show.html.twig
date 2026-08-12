@@ -5,7 +5,7 @@
 {% block body %}
     <section class="section">
         <div class="container" style="max-width: 800px; padding: 2rem 0;">
-            <a href="/news" class="btn btn--ghost" style="margin-bottom: 1.5rem;">{{ 'news.public.show.back'|trans }}</a>
+            <a href="{{ path('news_index') }}" class="btn btn--ghost" style="margin-bottom: 1.5rem;">{{ 'news.public.show.back'|trans }}</a>
 
             {% if newsArticle %}
                 <div class="news-detail" style="border: var(--border-medium); background: var(--color-bg-alt); padding: 1.5rem;">

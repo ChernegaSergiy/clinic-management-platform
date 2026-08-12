@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.backup_policies.index.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/backup_policies/new" class="ui primary button">
+                <a href="{{ path('admin_backup_policies_new') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.backup_policies.index.add_policy'|trans }}
                 </a>
             </div>
@@ -52,7 +52,7 @@
                                 <a href="/admin/backup_policies/edit?id={{ policy.id }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/backup_policies/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.backup_policies.index.delete_confirm'|trans }}');">
+                                <form action="{{ path('admin_backup_policies_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.backup_policies.index.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ policy.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

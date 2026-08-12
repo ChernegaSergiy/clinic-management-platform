@@ -16,7 +16,7 @@
         
         <div class="ui divider"></div>
         
-        <form class="ui form" method="POST" action="/admin/schedules/update">
+        <form class="ui form" method="POST" action="{{ path('admin_schedules_update') }}">
             <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
             
             <div class="ui four column grid">
@@ -56,7 +56,7 @@
                          <i class="save icon"></i>
                          {{ 'schedule.edit.save'|trans }}
                      </button>
-                     <a href="/admin/schedules/show?id={{ doctor.id }}" class="ui button">
+                     <a href="{{ path('admin_schedules_show', {'id': doctor.id}) }}" class="ui button">
                          <i class="arrow left icon"></i>
                          {{ 'schedule.edit.cancel'|trans }}
                      </a>

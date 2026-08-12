@@ -26,7 +26,7 @@
                     </div>
                 {% endif %}
 
-                <form method="POST" action="/login" style="display: grid; gap: 1rem;" autocomplete="on">
+                <form method="POST" action="{{ path('login_post') }}" style="display: grid; gap: 1rem;" autocomplete="on">
                     <div>
                         <label class="booking-label">{{ 'user.login.email'|trans }}</label>
                         <input class="booking-input" type="email" name="email" value="{{ old.email ?? '' }}" placeholder="{{ 'user.login.email_placeholder'|trans }}" required autocomplete="email">

@@ -30,7 +30,7 @@
                     {% else %}
                         <img class="ui medium circular image" src="/assets/images/default_user.png" alt="{{ 'user.profile.profile_photo_alt'|trans }}">
                     {% endif %}
-                    <form action="/user/profile/upload-photo" method="POST" enctype="multipart/form-data" class="ui form" style="margin-top: 15px;">
+                    <form action="{{ path('user_profile_photo') }}" method="POST" enctype="multipart/form-data" class="ui form" style="margin-top: 15px;">
                         <div class="field">
                             <label>{{ 'user.profile.change_photo'|trans }}</label>
                             <div class="ui action input">
@@ -137,12 +137,12 @@
                             </div>
                         </div>
 
-                        <a href="/user/mfa/clear-backup-codes" class="ui primary button">{{ 'user.profile.understood_button'|trans }}</a>
+                        <a href="{{ path('mfa_clear_backup_codes') }}" class="ui primary button">{{ 'user.profile.understood_button'|trans }}</a>
 
                         <div class="ui divider"></div>
                     {% endif %}
 
-                    <form action="/user/mfa/regenerate-backup-codes" method="POST" onsubmit="return confirm('{{ 'user.profile.regenerate_backup_codes_confirm'|trans }}');">
+                    <form action="{{ path('mfa_regenerate_backup_codes') }}" method="POST" onsubmit="return confirm('{{ 'user.profile.regenerate_backup_codes_confirm'|trans }}');">
                         <div class="ui form">
                             <div class="required field">
                                 <label for="mfa-password">{{ 'user.profile.password_confirmation_label'|trans }}</label>
@@ -175,7 +175,7 @@
                                 </div>
                             </div>
                             <div class="extra content">
-                                <a href="/user/mfa/setup/totp" class="ui primary fluid button">
+                                <a href="{{ path('mfa_setup', {'type': 'totp'}) }}" class="ui primary fluid button">
                                     <i class="shield icon"></i>
                                     {{ 'user.profile.enable_totp_button'|trans }}
                                 </a>
@@ -191,7 +191,7 @@
                                 </div>
                             </div>
                             <div class="extra content">
-                                <a href="/user/mfa/setup/hotp" class="ui primary fluid button">
+                                <a href="{{ path('mfa_setup', {'type': 'hotp'}) }}" class="ui primary fluid button">
                                     <i class="shield icon"></i>
                                     {{ 'user.profile.enable_hotp_button'|trans }}
                                 </a>
@@ -251,7 +251,7 @@
                 <div class="header">{{ 'user.profile.warning_header'|trans }}</div>
                 <p>{{ 'user.profile.disable_mfa_warning'|trans }}</p>
             </div>
-            <form action="/user/mfa/disable" method="POST" id="disable-mfa-form">
+            <form action="{{ path('mfa_disable') }}" method="POST" id="disable-mfa-form">
                 <div class="ui form">
                     <div class="required field">
                         <label>{{ 'user.profile.modal_password_label'|trans }}</label>

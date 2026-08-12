@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'admin.users.new.title'|trans }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/users/new">
+        <form class="ui form" method="POST" action="{{ path('admin_users_new_post') }}">
             <div class="two fields">
                 {{ forms.input('first_name', 'admin.users.new.first_name'|trans, old.first_name ?? null, 'text', 'admin.users.new.first_name_placeholder'|trans, errors.first_name ?? null, {'required': 'required'})
  }}
@@ -26,7 +26,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('admin.users.new.save'|trans, 'primary', '', 'save') }}
-            <a href="/admin/users" class="ui button"><i class="arrow left icon"></i> {{ 'admin.users.new.cancel'|trans }}</a>
+            <a href="{{ path('admin_users') }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.users.new.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

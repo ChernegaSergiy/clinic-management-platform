@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.service_categories.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/service-categories/new" class="ui primary button">
+                <a href="{{ path('admin_service_categories_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.service_categories.list.add_category'|trans }}
                 </a>
             </div>
@@ -34,10 +34,10 @@
                         <td>{{ category.name }}</td>
                         <td>{{ category.description ?? '-' }}</td>
                         <td>
-                            <a href="/admin/service-categories/edit?id={{ category.id }}" class="ui icon button">
+                            <a href="{{ path('admin_service_categories_edit_post', {'id': category.id}) }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
-                            <form action="/admin/service-categories/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.service_categories.list.confirm_delete'|trans }}');">
+                            <form action="{{ path('admin_service_categories_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.service_categories.list.confirm_delete'|trans }}');">
                                 <input type="hidden" name="id" value="{{ category.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>

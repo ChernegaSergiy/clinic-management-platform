@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'admin.dictionary_values.edit.title_full'|trans({'%id%': value.id}) }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/dictionaries/values/edit?id={{ value.id }}">
+        <form class="ui form" method="POST" action="{{ path('admin_dictionaries_values_edit_post', {'id': value.id}) }}">
             <input type="hidden" name="dictionary_id" value="{{ value.dictionary_id }}">
             {{ forms.input('label', 'admin.dictionary_values.edit.label'|trans, old.label ?? value.label, 'text', 'admin.dictionary_values.edit.label_placeholder'|trans, errors.label ?? null, {'required': 'required'}) }}
             {{ forms.input('value', 'admin.dictionary_values.edit.value'|trans, old.value ?? value.value, 'text', 'admin.dictionary_values.edit.value_placeholder'|trans, errors.value ?? null, {'required': 'required'}) }}
@@ -24,7 +24,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('admin.dictionary_values.edit.save'|trans, 'primary', '', 'save') }}
-            <a href="/admin/dictionaries/show?id={{ value.dictionary_id }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.dictionary_values.edit.cancel'|trans }}</a>
+            <a href="{{ path('admin_dictionaries_show', {'id': value.dictionary_id}) }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.dictionary_values.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

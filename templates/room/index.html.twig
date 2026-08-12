@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'room.list.header'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/rooms/new" class="ui primary button">
+                <a href="{{ path('admin_rooms_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'room.list.add_room'|trans }}
                 </a>
             </div>
@@ -46,13 +46,13 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="/admin/rooms/show?id={{ room.id }}" class="ui icon button">
+                            <a href="{{ path('admin_rooms_show_get', {'id': room.id}) }}" class="ui icon button">
                                 <i class="eye icon"></i>
                             </a>
-                            <a href="/admin/rooms/edit?id={{ room.id }}" class="ui icon button">
+                            <a href="{{ path('admin_rooms_edit_post', {'id': room.id}) }}" class="ui icon button">
                                 <i class="edit icon"></i>
                             </a>
-                            <form action="/admin/rooms/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'room.list.confirm_delete'|trans }}');">
+                            <form action="{{ path('admin_rooms_delete_post') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'room.list.confirm_delete'|trans }}');">
                                 <input type="hidden" name="id" value="{{ room.id }}">
                                 <button type="submit" class="ui icon button red">
                                     <i class="trash icon"></i>

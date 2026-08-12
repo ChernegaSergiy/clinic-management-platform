@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'admin.auth_configs.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/auth_configs/new">
+        <form class="ui form" method="POST" action="{{ path('admin_auth_configs_new_post') }}">
             <div class="field {% if errors.provider ?? null %}error{% endif %}">
                 <label>{{ 'admin.auth_configs.new.provider'|trans }}</label>
                 <select name="provider" class="ui fluid dropdown" required>
@@ -35,7 +35,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('admin.auth_configs.new.save_button'|trans, 'primary', '', 'save') }}
-            <a href="/admin/auth_configs" class="ui button"><i class="arrow left icon"></i> {{ 'admin.auth_configs.new.cancel_button'|trans }}</a>
+            <a href="{{ path('admin_auth_configs') }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.auth_configs.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

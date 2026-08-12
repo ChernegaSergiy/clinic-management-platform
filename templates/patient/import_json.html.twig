@@ -43,7 +43,7 @@
             </div>
 
             {{ ui.button('patient.import_json.import_button'|trans, 'primary', 'large', 'upload') }}
-            <a href="/patients" class="ui button">
+            <a href="{{ path('patient_index') }}" class="ui button">
                 <i class="arrow left icon"></i> {{ 'patient.import_json.cancel_button'|trans }}
             </a>
         </form>

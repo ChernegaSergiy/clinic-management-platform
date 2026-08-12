@@ -9,7 +9,7 @@
 
         <div class="ui divider"></div>
 
-        <form class="ui form" action="/appointments/analytics" method="GET">
+        <form class="ui form" action="{{ path('appointment_load_analytics') }}" method="GET">
             <div class="field">
                 <label>{{ 'appointment.analytics.date_label'|trans }}</label>
                 <input type="date" name="date" value="{{ date }}">

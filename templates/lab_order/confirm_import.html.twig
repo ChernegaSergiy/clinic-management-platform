@@ -50,7 +50,7 @@
 
             <form class="ui form" action="/lab-orders/import/finalize" method="POST">
                 <button class="ui green button" type="submit">{{ 'lab_order.confirm_import.confirm_button'|trans }}</button>
-                <a href="/lab-orders/import" class="ui button">
+                <a href="{{ path('lab_orders_import') }}" class="ui button">
                     <i class="arrow left icon"></i> {{ 'lab_order.confirm_import.cancel_button'|trans }}
                 </a>
             </form>

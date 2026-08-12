@@ -46,10 +46,10 @@
 
         <div class="ui divider"></div>
 
-        <a href="/admin/rooms/edit?id={{ room.id }}" class="ui primary button">
+        <a href="{{ path('admin_rooms_edit_post', {'id': room.id}) }}" class="ui primary button">
             <i class="edit icon"></i> {{ 'room.show.edit'|trans }}
         </a>
-        <a href="/admin/rooms" class="ui button">
+        <a href="{{ path('admin_rooms_index') }}" class="ui button">
             <i class="arrow left icon"></i> {{ 'room.show.back'|trans }}
         </a>
     </div>

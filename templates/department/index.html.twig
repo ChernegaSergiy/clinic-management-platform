@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'department.list.header'|trans }}</h2>
             </div>
             <div class="four wide column right aligned">
-                <a href="/admin/departments/new" class="ui primary button">
+                <a href="{{ path('admin_departments_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'department.list.add_department'|trans }}
                 </a>
             </div>
@@ -64,19 +64,19 @@
                             </td>
                             <td>{{ department.sort_order }}</td>
                             <td>
-                                <a href="/admin/departments/show?id={{ department.id }}" class="ui icon button">
+                                <a href="{{ path('admin_departments_show', {'id': department.id}) }}" class="ui icon button">
                                     <i class="eye icon"></i>
                                 </a>
-                                <a href="/admin/departments/edit?id={{ department.id }}" class="ui icon button">
+                                <a href="{{ path('admin_departments_edit_post', {'id': department.id}) }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form method="POST" action="/admin/departments/toggle-status" style="display: inline-block;">
+                                <form method="POST" action="{{ path('admin_departments_toggle_status') }}" style="display: inline-block;">
                                     <input type="hidden" name="id" value="{{ department.id }}">
                                     <button type="submit" class="ui icon button {% if department.is_active %}orange{% else %}green{% endif %}">
                                         <i class="power off icon"></i>
                                     </button>
                                 </form>
-                                <form method="POST" action="/admin/departments/delete" style="display: inline-block;" 
+                                <form method="POST" action="{{ path('admin_departments_delete') }}" style="display: inline-block;" 
                                       onsubmit="return confirm('{{ 'department.list.confirm_delete'|trans }}');">
                                     <input type="hidden" name="id" value="{{ department.id }}">
                                     <button type="submit" class="ui icon button red">

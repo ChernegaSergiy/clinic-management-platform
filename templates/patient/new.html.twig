@@ -32,7 +32,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('patient.new.save'|trans, 'primary', '', 'save') }}
-            <a href="/patients" class="ui button"><i class="arrow left icon"></i> {{ 'patient.new.cancel'|trans }}</a>
+            <a href="{{ path('patient_index') }}" class="ui button"><i class="arrow left icon"></i> {{ 'patient.new.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

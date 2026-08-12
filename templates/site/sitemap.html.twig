@@ -16,19 +16,19 @@
                         <article class="contact-block"> {# Using contact-block for content grouping #}
                             <div class="contact-block__title">Публічні сторінки</div>
                             <ul class="time-table"> {# Re-using time-table for list styling #}
-                                <li><a href="/">Головна</a></li>
-                                <li><a href="/about">Про клініку</a></li>
-                                <li><a href="/contact">Контакти</a></li>
-                                <li><a href="/book-appointment">Записатися</a></li>
-                                <li><a href="/privacy">Політика конфіденційності</a></li>
+                                <li><a href="{{ path('site_home') }}">Головна</a></li>
+                                <li><a href="{{ path('site_about') }}">Про клініку</a></li>
+                                <li><a href="{{ path('site_contact') }}">Контакти</a></li>
+                                <li><a href="{{ path('appointment_submit_public_form') }}">Записатися</a></li>
+                                <li><a href="{{ path('site_privacy') }}">Політика конфіденційності</a></li>
                             </ul>
                         </article>
                         <article class="contact-block"> {# Using contact-block for content grouping #}
                             <div class="contact-block__title">Службові</div>
                             <ul class="time-table"> {# Re-using time-table for list styling #}
-                                <li><a href="/login">Вхід для персоналу</a></li>
-                                <li><a href="/appointments">Календар записів</a></li>
-                                <li><a href="/dashboard">Панель</a></li>
+                                <li><a href="{{ path('login_post') }}">Вхід для персоналу</a></li>
+                                <li><a href="{{ path('appointment_index') }}">Календар записів</a></li>
+                                <li><a href="{{ path('dashboard') }}">Панель</a></li>
                             </ul>
                         </article>
                     </div>

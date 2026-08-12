@@ -31,7 +31,7 @@
             <div class="ui divider"></div>
 
             <button class="ui primary button" type="submit"><i class="save icon"></i> {{ 'insurance.companies.new.save_button'|trans }}</button>
-            <a href="/insurance/companies" class="ui button"><i class="arrow left icon"></i> {{ 'insurance.companies.new.cancel_button'|trans }}</a>
+            <a href="{{ path('insurance_companies_index') }}" class="ui button"><i class="arrow left icon"></i> {{ 'insurance.companies.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

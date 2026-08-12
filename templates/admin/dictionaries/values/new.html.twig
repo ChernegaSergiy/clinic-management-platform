@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'admin.dictionary_values.new.header'|trans }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/dictionaries/values/new">
+        <form class="ui form" method="POST" action="{{ path('admin_dictionaries_values_new_post') }}">
             <input type="hidden" name="dictionary_id" value="{{ dictionary_id }}">
             {{ forms.input('label', 'admin.dictionary_values.new.label'|trans, old.label ?? '', 'text', 'admin.dictionary_values.new.label_placeholder'|trans, errors.label ?? null, {'required': 'required'}) }}
             {{ forms.input('value', 'admin.dictionary_values.new.value'|trans, old.value ?? '', 'text', 'admin.dictionary_values.new.value_placeholder'|trans, errors.value ?? null, {'required': 'required'}) }}
@@ -24,7 +24,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('admin.dictionary_values.new.save_button'|trans, 'primary', '', 'save') }}
-            <a href="/admin/dictionaries/show?id={{ dictionary_id }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.dictionary_values.new.cancel_button'|trans }}</a>
+            <a href="{{ path('admin_dictionaries_show', {'id': dictionary_id}) }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.dictionary_values.new.cancel_button'|trans }}</a>
         </form>
     </div>
 {% endblock %}

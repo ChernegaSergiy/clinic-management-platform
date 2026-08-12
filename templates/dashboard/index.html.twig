@@ -15,9 +15,9 @@
             {% if canExport %}
                 <div class="six wide column right aligned">
                     <div class="ui mini basic buttons">
-                        <a href="/dashboard/export-csv" class="ui button">{{ 'dashboard.export.csv'|trans }}</a>
-                        <a href="/dashboard/export-pdf" class="ui button">{{ 'dashboard.export.pdf'|trans }}</a>
-                        <a href="/dashboard/export-excel" class="ui button">{{ 'dashboard.export.excel'|trans }}</a>
+                        <a href="{{ path('dashboard_export_csv') }}" class="ui button">{{ 'dashboard.export.csv'|trans }}</a>
+                        <a href="{{ path('dashboard_export_pdf') }}" class="ui button">{{ 'dashboard.export.pdf'|trans }}</a>
+                        <a href="{{ path('dashboard_export_excel') }}" class="ui button">{{ 'dashboard.export.excel'|trans }}</a>
                     </div>
                 </div>
             {% endif %}

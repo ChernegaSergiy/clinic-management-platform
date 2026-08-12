@@ -10,16 +10,16 @@
                 <h2 class="ui header">{{ 'billing.list.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/billing/export-csv" class="ui secondary button">
+                <a href="{{ path('billing_export_csv') }}" class="ui secondary button">
                     <i class="file alternate outline icon"></i> {{ 'billing.list.export_csv'|trans }}
                 </a>
-                <a href="/billing/export-excel" class="ui secondary button">
+                <a href="{{ path('billing_export_excel') }}" class="ui secondary button">
                     <i class="file excel icon"></i> {{ 'billing.list.export_excel'|trans }}
                 </a>
-                <a href="/billing/export-pdf" class="ui secondary button">
+                <a href="{{ path('billing_export_pdf') }}" class="ui secondary button">
                     <i class="file pdf icon"></i> {{ 'billing.list.export_pdf'|trans }}
                 </a>
-                <a href="/billing/new" class="ui primary button">
+                <a href="{{ path('billing_new') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'billing.list.create_invoice'|trans }}
                 </a>
             </div>

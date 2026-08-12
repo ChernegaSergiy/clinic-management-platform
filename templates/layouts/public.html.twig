@@ -29,13 +29,13 @@
 
             <nav id="mainNav" aria-label="Основна навігація">
                 <ul class="nav-list">
-                    <li><a class="nav-link" href="/">Головна</a></li>
-                    <li><a class="nav-link" href="/about">Про лікарню</a></li>
-                    <li><a class="nav-link" href="/departments">Відділення</a></li>
-                    <li><a class="nav-link" href="/doctors">Лікарі</a></li>
-                    <li><a class="nav-link" href="/our-team">Команда розробників</a></li>
-                    <li><a class="nav-link" href="/book-appointment">Запис</a></li>
-                    <li><a class="nav-link" href="/contact">Контакти</a></li>
+                    <li><a class="nav-link" href="{{ path('site_home') }}">Головна</a></li>
+                    <li><a class="nav-link" href="{{ path('site_about') }}">Про лікарню</a></li>
+                    <li><a class="nav-link" href="{{ path('site_departments') }}">Відділення</a></li>
+                    <li><a class="nav-link" href="{{ path('site_doctors') }}">Лікарі</a></li>
+                    <li><a class="nav-link" href="{{ path('site_our_team') }}">Команда розробників</a></li>
+                    <li><a class="nav-link" href="{{ path('appointment_submit_public_form') }}">Запис</a></li>
+                    <li><a class="nav-link" href="{{ path('site_contact') }}">Контакти</a></li>
 
                 </ul>
             </nav>
@@ -49,7 +49,7 @@
     <footer>
         <div class="container">
             <div class="footer-row">
-                <div>{{ clinic_name }} · <a href="/privacy">Приватність</a> · <a href="/sitemap">Карта сайту</a></div>
+                <div>{{ clinic_name }} · <a href="{{ path('site_privacy') }}">Приватність</a> · <a href="{{ path('site_sitemap') }}">Карта сайту</a></div>
                 <div>Офіційний інформаційний ресурс (макет)</div>
             </div>
             <div class="footer-row" style="opacity: 0.7; border-top: 1px solid #000; padding-top: 0.5rem; margin-top: 0.5rem;">

@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'admin.users.edit.title'|trans({'%id%': user.id}) }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/admin/users/edit?id={{ user.id }}">
+        <form class="ui form" method="POST" action="{{ path('admin_users_edit_post', {'id': user.id}) }}">
             <div class="two fields">
                 {{ forms.input('first_name', 'admin.users.new.first_name'|trans, user.first_name, 'text', 'admin.users.new.first_name_placeholder'|trans, errors.first_name ?? null, {'required': 'required'}) }}
                 {{ forms.input('last_name', 'admin.users.new.last_name'|trans, user.last_name, 'text', 'admin.users.new.last_name_placeholder'|trans, errors.last_name ?? null, {'required': 'required'}) }}
@@ -21,7 +21,7 @@
             <div class="ui divider"></div>
 
             {{ ui.button('admin.users.edit.save'|trans, 'primary', '', 'save') }}
-            <a href="/admin/users/show?id={{ user.id }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.users.edit.cancel'|trans }}</a>
+            <a href="{{ path('admin_users_show', {'id': user.id}) }}" class="ui button"><i class="arrow left icon"></i> {{ 'admin.users.edit.cancel'|trans }}</a>
         </form>
     </div>
 {% endblock %}

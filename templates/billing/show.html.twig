@@ -69,7 +69,7 @@
         <a href="/billing/edit?id={{ invoice.id }}" class="ui primary button">
             <i class="edit icon"></i> {{ 'billing.show.edit'|trans }}
         </a>
-        <a href="/billing" class="ui button">
+        <a href="{{ path('billing_index') }}" class="ui button">
             <i class="arrow left icon"></i> {{ 'billing.show.back'|trans }}
         </a>
     </div>

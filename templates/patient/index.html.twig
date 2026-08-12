@@ -10,16 +10,16 @@
                 <h2 class="ui header">{{ 'patient.list.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/patients/export-csv" class="ui secondary button">
+                <a href="{{ path('patient_export_csv') }}" class="ui secondary button">
                     <i class="file alternate outline icon"></i> {{ 'patient.list.export_csv'|trans }}
                 </a>
-                <a href="/patients/export-json" class="ui secondary button">
+                <a href="{{ path('patient_export_json') }}" class="ui secondary button">
                     <i class="file alternate outline icon"></i> {{ 'patient.list.export_json'|trans }}
                 </a>
-                <a href="/patients/import-json" class="ui positive button">
+                <a href="{{ path('patient_import_json') }}" class="ui positive button">
                     <i class="upload icon"></i> {{ 'patient.list.import_json'|trans }}
                 </a>
-                <a href="/patients/new" class="ui primary button">
+                <a href="{{ path('patient_new_get') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'patient.list.add'|trans }}
                 </a>
             </div>

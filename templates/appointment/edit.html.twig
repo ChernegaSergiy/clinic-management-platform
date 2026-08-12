@@ -9,7 +9,7 @@
         <h2 class="ui header">{{ 'appointment.edit.title_full'|trans({'%id%': appointment.id}) }}</h2>
         <div class="ui divider"></div>
 
-        <form class="ui form" method="POST" action="/appointments/edit?id={{ appointment.id }}">
+        <form class="ui form" method="POST" action="{{ path('appointment_update')?id={{ appointment.id }}">
             <input type="hidden" name="id" value="{{ appointment.id }}">
             <div class="two fields">
                 {{ forms.select('patient_id', 'appointment.edit.patient'|trans, patients, appointment.patient_id, errors.patient_id ?? null, {'required': 'required'}) }}

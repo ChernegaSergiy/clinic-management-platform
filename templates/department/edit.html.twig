@@ -22,7 +22,7 @@
             </div>
         {% endif %}
 
-        <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="/admin/departments/edit?id={{ department.id }}">
+        <form class="ui form {% if errors is defined %}error{% endif %}" method="POST" action="{{ path('admin_departments_edit_post', {'id': department.id}) }}">
             <div class="field">
                 <label>{{ 'department.new.name_label'|trans }} *</label>
                 <input type="text" name="name" placeholder="{{ 'department.new.name_placeholder'|trans }}" 
@@ -69,10 +69,10 @@
             <button type="submit" class="ui primary button">
                 <i class="save icon"></i> {{ 'department.edit.save_button'|trans }}
             </button>
-            <a href="/admin/departments/show?id={{ department.id }}" class="ui button">
+            <a href="{{ path('admin_departments_show', {'id': department.id}) }}" class="ui button">
                 <i class="arrow left icon"></i> {{ 'department.edit.cancel_button'|trans }}
             </a>
-            <a href="/admin/departments" class="ui button">
+            <a href="{{ path('admin_departments_index') }}" class="ui button">
                 <i class="list icon"></i> {{ 'department.edit.back_to_list'|trans }}
             </a>
         </form>

@@ -47,12 +47,12 @@
         </a>
         {% if appointment.status == 'scheduled' %}
             <a href="/medical-records/new?appointment_id={{ appointment.id }}" class="ui green button">{{ 'appointment.show.create_medical_record'|trans }}</a>
-            <form action="/appointments/cancel" method="POST" style="display: inline;">
+            <form action="{{ path('appointment_cancel') }}" method="POST" style="display: inline;">
                 <input type="hidden" name="id" value="{{ appointment.id }}">
                 <button type="submit" class="ui negative button">{{ 'appointment.show.cancel'|trans }}</button>
             </form>
         {% endif %}
-        <a href="/appointments" class="ui button">
+        <a href="{{ path('appointment_index') }}" class="ui button">
             <i class="arrow left icon"></i> {{ 'appointment.show.back'|trans }}
         </a>
     </div>

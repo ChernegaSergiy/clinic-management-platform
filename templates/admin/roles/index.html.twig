@@ -33,7 +33,7 @@
                             <td>{{ role.name }}</td>
                             <td>{{ role.description }}</td>
                             <td>
-                                <a href="/admin/roles/edit?id={{ role.id }}" class="ui icon button">
+                                <a href="{{ path('admin_roles_edit_post', {'id': role.id}) }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
                             </td>

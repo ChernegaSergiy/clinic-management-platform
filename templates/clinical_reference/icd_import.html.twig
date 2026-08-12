@@ -17,9 +17,9 @@
         <p>{{ 'clinical_reference.icd_import.current_count'|trans }} <strong>{{ count }}</strong></p>
         <p>{{ 'clinical_reference.icd_import.data_source'|trans }} <code>NK-025-2021</code> (meddata.pp.ua) {{ 'clinical_reference.icd_import.package'|trans }} <code>medcore-ua/nk-025-2021-parser</code>.</p>
 
-        <form class="ui form" method="POST" action="/admin/clinical/icd-import">
+        <form class="ui form" method="POST" action="{{ path('clinical_icd_import_run') }}">
             <button type="submit" class="ui primary button">{{ 'clinical_reference.icd_import.update_button'|trans }}</button>
-            <a href="/admin/clinical" class="ui button">{{ 'clinical_reference.icd_import.back'|trans }}</a>
+            <a href="{{ path('clinical_index') }}" class="ui button">{{ 'clinical_reference.icd_import.back'|trans }}</a>
         </form>
     </div>
 {% endblock %}

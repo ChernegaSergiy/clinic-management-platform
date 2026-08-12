@@ -10,7 +10,7 @@
                 <h2 class="ui header">{{ 'admin.dictionaries.title'|trans }}</h2>
             </div>
             <div class="eight wide column right aligned">
-                <a href="/admin/dictionaries/new" class="ui primary button">
+                <a href="{{ path('admin_dictionaries_new_post') }}" class="ui primary button">
                     <i class="plus icon"></i> {{ 'admin.dictionaries.add'|trans }}
                 </a>
             </div>
@@ -37,13 +37,13 @@
                             <td>{{ dictionary.description }}</td>
                             <td>{{ dictionary.type }}</td>
                             <td>
-                                <a href="/admin/dictionaries/show?id={{ dictionary.id }}" class="ui icon button">
+                                <a href="{{ path('admin_dictionaries_show', {'id': dictionary.id}) }}" class="ui icon button">
                                     <i class="eye icon"></i>
                                 </a>
-                                <a href="/admin/dictionaries/edit?id={{ dictionary.id }}" class="ui icon button">
+                                <a href="{{ path('admin_dictionaries_edit_post', {'id': dictionary.id}) }}" class="ui icon button">
                                     <i class="edit icon"></i>
                                 </a>
-                                <form action="/admin/dictionaries/delete" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.dictionaries.delete_confirm'|trans }}');">
+                                <form action="{{ path('admin_dictionaries_delete') }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ 'admin.dictionaries.delete_confirm'|trans }}');">
                                     <input type="hidden" name="id" value="{{ dictionary.id }}">
                                     <button type="submit" class="ui icon button red">
                                         <i class="trash icon"></i>

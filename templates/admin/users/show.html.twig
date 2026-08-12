@@ -42,10 +42,10 @@
 
         <div class="ui divider"></div>
 
-        <a href="/admin/users/edit?id={{ user.id }}" class="ui primary button">
+        <a href="{{ path('admin_users_edit_post', {'id': user.id}) }}" class="ui primary button">
             <i class="edit icon"></i> {{ 'admin.users.show.edit'|trans }}
         </a>
-        <a href="/admin/users" class="ui button">
+        <a href="{{ path('admin_users') }}" class="ui button">
             <i class="arrow left icon"></i> {{ 'admin.users.show.back'|trans }}
         </a>
     </div>
