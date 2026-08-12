@@ -47,9 +47,11 @@ class SessionAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request) : ?bool
     {
-        $session = $request->getSession();
+        if (!$request->hasSession()) {
+            return false;
+        }
 
-        return $session->has('user_id');
+        return $request->getSession()->has('user_id');
     }
 
     public function authenticate(Request $request) : Passport
