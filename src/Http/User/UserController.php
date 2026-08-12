@@ -60,7 +60,7 @@ class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $this->userRepository->findById($_SESSION['user']['id']);
+        $user = $this->userRepository->findById($this->getUser()->getId());
 
         if (!$user) {
             session_destroy();
@@ -91,7 +91,7 @@ class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $this->getUser()->getId();
         $this->userOAuthIdentityRepository->deleteByUserIdAndProvider($userId, $provider);
 
         $_SESSION['success_message'] = sprintf('Ваш акаунт %s було успішно відв\'язано.', ucfirst($provider));
@@ -103,7 +103,7 @@ class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $this->getUser()->getId();
         $uploadDir = __DIR__ . '/../../../public/uploads/avatars/';
 
         // Create directory if it doesn't exist

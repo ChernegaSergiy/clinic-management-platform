@@ -176,7 +176,7 @@ class AdminKpiController extends AbstractController
         $this->authorizeKpiAccess();
         $definitions = $this->kpiRepository->findActiveKpiDefinitions();
         $today = new \DateTimeImmutable('today');
-        $userId = $_SESSION['user']['id'] ?? 1;
+        $userId = $this->getUser()->getId();
 
         foreach ($definitions as $definition) {
             $period = $definition['period'] ?? 'day';

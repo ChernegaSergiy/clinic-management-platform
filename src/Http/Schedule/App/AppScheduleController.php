@@ -46,7 +46,7 @@ class AppScheduleController extends AbstractController
     {
         $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_OWN');
 
-        $userId = (int)$_SESSION['user']['id'];
+        $userId = $this->getUser()->getId();
         $schedule = $this->doctorScheduleRepository->findByDoctor($userId);
         $exceptions = $this->scheduleExceptionRepository->findByDoctorAndDateRange(
             $userId,
@@ -68,7 +68,7 @@ class AppScheduleController extends AbstractController
     #[Route('/doctor/schedule/update', name: 'doctor_schedule_update', methods: ['POST'])]
     public function update() : Response
     {
-        $sessionUserId = (int)$_SESSION['user']['id'];
+        $sessionUserId = $this->getUser()->getId();
         $targetDoctorId = $sessionUserId; // Default
 
         if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
@@ -107,7 +107,7 @@ class AppScheduleController extends AbstractController
     #[Route('/doctor/schedule/exceptions/add', name: 'doctor_schedule_exceptions_add', methods: ['POST'])]
     public function addException() : Response
     {
-        $sessionUserId = (int)$_SESSION['user']['id'];
+        $sessionUserId = $this->getUser()->getId();
         $targetDoctorId = $sessionUserId; // Default
 
         if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
@@ -137,7 +137,7 @@ class AppScheduleController extends AbstractController
     #[Route('/doctor/schedule/exceptions/delete', name: 'doctor_schedule_exceptions_delete', methods: ['POST'])]
     public function deleteException() : Response
     {
-        $sessionUserId = (int)$_SESSION['user']['id'];
+        $sessionUserId = $this->getUser()->getId();
         $exceptionId = (int)$_POST['exception_id'];
 
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);

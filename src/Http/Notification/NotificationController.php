@@ -46,7 +46,7 @@ class NotificationController extends AbstractController
     public function getUnread() : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = (int)($_SESSION['user']['id'] ?? 0);
+        $userId = $this->getUser()->getId();
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -74,7 +74,7 @@ class NotificationController extends AbstractController
     public function markAllRead() : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = (int)($_SESSION['user']['id'] ?? 0);
+        $userId = $this->getUser()->getId();
 
         $success = $this->notificationRepository->markAllAsReadByUserId($userId);
 
@@ -88,7 +88,7 @@ class NotificationController extends AbstractController
     public function delete() : JsonResponse
     {
         $this->denyAccessUnlessGranted('NOTIFICATION_VIEW');
-        $userId = (int)($_SESSION['user']['id'] ?? 0);
+        $userId = $this->getUser()->getId();
 
         $id = (int)($_POST['id'] ?? 0);
         $success = $this->notificationRepository->deleteByIdAndUser($id, $userId);

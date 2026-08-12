@@ -43,7 +43,7 @@ class AppKpiController extends AbstractController
     {
         $this->denyAccessUnlessGranted('KPI_VIEW');
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $this->getUser()->getId();
         $results = $this->kpiResultRepository->findResultsForUser($userId);
 
         return $this->render('kpi/results/index.html.twig', ['results' => $results]);

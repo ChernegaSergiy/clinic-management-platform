@@ -253,7 +253,7 @@ class UserController extends AbstractController
         }
 
         // Prevent admin from deleting themselves
-        if ($user['id'] === $_SESSION['user']['id']) {
+        if ($user['id'] === $this->getUser()->getId()) {
             $_SESSION['error_message'] = "Ви не можете видалити свій власний обліковий запис.";
             return $this->redirectToRoute('admin_users');
         }
