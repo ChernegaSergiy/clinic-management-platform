@@ -32,11 +32,12 @@ use App\Event\UserLoggedInEvent;
 use App\Event\UserLoggedOutEvent;
 use App\Shared\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AuthController extends AbstractController
 {
@@ -48,7 +49,7 @@ class AuthController extends AbstractController
     private \App\Shared\Repository\SettingsRepository $settingsRepository;
     private Validator $validator;
     private EventDispatcherInterface $eventDispatcher;
-    private Security $security;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         UserRepository $userRepository,
@@ -59,7 +60,7 @@ class AuthController extends AbstractController
         OAuthController $oauthController,
         Validator $validator,
         EventDispatcherInterface $eventDispatcher,
-        Security $security
+        TokenStorageInterface $tokenStorage
     ) {
         $this->userRepository = $userRepository;
         $this->authConfigRepository = $authConfigRepository;
@@ -69,7 +70,7 @@ class AuthController extends AbstractController
         $this->oauthController = $oauthController;
         $this->validator = $validator;
         $this->eventDispatcher = $eventDispatcher;
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     #[Route('/login', name: 'login_form', methods: ['GET'])]
@@ -124,7 +125,8 @@ class AuthController extends AbstractController
 
             if ('disabled' === $mfaPolicy) {
                 if ($userEntity) {
-                    $this->security->login($userEntity);
+                    $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
+                    $this->tokenStorage->setToken($token);
                 }
                 $_SESSION['user'] = [
                     'id' => $user['id'],
@@ -165,7 +167,8 @@ class AuthController extends AbstractController
             }
 
             if ($userEntity) {
-                $this->security->login($userEntity);
+                $token = new UsernamePasswordToken($userEntity, 'main', $userEntity->getRoles());
+                $this->tokenStorage->setToken($token);
             }
             $_SESSION['user'] = [
                 'id' => $user['id'],
@@ -211,7 +214,7 @@ class AuthController extends AbstractController
         if ($userId && $userEmail) {
             $this->eventDispatcher->dispatch(new UserLoggedOutEvent($userId, $userEmail));
         }
-        $this->security->getTokenStorage()->setToken(null);
+        $this->tokenStorage->setToken(null);
         session_destroy();
         return $this->redirectToRoute('dashboard_redirect');
     }
