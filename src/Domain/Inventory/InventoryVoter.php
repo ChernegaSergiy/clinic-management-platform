@@ -52,15 +52,6 @@ class InventoryVoter extends Voter
             return false;
         }
 
-        // Administrators, Medical Managers, and Nurses can manage inventory
-        if (
-            $this->security->isGranted('ROLE_ADMIN') ||
-            $this->security->isGranted('ROLE_MEDICAL_MANAGER') ||
-            $this->security->isGranted('ROLE_NURSE')
-        ) {
-            return true;
-        }
-
-        return false;
+        return $this->security->isGranted('ROLE_INVENTORY_MANAGE');
     }
 }
