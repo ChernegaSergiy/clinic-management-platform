@@ -66,7 +66,7 @@ class HrmController extends AbstractController
     #[Route('/hrm/new', name: 'hrm_new', methods: ['GET'])]
     public function create() : Response
     {
-        $this->denyAccessUnlessGranted('HRM_WRITE');
+        $this->denyAccessUnlessGranted('HRM_EDIT');
 
         $users = $this->userRepository->findAll();
         $departments = $this->departmentRepository->findAllActive();
@@ -80,7 +80,7 @@ class HrmController extends AbstractController
     #[Route('/hrm/new', name: 'hrm_store', methods: ['POST'])]
     public function store() : Response
     {
-        $this->denyAccessUnlessGranted('HRM_WRITE');
+        $this->denyAccessUnlessGranted('HRM_EDIT');
 
         $validator = $this->validator;
         $rules = [
@@ -129,7 +129,7 @@ class HrmController extends AbstractController
     #[Route('/hrm/edit', name: 'hrm_edit', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->denyAccessUnlessGranted('HRM_WRITE');
+        $this->denyAccessUnlessGranted('HRM_EDIT');
         $id = (int)($_GET['id'] ?? 0);
 
         $employee = $this->hrmRepository->findById($id);
@@ -151,7 +151,7 @@ class HrmController extends AbstractController
     #[Route('/hrm/edit', name: 'hrm_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('HRM_WRITE');
+        $this->denyAccessUnlessGranted('HRM_EDIT');
         $id = (int)($_GET['id'] ?? 0);
 
         $employee = $this->hrmRepository->findById($id);

@@ -70,7 +70,7 @@ class PatientController extends AbstractController
         $searchTerm = $_GET['search'] ?? '';
         $patients = [];
 
-        if ($this->isGranted('PATIENT_VIEW_ALL')) {
+        if ($this->isGranted('PATIENT_VIEW_ANY')) {
             $patients = $this->patientRepository->findAll($searchTerm);
         } elseif ($user && $user->getId()) {
             $patientIds = $this->appointmentRepository->findPatientIdsByDoctor($user->getId());
@@ -215,7 +215,7 @@ class PatientController extends AbstractController
     #[Route('/patients/export-csv', name: 'patient_export_csv', methods: ['GET'])]
     public function exportCsv() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_VIEW_ALL');
+        $this->denyAccessUnlessGranted('PATIENT_VIEW_ANY');
 
         $patients = $this->patientRepository->findAll();
         $patients = array_map(static function ($patient) : array {
@@ -251,7 +251,7 @@ class PatientController extends AbstractController
     #[Route('/patients/export-json', name: 'patient_export_json', methods: ['GET'])]
     public function exportPatientsToJson() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_VIEW_ALL');
+        $this->denyAccessUnlessGranted('PATIENT_VIEW_ANY');
 
         $patients = $this->patientRepository->findAll();
 
@@ -360,7 +360,7 @@ class PatientController extends AbstractController
     #[Route('/patients/toggle-status', name: 'patient_toggle_status', methods: ['POST'])]
     public function toggleStatus() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT_ALL');
+        $this->denyAccessUnlessGranted('PATIENT_EDIT_ANY');
 
         $id = (int)($_POST['id'] ?? 0);
         $patient = $this->patientRepository->findById($id);

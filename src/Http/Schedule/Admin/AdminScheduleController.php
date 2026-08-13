@@ -49,7 +49,7 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules', name: 'admin_schedules_index', methods: ['GET'])]
     public function adminIndex() : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         $allDoctors = $this->userRepository->findAllDoctors();
 
         return $this->render('schedule/admin.html.twig', [
@@ -60,7 +60,7 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules/show', name: 'admin_schedules_show', methods: ['GET'])]
     public function adminShow() : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
 
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
@@ -84,12 +84,12 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules/update', name: 'admin_schedules_update', methods: ['POST'])]
     public function adminUpdate(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         $targetDoctorId = (int)$_POST['doctor_id'];
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $user->getId()) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -118,12 +118,12 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules/exceptions/add', name: 'admin_schedules_exceptions_add', methods: ['POST'])]
     public function adminAddException(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         $targetDoctorId = (int)$_POST['doctor_id'];
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $user->getId()) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         $exceptionData = [
@@ -143,7 +143,7 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules/exceptions/delete', name: 'admin_schedules_exceptions_delete', methods: ['POST'])]
     public function adminDeleteException(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         $exceptionId = (int)$_POST['exception_id'];
         $exception = $this->scheduleExceptionRepository->findById($exceptionId);
 
@@ -155,11 +155,11 @@ class AdminScheduleController extends AbstractController
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== $user->getId()) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         // Final check that exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === $user->getId() || $this->isGranted('SCHEDULE_MANAGE_ALL')) {
+        if ($targetDoctorId === $user->getId() || $this->isGranted('SCHEDULE_MANAGE_ANY')) {
             $this->scheduleExceptionRepository->delete($exceptionId);
         }
 
@@ -169,7 +169,7 @@ class AdminScheduleController extends AbstractController
     #[Route('/schedules/edit', name: 'admin_schedules_edit', methods: ['GET'])]
     public function adminEdit() : Response
     {
-        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+        $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         $doctorId = (int)($_GET['id'] ?? 0);
         $doctor = $this->userRepository->findById($doctorId);
 

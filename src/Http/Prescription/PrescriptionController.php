@@ -68,7 +68,7 @@ class PrescriptionController extends AbstractController
         $searchTerm = $_GET['search'] ?? '';
         $prescriptions = [];
 
-        if ($this->isGranted('PRESCRIPTION_VIEW_ALL')) {
+        if ($this->isGranted('PRESCRIPTION_VIEW_ANY')) {
             $prescriptions = $this->prescriptionRepository->findAll($searchTerm);
         } elseif ($user && $user->getId()) {
             $prescriptions = $this->prescriptionRepository->findByDoctorId($user->getId(), $searchTerm);

@@ -217,7 +217,7 @@ class LabOrderController extends AbstractController
     #[Route('/lab-orders/import', name: 'lab_orders_import', methods: ['GET'])]
     public function import() : Response
     {
-        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ANY');
 
         $response = $this->render('lab_order/import.html.twig', [
             'errors' => $_SESSION['errors'] ?? [],
@@ -230,7 +230,7 @@ class LabOrderController extends AbstractController
     #[Route('/lab-orders/import', name: 'lab_orders_import_post', methods: ['POST'])]
     public function processImport() : Response
     {
-        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ANY');
 
         if (empty($_FILES['hl7_dicom_file'])) {
             $_SESSION['errors']['file'] = 'Будь ласка, виберіть файл для завантаження.';
@@ -273,7 +273,7 @@ class LabOrderController extends AbstractController
     #[Route('/lab-orders/import/confirm', name: 'lab_orders_import_confirm', methods: ['GET'])]
     public function confirmImport() : Response
     {
-        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ANY');
 
         if (empty($_SESSION['hl7_dicom_parsed_data'])) {
             $_SESSION['errors']['import'] = 'Немає даних для підтвердження імпорту.';
@@ -291,7 +291,7 @@ class LabOrderController extends AbstractController
     #[Route('/lab-orders/import/finalize', name: 'lab_orders_import_finalize', methods: ['POST'])]
     public function finalizeImport() : Response
     {
-        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ALL');
+        $this->denyAccessUnlessGranted('LAB_ORDER_EDIT_ANY');
 
         if (empty($_SESSION['hl7_dicom_parsed_data']) || empty($_SESSION['hl7_dicom_temp_path'])) {
             $_SESSION['errors']['import'] = 'Немає даних для фіналізації імпорту.';

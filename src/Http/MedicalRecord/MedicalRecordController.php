@@ -99,7 +99,7 @@ class MedicalRecordController extends AbstractController
         $searchTerm = $_GET['search'] ?? '';
         $records = [];
 
-        if ($this->isGranted('MEDICAL_RECORD_VIEW_ALL')) {
+        if ($this->isGranted('MEDICAL_RECORD_VIEW_ANY')) {
             $records = $this->medicalRecordRepository->findAll($searchTerm);
         } elseif ($user && $user->getId()) {
             $records = $this->medicalRecordRepository->findByDoctorId($user->getId(), $searchTerm);

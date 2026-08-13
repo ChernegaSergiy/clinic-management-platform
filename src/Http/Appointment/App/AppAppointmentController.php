@@ -82,7 +82,7 @@ class AppAppointmentController extends AbstractController
         $waitlist = $this->waitlistRepository->getWaitlistEntries();
         $appointments = [];
 
-        if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_ANY')) {
             $appointments = $this->appointmentRepository->findAll();
         } elseif ($this->isGranted('APPOINTMENT_VIEW_OWN')) {
             if ($user->getId()) {
@@ -93,7 +93,7 @@ class AppAppointmentController extends AbstractController
         $calendarDoctors = [];
         foreach ($doctors as $doctor) {
             if (
-                $this->isGranted('APPOINTMENT_VIEW_ALL') ||
+                $this->isGranted('APPOINTMENT_VIEW_ANY') ||
                 ($this->isGranted('APPOINTMENT_VIEW_OWN') && (int)$doctor['id'] === $user->getId())
             ) {
                 $calendarDoctors[] = [
@@ -174,7 +174,7 @@ class AppAppointmentController extends AbstractController
         }
 
         $doctorOptions = [];
-        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ANY')) {
             foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
@@ -219,7 +219,7 @@ class AppAppointmentController extends AbstractController
 
         $submittedDoctorId = (int)($_POST['doctor_id'] ?? 0);
 
-        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL') && $user->getId() !== $submittedDoctorId) {
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ANY') && $user->getId() !== $submittedDoctorId) {
             return new Response("Доступ заборонено: Ви можете створювати записи лише для себе.", 403);
         }
 
@@ -382,7 +382,7 @@ class AppAppointmentController extends AbstractController
         $end = $_GET['end'] ?? null;
         $appointments = [];
 
-        if ($this->isGranted('APPOINTMENT_VIEW_ALL')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_ANY')) {
             if ($start && $end) {
                 $appointments = $this->appointmentRepository->findByDateRange($start, $end);
             } else {
@@ -469,7 +469,7 @@ class AppAppointmentController extends AbstractController
         }
 
         $doctorOptions = [];
-        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ALL')) {
+        if ($this->isGranted('APPOINTMENT_VIEW_OWN') && !$this->isGranted('APPOINTMENT_VIEW_ANY')) {
             foreach ($doctors as $doctor) {
                 if ((int)$doctor['id'] === $user->getId()) {
                     $doctorOptions[$doctor['id']] = $doctor['full_name'];
@@ -615,7 +615,7 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
     public function cancel() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_CANCEL');
+        $this->denyAccessUnlessGranted('APPOINTMENT_CANCEL_ANY');
         $id = (int)($_POST['id'] ?? 0);
 
         $appointment = $this->appointmentRepository->findById($id);
@@ -651,7 +651,7 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/waitlist', name: 'appointment_waitlist', methods: ['GET'])]
     public function showWaitlist() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ALL');
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ANY');
 
         $waitlistEntries = $this->waitlistRepository->getWaitlistEntries('pending');
         $patients = $this->patientRepository->findAllActive();
@@ -715,7 +715,7 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/load-analytics', name: 'appointment_load_analytics', methods: ['GET'])]
     public function showLoadAnalytics() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ALL');
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW_ANY');
 
         $date = $_GET['date'] ?? date('Y-m-d');
         $doctorLoad = $this->appointmentRepository->getDoctorDailyLoad($date);

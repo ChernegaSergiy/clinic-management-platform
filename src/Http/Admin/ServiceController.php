@@ -51,7 +51,7 @@ class ServiceController extends AbstractController
     #[Route('/services', name: 'admin_services', methods: ['GET'])]
     public function listServices() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $services = $this->serviceRepository->findAll();
         return $this->render('admin/services/index.html.twig', ['services' => $services]);
     }
@@ -59,7 +59,7 @@ class ServiceController extends AbstractController
     #[Route('/services/new', name: 'admin_services_new', methods: ['GET'])]
     public function createService() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $categories = $this->serviceCategoryRepository->findAllCategories();
         $categoryOptions = [];
         foreach ($categories as $category) {
@@ -78,7 +78,7 @@ class ServiceController extends AbstractController
     #[Route('/services/new', name: 'admin_services_new_post', methods: ['POST'])]
     public function storeService() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -104,7 +104,7 @@ class ServiceController extends AbstractController
     #[Route('/services/edit', name: 'admin_services_edit', methods: ['GET'])]
     public function editService() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $service = $this->serviceRepository->findById($id);
@@ -132,7 +132,7 @@ class ServiceController extends AbstractController
     #[Route('/services/edit', name: 'admin_services_edit_post', methods: ['POST'])]
     public function updateService() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $service = $this->serviceRepository->findById($id);
@@ -165,7 +165,7 @@ class ServiceController extends AbstractController
     #[Route('/services/delete', name: 'admin_services_delete', methods: ['POST'])]
     public function deleteService() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         $this->serviceRepository->delete($id);
@@ -177,7 +177,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories', name: 'admin_service_categories', methods: ['GET'])]
     public function listServiceCategories() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $categories = $this->serviceCategoryRepository->findAllCategories();
         return $this->render('admin/service_categories/index.html.twig', ['categories' => $categories]);
     }
@@ -185,7 +185,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories/new', name: 'admin_service_categories_new', methods: ['GET'])]
     public function createServiceCategory() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
         $response = $this->render('admin/service_categories/new.html.twig', [
             'old' => $_SESSION['old'] ?? [],
             'errors' => $_SESSION['errors'] ?? [],
@@ -197,7 +197,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories/new', name: 'admin_service_categories_new_post', methods: ['POST'])]
     public function storeServiceCategory() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $validator = $this->validator;
         $validator->validate($_POST, [
@@ -219,7 +219,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories/edit', name: 'admin_service_categories_edit', methods: ['GET'])]
     public function editServiceCategory() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $category = $this->serviceCategoryRepository->findById($id);
@@ -240,7 +240,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories/edit', name: 'admin_service_categories_edit_post', methods: ['POST'])]
     public function updateServiceCategory() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_GET['id'] ?? 0);
         $category = $this->serviceCategoryRepository->findById($id);
@@ -269,7 +269,7 @@ class ServiceController extends AbstractController
     #[Route('/service-categories/delete', name: 'admin_service_categories_delete', methods: ['POST'])]
     public function deleteServiceCategory() : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE_SERVICE_CATEGORIES');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN_MANAGE');
 
         $id = (int)($_POST['id'] ?? 0);
         if ($this->serviceCategoryRepository->hasServices($id)) {

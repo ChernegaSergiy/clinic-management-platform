@@ -73,13 +73,13 @@ class AppScheduleController extends AbstractController
         $sessionUserId = $user->getId();
         $targetDoctorId = $sessionUserId; // Default
 
-        if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->isGranted('SCHEDULE_MANAGE_ANY') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         $scheduleData = $_POST['schedule'] ?? [];
@@ -112,13 +112,13 @@ class AppScheduleController extends AbstractController
         $sessionUserId = $user->getId();
         $targetDoctorId = $sessionUserId; // Default
 
-        if ($this->isGranted('SCHEDULE_MANAGE_ALL') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
+        if ($this->isGranted('SCHEDULE_MANAGE_ANY') && isset($_POST['doctor_id']) && (int)$_POST['doctor_id'] > 0) {
             $targetDoctorId = (int)$_POST['doctor_id'];
         }
 
         // Authorize if attempting to modify another user's schedule
         if ($targetDoctorId !== $sessionUserId) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         $exceptionData = [
@@ -152,11 +152,11 @@ class AppScheduleController extends AbstractController
 
         // Authorize if attempting to delete another user's exception
         if ($targetDoctorId !== $sessionUserId) {
-            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ALL');
+            $this->denyAccessUnlessGranted('SCHEDULE_MANAGE_ANY');
         }
 
         // Final check that exception belongs to the intended targetDoctorId
-        if ($targetDoctorId === $sessionUserId || $this->isGranted('SCHEDULE_MANAGE_ALL')) {
+        if ($targetDoctorId === $sessionUserId || $this->isGranted('SCHEDULE_MANAGE_ANY')) {
             $this->scheduleExceptionRepository->delete($exceptionId);
         }
 
