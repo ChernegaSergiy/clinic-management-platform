@@ -6,26 +6,15 @@
 
 {% block top_menu %}
     {% if app.user is not null %}
-        {% set role = app.user.role.name|default('') %}
-        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
-        {% set canPrescriptions = role in ['admin','doctor'] %}
-        {% set canInventory = role in ['admin','inventory_manager'] %}
-        {% set canBilling = role in ['admin','billing'] %}
-        {% set canAdminNav = role in ['admin'] %}
-        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
-        {% set canSchedule = role in ['admin', 'doctor'] %}
-
         <a class="item" href="{{ path('dashboard') }}">Панель</a>
-        {% if canPatients %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
-        {% if canAppointments %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
-        {% if canMedical %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
-        {% if canPrescriptions %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
-        {% if canInventory %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
-        {% if canBilling %}<a class="item" href="{{ path('billing_index') }}">Рахунки</a>{% endif %}
-        {% if canHrm %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
-        {% if canAdminNav %}<a class="item" href="{{ path('admin_users') }}">Користувачі</a>{% endif %}
+        {% if is_granted('PATIENT_VIEW') %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
+        {% if is_granted('APPOINTMENT_VIEW') %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
+        {% if is_granted('MEDICAL_RECORD_VIEW') %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
+        {% if is_granted('PRESCRIPTION_VIEW') %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
+        {% if is_granted('INVENTORY_VIEW') %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
+        {% if is_granted('BILLING_VIEW') %}<a class="item" href="{{ path('billing_index') }}">Рахунки</a>{% endif %}
+        {% if is_granted('HRM_VIEW') %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
+        {% if is_granted('ROLE_ADMIN') %}<a class="item" href="{{ path('admin_users') }}">Користувачі</a>{% endif %}
         <div class="ui dropdown item" id="notificationDropdown">
             <i class="bell icon"></i> Сповіщення
             <span class="ui red circular mini label notification-badge" style="display: none;"></span>
@@ -45,35 +34,22 @@
 
 {% block mobile_menu %}
     {% if app.user is not null %}
-        {% set role = app.user.role.name|default('') %}
-        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
-        {% set canPrescriptions = role in ['admin','doctor'] %}
-        {% set canInventory = role in ['admin','inventory_manager'] %}
-        {% set canBilling = role in ['admin','billing'] %}
-        {% set canAdminNav = role in ['admin'] %}
-        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
-        {% set canSchedule = role in ['admin', 'doctor'] %}
-        {% set canPersonalSchedule = role in ['doctor'] %}
-        {% set canAdminSchedules = role in ['admin'] %}
-
         <a class="item" href="{{ path('dashboard') }}">Панель</a>
-        {% if canPatients %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
-        {% if canAppointments %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
-        {% if canPersonalSchedule %}<a class="item" href="{{ path('doctor_schedule_index') }}">Мій графік</a>{% endif %}
-        {% if canAdminSchedules %}<a class="item" href="{{ path('admin_schedules_index') }}">Управління графіками</a>{% endif %}
-        {% if canMedical %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
-        {% if canPrescriptions %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
-        {% if canInventory %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
-        {% if canBilling %}
+        {% if is_granted('PATIENT_VIEW') %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
+        {% if is_granted('APPOINTMENT_VIEW') %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
+        {% if is_granted('SCHEDULE_MANAGE_OWN') %}<a class="item" href="{{ path('doctor_schedule_index') }}">Мій графік</a>{% endif %}
+        {% if is_granted('SCHEDULE_MANAGE_ANY') %}<a class="item" href="{{ path('admin_schedules_index') }}">Управління графіками</a>{% endif %}
+        {% if is_granted('MEDICAL_RECORD_VIEW') %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
+        {% if is_granted('PRESCRIPTION_VIEW') %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
+        {% if is_granted('INVENTORY_VIEW') %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
+        {% if is_granted('BILLING_VIEW') %}
             <a class="item" href="{{ path('billing_index') }}">Рахунки</a>
             <a class="item" href="{{ path('billing_contracts_index') }}">Контракти</a>
             <a class="item" href="{{ path('insurance_companies_index') }}">Страх. Компанії</a>
             <a class="item" href="{{ path('insurance_claims_index') }}">Страх. Вимоги</a>
         {% endif %}
-        {% if canHrm %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
-        {% if canAdminNav %}
+        {% if is_granted('HRM_VIEW') %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
             <a class="item" href="{{ path('admin_kpi_definitions_index') }}">Налаштування KPI</a>
             <a class="item" href="{{ path('admin_users') }}">Користувачі</a>
             <a class="item" href="{{ path('clinical_index') }}">Клінічні довідники</a>
@@ -94,35 +70,22 @@
 
 {% block sidebar %}
     {% if app.user is not null %}
-        {% set role = app.user.role.name|default('') %}
-        {% set canPatients = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canAppointments = role in ['admin','medical_manager','registrar','doctor','nurse'] %}
-        {% set canMedical = role in ['admin','medical_manager','doctor','nurse'] %}
-        {% set canPrescriptions = role in ['admin','doctor'] %}
-        {% set canInventory = role in ['admin','inventory_manager'] %}
-        {% set canBilling = role in ['admin','billing'] %}
-        {% set canAdminNav = role in ['admin'] %}
-        {% set canHrm = role in ['admin', 'hr_manager', 'medical_manager'] %}
-        {% set canSchedule = role in ['admin', 'doctor'] %}
-        {% set canPersonalSchedule = role in ['doctor'] %}
-        {% set canAdminSchedules = role in ['admin'] %}
-
         <a class="item" href="{{ path('dashboard') }}">Панель</a>
-        {% if canPatients %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
-        {% if canAppointments %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
-        {% if canPersonalSchedule %}<a class="item" href="{{ path('doctor_schedule_index') }}">Мій графік</a>{% endif %}
-        {% if canAdminSchedules %}<a class="item" href="{{ path('admin_schedules_index') }}">Управління графіками</a>{% endif %}
-        {% if canMedical %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
-        {% if canPrescriptions %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
-        {% if canInventory %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
-        {% if canBilling %}
+        {% if is_granted('PATIENT_VIEW') %}<a class="item" href="{{ path('patient_index') }}">Пацієнти</a>{% endif %}
+        {% if is_granted('APPOINTMENT_VIEW') %}<a class="item" href="{{ path('appointment_index') }}">Записи</a>{% endif %}
+        {% if is_granted('SCHEDULE_MANAGE_OWN') %}<a class="item" href="{{ path('doctor_schedule_index') }}">Мій графік</a>{% endif %}
+        {% if is_granted('SCHEDULE_MANAGE_ANY') %}<a class="item" href="{{ path('admin_schedules_index') }}">Управління графіками</a>{% endif %}
+        {% if is_granted('MEDICAL_RECORD_VIEW') %}<a class="item" href="{{ path('medical_records_index') }}">Медичні записи</a>{% endif %}
+        {% if is_granted('PRESCRIPTION_VIEW') %}<a class="item" href="{{ path('prescription_index') }}">Рецепти</a>{% endif %}
+        {% if is_granted('INVENTORY_VIEW') %}<a class="item" href="{{ path('inventory_index') }}">Склад</a>{% endif %}
+        {% if is_granted('BILLING_VIEW') %}
             <a class="item" href="{{ path('billing_index') }}">Рахунки</a>
             <a class="item" href="{{ path('billing_contracts_index') }}">Контракти</a>
             <a class="item" href="{{ path('insurance_companies_index') }}">Страх. Компанії</a>
             <a class="item" href="{{ path('insurance_claims_index') }}">Страх. Вимоги</a>
         {% endif %}
-        {% if canHrm %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
-        {% if canAdminNav %}
+        {% if is_granted('HRM_VIEW') %}<a class="item" href="{{ path('hrm_index') }}">Співробітники</a>{% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
             <a class="item" href="{{ path('admin_kpi_definitions_index') }}">Налаштування KPI</a>
             <a class="item" href="{{ path('admin_users') }}">Користувачі</a>
             <a class="item" href="{{ path('clinical_index') }}">Клінічні довідники</a>
