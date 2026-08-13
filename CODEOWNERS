@@ -61,7 +61,6 @@ public/images/ @Andriihev
 
 # Testing
 tests/Core/Http/FrontControllerTest.php @makztezerest
-tests/Database/DatabaseTest.php @makztezerest
 tests/ @ChernegaSergiy
 
 # CI/CD
