@@ -81,6 +81,7 @@ security:
             - ROLE_BILLING_VIEW
             - ROLE_BILLING_MANAGE
             - ROLE_DASHBOARD_VIEW
+            - ROLE_DEPARTMENT_VIEW
             - ROLE_INSURANCE_VIEW
             - ROLE_KPI_VIEW
             - ROLE_NEWS_VIEW
@@ -96,6 +97,7 @@ security:
             - ROLE_APPOINTMENT_EDIT_OWN
             - ROLE_APPOINTMENT_CANCEL_OWN
             - ROLE_APPOINTMENT_CREATE
+            - ROLE_DEPARTMENT_VIEW
             - ROLE_DASHBOARD_VIEW
             - ROLE_LAB_ORDER_VIEW_OWN
             - ROLE_LAB_ORDER_EDIT_OWN
@@ -114,6 +116,7 @@ security:
             - ROLE_SCHEDULE_MANAGE_OWN
         ROLE_NURSE:
             - ROLE_APPOINTMENT_VIEW_OWN
+            - ROLE_DEPARTMENT_VIEW
             - ROLE_DASHBOARD_VIEW
             - ROLE_LAB_ORDER_VIEW_OWN
             - ROLE_MEDICAL_RECORD_VIEW_OWN
@@ -144,6 +147,7 @@ security:
             - ROLE_NOTIFICATION_VIEW
         ROLE_HR_MANAGER:
             - ROLE_DASHBOARD_VIEW
+            - ROLE_DEPARTMENT_VIEW
             - ROLE_HRM_VIEW
             - ROLE_HRM_EDIT
             - ROLE_HRM_MANAGE
