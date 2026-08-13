@@ -8,7 +8,7 @@
  *  | | | | | |  __/ (_| | (_| (_) | | |  __/_____| |_| | (_| |
  *  |_| |_| |_|\___|\__,_|\___\___/|_|  \___|      \__,_|\__,_|
  *
- * This program is free software: you can redistribute and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the CSSM Unlimited License v2.0.
  *
  * This license permits unlimited use, modification, and distribution
@@ -32,12 +32,19 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 final class AppointmentVoter extends Voter
 {
     public const VIEW = 'APPOINTMENT_VIEW';
-    public const VIEW_ALL = 'APPOINTMENT_VIEW_ALL';
+    public const VIEW_ANY = 'APPOINTMENT_VIEW_ANY';
     public const VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
     public const CREATE = 'APPOINTMENT_CREATE';
     public const EDIT = 'APPOINTMENT_EDIT';
-    public const EDIT_ALL = 'APPOINTMENT_EDIT_ALL';
-    public const CANCEL = 'APPOINTMENT_CANCEL';
+    public const EDIT_ANY = 'APPOINTMENT_EDIT_ANY';
+    public const EDIT_OWN = 'APPOINTMENT_EDIT_OWN';
+    public const CANCEL_ANY = 'APPOINTMENT_CANCEL_ANY';
+    public const CANCEL_OWN = 'APPOINTMENT_CANCEL_OWN';
+
+    // Deprecated aliases — kept for controller compatibility until Phase 5
+    public const VIEW_ALL = self::VIEW_ANY;
+    public const EDIT_ALL = self::EDIT_ANY;
+    public const CANCEL = self::CANCEL_ANY;
 
     private AppointmentRepository $appointmentRepository;
     private Security $security;
@@ -54,12 +61,18 @@ final class AppointmentVoter extends Voter
     {
         return in_array($attribute, [
             self::VIEW,
-            self::VIEW_ALL,
+            self::VIEW_ANY,
             self::VIEW_OWN,
             self::CREATE,
             self::EDIT,
-            self::EDIT_ALL,
-            self::CANCEL,
+            self::EDIT_ANY,
+            self::EDIT_OWN,
+            self::CANCEL_ANY,
+            self::CANCEL_OWN,
+            // Legacy aliases — accepted but deprecated
+            'APPOINTMENT_VIEW_ALL',
+            'APPOINTMENT_EDIT_ALL',
+            'APPOINTMENT_CANCEL',
         ], true);
     }
 
@@ -80,79 +93,69 @@ final class AppointmentVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $this->canView($user, $appointmentId),
-            self::VIEW_ALL => $this->canViewAll(),
-            self::VIEW_OWN => $this->canViewOwn(),
-            self::CREATE => $this->canCreate(),
+            self::VIEW_ANY, 'APPOINTMENT_VIEW_ALL' => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY'),
+            self::VIEW_OWN => $this->canViewOwn($user, $appointmentId),
+            self::CREATE => $this->security->isGranted('ROLE_APPOINTMENT_CREATE'),
             self::EDIT => $this->canEdit($user, $appointmentId),
-            self::EDIT_ALL => $this->canEditAll(),
-            self::CANCEL => $this->canCancel($user, $appointmentId),
+            self::EDIT_ANY, 'APPOINTMENT_EDIT_ALL' => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY'),
+            self::EDIT_OWN => $this->canEditOwn($user, $appointmentId),
+            self::CANCEL_ANY, 'APPOINTMENT_CANCEL' => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY'),
+            self::CANCEL_OWN => $this->canCancelOwn($user, $appointmentId),
             default => false,
         };
     }
 
-    private function canViewAll() : bool
-    {
-        return $this->security->isGranted('ROLE_REGISTRAR');
-    }
-
-    private function canViewOwn() : bool
-    {
-        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
-    }
-
-    private function canCreate() : bool
-    {
-        return $this->security->isGranted('ROLE_REGISTRAR');
-    }
-
     private function canView(User $user, ?int $appointmentId) : bool
     {
-        // Registrars can view all appointments
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+        if ($this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY')) {
             return true;
         }
 
-        // Doctors and nurses can view their own assigned appointments
-        if ($appointmentId && ($this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE'))) {
+        if ($appointmentId && $this->security->isGranted('ROLE_APPOINTMENT_VIEW_OWN')) {
             return $this->isUserOwnerOfAppointment($user, $appointmentId);
         }
 
         return false;
+    }
+
+    private function canViewOwn(User $user, ?int $appointmentId) : bool
+    {
+        if (!$appointmentId) {
+            return false;
+        }
+
+        return $this->isUserOwnerOfAppointment($user, $appointmentId);
     }
 
     private function canEdit(User $user, ?int $appointmentId) : bool
     {
-        // Registrars can edit any appointment
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
+        if ($this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY')) {
             return true;
         }
 
-        // Doctors can edit their own assigned appointments
-        if ($appointmentId && $this->security->isGranted('ROLE_DOCTOR')) {
+        if ($appointmentId && $this->security->isGranted('ROLE_APPOINTMENT_EDIT_OWN')) {
             return $this->isUserOwnerOfAppointment($user, $appointmentId);
         }
 
         return false;
     }
 
-    private function canEditAll() : bool
+    private function canEditOwn(User $user, ?int $appointmentId) : bool
     {
-        return $this->security->isGranted('ROLE_REGISTRAR');
+        if (!$appointmentId) {
+            return false;
+        }
+
+        return $this->isUserOwnerOfAppointment($user, $appointmentId);
     }
 
-    private function canCancel(User $user, ?int $appointmentId) : bool
+    private function canCancelOwn(User $user, ?int $appointmentId) : bool
     {
-        // Registrars can cancel any appointment
-        if ($this->security->isGranted('ROLE_REGISTRAR')) {
-            return true;
+        if (!$appointmentId) {
+            return false;
         }
 
-        // Doctors can cancel their own assigned appointments
-        if ($appointmentId && $this->security->isGranted('ROLE_DOCTOR')) {
-            return $this->isUserOwnerOfAppointment($user, $appointmentId);
-        }
-
-        return false;
+        return $this->isUserOwnerOfAppointment($user, $appointmentId);
     }
 
     private function isUserOwnerOfAppointment(User $user, int $appointmentId) : bool

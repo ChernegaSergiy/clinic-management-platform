@@ -8,7 +8,7 @@
  *  | | | | | |  __/ (_| | (_| (_) | | |  __/_____| |_| | (_| |
  *  |_| |_| |_|\___|\__,_|\___\___/|_|  \___|      \__,_|\__,_|
  *
- * This program is free software: you can redistribute and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the CSSM Unlimited License v2.0.
  *
  * This license permits unlimited use, modification, and distribution
@@ -33,10 +33,17 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class PrescriptionVoter extends Voter
 {
     public const VIEW = 'PRESCRIPTION_VIEW';
-    public const VIEW_ALL = 'PRESCRIPTION_VIEW_ALL';
+    public const VIEW_ANY = 'PRESCRIPTION_VIEW_ANY';
     public const VIEW_OWN = 'PRESCRIPTION_VIEW_OWN';
     public const CREATE = 'PRESCRIPTION_CREATE';
+    public const CREATE_ANY = 'PRESCRIPTION_CREATE_ANY';
+    public const CREATE_OWN = 'PRESCRIPTION_CREATE_OWN';
     public const EDIT = 'PRESCRIPTION_EDIT';
+    public const EDIT_ANY = 'PRESCRIPTION_EDIT_ANY';
+    public const EDIT_OWN = 'PRESCRIPTION_EDIT_OWN';
+
+    // Deprecated aliases — kept for controller compatibility until Phase 5
+    public const VIEW_ALL = self::VIEW_ANY;
 
     private PrescriptionRepository $prescriptionRepository;
     private AppointmentRepository $appointmentRepository;
@@ -54,7 +61,19 @@ class PrescriptionVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject) : bool
     {
-        return in_array($attribute, [self::VIEW, self::VIEW_ALL, self::VIEW_OWN, self::CREATE, self::EDIT], true);
+        return in_array($attribute, [
+            self::VIEW,
+            self::VIEW_ANY,
+            self::VIEW_OWN,
+            self::CREATE,
+            self::CREATE_ANY,
+            self::CREATE_OWN,
+            self::EDIT,
+            self::EDIT_ANY,
+            self::EDIT_OWN,
+            // Legacy aliases — accepted but deprecated
+            'PRESCRIPTION_VIEW_ALL',
+        ], true);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token) : bool
@@ -71,71 +90,92 @@ class PrescriptionVoter extends Voter
 
         $prescriptionId = $this->extractPrescriptionId($subject);
 
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($user, $prescriptionId);
-            case self::VIEW_ALL:
-                return $this->canViewAll();
-            case self::VIEW_OWN:
-                return $this->canViewOwn();
-            case self::CREATE:
-                return $this->canCreate($user, $subject);
-            case self::EDIT:
-                return $this->canEdit($user, $prescriptionId);
-        }
-
-        return false;
+        return match ($attribute) {
+            self::VIEW => $this->canView($user, $prescriptionId),
+            self::VIEW_ANY, 'PRESCRIPTION_VIEW_ALL' => $this->security->isGranted('ROLE_PRESCRIPTION_VIEW_ANY'),
+            self::VIEW_OWN => $this->canViewOwn($user, $prescriptionId),
+            self::CREATE => $this->canCreate($user, $subject),
+            self::CREATE_ANY => $this->security->isGranted('ROLE_PRESCRIPTION_CREATE_ANY'),
+            self::CREATE_OWN => $this->canCreateOwn($user, $subject),
+            self::EDIT => $this->canEdit($user, $prescriptionId),
+            self::EDIT_ANY => $this->security->isGranted('ROLE_PRESCRIPTION_EDIT_ANY'),
+            self::EDIT_OWN => $this->canEditOwn($user, $prescriptionId),
+            default => false,
+        };
     }
 
     private function canView(User $user, ?int $prescriptionId) : bool
     {
-        // Registrars can view all prescriptions (e.g. for printing)
-        if ($this->canViewAll()) {
+        if ($this->security->isGranted('ROLE_PRESCRIPTION_VIEW_ANY')) {
             return true;
         }
 
-        // Doctors and nurses can view prescriptions if they own them or are assigned to the patient
-        if ($prescriptionId && $this->canViewOwn()) {
+        if ($prescriptionId && $this->security->isGranted('ROLE_PRESCRIPTION_VIEW_OWN')) {
             return $this->isOwner($user, $prescriptionId);
         }
 
         return false;
     }
 
-    private function canViewAll() : bool
+    private function canViewOwn(User $user, ?int $prescriptionId) : bool
     {
-        return $this->security->isGranted('ROLE_REGISTRAR');
-    }
+        if (!$prescriptionId) {
+            return false;
+        }
 
-    private function canViewOwn() : bool
-    {
-        return $this->security->isGranted('ROLE_DOCTOR') || $this->security->isGranted('ROLE_NURSE');
+        return $this->isOwner($user, $prescriptionId);
     }
 
     private function canCreate(User $user, mixed $subject) : bool
     {
-        // Only doctors can create prescriptions
-        if ($this->security->isGranted('ROLE_DOCTOR')) {
-            $context = is_array($subject) ? $subject : [];
-            $submittedDoctorId = $context['doctor_id'] ?? null;
+        if ($this->security->isGranted('ROLE_PRESCRIPTION_CREATE_ANY')) {
+            return true;
+        }
 
-            if (!$submittedDoctorId) {
-                return true; // No explicit doctor specified, assuming creating for self
-            }
-            return $user->getId() === (int)$submittedDoctorId;
+        if ($this->security->isGranted('ROLE_PRESCRIPTION_CREATE_OWN')) {
+            return $this->isDoctorCreatingForSelf($user, $subject);
         }
 
         return false;
     }
 
+    private function canCreateOwn(User $user, mixed $subject) : bool
+    {
+        return $this->isDoctorCreatingForSelf($user, $subject);
+    }
+
     private function canEdit(User $user, ?int $prescriptionId) : bool
     {
-        // Only doctors can edit prescriptions, and only if they own them
-        if ($prescriptionId && $this->security->isGranted('ROLE_DOCTOR')) {
+        if ($this->security->isGranted('ROLE_PRESCRIPTION_EDIT_ANY')) {
+            return true;
+        }
+
+        if ($prescriptionId && $this->security->isGranted('ROLE_PRESCRIPTION_EDIT_OWN')) {
             return $this->isOwner($user, $prescriptionId);
         }
 
         return false;
+    }
+
+    private function canEditOwn(User $user, ?int $prescriptionId) : bool
+    {
+        if (!$prescriptionId) {
+            return false;
+        }
+
+        return $this->isOwner($user, $prescriptionId);
+    }
+
+    private function isDoctorCreatingForSelf(User $user, mixed $subject) : bool
+    {
+        $context = is_array($subject) ? $subject : [];
+        $submittedDoctorId = $context['doctor_id'] ?? null;
+
+        if (!$submittedDoctorId) {
+            return true;
+        }
+
+        return $user->getId() === (int) $submittedDoctorId;
     }
 
     private function isOwner(User $user, int $prescriptionId) : bool
@@ -146,12 +186,12 @@ class PrescriptionVoter extends Voter
         }
 
         $prescription = $this->prescriptionRepository->findById($prescriptionId);
-        if ($prescription && (int)$prescription['doctor_id'] === $userId) {
+        if ($prescription && (int) $prescription['doctor_id'] === $userId) {
             return true;
         }
 
         if ($prescription && isset($prescription['patient_id'])) {
-            return $this->appointmentRepository->isPatientAssignedToDoctor((int)$prescription['patient_id'], $userId);
+            return $this->appointmentRepository->isPatientAssignedToDoctor((int) $prescription['patient_id'], $userId);
         }
 
         return false;
