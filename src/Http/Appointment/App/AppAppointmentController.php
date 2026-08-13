@@ -450,8 +450,11 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/edit', name: 'appointment_edit', methods: ['GET'])]
     public function edit(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('APPOINTMENT_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -498,8 +501,11 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/edit', name: 'appointment_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT');
         $id = (int)($_POST['id'] ?? 0);
+
+        if (!$this->isGranted('APPOINTMENT_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $rawInput = $_POST;
 
@@ -615,8 +621,11 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/cancel', name: 'appointment_cancel', methods: ['POST'])]
     public function cancel() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_CANCEL_ANY');
         $id = (int)($_POST['id'] ?? 0);
+
+        if (!$this->isGranted('APPOINTMENT_CANCEL', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $appointment = $this->appointmentRepository->findById($id);
 
