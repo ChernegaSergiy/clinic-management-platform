@@ -133,8 +133,11 @@ class PatientController extends AbstractController
     #[Route('/patients/show', name: 'patient_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_VIEW');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('PATIENT_VIEW', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $patient = $this->patientRepository->findById($id);
 
@@ -155,8 +158,11 @@ class PatientController extends AbstractController
     #[Route('/patients/edit', name: 'patient_edit', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('PATIENT_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $patient = $this->patientRepository->findById($id);
 
@@ -170,8 +176,11 @@ class PatientController extends AbstractController
     #[Route('/patients/edit', name: 'patient_update', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('PATIENT_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $patient = $this->patientRepository->findById($id);
 
@@ -376,7 +385,9 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/add', name: 'patient_policy_add', methods: ['GET'])]
     public function addPolicy(int $patientId) : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
+        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
+            return $this->createAccessDeniedException();
+        }
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -394,7 +405,9 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/store', name: 'patient_policy_store', methods: ['POST'])]
     public function storePolicy(int $patientId) : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
+        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
+            return $this->createAccessDeniedException();
+        }
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -436,7 +449,9 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/edit', name: 'patient_policy_edit', methods: ['GET'])]
     public function editPolicy(int $patientId) : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
+        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
+            return $this->createAccessDeniedException();
+        }
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -458,7 +473,9 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/update', name: 'patient_policy_update', methods: ['POST'])]
     public function updatePolicy(int $patientId) : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
+        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
+            return $this->createAccessDeniedException();
+        }
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -505,7 +522,9 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/delete', name: 'patient_policy_delete', methods: ['POST'])]
     public function deletePolicy(int $patientId) : Response
     {
-        $this->denyAccessUnlessGranted('PATIENT_EDIT');
+        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
+            return $this->createAccessDeniedException();
+        }
 
         $policyId = (int)($_POST['id'] ?? 0);
         $policy = $this->insuranceService->getPatientPolicy($policyId);
