@@ -2,132 +2,197 @@
 
 ## Overview
 
-The new modular access rights system allows bundles to independently register their rights and access verification policies.
+Symfony Voters + `role_hierarchy` in `security.yaml`. The hierarchy is the **single source of truth** for all permission grants.
 
-## Architecture
+## Naming Convention
 
-### PermissionRegistry
-
-Class for registering and managing access rights.
-
-```php
-$registry = new PermissionRegistry();
-$registry->add('hrm.read', 'View employees');
-$registry->addRoleMapping('hr_manager', ['hrm.read', 'hrm.write']);
+```
+ROLE_{DOMAIN}_{ACTION}_{SCOPE}
 ```
 
-### PolicyRegistry
+| Component | Values | Notes |
+|-----------|--------|-------|
+| `DOMAIN` | `APPOINTMENT`, `PATIENT`, `MEDICAL_RECORD`, etc. | Singular noun |
+| `ACTION` | `VIEW`, `CREATE`, `EDIT`, `DELETE`, `CANCEL`, `MANAGE`, `EXPORT` | `MANAGE` = full CRUD |
+| `SCOPE` | `ANY`, `OWN` | Optional; omitted for admin-only permissions |
 
-Class for registering access verification policies for resources.
+Examples:
+- `ROLE_APPOINTMENT_VIEW_ANY` — view all appointments
+- `ROLE_APPOINTMENT_VIEW_OWN` — view only own appointments
+- `ROLE_DEPARTMENT_MANAGE` — full department management (admin-only, no scope)
+
+## Voter Attribute Convention
+
+Voter attributes are the **same strings without `ROLE_` prefix**:
 
 ```php
-$registry = new PolicyRegistry();
-$registry->register('hrm', HrmPolicy::class);
+public const VIEW_ANY = 'APPOINTMENT_VIEW_ANY';
+public const VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
 ```
 
-### Policy
+## Role Hierarchy (`security.yaml`)
 
-Abstract base class for all policies.
+The hierarchy defines which roles inherit which permissions:
+
+```yaml
+security:
+    role_hierarchy:
+        ROLE_ADMIN:
+            - ROLE_APPOINTMENT_VIEW_ANY
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_APPOINTMENT_EDIT_ANY
+            - ROLE_APPOINTMENT_DELETE
+            # ... other admin permissions
+
+        ROLE_DOCTOR:
+            - ROLE_APPOINTMENT_VIEW_OWN
+            - ROLE_APPOINTMENT_CREATE
+            - ROLE_APPOINTMENT_EDIT_OWN
+            - ROLE_APPOINTMENT_CANCEL_OWN
+            # ... other doctor permissions
+
+        ROLE_NURSE:
+            - ROLE_APPOINTMENT_VIEW_OWN
+            - ROLE_PATIENT_VIEW_OWN
+            - ROLE_MEDICAL_RECORD_VIEW_OWN
+            # ... other nurse permissions
+```
+
+**Key rules:**
+- `_ANY` = access to all records
+- `_OWN` = access to own records only
+- `MANAGE` = full CRUD (used for admin-only domains like `DEPARTMENT_MANAGE`)
+- `VIEW` = read-only access
+- `CREATE` = can create new records
+- `EDIT` = can modify existing records
+- `DELETE` = can remove records
+- `CANCEL` = can cancel appointments/prescriptions
+- `EXPORT` = can export data
+
+## Voter Implementation
+
+### Ownership-free voters (admin-only domains)
 
 ```php
-class HrmPolicy extends Policy
+class DepartmentVoter extends Voter
 {
-    public function view(mixed $resource): bool
+    public const VIEW = 'DEPARTMENT_VIEW';
+    public const CREATE = 'DEPARTMENT_CREATE';
+    public const EDIT = 'DEPARTMENT_EDIT';
+    public const DELETE = 'DEPARTMENT_DELETE';
+    public const MANAGE = 'DEPARTMENT_MANAGE';
+
+    protected function supports(string $attribute, mixed $subject): bool
     {
-        // Access verification logic
-        return $this->isAdmin();
+        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::MANAGE], true);
     }
 
-    public function create(): bool { }
-    public function update(mixed $resource): bool { }
-    public function delete(mixed $resource): bool { }
-}
-```
-
-## Usage in Bundles
-
-### Permission and Policy Registration
-
-Each bundle registers its permissions and policies through a Symfony `CompilerPass` (e.g. in `DependencyInjection/Compiler/HrmPermissionsPass.php`):
-
-```php
-class HrmPermissionsPass implements CompilerPassInterface
-{
-    public function process(ContainerBuilder $container): void
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if ($container->hasDefinition(PermissionRegistry::class)) {
-            $registry = $container->getDefinition(PermissionRegistry::class);
-            $registry->addMethodCall('add', ['hrm.read', 'View employees']);
-            $registry->addMethodCall('add', ['hrm.write', 'Edit employees']);
-            $registry->addMethodCall('add', ['hrm.manage', 'Manage employees']);
-
-            $registry->addMethodCall('addRoleMapping', ['admin', ['hrm.read', 'hrm.write', 'hrm.manage']]);
-            $registry->addMethodCall('addRoleMapping', ['hr_manager', ['hrm.read', 'hrm.write', 'hrm.manage']]);
-            $registry->addMethodCall('addRoleMapping', ['medical_manager', ['hrm.read']]);
+        $user = $token->getUser();
+        if (!$user instanceof User) {
+            return false;
         }
 
-        if ($container->hasDefinition(PolicyRegistry::class)) {
-            $registry = $container->getDefinition(PolicyRegistry::class);
-            $registry->addMethodCall('register', ['hrm', HrmPolicy::class]);
-        }
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_DEPARTMENT_VIEW'),
+            self::CREATE => $this->security->isGranted('ROLE_DEPARTMENT_CREATE'),
+            self::EDIT => $this->security->isGranted('ROLE_DEPARTMENT_EDIT'),
+            self::DELETE => $this->security->isGranted('ROLE_DEPARTMENT_DELETE'),
+            self::MANAGE => $this->security->isGranted('ROLE_DEPARTMENT_MANAGE'),
+            default => false,
+        };
     }
 }
 ```
 
-## Permission Checking in Controllers
-
-### Modern Way (via Gate)
+### Ownership voters (domain + entity ownership)
 
 ```php
-public function index(): void
+class AppointmentVoter extends Voter
 {
-    Gate::authorize('hrm.read');
-    // ... method code
+    public const VIEW_ANY = 'APPOINTMENT_VIEW_ANY';
+    public const VIEW_OWN = 'APPOINTMENT_VIEW_OWN';
+    public const CREATE = 'APPOINTMENT_CREATE';
+    public const EDIT_ANY = 'APPOINTMENT_EDIT_ANY';
+    public const EDIT_OWN = 'APPOINTMENT_EDIT_OWN';
+    public const CANCEL_ANY = 'APPOINTMENT_CANCEL_ANY';
+    public const CANCEL_OWN = 'APPOINTMENT_CANCEL_OWN';
+    public const DELETE = 'APPOINTMENT_DELETE';
+
+    // Legacy aliases for backward compatibility
+    private const ALIASES = [
+        'APPOINTMENT_VIEW_ALL' => self::VIEW_ANY,
+        'APPOINTMENT_EDIT_ALL' => self::EDIT_ANY,
+        'APPOINTMENT_CANCEL' => self::CANCEL_ANY,
+    ];
+
+    protected function supports(string $attribute, mixed $subject): bool
+    {
+        return in_array($attribute, [
+            self::VIEW_ANY, self::VIEW_OWN,
+            self::CREATE,
+            self::EDIT_ANY, self::EDIT_OWN,
+            self::CANCEL_ANY, self::CANCEL_OWN,
+            self::DELETE,
+            ...array_keys(self::ALIASES),
+        ], true);
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    {
+        $user = $token->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        // Resolve legacy aliases
+        $attribute = self::ALIASES[$attribute] ?? $attribute;
+
+        return match ($attribute) {
+            self::VIEW_ANY => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY'),
+            self::VIEW_OWN => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_OWN') && $this->isOwner($subject, $user),
+            self::CREATE => $this->security->isGranted('ROLE_APPOINTMENT_CREATE'),
+            self::EDIT_ANY => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY'),
+            self::EDIT_OWN => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_OWN') && $this->isOwner($subject, $user),
+            self::CANCEL_ANY => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY'),
+            self::CANCEL_OWN => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_OWN') && $this->isOwner($subject, $user),
+            self::DELETE => $this->security->isGranted('ROLE_APPOINTMENT_DELETE'),
+            default => false,
+        };
+    }
 }
 ```
 
-### Checking Without Throwing Error
+## Adding New Permissions
 
-```php
-if (Gate::allows('hrm.write')) {
-    // User has access
-}
-```
+1. **Define roles** in `config/packages/security.yaml` under `role_hierarchy`
+2. **Add constants** to the Voter class
+3. **Implement `supports()`** and **`voteOnAttribute()`** using `ROLE_*` strings
+4. **Update controllers** to use new attribute names
 
-### With Context
+## Legacy Aliases
 
-```php
-Gate::authorize('patients.read', ['patient_id' => $id]);
-```
+Old attribute names (`*_ALL`, `*_WRITE`, etc.) are mapped to canonical names via `ALIASES` constant in voters. These exist for backward compatibility during transition and should be removed once all controllers are updated.
 
-## Initialization in Request Lifecycle
+## Current Voter Inventory
 
-In the new architecture, initialization is handled through the Symfony DI container and `App\Kernel`:
-
-```php
-// 1. Container compilation
-// Symfony Kernel compiles the container and runs all registered CompilerPass classes.
-// The `HrmPermissionsPass` is executed, injecting permissions into the `PermissionRegistry` definition.
-
-// 2. Resolve core services from DI
-$permissionRegistry = $container->get(PermissionRegistry::class);
-$policyRegistry = $container->get(PolicyRegistry::class);
-
-// 3. Configure Gate
-// This happens globally via a listener or direct injection.
-Gate::setPermissionRegistry($permissionRegistry);
-Gate::setPolicyRegistry($policyRegistry);
-```
-
-## Advantages of the New System
-
-1. **Modularity** — each module manages its own permissions independently
-2. **Flexibility** — easy to add new permissions and policies
-3. **Type safety** — policies are typed and validated
-4. **No hardcode** — permissions are not hardcoded in the core
-5. **Easy testing** — policies are easy to mock for tests
-6. **Readability** — access logic is clear and structured
-
-## Migration from Old System
-
-The old Gate system is still supported through `GateNew.php` with fallback to legacy permissions. Modules can be gradually migrated to the new system.
+| Voter | Attributes | Ownership |
+|-------|-----------|-----------|
+| `AppointmentVoter` | `VIEW_ANY/OWN`, `CREATE`, `EDIT_ANY/OWN`, `CANCEL_ANY/OWN`, `DELETE` | Yes |
+| `PatientVoter` | `VIEW_ANY/OWN`, `CREATE`, `EDIT_ANY/OWN`, `DELETE` | Yes |
+| `MedicalRecordVoter` | `VIEW_ANY/OWN`, `CREATE`, `EDIT_OWN`, `DELETE` | Yes |
+| `PrescriptionVoter` | `VIEW_ANY/OWN`, `CREATE`, `EDIT_OWN`, `CANCEL_OWN`, `DELETE` | Yes |
+| `LabOrderVoter` | `VIEW_ANY/OWN`, `CREATE`, `EDIT_ANY/OWN`, `DELETE` | Yes |
+| `ScheduleVoter` | `VIEW_ANY/OWN`, `MANAGE_ANY/OWN`, `DELETE` | Yes |
+| `DepartmentVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE`, `MANAGE` | No |
+| `HrmVoter` | `VIEW`, `EDIT`, `MANAGE` | No |
+| `BillingVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE`, `MANAGE` | No |
+| `InsuranceVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE` | No |
+| `NewsVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE` | No |
+| `RoomVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE`, `MANAGE` | No |
+| `NotificationVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE` | No |
+| `ClinicalReferenceVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE` | No |
+| `DashboardVoter` | `VIEW` | No |
+| `KpiVoter` | `VIEW` | No |
+| `InventoryVoter` | `VIEW`, `CREATE`, `EDIT`, `DELETE`, `MANAGE` | No |
