@@ -435,8 +435,11 @@ class AppAppointmentController extends AbstractController
     #[Route('/appointments/show', name: 'appointment_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('APPOINTMENT_VIEW', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $appointment = $this->appointmentRepository->findById($id);
 
