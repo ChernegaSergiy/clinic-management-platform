@@ -179,10 +179,8 @@ class MedicalRecordController extends AbstractController
     public function show(#[CurrentUser] User $user) : Response
     {
         $id = (int)($_GET['id'] ?? 0);
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW', $id);
 
-        if (!$this->isGranted('MEDICAL_RECORD_VIEW', $id)) {
-            return $this->createAccessDeniedException();
-        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -234,10 +232,8 @@ class MedicalRecordController extends AbstractController
     public function edit() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT', $id);
 
-        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -257,10 +253,8 @@ class MedicalRecordController extends AbstractController
     public function update() : Response
     {
         $id = (int)($_POST['id'] ?? 0);
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT', $id);
 
-        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -309,10 +303,8 @@ class MedicalRecordController extends AbstractController
     public function uploadAttachment(#[CurrentUser] User $user) : Response
     {
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT', $medicalRecordId);
 
-        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $medicalRecordId)) {
-            return $this->createAccessDeniedException();
-        }
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
         if (!$record) {
@@ -353,10 +345,8 @@ class MedicalRecordController extends AbstractController
         }
 
         $medicalRecordId = (int)$attachment['entity_id'];
+        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW', $medicalRecordId);
 
-        if (!$this->isGranted('MEDICAL_RECORD_VIEW', $medicalRecordId)) {
-            return $this->createAccessDeniedException();
-        }
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
         if (!$record) {

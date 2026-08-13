@@ -171,10 +171,7 @@ class PrescriptionController extends AbstractController
     public function show() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('PRESCRIPTION_VIEW', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PRESCRIPTION_VIEW', $id);
 
         $prescription = $this->prescriptionRepository->findById($id);
 

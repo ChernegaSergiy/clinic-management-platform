@@ -134,10 +134,7 @@ class PatientController extends AbstractController
     public function show() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('PATIENT_VIEW', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_VIEW', $id);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -159,10 +156,7 @@ class PatientController extends AbstractController
     public function edit() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('PATIENT_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $id);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -177,10 +171,7 @@ class PatientController extends AbstractController
     public function update() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('PATIENT_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $id);
 
         $patient = $this->patientRepository->findById($id);
 
@@ -385,9 +376,7 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/add', name: 'patient_policy_add', methods: ['GET'])]
     public function addPolicy(int $patientId) : Response
     {
-        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $patientId);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -405,9 +394,7 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/store', name: 'patient_policy_store', methods: ['POST'])]
     public function storePolicy(int $patientId) : Response
     {
-        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $patientId);
 
         $patient = $this->patientRepository->findById($patientId);
         if (!$patient) {
@@ -449,9 +436,7 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/edit', name: 'patient_policy_edit', methods: ['GET'])]
     public function editPolicy(int $patientId) : Response
     {
-        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $patientId);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -473,9 +458,7 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/update', name: 'patient_policy_update', methods: ['POST'])]
     public function updatePolicy(int $patientId) : Response
     {
-        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $patientId);
 
         $policyId = (int)($_GET['id'] ?? 0);
         $patient = $this->patientRepository->findById($patientId);
@@ -522,9 +505,7 @@ class PatientController extends AbstractController
     #[Route('/patients/{patientId}/policies/delete', name: 'patient_policy_delete', methods: ['POST'])]
     public function deletePolicy(int $patientId) : Response
     {
-        if (!$this->isGranted('PATIENT_EDIT', $patientId)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('PATIENT_EDIT', $patientId);
 
         $policyId = (int)($_POST['id'] ?? 0);
         $policy = $this->insuranceService->getPatientPolicy($policyId);

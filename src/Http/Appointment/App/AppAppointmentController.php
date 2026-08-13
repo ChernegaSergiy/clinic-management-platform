@@ -436,10 +436,7 @@ class AppAppointmentController extends AbstractController
     public function show() : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('APPOINTMENT_VIEW', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('APPOINTMENT_VIEW', $id);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -454,10 +451,7 @@ class AppAppointmentController extends AbstractController
     public function edit(#[CurrentUser] User $user) : Response
     {
         $id = (int)($_GET['id'] ?? 0);
-
-        if (!$this->isGranted('APPOINTMENT_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT', $id);
 
         $appointment = $this->appointmentRepository->findById($id);
 
@@ -505,10 +499,7 @@ class AppAppointmentController extends AbstractController
     public function update() : Response
     {
         $id = (int)($_POST['id'] ?? 0);
-
-        if (!$this->isGranted('APPOINTMENT_EDIT', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('APPOINTMENT_EDIT', $id);
 
         $rawInput = $_POST;
 
@@ -625,10 +616,7 @@ class AppAppointmentController extends AbstractController
     public function cancel() : Response
     {
         $id = (int)($_POST['id'] ?? 0);
-
-        if (!$this->isGranted('APPOINTMENT_CANCEL', $id)) {
-            return $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('APPOINTMENT_CANCEL', $id);
 
         $appointment = $this->appointmentRepository->findById($id);
 
