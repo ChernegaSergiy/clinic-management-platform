@@ -7,30 +7,51 @@
 # https://help.github.com/articles/about-codeowners/
 
 # Core functionality
-src/Core/ @ChernegaSergiy
+src/Infrastructure/ @ChernegaSergiy
+src/Shared/ @ChernegaSergiy
 src/Event/ @ChernegaSergiy
 
 # Modules
-src/Bundles/AdminBundle/ @ChernegaSergiy
-src/Bundles/AppointmentBundle/ @Andriihev @ChernegaSergiy
-src/Bundles/BillingBundle/ @ChernegaSergiy
-src/Bundles/ClinicalReferenceBundle/ @ChernegaSergiy
-src/Bundles/DashboardBundle/ @ChernegaSergiy
-src/Bundles/DepartmentBundle/ @ChernegaSergiy
-src/Bundles/HrmBundle/ @ChernegaSergiy
-src/Bundles/InsuranceBundle/ @ChernegaSergiy
-src/Bundles/InventoryBundle/ @ChernegaSergiy
-src/Bundles/KpiBundle/ @ChernegaSergiy
-src/Bundles/LabOrderBundle/ @ChernegaSergiy
-src/Bundles/MedicalRecordBundle/ @ChernegaSergiy
-src/Bundles/NewsBundle/ @ChernegaSergiy
-src/Bundles/NotificationBundle/ @ChernegaSergiy
-src/Bundles/PatientBundle/ @ChernegaSergiy
-src/Bundles/PrescriptionBundle/ @ChernegaSergiy
-src/Bundles/RoomBundle/ @Andriihev @ChernegaSergiy
-src/Bundles/ScheduleBundle/ @Andriihev @ChernegaSergiy
-src/Bundles/SiteBundle/ @ChernegaSergiy
-src/Bundles/UserBundle/ @ChernegaSergiy
+src/Domain/Admin/ @ChernegaSergiy
+src/Http/Admin/ @ChernegaSergiy
+src/Domain/Appointment/ @Andriihev @ChernegaSergiy
+src/Http/Appointment/ @Andriihev @ChernegaSergiy
+src/Domain/Billing/ @ChernegaSergiy
+src/Http/Billing/ @ChernegaSergiy
+src/Domain/ClinicalReference/ @ChernegaSergiy
+src/Http/ClinicalReference/ @ChernegaSergiy
+src/Domain/Dashboard/ @ChernegaSergiy
+src/Http/Dashboard/ @ChernegaSergiy
+src/Domain/Department/ @ChernegaSergiy
+src/Http/Department/ @ChernegaSergiy
+src/Domain/Hrm/ @ChernegaSergiy
+src/Http/Hrm/ @ChernegaSergiy
+src/Domain/Insurance/ @ChernegaSergiy
+src/Http/Insurance/ @ChernegaSergiy
+src/Domain/Inventory/ @ChernegaSergiy
+src/Http/Inventory/ @ChernegaSergiy
+src/Domain/Kpi/ @ChernegaSergiy
+src/Http/Kpi/ @ChernegaSergiy
+src/Domain/LabOrder/ @ChernegaSergiy
+src/Http/LabOrder/ @ChernegaSergiy
+src/Domain/MedicalRecord/ @ChernegaSergiy
+src/Http/MedicalRecord/ @ChernegaSergiy
+src/Domain/News/ @ChernegaSergiy
+src/Http/News/ @ChernegaSergiy
+src/Domain/Notification/ @ChernegaSergiy
+src/Http/Notification/ @ChernegaSergiy
+src/Domain/Patient/ @ChernegaSergiy
+src/Http/Patient/ @ChernegaSergiy
+src/Domain/Prescription/ @ChernegaSergiy
+src/Http/Prescription/ @ChernegaSergiy
+src/Domain/Room/ @Andriihev @ChernegaSergiy
+src/Http/Room/ @Andriihev @ChernegaSergiy
+src/Domain/Schedule/ @Andriihev @ChernegaSergiy
+src/Http/Schedule/ @Andriihev @ChernegaSergiy
+src/Http/Site/ @ChernegaSergiy
+src/Domain/User/ @ChernegaSergiy
+src/Http/User/ @ChernegaSergiy
+src/Auth/ @ChernegaSergiy
 templates/ @Andriihev
 
 # Frontend assets
