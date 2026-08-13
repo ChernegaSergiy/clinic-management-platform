@@ -218,14 +218,9 @@ class ContractController extends AbstractController
     }
 
     #[Route('/billing/contracts/{id}/download', name: 'billing_contracts_download', methods: ['GET'])]
-    public function downloadFile(int $id = 0) : Response
+    public function downloadFile(int $id) : Response
     {
         $this->denyAccessUnlessGranted('BILLING_MANAGE');
-
-        // Accept ID from route parameter or query string fallback
-        if (0 === $id) {
-            $id = (int)($_GET['id'] ?? 0);
-        }
 
         $contract = $this->contractRepository->findById($id);
 
