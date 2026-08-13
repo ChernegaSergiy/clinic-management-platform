@@ -60,7 +60,6 @@ public/css/ @Andriihev
 public/images/ @Andriihev
 
 # Testing
-tests/Core/Http/FrontControllerTest.php @makztezerest
 tests/ @ChernegaSergiy
 
 # CI/CD
