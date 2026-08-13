@@ -53,7 +53,7 @@ class ClinicalReferenceVoter extends Voter
         }
 
         // Administrators and Medical Managers can manage clinical reference data
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+        if ($this->security->isGranted('ROLE_CLINICAL_REFERENCE_MANAGE')) {
             return true;
         }
 

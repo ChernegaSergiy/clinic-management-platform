@@ -53,23 +53,10 @@ class DashboardVoter extends Voter
             return false;
         }
 
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
-
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->security->isGranted('ROLE_REGISTRAR')
-                    || $this->security->isGranted('ROLE_DOCTOR')
-                    || $this->security->isGranted('ROLE_NURSE')
-                    || $this->security->isGranted('ROLE_LAB_TECHNICIAN')
-                    || $this->security->isGranted('ROLE_BILLING')
-                    || $this->security->isGranted('ROLE_INVENTORY_MANAGER')
-                    || $this->security->isGranted('ROLE_HR_MANAGER');
-            case self::EXPORT:
-                return $this->security->isGranted('ROLE_BILLING');
-        }
-
-        return false;
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_DASHBOARD_VIEW'),
+            self::EXPORT => $this->security->isGranted('ROLE_DASHBOARD_EXPORT'),
+            default => false,
+        };
     }
 }

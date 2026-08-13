@@ -54,7 +54,7 @@ class RoomVoter extends Voter
         }
 
         // Only administrators and medical managers can manage rooms
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
+        if ($this->security->isGranted('ROLE_ROOM_MANAGE')) {
             return true;
         }
 

@@ -56,30 +56,13 @@ class DepartmentVoter extends Voter
             return false;
         }
 
-        // Administrators and Medical Managers have full access to manage departments
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
-
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($user);
-            case self::CREATE:
-            case self::EDIT:
-            case self::DELETE:
-            case self::MANAGE:
-                return false; // Only admins and medical managers can modify departments
-        }
-
-        return false;
-    }
-
-    private function canView(User $user) : bool
-    {
-        // Almost all staff roles need to view the list of departments
-        return $this->security->isGranted('ROLE_DOCTOR')
-            || $this->security->isGranted('ROLE_NURSE')
-            || $this->security->isGranted('ROLE_REGISTRAR')
-            || $this->security->isGranted('ROLE_HR_MANAGER');
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_DEPARTMENT_VIEW'),
+            self::CREATE => $this->security->isGranted('ROLE_DEPARTMENT_CREATE'),
+            self::EDIT => $this->security->isGranted('ROLE_DEPARTMENT_EDIT'),
+            self::DELETE => $this->security->isGranted('ROLE_DEPARTMENT_DELETE'),
+            self::MANAGE => $this->security->isGranted('ROLE_DEPARTMENT_MANAGE'),
+            default => false,
+        };
     }
 }

@@ -53,34 +53,10 @@ class KpiVoter extends Voter
             return false;
         }
 
-        // Administrators, Medical Managers, and HR Managers can manage KPIs
-        switch ($attribute) {
-            case self::VIEW:
-                return $this->canView();
-            case self::MANAGE:
-                return $this->canManage();
-            default:
-                return false;
-        }
-    }
-
-    private function canView() : bool
-    {
-        return $this->security->isGranted('ROLE_ADMIN')
-            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
-            || $this->security->isGranted('ROLE_HR_MANAGER')
-            || $this->security->isGranted('ROLE_REGISTRAR')
-            || $this->security->isGranted('ROLE_DOCTOR')
-            || $this->security->isGranted('ROLE_NURSE')
-            || $this->security->isGranted('ROLE_BILLING')
-            || $this->security->isGranted('ROLE_LAB_TECHNICIAN')
-            || $this->security->isGranted('ROLE_INVENTORY_MANAGER');
-    }
-
-    private function canManage() : bool
-    {
-        return $this->security->isGranted('ROLE_ADMIN')
-            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
-            || $this->security->isGranted('ROLE_HR_MANAGER');
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_KPI_VIEW'),
+            self::MANAGE => $this->security->isGranted('ROLE_KPI_MANAGE'),
+            default => false,
+        };
     }
 }

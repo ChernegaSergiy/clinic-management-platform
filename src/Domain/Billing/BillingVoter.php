@@ -53,17 +53,10 @@ class BillingVoter extends Voter
             return false;
         }
 
-        // Administrators and Medical Managers have full access to billing
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
-
-        switch ($attribute) {
-            case self::VIEW:
-            case self::MANAGE:
-                return $this->security->isGranted('ROLE_REGISTRAR');
-        }
-
-        return false;
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_BILLING_VIEW'),
+            self::MANAGE => $this->security->isGranted('ROLE_BILLING_MANAGE'),
+            default => false,
+        };
     }
 }

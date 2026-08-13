@@ -54,11 +54,11 @@ class HrmVoter extends Voter
             return false;
         }
 
-        // HR Managers, Administrators and Medical Managers can manage human resources
-        if ($this->security->isGranted('ROLE_HR_MANAGER') || $this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
-
-        return false;
+        return match ($attribute) {
+            self::VIEW => $this->security->isGranted('ROLE_HRM_VIEW'),
+            self::EDIT => $this->security->isGranted('ROLE_HRM_EDIT'),
+            self::MANAGE => $this->security->isGranted('ROLE_HRM_MANAGE'),
+            default => false,
+        };
     }
 }

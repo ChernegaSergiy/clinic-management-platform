@@ -54,22 +54,9 @@ class InsuranceVoter extends Voter
         }
 
         return match ($attribute) {
-            self::VIEW => $this->canView(),
-            self::MANAGE => $this->canManage(),
+            self::VIEW => $this->security->isGranted('ROLE_INSURANCE_VIEW'),
+            self::MANAGE => $this->security->isGranted('ROLE_INSURANCE_MANAGE'),
             default => false,
         };
-    }
-
-    private function canView() : bool
-    {
-        return $this->security->isGranted('ROLE_ADMIN')
-            || $this->security->isGranted('ROLE_MEDICAL_MANAGER')
-            || $this->security->isGranted('ROLE_REGISTRAR');
-    }
-
-    private function canManage() : bool
-    {
-        return $this->security->isGranted('ROLE_ADMIN')
-            || $this->security->isGranted('ROLE_MEDICAL_MANAGER');
     }
 }

@@ -52,16 +52,6 @@ class NotificationVoter extends Voter
             return false;
         }
 
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_MEDICAL_MANAGER')) {
-            return true;
-        }
-
-        return $this->security->isGranted('ROLE_DOCTOR')
-            || $this->security->isGranted('ROLE_NURSE')
-            || $this->security->isGranted('ROLE_REGISTRAR')
-            || $this->security->isGranted('ROLE_BILLING')
-            || $this->security->isGranted('ROLE_LAB_TECHNICIAN')
-            || $this->security->isGranted('ROLE_INVENTORY_MANAGER')
-            || $this->security->isGranted('ROLE_HR_MANAGER');
+        return $this->security->isGranted('ROLE_NOTIFICATION_VIEW');
     }
 }
