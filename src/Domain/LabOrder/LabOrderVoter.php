@@ -60,8 +60,6 @@ class LabOrderVoter extends Voter
             self::EDIT,
             self::EDIT_ANY,
             self::EDIT_OWN,
-            // Legacy alias — accepted but deprecated
-            'LAB_ORDER_EDIT_ALL',
         ], true);
     }
 
@@ -85,7 +83,7 @@ class LabOrderVoter extends Voter
             self::VIEW_OWN => $this->canViewOwn($user, $labOrderId),
             self::CREATE => $this->security->isGranted('ROLE_LAB_ORDER_CREATE'),
             self::EDIT => $this->canEdit($user, $labOrderId),
-            self::EDIT_ANY, 'LAB_ORDER_EDIT_ALL' => $this->security->isGranted('ROLE_LAB_ORDER_EDIT_ANY'),
+            self::EDIT_ANY => $this->security->isGranted('ROLE_LAB_ORDER_EDIT_ANY'),
             self::EDIT_OWN => $this->canEditOwn($user, $labOrderId),
             default => false,
         };

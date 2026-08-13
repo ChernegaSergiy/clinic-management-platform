@@ -41,11 +41,6 @@ final class AppointmentVoter extends Voter
     public const CANCEL_ANY = 'APPOINTMENT_CANCEL_ANY';
     public const CANCEL_OWN = 'APPOINTMENT_CANCEL_OWN';
 
-    // Deprecated aliases — kept for controller compatibility until Phase 5
-    public const VIEW_ALL = self::VIEW_ANY;
-    public const EDIT_ALL = self::EDIT_ANY;
-    public const CANCEL = self::CANCEL_ANY;
-
     private AppointmentRepository $appointmentRepository;
     private Security $security;
 
@@ -69,10 +64,6 @@ final class AppointmentVoter extends Voter
             self::EDIT_OWN,
             self::CANCEL_ANY,
             self::CANCEL_OWN,
-            // Legacy aliases — accepted but deprecated
-            'APPOINTMENT_VIEW_ALL',
-            'APPOINTMENT_EDIT_ALL',
-            'APPOINTMENT_CANCEL',
         ], true);
     }
 
@@ -93,13 +84,13 @@ final class AppointmentVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $this->canView($user, $appointmentId),
-            self::VIEW_ANY, 'APPOINTMENT_VIEW_ALL' => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY'),
+            self::VIEW_ANY => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY'),
             self::VIEW_OWN => $this->canViewOwn($user, $appointmentId),
             self::CREATE => $this->security->isGranted('ROLE_APPOINTMENT_CREATE'),
             self::EDIT => $this->canEdit($user, $appointmentId),
-            self::EDIT_ANY, 'APPOINTMENT_EDIT_ALL' => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY'),
+            self::EDIT_ANY => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY'),
             self::EDIT_OWN => $this->canEditOwn($user, $appointmentId),
-            self::CANCEL_ANY, 'APPOINTMENT_CANCEL' => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY'),
+            self::CANCEL_ANY => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY'),
             self::CANCEL_OWN => $this->canCancelOwn($user, $appointmentId),
             default => false,
         };

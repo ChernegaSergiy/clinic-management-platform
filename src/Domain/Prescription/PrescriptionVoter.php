@@ -42,9 +42,6 @@ class PrescriptionVoter extends Voter
     public const EDIT_ANY = 'PRESCRIPTION_EDIT_ANY';
     public const EDIT_OWN = 'PRESCRIPTION_EDIT_OWN';
 
-    // Deprecated aliases — kept for controller compatibility until Phase 5
-    public const VIEW_ALL = self::VIEW_ANY;
-
     private PrescriptionRepository $prescriptionRepository;
     private AppointmentRepository $appointmentRepository;
     private Security $security;
@@ -71,8 +68,6 @@ class PrescriptionVoter extends Voter
             self::EDIT,
             self::EDIT_ANY,
             self::EDIT_OWN,
-            // Legacy aliases — accepted but deprecated
-            'PRESCRIPTION_VIEW_ALL',
         ], true);
     }
 
@@ -92,7 +87,7 @@ class PrescriptionVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $this->canView($user, $prescriptionId),
-            self::VIEW_ANY, 'PRESCRIPTION_VIEW_ALL' => $this->security->isGranted('ROLE_PRESCRIPTION_VIEW_ANY'),
+            self::VIEW_ANY => $this->security->isGranted('ROLE_PRESCRIPTION_VIEW_ANY'),
             self::VIEW_OWN => $this->canViewOwn($user, $prescriptionId),
             self::CREATE => $this->canCreate($user, $subject),
             self::CREATE_ANY => $this->security->isGranted('ROLE_PRESCRIPTION_CREATE_ANY'),

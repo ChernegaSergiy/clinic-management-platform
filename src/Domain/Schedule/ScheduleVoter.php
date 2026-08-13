@@ -36,9 +36,6 @@ class ScheduleVoter extends Voter
     public const MANAGE_OWN = 'SCHEDULE_MANAGE_OWN';
     public const MANAGE_ANY = 'SCHEDULE_MANAGE_ANY';
 
-    // Deprecated alias — kept for controller compatibility until Phase 5
-    public const MANAGE_ALL = self::MANAGE_ANY;
-
     private Security $security;
 
     public function __construct(Security $security)
@@ -53,8 +50,6 @@ class ScheduleVoter extends Voter
             self::UPDATE,
             self::MANAGE_OWN,
             self::MANAGE_ANY,
-            // Legacy alias — accepted but deprecated
-            'SCHEDULE_MANAGE_ALL',
         ], true);
     }
 
@@ -77,7 +72,7 @@ class ScheduleVoter extends Voter
             self::VIEW => $this->canView($user, $doctorId),
             self::UPDATE => $this->canUpdate($user, $doctorId),
             self::MANAGE_OWN => $this->canManageOwn($user, $doctorId),
-            self::MANAGE_ANY, 'SCHEDULE_MANAGE_ALL' => $this->security->isGranted('ROLE_SCHEDULE_MANAGE_ANY'),
+            self::MANAGE_ANY => $this->security->isGranted('ROLE_SCHEDULE_MANAGE_ANY'),
             default => false,
         };
     }

@@ -39,9 +39,6 @@ class MedicalRecordVoter extends Voter
     public const EDIT_ANY = 'MEDICAL_RECORD_EDIT_ANY';
     public const EDIT_OWN = 'MEDICAL_RECORD_EDIT_OWN';
 
-    // Deprecated aliases — kept for controller compatibility until Phase 5
-    public const VIEW_ALL = self::VIEW_ANY;
-
     private MedicalRecordRepository $medicalRecordRepository;
     private Security $security;
 
@@ -63,8 +60,6 @@ class MedicalRecordVoter extends Voter
             self::EDIT,
             self::EDIT_ANY,
             self::EDIT_OWN,
-            // Legacy aliases — accepted but deprecated
-            'MEDICAL_RECORD_VIEW_ALL',
         ], true);
     }
 
@@ -85,7 +80,7 @@ class MedicalRecordVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $this->canView($user, $recordId),
-            self::VIEW_ANY, 'MEDICAL_RECORD_VIEW_ALL' => $this->security->isGranted('ROLE_MEDICAL_RECORD_VIEW_ANY'),
+            self::VIEW_ANY => $this->security->isGranted('ROLE_MEDICAL_RECORD_VIEW_ANY'),
             self::VIEW_OWN => $this->canViewOwn($user, $recordId),
             self::CREATE => $this->security->isGranted('ROLE_MEDICAL_RECORD_CREATE'),
             self::EDIT => $this->canEdit($user, $recordId),

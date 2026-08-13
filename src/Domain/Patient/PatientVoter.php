@@ -40,10 +40,6 @@ class PatientVoter extends Voter
     public const EDIT_ANY = 'PATIENT_EDIT_ANY';
     public const EDIT_OWN = 'PATIENT_EDIT_OWN';
 
-    // Deprecated aliases — kept for controller compatibility until Phase 5
-    public const VIEW_ALL = self::VIEW_ANY;
-    public const EDIT_ALL = self::EDIT_ANY;
-
     private AppointmentRepository $appointmentRepository;
     private Security $security;
 
@@ -65,9 +61,6 @@ class PatientVoter extends Voter
             self::EDIT,
             self::EDIT_ANY,
             self::EDIT_OWN,
-            // Legacy aliases — accepted but deprecated
-            'PATIENT_VIEW_ALL',
-            'PATIENT_EDIT_ALL',
         ], true);
     }
 
@@ -88,11 +81,11 @@ class PatientVoter extends Voter
 
         return match ($attribute) {
             self::VIEW => $this->canView($user, $patientId),
-            self::VIEW_ANY, 'PATIENT_VIEW_ALL' => $this->security->isGranted('ROLE_PATIENT_VIEW_ANY'),
+            self::VIEW_ANY => $this->security->isGranted('ROLE_PATIENT_VIEW_ANY'),
             self::VIEW_OWN => $this->canViewOwn($user, $patientId),
             self::CREATE => $this->security->isGranted('ROLE_PATIENT_CREATE'),
             self::EDIT => $this->canEdit($user, $patientId),
-            self::EDIT_ANY, 'PATIENT_EDIT_ALL' => $this->security->isGranted('ROLE_PATIENT_EDIT_ANY'),
+            self::EDIT_ANY => $this->security->isGranted('ROLE_PATIENT_EDIT_ANY'),
             self::EDIT_OWN => $this->canEditOwn($user, $patientId),
             default => false,
         };
