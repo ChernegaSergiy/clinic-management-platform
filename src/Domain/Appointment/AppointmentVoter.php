@@ -38,6 +38,7 @@ final class AppointmentVoter extends Voter
     public const EDIT = 'APPOINTMENT_EDIT';
     public const EDIT_ANY = 'APPOINTMENT_EDIT_ANY';
     public const EDIT_OWN = 'APPOINTMENT_EDIT_OWN';
+    public const CANCEL = 'APPOINTMENT_CANCEL';
     public const CANCEL_ANY = 'APPOINTMENT_CANCEL_ANY';
     public const CANCEL_OWN = 'APPOINTMENT_CANCEL_OWN';
 
@@ -62,6 +63,7 @@ final class AppointmentVoter extends Voter
             self::EDIT,
             self::EDIT_ANY,
             self::EDIT_OWN,
+            self::CANCEL,
             self::CANCEL_ANY,
             self::CANCEL_OWN,
         ], true);
@@ -90,6 +92,7 @@ final class AppointmentVoter extends Voter
             self::EDIT => $this->canEdit($user, $appointmentId),
             self::EDIT_ANY => $this->security->isGranted('ROLE_APPOINTMENT_EDIT_ANY'),
             self::EDIT_OWN => $this->canEditOwn($user, $appointmentId),
+            self::CANCEL => $this->canCancel($user, $appointmentId),
             self::CANCEL_ANY => $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY'),
             self::CANCEL_OWN => $this->canCancelOwn($user, $appointmentId),
             default => false,
@@ -147,6 +150,19 @@ final class AppointmentVoter extends Voter
         }
 
         return $this->isUserOwnerOfAppointment($user, $appointmentId);
+    }
+
+    private function canCancel(User $user, ?int $appointmentId) : bool
+    {
+        if ($this->security->isGranted('ROLE_APPOINTMENT_CANCEL_ANY')) {
+            return true;
+        }
+
+        if ($appointmentId && $this->security->isGranted('ROLE_APPOINTMENT_CANCEL_OWN')) {
+            return $this->isUserOwnerOfAppointment($user, $appointmentId);
+        }
+
+        return false;
     }
 
     private function isUserOwnerOfAppointment(User $user, int $appointmentId) : bool
