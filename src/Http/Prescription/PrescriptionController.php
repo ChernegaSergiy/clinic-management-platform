@@ -170,8 +170,11 @@ class PrescriptionController extends AbstractController
     #[Route('/prescriptions/show', name: 'prescription_show', methods: ['GET'])]
     public function show() : Response
     {
-        $this->denyAccessUnlessGranted('PRESCRIPTION_VIEW');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('PRESCRIPTION_VIEW', $id)) {
+            return $this->createAccessDeniedException();
+        }
 
         $prescription = $this->prescriptionRepository->findById($id);
 
