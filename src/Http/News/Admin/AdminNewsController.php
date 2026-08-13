@@ -101,11 +101,10 @@ class AdminNewsController extends AbstractController
     }
 
     #[Route('/news/edit/{id}', name: 'admin_news_edit', methods: ['GET'])]
-    public function edit(array $args) : Response
+    public function edit(int $id) : Response
     {
         $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
-        $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
@@ -132,11 +131,10 @@ class AdminNewsController extends AbstractController
     }
 
     #[Route('/news/edit/{id}', name: 'admin_news_update', methods: ['POST'])]
-    public function update(array $args) : Response
+    public function update(int $id) : Response
     {
         $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
-        $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle) {
@@ -167,11 +165,10 @@ class AdminNewsController extends AbstractController
     }
 
     #[Route('/news/delete/{id}', name: 'admin_news_delete', methods: ['POST'])]
-    public function delete(array $args) : Response
+    public function delete(int $id) : Response
     {
         $this->denyAccessUnlessGranted('NEWS_MANAGE');
 
-        $id = (int)($args['id'] ?? 0);
         $this->newsRepository->delete($id);
 
         return $this->redirectToRoute('admin_news_index');

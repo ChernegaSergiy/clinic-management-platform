@@ -48,9 +48,8 @@ class PublicNewsController extends AbstractController
     }
 
     #[Route('/news/{id}', name: 'news_show', methods: ['GET'])]
-    public function show(array $args) : Response
+    public function show(int $id) : Response
     {
-        $id = (int)($args['id'] ?? 0);
         $newsArticle = $this->newsRepository->findById($id);
 
         if (!$newsArticle || !$newsArticle['is_published']) {
