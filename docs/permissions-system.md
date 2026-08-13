@@ -120,13 +120,6 @@ class AppointmentVoter extends Voter
     public const CANCEL_OWN = 'APPOINTMENT_CANCEL_OWN';
     public const DELETE = 'APPOINTMENT_DELETE';
 
-    // Legacy aliases for backward compatibility
-    private const ALIASES = [
-        'APPOINTMENT_VIEW_ALL' => self::VIEW_ANY,
-        'APPOINTMENT_EDIT_ALL' => self::EDIT_ANY,
-        'APPOINTMENT_CANCEL' => self::CANCEL_ANY,
-    ];
-
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [
@@ -135,7 +128,6 @@ class AppointmentVoter extends Voter
             self::EDIT_ANY, self::EDIT_OWN,
             self::CANCEL_ANY, self::CANCEL_OWN,
             self::DELETE,
-            ...array_keys(self::ALIASES),
         ], true);
     }
 
@@ -145,9 +137,6 @@ class AppointmentVoter extends Voter
         if (!$user instanceof User) {
             return false;
         }
-
-        // Resolve legacy aliases
-        $attribute = self::ALIASES[$attribute] ?? $attribute;
 
         return match ($attribute) {
             self::VIEW_ANY => $this->security->isGranted('ROLE_APPOINTMENT_VIEW_ANY'),
@@ -170,10 +159,6 @@ class AppointmentVoter extends Voter
 2. **Add constants** to the Voter class
 3. **Implement `supports()`** and **`voteOnAttribute()`** using `ROLE_*` strings
 4. **Update controllers** to use new attribute names
-
-## Legacy Aliases
-
-Old attribute names (`*_ALL`, `*_WRITE`, etc.) are mapped to canonical names via `ALIASES` constant in voters. These exist for backward compatibility during transition and should be removed once all controllers are updated.
 
 ## Current Voter Inventory
 
