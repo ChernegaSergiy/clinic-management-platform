@@ -178,8 +178,11 @@ class MedicalRecordController extends AbstractController
     #[Route('/medical-records/show', name: 'medical_records_show', methods: ['GET'])]
     public function show(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('MEDICAL_RECORD_VIEW', $id)) {
+            return $this->createAccessDeniedException();
+        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -230,8 +233,11 @@ class MedicalRecordController extends AbstractController
     #[Route('/medical-records/edit', name: 'medical_records_edit_get', methods: ['GET'])]
     public function edit() : Response
     {
-        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $id = (int)($_GET['id'] ?? 0);
+
+        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -250,8 +256,11 @@ class MedicalRecordController extends AbstractController
     #[Route('/medical-records/edit', name: 'medical_records_edit_post', methods: ['POST'])]
     public function update() : Response
     {
-        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $id = (int)($_POST['id'] ?? 0);
+
+        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $id)) {
+            return $this->createAccessDeniedException();
+        }
         $record = $this->medicalRecordRepository->findById($id);
 
         if (!$record) {
@@ -299,8 +308,11 @@ class MedicalRecordController extends AbstractController
     #[Route('/medical-records/attachments/upload', name: 'medical_records_attachments_upload', methods: ['POST'])]
     public function uploadAttachment(#[CurrentUser] User $user) : Response
     {
-        $this->denyAccessUnlessGranted('MEDICAL_RECORD_EDIT');
         $medicalRecordId = (int)($_POST['medical_record_id'] ?? 0);
+
+        if (!$this->isGranted('MEDICAL_RECORD_EDIT', $medicalRecordId)) {
+            return $this->createAccessDeniedException();
+        }
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
         if (!$record) {
@@ -333,7 +345,6 @@ class MedicalRecordController extends AbstractController
     #[Route('/medical-records/attachments/download', name: 'medical_records_attachments_download', methods: ['GET'])]
     public function downloadAttachment() : Response
     {
-        $this->denyAccessUnlessGranted('MEDICAL_RECORD_VIEW');
         $attachmentId = (int)($_GET['attachment_id'] ?? 0);
         $attachment = $this->attachmentService->getAttachmentById($attachmentId);
 
@@ -342,6 +353,10 @@ class MedicalRecordController extends AbstractController
         }
 
         $medicalRecordId = (int)$attachment['entity_id'];
+
+        if (!$this->isGranted('MEDICAL_RECORD_VIEW', $medicalRecordId)) {
+            return $this->createAccessDeniedException();
+        }
         $record = $this->medicalRecordRepository->findById($medicalRecordId);
 
         if (!$record) {
